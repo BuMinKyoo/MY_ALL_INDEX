@@ -10,5 +10,7 @@
         <Button Width="100" Height="100" Content="asdfsdf"/>
         <Button Width="200" Height="200" Content="asdfsdf"/>
         <Button Width="200" Height="200" Content="asdfsdf"/>
+        <Button Width="200" Height="200" Content="asdfsdf"/>
+        <Button Width="200" Height="200" Content="asdfsdf"/>
     </Grid>
 </Window>
