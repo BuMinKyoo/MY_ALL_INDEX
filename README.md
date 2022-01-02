@@ -1,4 +1,4 @@
 ## TIL
 
 ### WPF
-- [Grid] (링크)
+- [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
