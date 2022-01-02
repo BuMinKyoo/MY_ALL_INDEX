@@ -14,8 +14,8 @@
         Auto : Grid가 가지고 있는 하위 content의 크기만큼의 크기를 가짐
         number* : 남은 공간을 등분하여 크기를 가짐
                   ex) 2* 과 1* : 남은 크기를 2:1비율로 가져감
-        
         -->
+            
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="100"/>
