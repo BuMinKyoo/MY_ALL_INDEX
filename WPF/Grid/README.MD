@@ -1,7 +1,7 @@
 
-##### - number : number만큼의 크기를 설정
+##### - number : number만큼의 크기를 설정(화면크기를 임의로 늘려도 요소가 늘어나지X)
 ##### - Auto : Grid가 가지고 있는 하위 content의 크기만큼의 크기를 가짐
-##### - number* : 남은 공간을 등분하여 크기를 가짐 ex) 2* 과 1* : 남은 크기를 2:1비율로 가져감  
+##### - number* : 남은 공간을 등분하여 크기를 가짐 ex) 2* 과 1* : 남은 크기를 2:1비율로 가져감(화면크기를 임의로 늘리면 요소가 늘어남)  
 
 ```
     <Grid> 
@@ -26,9 +26,8 @@
         <Button Grid.Column="1" Grid.Row="2" Content="버튼8"/>
         <Button Grid.Column="2" Grid.Row="3" Content="버튼9"/>
     </Grid>
-</Window>
-
 ```
+
 <img src="https://user-images.githubusercontent.com/39178978/147874900-2aab4125-8b19-4c41-9804-d39d12ac353b.png">
 
 <br/><br/>
@@ -37,7 +36,7 @@
 
 <br/><br/>
 
-##### - 다양한 Element안에 Grid를 만들 수 있음
+##### - 다양한 요소안에 Grid를 만들 수 있음
 
 ```
 <Button Grid.Column="2" Height="150" Width="150">
