@@ -1,6 +1,7 @@
 ## TIL
 
 ### WPF
+##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
 - [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
 - [Canvas](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Canvas)
 - [DockPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/DockPanel)
