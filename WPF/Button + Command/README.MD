@@ -1,12 +1,14 @@
 ##### - XAML에서 직접 Button 이벤트 만드는 방법
 
-~~~
 #XAML
+~~~
 <Grid>
     <Button Width="100" Height="100" Content="버튼" Click="Button_Click"/>
 </Grid>
+~~~
 
 #XAML.cs
+~~~
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -31,13 +33,15 @@ public partial class MainWindow : Window
 
 ##### - MVVM패턴을 위 Button에 Command로 Click이벤트를 사용하는 방법
 
-```
 #XAML
+~~~
 <Grid>
     <Button Width="100" Height="100" Content="버튼" Command="{Binding OneClick}"/>
 </Grid>
+~~~
 
 #XAML.cs
+~~~
 using System.Windows.Input; <- ICommand실행시 참조필요
 
 public partial class MainWindow : Window
@@ -59,8 +63,10 @@ public partial class MainWindow : Window
         MessageBox.Show("클릭 이벤트 발생");
     }
 }
+~~~
 
 #Command.cs
+~~~
 using System.Windows.Input;
 
 public class Command : ICommand
@@ -84,7 +90,7 @@ public class Command : ICommand
         _execute(parameter);
     }
 }
-```
+~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/151136487-7cbf3db9-aa5e-41f8-aef9-1401baabe5af.png">
 
@@ -96,8 +102,8 @@ public class Command : ICommand
 
 ##### - #XAML.cs부분을 이렇게 따로 수정해서 사용하는것이 보기 편함
 
-~~~
 #XAML.cs
+~~~
 using System.Windows.Input;
 
 public partial class MainWindow : Window
