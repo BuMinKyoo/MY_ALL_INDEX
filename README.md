@@ -21,6 +21,11 @@
 
 ***
 
+##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Decorator
+- [Border](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Border)
+
+***
+
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
 - [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
 
@@ -30,3 +35,4 @@
 
 ##### Binding
 - [Button + Command](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Button%20%2B%20Command)
+
