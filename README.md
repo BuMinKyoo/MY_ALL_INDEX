@@ -2,7 +2,14 @@
 
 <br/>
 
+
+
 ### WPF
+
+- [Window속성](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Window%EC%86%8D%EC%84%B1)
+
+***
+
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
 - [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
 - [Canvas](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Canvas)
