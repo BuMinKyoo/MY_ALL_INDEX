@@ -10,6 +10,11 @@
 
 ***
 
+##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+- [TextBlock](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TextBlock)
+
+***
+
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
 - [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
 - [Canvas](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Canvas)
@@ -41,4 +46,3 @@
 
 ##### Binding
 - [Button + Command](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Button%20%2B%20Command)
-
