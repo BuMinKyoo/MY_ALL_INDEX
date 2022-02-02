@@ -12,6 +12,7 @@
 
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
 - [TextBlock](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TextBlock)
+- [Popup](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Popup)
 
 ***
 
@@ -34,11 +35,7 @@
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
 - [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
 
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
-
-***
-
-#### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector - ListBox
+##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector - ListBox
 - [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
   - ObservableCollection
 
