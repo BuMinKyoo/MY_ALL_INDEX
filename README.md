@@ -13,33 +13,17 @@
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
 - [TextBlock](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TextBlock)
 - [Popup](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Popup)
-
-***
-
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
-- [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
-- [Canvas](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Canvas)
-- [DockPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/DockPanel)
-- [StackPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/StackPanel)
-- [WrapPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/WrapPanel)
-- [Viewbox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Viewbox)
-- [UniformGrid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/UniformGrid)
-
-***
-
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Decorator
-- [Border](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Border)
-
-***
-
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
-- [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
-
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
-- [ScrollViewer](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ScrollViewer)
-
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector - ListBox
-- [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
+- Panel - [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
+- Panel - [Canvas](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Canvas)
+- Panel - [DockPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/DockPanel)
+- Panel - [StackPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/StackPanel)
+- Panel - [WrapPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/WrapPanel)
+- Panel - [Viewbox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Viewbox)
+- Panel - [UniformGrid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/UniformGrid)
+- Decorator - [Border](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Border)
+- Control - [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
+- Control - ContentControl - [ScrollViewer](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ScrollViewer)
+- Control - ItemsControl - Selector - ListBox - [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
   - ObservableCollection
 
 ***
