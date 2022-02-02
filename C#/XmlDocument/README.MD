@@ -80,4 +80,45 @@ using (XmlTextWriter writer = new XmlTextWriter(filepath, Encoding.UTF8))
 <br/>
 
 #결과  
-<img src="https://user-images.githubusercontent.com/39178978/152149344-016c2b4a-dba9-4dae-b93d-5c00147a4fd5.png">
+<img src="https://user-images.githubusercontent.com/39178978/152149344-016c2b4a-dba9-4dae-b93d-5c00147a4fd5.png" width="300" height="300">
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
+- XmlDocument 클래스를 이용해 XML 불러오기 및 수정하기
+
+~~~
+// See https://aka.ms/new-console-template for more information
+using System.Text;
+using System.Xml;
+
+XmlDocument doc = new XmlDocument();
+
+string xmlFilePath = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\aa.xml";
+doc.Load(xmlFilePath);
+
+XmlNodeList stuNodes = doc.SelectNodes("Class/Students/Student");
+
+foreach (XmlElement stuNode in stuNodes)
+{
+    Console.WriteLine($"학생이름 : {stuNode.Attributes["Name"].Value}");
+    Console.WriteLine($"학생번호 : {stuNode.Attributes["Number"].Value}");
+
+    foreach (XmlElement scoreNodes in stuNode.ChildNodes)
+    {
+        Console.WriteLine($"영어점수 : {scoreNodes["English"].InnerText}");
+        scoreNodes["English"].InnerText = "100";
+        Console.WriteLine("영어점수 100점으로 변경");
+
+        doc.Save(xmlFilePath);
+    }
+}
+~~~
+
+<br/>
+
+#결과  
+<img src="https://user-images.githubusercontent.com/39178978/152168302-130db569-2118-4c8b-9032-ad2cd7c2b0cb.png" width="300" height="300">
