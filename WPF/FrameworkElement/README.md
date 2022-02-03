@@ -1,4 +1,7 @@
 ##### - FrameworkElement속성
+
+<br/>
+
   - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
 ~~~
 <Grid>
