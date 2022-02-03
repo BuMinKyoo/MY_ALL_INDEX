@@ -27,8 +27,11 @@
 - Control - [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
 - Control - ContentControl - [ScrollViewer](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ScrollViewer)
 - Control - ContentControl - HeaderedContentControl - [Expander](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Expander)
+- Control - ContentControl - HeaderedContentControl - [GroupBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GroupBox)
 - Control - ItemsControl - Selector - ListBox - [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
   - ObservableCollection
+
+
 
 ***
 
