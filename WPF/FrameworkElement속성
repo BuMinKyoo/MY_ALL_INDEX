@@ -1,6 +1,5 @@
-
-##### - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
-  - FrameworkElement의 속성임,따라서 FrameworkElement을 상속받는다면 전부 사용 가능
+##### - FrameworkElement속성
+  - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
 
 <br/>
 
