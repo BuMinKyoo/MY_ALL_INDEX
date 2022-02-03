@@ -9,7 +9,11 @@
 
 ### WPF
 
-- [Window속성](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Window%EC%86%8D%EC%84%B1)
+##### - [Window속성](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Window%EC%86%8D%EC%84%B1)
+
+***
+
+- [FrameworkElement속성](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ToolTip)
 
 ***
 
