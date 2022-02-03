@@ -1,8 +1,5 @@
 ##### - FrameworkElement속성
   - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
-
-<br/>
-
 ~~~
 <Grid>
     <TextBox Width="100" Height="30">
