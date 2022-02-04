@@ -1,3 +1,92 @@
+##### - Selector를 상속받은 클래스들은 여러 속성들을 사용 할 수 있음
+  - SelectedItem : ListView에 속해 있는 ListViewItem을 반환한다
+  - SelectedItems : ListView에 속해 있는 모든 ListViewItem을 반환한다
+  - SelectedIndex : ListViewItem을 클릭했을시 ListView가 가지고 있는 SelectedIndex은 숫자로 반환되며, 위부터 0부터 시작되어 반환해 준다
+  - SelectedValue
+  - SelectedValuedPath
+
+<br/><br/>
+
+  - SelectedItem  
+#XAML
+~~~
+<ListView x:Name="listv">
+    <ListViewItem Content="1일"/>
+    <ListViewItem Content="2일"/>
+    <ListViewItem Content="3일"/>
+    <ListViewItem Content="4일"/>
+    <ListViewItem Content="5일"/>
+    <ListViewItem Content="6일"/>
+    <Button Width="100" Height="30" Content="선택" Click="Button_Click"/>
+</ListView>
+~~~
+
+<br/>
+
+#XAMLcs
+~~~
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(listv.SelectedItem.ToString()); // 0부터 시작
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152518058-4cb3e9f6-b744-442e-a980-07786e121536.png">
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
+  - SelectedIndex  
+#XAML
+~~~
+<ListView x:Name="listv">
+    <ListViewItem Content="1일"/>
+    <ListViewItem Content="2일"/>
+    <ListViewItem Content="3일"/>
+    <ListViewItem Content="4일"/>
+    <ListViewItem Content="5일"/>
+    <ListViewItem Content="6일"/>
+    <Button Width="100" Height="30" Content="선택" Click="Button_Click"/>
+</ListView>
+~~~
+
+<br/>
+
+#XAML.cs
+~~~
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(listv.SelectedIndex.ToString()); // 0부터 시작
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152517500-e7a55889-e2d2-4388-9847-d321ef45fd06.png">
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
 
 ##### - ListView헤더 크기를 비율로 조절하기 : ListView안쪽에서는 Grid를 따로 만들어 RowDefinition, ColumnDefinition을 통한 Height="1*"의 조절이 되지 않기 때문에 Grid와 Border값을 새로 하나 만들어 GridViewColumn Width="{Binding ElementName=dummywidth1, Path=ActualWidth}"이 방법을 통해서 크기를 맞춰 줄 수 있다.
 
