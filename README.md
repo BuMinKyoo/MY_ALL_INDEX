@@ -10,11 +10,10 @@
 ### WPF
 
 - [Window속성](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Window%EC%86%8D%EC%84%B1)
-- [FrameworkElement속성](https://github.com/BuMinKyoo/TIL/tree/main/WPF/FrameworkElement)
 
 ***
 
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+##### Object - DispatcherObject - DependencyObject - Visual - UIElement - [FrameworkElement](https://github.com/BuMinKyoo/TIL/tree/main/WPF/FrameworkElement)
 - [TextBlock](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TextBlock)
 - [Popup](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Popup)
 - Panel - [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
