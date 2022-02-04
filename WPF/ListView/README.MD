@@ -8,6 +8,7 @@
 <br/><br/>
 
   - SelectedItem  
+
 #XAML
 ~~~
 <ListView x:Name="listv">
@@ -40,6 +41,45 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152518058-4cb3e9f6-b744-442e-a980-07786e121536.png">
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
+  - SelectedItem에 대한 Content만 뽑아내기
+#XAML
+~~~
+<ListView x:Name="listv">
+    <ListViewItem Content="1일"/>
+    <ListViewItem Content="2일"/>
+    <ListViewItem Content="3일"/>
+    <ListViewItem Content="4일"/>
+    <ListViewItem Content="5일"/>
+    <ListViewItem Content="6일"/>
+    <Button Width="100" Height="30" Content="선택" Click="Button_Click"/>
+</ListView>
+~~~
+
+<br/>
+
+~~~
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(((ListViewItem)listv.SelectedItem).Content.ToString()); // 0부터 시작
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152519055-3640bb45-fc94-499b-a3b9-959a3a7557f0.png">
 
 <br/><br/>
 
