@@ -33,6 +33,7 @@
 - Control - ContentControl - HeaderedContentControl - [GroupBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GroupBox)
 - Control - ItemsControl - Selector - ListBox - [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
   - ObservableCollection
+- Control - ItemsControl - Selector - [TabControl](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TabControl)
 
 ***
 
