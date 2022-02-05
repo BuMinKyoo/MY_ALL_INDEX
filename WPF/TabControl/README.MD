@@ -1,3 +1,9 @@
+##### - Selector를 상속받은 클래스들은 여러 속성들을 사용 할 수 있음
+  - SelectedItem, SelectedItems, SelectedIndex, SelectedValue, SelectedValuedPath 등등
+
+<br/>
+
+***
 
 ##### - TabControl : 탭을 만듬
   - TabItem : TabControl안에 요소를 생성
