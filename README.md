@@ -23,19 +23,30 @@
 - Panel - [WrapPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/WrapPanel)
 - Panel - [Viewbox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Viewbox)
 - Panel - [UniformGrid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/UniformGrid)
+
+<br/>
+
 - Decorator - [Border](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Border)
+
+<br/>
+
 - Control - [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
 - Control - Thumb - [GridSplitter](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GridSplitter)
 - Control - RangeBase - [ProgressBar](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ProgressBar)
+
+<br/>
+
 - Control - ContentControl - [ScrollViewer](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ScrollViewer)
 - Control - ContentControl - ButtonBase - [RepeatButton](https://github.com/BuMinKyoo/TIL/tree/main/WPF/RepeatButton)
 - Control - ContentControl - HeaderedContentControl - [Expander](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Expander)
 - Control - ContentControl - HeaderedContentControl - [GroupBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GroupBox)
+
+<br/>
+
+- Control - ItemsControl - Selector - [TabControl](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TabControl)
+- Control - ItemsControl - Selector - [ComboBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ComboBox)
 - Control - ItemsControl - Selector - [ListBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListBox) - [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
   - [ObservableCollection](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ObservableCollection)
-- Control - ItemsControl - Selector - [TabControl](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TabControl)
-
-***
 
 ##### Binding
 - [Button + Command](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Button%20%2B%20Command)
