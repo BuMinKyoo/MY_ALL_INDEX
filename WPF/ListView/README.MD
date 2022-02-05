@@ -3,7 +3,8 @@
   - SelectedItems : ListView에 속해 있는 모든 ListViewItem을 반환한다
   - SelectedIndex : ListViewItem을 클릭했을시 ListView가 가지고 있는 SelectedIndex은 숫자로 반환되며, 위부터 0부터 시작되어 반환해 준다
   - SelectedValue
-  - SelectedValuedPath
+  - SelectedValuedPath  
+등등
 
 <br/><br/>
 
