@@ -31,7 +31,7 @@
 - Control - ContentControl - ButtonBase - [RepeatButton](https://github.com/BuMinKyoo/TIL/tree/main/WPF/RepeatButton)
 - Control - ContentControl - HeaderedContentControl - [Expander](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Expander)
 - Control - ContentControl - HeaderedContentControl - [GroupBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GroupBox)
-- Control - ItemsControl - Selector - ListBox - [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
+- Control - ItemsControl - Selector - [ListBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListBox) - [ListView](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ListView)
   - [ObservableCollection](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ObservableCollection)
 - Control - ItemsControl - Selector - [TabControl](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TabControl)
 
