@@ -23,3 +23,19 @@
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152794008-a5828c1a-bba4-440d-98e6-630b2c633433.png">
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
+  - MenuItem의 아이콘 넣기
+
+~~~
+<MenuItem Header="파일">
+    <MenuItem.Icon>
+        <Image Source=""
+    </MenuItem.Icon>
+</MenuItem>
+~~~
