@@ -6,6 +6,9 @@
   - InputGestureText : 단축키 설정, 단지 표시용 이다. 실제 명령은 커맨드 바인딩 작업이 추가적으로 필요하다.
   - IsCheckable 속성 값을 true/false로 설정
 
+##### - MenuItem
+  - SubmenuOpened : submenu를 오픈 했을때 발생하는 이벤트
+
 ~~~
 <DockPanel>
     <Menu DockPanel.Dock="Top">
