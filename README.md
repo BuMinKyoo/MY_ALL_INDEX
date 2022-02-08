@@ -9,7 +9,7 @@
 
 ### WPF
 
-- [Window](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Window%EC%86%8D%EC%84%B1)
+- [Window](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Window)
 
 ***
 
