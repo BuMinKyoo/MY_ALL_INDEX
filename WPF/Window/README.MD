@@ -2,13 +2,13 @@
 <br/><br/>
 
 ##### - 내부적인 부분에 대한 상세한 설명은 아직 공부가 더 필요한듯하다..단순하게만 적고 넘어가자.
-- xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" // Name을 사용하게 해주는것  
-각각의 자료의 프로퍼티
+  - xmlns는 xml namespace의 줄임말이고, URI로 네임스페이스 이름을 정의한 형태이다.
 
-- xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" // x:Name을 사용하게 해주는것  
-외부에서 Name이라는 프로퍼티에 복사를 해줌, 외부에서 관리하는 코드
+- xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+사용자 인터페이스를 만드는데 WPF의 모든 클래스 들이 들어 있고, 네임 스페이스 접두사가 없기 때문에 문서 전체에 적용되는 네임 스페이스
 
-- 모든 상황에서 x:Name을 사용 할 수 있다고 한다.
+- xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+XAML의 네임 스페이스이고, 다양한 XAML유틸리티 기능을 포함하고 있는 네임 스페이스 이다. 접두사는 X로 매핑된다.
 
 <br/><br/>
 
