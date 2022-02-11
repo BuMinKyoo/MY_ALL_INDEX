@@ -40,7 +40,7 @@
 
 <br/>
 
-- [Control](https://github.com/BuMinKyoo/TIL/tree/main/Control)
+- [Control](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Control)
 - Control - [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
 - Control - [PasswordBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/PasswordBox)
 - Control - Thumb - [GridSplitter](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GridSplitter)
