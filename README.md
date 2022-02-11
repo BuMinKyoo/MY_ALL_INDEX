@@ -40,6 +40,7 @@
 
 <br/>
 
+- [Control](https://github.com/BuMinKyoo/TIL/tree/main/Control)
 - Control - [Separator](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Separator)
 - Control - Thumb - [GridSplitter](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GridSplitter)
 - Control - RangeBase - [ProgressBar](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ProgressBar)
