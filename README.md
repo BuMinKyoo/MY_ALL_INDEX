@@ -6,10 +6,14 @@
 
 <br/>
 
+***
+
 ### C#
 - [XmlDocument](https://github.com/BuMinKyoo/TIL/tree/main/C%23/XmlDocument)
 
 <br/>
+
+***
 
 ### WPF
 
@@ -67,3 +71,7 @@
 
 ##### Binding
 - [Button + Command](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Button%20%2B%20Command)
+
+***
+
+  - [xml,API](https://github.com/BuMinKyoo/TIL/tree/main/WPF/xml%2CAPI)
