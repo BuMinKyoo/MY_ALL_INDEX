@@ -119,3 +119,74 @@ public partial class MainWindow : Window
 <br/>
 
 여기서 ShutdownMode="OnMainWindowClose"모드로 한다면, 여러 Window창을 만들었어도, 메인Window창을 끄게 되면 Application이 종료가 된다.
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
+##### - Application단에서 Event
+  - Startup : Application이 시작하면서 이벤트 발생, 보통 UI진입전에 로그인을 해야 하는 경유에 적합 하다고 함
+  - Activated : Application이 가지고 있는 어떤 Window라도 포커스 될 경우에 발생
+  - Deactivated : Application이 가지고 있는 어떤 Window라도 포커스 잃으면 발생
+  - Exit : Application종료시 발생
+
+***
+
+<br/>
+
+#App.xaml
+~~~
+<Application x:Class="WpfApp20.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml"
+             Startup="Application_Startup"
+             Activated="Application_Activated"
+             Deactivated="Application_Deactivated"
+             Exit="Application_Exit"
+             ShutdownMode="OnLastWindowClose">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
+~~~
+
+<br/>
+
+#App.cs
+~~~
+public partial class App : Application
+{
+    private void Application_Startup(object sender, StartupEventArgs e)
+    {
+        Debug.WriteLine("Startup");
+    }
+
+    private void Application_Activated(object sender, EventArgs e)
+    {
+        Debug.WriteLine("Activated");
+    }
+
+    private void Application_Deactivated(object sender, EventArgs e)
+    {
+        Debug.WriteLine("Deactivated");
+    }
+
+    private void Application_Exit(object sender, ExitEventArgs e)
+    {
+        Debug.WriteLine("Exit");
+    }
+}
+~~~
+
+<br/>
+
+#Debug창
+~~~
+Startup
+Activated
+Deactivated
+Exit
+~~~
