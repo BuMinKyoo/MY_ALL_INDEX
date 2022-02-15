@@ -1,5 +1,6 @@
 
 ##### - 하나의 프로젝트에서 참조하기
+  - Class를 참조할 경우 일반적으로 클래스 라이브 러리의 .NET Standard 프레임 워크를 이용하여 참조한다(이유 : .NET Framework, .NET Core, Xamarin 전부 호환 되기 때문에)
 
 ***
 
@@ -202,6 +203,51 @@ public class Car
 </Window>
 ~~~
 로 이용 하면 된다.
+
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
+  - 같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기
+
+<br/>
+
+#XAML
+~~~
+<Window x:Class="WpfApp27.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:WpfApp27"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <local:UserControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~
+<UserControl x:Class="WpfApp27.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="200" Width="200">
+    <Grid>
+        <Rectangle Width="100" Height="100" Fill="red"/>
+    </Grid>
+</UserControl>
+
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/154071023-dc86e23e-7446-4666-b22b-5640a0088549.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/154070852-06c0695f-deae-435b-be8f-961da99fe395.png">
 
 <br/><br/>
 
