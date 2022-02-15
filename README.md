@@ -75,3 +75,4 @@
 ***
 
   - [xml,API](https://github.com/BuMinKyoo/TIL/tree/main/WPF/xml%2CAPI)
+  - [INotifyPropertyChanged](https://github.com/BuMinKyoo/TIL/tree/main/WPF/INotifyPropertyChanged)
