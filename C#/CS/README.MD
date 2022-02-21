@@ -407,8 +407,62 @@ foreach (string 변수명 in list)
 }
 ~~~
 
-  - 함수의 시그니처 : 같은 함수가 존재하면 안되기 때문에 그 함수를 구별하기 위해 달라야 하는것들. 이것 두개가 같다면 함수 오버로딩을 통해서 기존에 있던 함수가 아닌 오버로딩된 함수를 호출 할 수 있음
-    - 함수명, 매개변수
+  - 함수의 시그니처(함수명, 매개변수) : 같은 함수가 존재하면 안되기 때문에 그 함수를 구별하기 위해 달라야 하는것들. 이것 두개가 같다면 같은 함수라고 생각할 수 있음
+    - 함수 오버로딩 : 함수의 이름은 같지만 매개변수를 다르게 함으로써 함수를 여러개 만드는 것. 그렇게 되면 매개변수에 맞게 함수가 다르게 실행된다
+
+~~~c#
+public class Program
+{
+    static void Main(string[] args)
+    {
+        Print(4);
+        Print(4.4f);
+        Print("4");
+        Print("4", 4.4f);
+    }
+
+    static void Print(int a)
+    {
+        Console.WriteLine(a);
+    }
+
+    static void Print(string a)
+    {
+        Console.WriteLine(a);
+    }
+
+    static void Print(float a)
+    {
+        Console.WriteLine(a);
+    }
+
+    static void Print(string a, float b)
+    {
+        Console.WriteLine(a);
+    }
+}
+
+출력값
+4
+4.4
+4
+4
+~~~
+
+<br/>
+
+~~~c#
+static int Print(int a)
+{
+}
+
+static string Print(int a)
+{
+}
+
+// 반환은 다르지만, 시그니처인 함수 이름과 매개변수가 같기 때문에. 동일 함수로 인지되어 오류가 난다.
+~~~
+
   - 값에 의한 전달(함수, 구조체, enum은 값형)
     - 값에 의한 전달은 스택에 쌓이고, 값이 복사되어 들어가기 때문에 원래의 값은 바뀌지 않는다.
 
@@ -643,4 +697,67 @@ Enumber : 7
 Estr : kiki
 ~~~
 
+##### 29. 어서트(assert)
+  - 절대로 발생하지 않아야 하는 조건을 런타임 중에 검사
+  - 만약 발생한다면 코드가 올바르게 동작 하지 않는 다는것
+  - 디버그 모드에서만 동작
+  - 어서트 안의 조건식이 거짓일때 메세지 출력
+    - "난 이렇게 코드를 짰는데, 이게 아니면 메세지를 출력해라"는 의미
+  - Debug.Assert((표현식), (메세지))
+
+<br/>
+
+##### 30. 배열의 배열
+  - 2D배열의 문제는 직사각형 형태의 데이터만 가능하다(행마다 열수가 같아야함)
+    - 이러한 문제를 해결하기 위해 배열의 배열을 사용 할 수 있다.
+
+~~~c#
+static void Main(string[] args)
+{
+    int[][] i = new int[3][]; // 행3개 짜리 배열의 배열 선언
+    i[0] = new int[1]; // 열1개 짜리 배열 선언
+    i[0][0] = 10; // 행0, 열0에 10 대입
+    i[1] = new int[] {20,30}; // 열2개 짜리 배열 선언
+    i[2] = new int[3] {40,50,60}; // 열3개 짜리 배열 선언
+
+    Console.WriteLine(i[0][0]); // 행0, 열0에 접근, 출력:10
+}
+~~~
+
+<br/>
+
+~~~c#
+static void Main(string[] args)
+{
+    int[][] i = new int[3][]; // 행3개 짜리 배열의 배열 선언
+    i[0] = new int[1]; // 열1개 짜리 배열 선언
+    i[0][0] = 10; // 행0, 열0에 10 대입
+    i[1] = new int[] {20,30}; // 열2개 짜리 배열 선언
+    i[2] = new int[3] {40,50,60}; // 열3개 짜리 배열 선언
+
+    Console.WriteLine(i[0][0]); // 행0, 열0에 접근, 출력:10
+
+    int[] i_fore = i[2]; // i의 3번째 행을 i_fore에 대입하
+    Console.WriteLine(i_fore[0]); // 출력:40
+}
+~~~
+
+<br/>
+
+##### 31. 문자열토크나이저
+  - <문자열 변수 이름>.Indexof(char)
+    - char의 위치를 찾아서 색인을 반환하는 함수
+  - <문자열 변수 이름>.substring(<색인>)
+    - 지정인 색인 으로부터 문자열을 추출하는것
+  - <문자열 변수 이름>.<색인>
+    - 지정인 색인 문자열 반환
+      - ex) char index = message[6];
+  - <문자열 변수 이름>.Split(char)
+    - char로 문자열을 쪼갬
+      - ex) string[] index = message.Split(',');
+      - ex) string[] index = message.Split(',',';');
+  - <문자열 변수 이름>.Trim()
+  - <문자열 변수 이름>.TrimStart()
+    - 불필요한 공백 없애
+  - 여러가지 String의 속성 : https://docs.microsoft.com/ko-kr/dotnet/api/system.string?view=net-6.0
 
