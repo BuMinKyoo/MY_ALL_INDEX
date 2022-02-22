@@ -568,6 +568,43 @@ num1 : 10
 num2 : 5
 ~~~
 
+  - 기본값 인자(defalut parameter)
+    - 매개변수 선언할 때 미리 기본값을 정해둘 수 있음(하나 이상 가능)
+    - 함수를 사용 할때 기본값 인자로 지정해둔 매개변수를 필수로 넣어 주지 않아도 됨
+    - 기본값 인자는 중간에 있으면 안됨
+      - ex) static string Function(string name, string adress, string level = "") => ok
+      - ex) static string Function(string name, string level = "", string adress) => No...
+
+  - Try함수
+    - 예외 처리(exception구문)없이 예외 상황을 처리 할 수 있는 방법
+    - 예외가 발생되는 상황에 false를 반환하게하며, out매개 변수를 사용 하여 출력한다.
+
+~~~c#
+static void Main(string[] args)
+{
+    int num1 = 0;
+    int num2 = 5;
+    float num3 = 10f;
+
+    bool bSuccess = TryDivision(num1, num2, out num3);
+
+    Console.WriteLine(bSuccess);
+
+    static bool TryDivision(int denominator, int numerator, out float result)
+    {
+        if(denominator == 0)
+        {
+            result = 0f;
+            return false;
+        }
+
+        result = denominator / numerator;
+
+        return true;
+    }
+}
+~~~
+
 <br/>
 
 ##### 25. 값형, 참조형, 가비지 컬렉터
