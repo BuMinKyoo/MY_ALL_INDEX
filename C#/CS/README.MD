@@ -1,3 +1,8 @@
+##### CS공부하기 좋은 사이트
+- https://gyoogle.dev/blog/computer-science/data-structure/Heap.html
+
+<br/>
+
 ##### 1. 언어수준(저수준언어 , 고수준언어)
   - 컴퓨터가 이해하지 쉬운 언어에 가까울수록 저수준 언어
     - 0과1로만 이루어짐(= 기계어)
@@ -386,9 +391,9 @@ foreach (string 변수명 in list)
 <br/>
 
 ##### 23. 다차원 배열
-  - int[ , ] (변수) = new int[ 1, 2 ] -> 행 열, 행이 세로, 열이 가로 -> 배열 변수 선언
-  - int[ , ] (변수) = new int[ , ]{ { 1, 2, 3 }, { 2, 4, 6 } } -> 배열 생성과 대입
-  - int[ , ] (변수) = { { 1, 2, 3 }, { 2, 4, 6 } } -> 배열 생성과 대입 단축형
+  - int[ , ] <변수> = new int[ 1, 2 ] -> 행 열, 행이 세로, 열이 가로 -> 배열 변수 선언
+  - int[ , ] <변수> = new int[ , ]{ { 1, 2, 3 }, { 2, 4, 6 } } -> 배열 생성과 대입
+  - int[ , ] <변수> = { { 1, 2, 3 }, { 2, 4, 6 } } -> 배열 생성과 대입 단축형
   - int[1,2] -> 베열 접근법
 
 <br/>
@@ -401,7 +406,7 @@ foreach (string 변수명 in list)
     - 매개변수는 필수가 아니다!!
 
 ~~~
-(수식자) (접근제어자) (반환형) (함수명)((매개변수목록))
+<수식자> <접근제어자> <반환형> <함수명>(<매개변수목록>)
 {
     
 }
@@ -740,7 +745,7 @@ Estr : kiki
   - 디버그 모드에서만 동작
   - 어서트 안의 조건식이 거짓일때 메세지 출력
     - "난 이렇게 코드를 짰는데, 이게 아니면 메세지를 출력해라"는 의미
-  - Debug.Assert((표현식), (메세지))
+  - Debug.Assert(<표현식>, <메세지>)
 
 <br/>
 
@@ -797,4 +802,65 @@ static void Main(string[] args)
   - <문자열 변수 이름>.TrimStart()
     - 불필요한 공백 없애
   - 여러가지 String의 속성 : https://docs.microsoft.com/ko-kr/dotnet/api/system.string?view=net-6.0
+
+<br/>
+
+##### 32. 문자열빌더
+  - 일반적으로 Console.WritLine( 문자열 + 문자열 + 문자열 ....) 이런식으로 문자열을 더하는 경우에는 하나 더하고 문자열이 만들어지고 다시 하나 더하고 문자열이 만들어지는 식으로 되기 때문에 임시로 만들고 버리는 문자열이 많아 지게 된다.
+  - 많은 문자를 쓸때 문자열 빌더가 훨씬 빠르다.
+  - stringBuilder <변수명> = new stringBuilder(4096) -> 4096은 길이
+    - <변수명>.Append(“K”)
+    - <변수명>.AppendLine(“K”)
+    - <변수명>.Length
+    - <변수명>.Capacity
+    - <변수명>.ToString()
+    - ...etc...
+
+<br/>
+
+##### 33. 컬렉션
+  - 동일한 형의 여러 자료를 저장하는 공간
+  - 요소의 수를 바꿀 수 있음
+
+<br/>
+
+  - 리스트(List)
+    - List<int> <변수명> = new List<int>() -> 정의
+    - List<int> <변수명> = new List<int>{ 1,2,3 } -> 정의
+    - <변수명>.Add(10) / <변수명>.Add(“Bobe”) -> 개체 더하기 ex)Bobe 더하기
+    - <변수명>.AddRange(list) -> 컬렉션 더하기 ex)list컬렉션 더하기
+    - bool bResul1 = <변수명>.Contains(40) -> 참,거짓 ex)40이 현재 List에 있는지?
+    - int index1 = <변수명>.Indexof(40) -> 리스트위치 확인 ex)40이 현제 List에 몇번째에 있는지
+    - int index1 = <변수명>.Insert(1,”kk”) -> 정해진 곳에 데이터 넣기 
+    - 변수명.Clear() -> 모든 요소 제거
+    - etc...
+
+<br/>
+	
+  - Dictonary
+    - Dictionary<key, value> 변수명 = new Dictionary<key, value>() -> 정의
+    - Dictionary<key, value> 변수명 = new Dictionary<key, value>{ { “key1”, 2}, { “key2”, 2 }  } -> 정의
+    - <변수명>.Add(key, value)
+    - bool bResul1 = <변수명>.TryAdd(key, value); / 참,거짓
+    - <변수명>.Clear()
+    - <변수명>.ContainsKey(“kiki”); -> 있는지 자료찾기
+    - <변수명>.ContainsValue(“kiki”); -> 있는지 자료찾기
+    - bool bResul1 = <변수명>.Remove(“keyi”); -> 키만 지울 수 있음
+    - bool bResul1 = 변수명.TryGetValue(“keyi”, out value)
+    - <변수명>[key] -> 접근하기
+
+	
+	
+	
+	
+  - var
+    - 컴파일러가 알아서 자료형의 추론해준다
+
+
+
+
+
+
+
+
 
