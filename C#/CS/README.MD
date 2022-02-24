@@ -610,6 +610,59 @@ static void Main(string[] args)
 }
 ~~~
 
+  - 확장메서드
+    - 클래스에 함수를 추가하지 못할 때 사용(마치 그 클래스가 가지고 있는 함수 인것 마냥 쓰게 해줌)
+    - 기존 정의된 메서드와 동일한 이름을 갖는 확정 매서드가 있다면, 기존 정의된 매서드가 실행 되게 된다
+    - 정적 클래스에서만 사용 가능하다
+    - 정적 함수를 만든다, 정적 함수에서만 사용 가능
+      - 확장 메서드의 첫번째 인자는 함수에 넣고자 했던 클래스 이름을 적는다
+      - 첫번째 인자는 반드시 this를 붙인다
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+
+            Car car = new Car();
+            car.GetCount("출력");
+
+            string str1 = "야호~";
+            str1.GetCount();
+            "야호~".GetCount();
+        }
+    }
+
+    public class Car
+    {
+        public string Name { get; set; }
+    }
+    static class CarExtend
+    {
+        public static void GetCount(this Car car, string str)
+        {
+            Console.WriteLine(str);
+        }
+    }
+
+    static class StringExtend
+    {
+        public static void GetCount(this string str)
+        {
+            Console.WriteLine(str);
+        }
+    }
+}
+
+
+출력값
+출력
+야호~
+야호~
+~~~
+
 <br/>
 
 ##### 25. 값형, 참조형, 가비지 컬렉터
@@ -622,8 +675,264 @@ static void Main(string[] args)
 <br/>
 
 ##### 26. 클래스
+  - 클래스 : 개체를 만들어 내기 위한 설계도, 틀
+  - 개체 : 클래스에 선언된  모양 그대로 생성된 실체(=클래스의 인스턴스 라고도 함)
+  - 멤버 변수 : 클래스 안에서 선언한 변수
+  - 클래스 안에 함수를 정의 할 수도 있음
+
+<br/>
+
+  - <클래스명> <변수> = new <클래스명>() -> 개체 선언
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+        }
+    }
+
+    public class Car
+    {
+        public int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+    }
+}
+~~~
+
+  - <클래스명>.<함수> or <변수> -> 클래스 안에 있는 함수나 변수에 접근
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            Console.WriteLine("car.Gas : " + car.Gas);
+            Console.Write("car.Sound() : ");
+            car.Sound();
+        }
+    }
+
+    public class Car
+    {
+        public int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+    }
+}
 
 
+출력값
+car.Gas : 10
+car.Sound() : 빵빵~
+~~~
+
+  - 생성자
+    - public <클래스명>(매개변수)
+    - 개체를 생성할때 반드시 호출되는 함수 -> 매개변수를 넣어 두면 매개변수를 강제할 수 있음(개체 생성시 매개 변수를 넣지 않으면 오류가 발생)
+    - 반환형X
+    - 생성자도 함수 오버로딩이 가능하므로 변수를 조절할 수 있음
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            Console.WriteLine("car.Gas : " + car.Gas);
+        }
+    }
+
+    public class Car
+    {
+        public int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+
+        public Car()
+        {
+            Gas = 20;
+            Console.WriteLine("car.Sound : ");
+            Sound();
+        }
+    }
+}
+~~~
+
+  - 접근 제어자
+    - public : 클래스 밖에서 호출 가능
+    - private : 클래스 밖에서 호출 불가(클래스명.함수 x) -> 클래스 내부에서는 호출 가능
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            Console.WriteLine("car.Gas : " + car.Gas);
+            Console.Write("car.Sound() : ");
+            car.Sound();
+        }
+    }
+
+    public class Car
+    {
+        static int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+    }
+}
+
+// car.Gas를 호출하는데 에러가 남
+~~~
+
+  - 정적 클래스
+    - static : 클래스 자체에 종속됨
+    - static class 라면 그 멤버들이 전부 ststic이여야함
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            Console.WriteLine("Car.Gas : " + Car.Gas);
+            Console.Write("car.Sound() : ");
+            car.Sound();
+        }
+    }
+
+    public class Car
+    {
+        static public int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+    }
+}
+
+// car.gas가 클래스 Car에 종속 되기 때문에, 클래스 이름으로 호출해야함
+~~~
+
+  - getter함수 setter함수
+
+~~~
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            car.Setter_Gas(10);
+            Console.WriteLine(car.Getter_Gas());
+
+        }
+    }
+    public class Car
+    {
+        private int Gas;
+
+        public void Setter_Gas(int gas)
+        {
+            Gas = gas;
+        }
+
+        public int Getter_Gas()
+        {
+            return Gas;
+        }
+    }
+}
+~~~
+
+  - 프로퍼티(Property) -> c#에서는 getter, setter함수보다 프로퍼티를 이용함
+    - 변수와 메서드가 모두 함께 있는 평태
+    - 프로퍼티는 변수가 아님, 컴파일러가 알아서 getter와 setter함수를 만들어 준다고 생각하면 됨
+    - <개체명>.<변수> -> getter
+    - <개체명>.<변수> = 10000 -> setter
+    - getter함수 -> public형식  /  setter함수 -> private 형식
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            Console.WriteLine("car.Gas : " + car.Gas);
+            car.Gas = 50;
+            Console.WriteLine("car.Gas : " + car.Gas);
+
+        }
+    }
+
+    public class Car
+    {
+        private int m_Gas = 10;
+        public int Gas
+        {
+            get
+            {
+                return m_Gas;
+            }
+            set
+            {
+                m_Gas = value;
+            }
+        }
+    }
+}
+~~~
+
+  - 자동 프로퍼티
+    - ex) public int Gas {get; set;}
+    - ex) public int Gas {get; set;} = 10; -> 초기에 대입
+    - ex) public int Gas {get; private set;} -> 이렇게 private를 각각 넣어 줄 수 있음
+    - 자동 프로퍼티는 setter같은 곳에서 특별한 연산을 해줄때는 만들 수 없음 -> 그때는 수동 프로퍼티를 이용해야함
+
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            car.Gas = 10;
+            Console.WriteLine(car.Gas);
+
+        }
+    }
+    public class Car
+    {
+        public int Gas { get; set; }
+    }
+}
+~~~
 
 <br/>
 
@@ -739,6 +1048,8 @@ Enumber : 7
 Estr : kiki
 ~~~
 
+<
+
 ##### 29. 어서트(assert)
   - 절대로 발생하지 않아야 하는 조건을 런타임 중에 검사
   - 만약 발생한다면 코드가 올바르게 동작 하지 않는 다는것
@@ -849,17 +1160,48 @@ static void Main(string[] args)
     - bool bResul1 = 변수명.TryGetValue(“keyi”, out value)
     - <변수명>[key] -> 접근하기
 
-	
-	
-	
+<br/>
+
+##### 34. partial클래스
+  - 클래스를 물리적으로만 여러 파일로 분리 할 수 있음
+
+#program.cs
+~~~c#
+namespace ConsoleApp9
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            car.Gas = 10;
+            Console.WriteLine(car.Gas);
+
+        }
+    }
+    public partial class Car
+    {
+        public string name { get; set; }
+    }
+}
+~~~
+
+<br/>
+
+#Car_Partial.cs
+~~~
+namespace ConsoleApp9
+{
+    public partial class Car
+    {
+        public int Gas { get; set; }
+
+    }
+}
+~~~
 	
   - var
     - 컴파일러가 알아서 자료형의 추론해준다
-
-
-
-
-
 
 
 
