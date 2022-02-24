@@ -1189,7 +1189,7 @@ namespace ConsoleApp9
 <br/>
 
 #Car_Partial.cs
-~~~
+~~~c#
 namespace ConsoleApp9
 {
     public partial class Car
@@ -1199,9 +1199,19 @@ namespace ConsoleApp9
     }
 }
 ~~~
+
+<br/>	
+
+##### 35. 구조체(struct)
+  - 기능은 없고 데이터만 있는 클래스
+  - 구조체는 값형임
+  - 사용은 클래스와 같지만 값형 이라는것!
+  - 생성자를 사용하게 되면, 매개변수가 없는 생성자를 만들 수 없고, 생성자를 생성하게 되면 필드가 모두 할당되어 있어야함
+
 	
-  - var
-    - 컴파일러가 알아서 자료형의 추론해준다
+
+var
+컴파일러가 알아서 자료형의 추론해준다
 
 
 
