@@ -79,5 +79,5 @@
 
 <br/>
 
-- [xml,API](https://github.com/BuMinKyoo/TIL/tree/main/WPF/xml%2CAPI)
+- [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기](https://github.com/BuMinKyoo/TIL/tree/main/WPF/xml%2CAPI)
 - [INotifyPropertyChanged](https://github.com/BuMinKyoo/TIL/tree/main/WPF/INotifyPropertyChanged)
