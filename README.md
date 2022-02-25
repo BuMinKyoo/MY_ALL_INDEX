@@ -79,5 +79,5 @@
 
 <br/>
 
-- [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기](https://github.com/BuMinKyoo/TIL/tree/main/WPF/xml%2CAPI)
+- [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기](https://github.com/BuMinKyoo/TIL/blob/main/WPF/%EA%B3%B5%EA%B3%B5API%20%EB%82%B4%EC%9A%A9%EC%9D%84%20xml%ED%8C%8C%EC%9D%BC%EB%A1%9C%20%EB%B6%88%EB%9F%AC%EC%99%80%EC%84%9C%20ComboBox%EC%99%80%20List%EB%A1%9C%20%EB%BF%8C%EB%A0%A4%EC%A3%BC%EA%B8%B0/README.MD)
 - [INotifyPropertyChanged](https://github.com/BuMinKyoo/TIL/tree/main/WPF/INotifyPropertyChanged)
