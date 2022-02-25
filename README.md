@@ -9,7 +9,7 @@
 ***
 
 ### C#
-- [Computer science,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/CS)
+- [Computer science,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/Computer%20science%2C%EB%AC%B8%EB%B2%95)
 - [꼼수...](https://github.com/BuMinKyoo/TIL/tree/main/C%23/%EA%BC%BC%EC%88%98...)
 - [XmlDocument](https://github.com/BuMinKyoo/TIL/tree/main/C%23/XmlDocument)
 
