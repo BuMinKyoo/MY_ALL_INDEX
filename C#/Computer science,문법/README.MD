@@ -1204,15 +1204,528 @@ namespace ConsoleApp9
 
 ##### 35. 구조체(struct)
   - 기능은 없고 데이터만 있는 클래스
-  - 구조체는 값형임
-  - 사용은 클래스와 같지만 값형 이라는것!
+  - 구조체는 값형임. 모양은 클래스와 같지만 값형 이라는것!
+  - 클래스는 힙영역에 할당 되지만 구조체는 스택영역에 할당 된다.
+  - 상속이 불가능함
+  - 스택영역에 할당되기 때문에 가비지 컬렉터의 영향을 받지 않아 성능을 높일 수 있다.
   - 생성자를 사용하게 되면, 매개변수가 없는 생성자를 만들 수 없고, 생성자를 생성하게 되면 필드가 모두 할당되어 있어야함
 
+~~~c#
+public class Program
+{
+    static void Main(string[] args)
+    {
+        List<Car> list = new List<Car>();
+        for(int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
+
+        for (int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
+
+        for (int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
+
+        for (int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
+
+        for (int i = 0; i < 100; i++)
+        {
+            list.Add(new Car());
+        }
+    }
+
+        
+}
+struct Car
+{
+
+}
+~~~
+  - struct는 값형이기때문에 컴파일시 스텍메모리에 전부 들어가게됨 따라서 개체수가 증가함에 따라 힙메모리가 증가하지 않음
+
+<img src="https://user-images.githubusercontent.com/39178978/155739978-1f9e6874-c9f0-4123-b8d9-002c3c563741.png">
 	
+~~~c#
+public class Program
+{
+    static void Main(string[] args)
+    {
+        List<Car> list = new List<Car>();
+        for(int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
 
-var
-컴파일러가 알아서 자료형의 추론해준다
+        for (int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
 
+        for (int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
 
+        for (int i = 0; i < 200; i++)
+        {
+            list.Add(new Car());
+        }
 
+        for (int i = 0; i < 100; i++)
+        {
+            list.Add(new Car());
+        }
+    }
 
+        
+}
+class Car
+{
+
+}
+~~~
+
+  - Class는 참조형이기 때문에 개체 수가 증가하면서 힙메모리 또한 증가한다
+
+<img src="https://user-images.githubusercontent.com/39178978/155740297-b88a2be9-707d-4e17-b5ae-819a9a9cff9a.png">
+				
+<br/>
+	
+##### 36. Nullable
+  - 참조형의 기본값은 'null' -> 메모리에서 보면 이진수 0과 같음
+  - 데이터가 없다는 것을 표시
+  - 참조형에는 0을 쓸 수 없음
+  - 값형에는 null을 쓸 수 없음
+  - 값형에 null을 쓸 수 있게 해주는 것이 Nullable이다.
+    - ec) Nullable<int> age;
+	
+<br/>
+	
+##### 37. LINQ : 데이터를 정렬하고, 추출하게 도와주는 C#문법중 하나, C#언어에 직접 쿼리 기능을 통합하는 방식을 기반으로 함
+
+  - where() : 특정 조건에 맞는 데이터만 찾아서 반환
+    - <개체>.where(m => <조건>)
+~~~c#
+public class Program
+{
+    static void Main(string[] args)
+    {
+        List<Car> carlist = new List<Car>();
+        carlist.Add(new Car(10));
+        carlist.Add(new Car(20));
+        carlist.Add(new Car(30));
+        carlist.Add(new Car(40));
+        var list_filter = carlist.Where(m => m.Price > 20);  // m : 리스트에 있는 요소들 / => : 각 요소들에 대해~
+
+        foreach(var item in list_filter)
+        {
+            Console.WriteLine(item);
+        }
+    }
+}
+
+public class Car
+{
+    public int Price { get; set; }
+    public Car(int price)
+    {
+        Price = price;
+    }
+}
+
+출력
+ConsoleApp11.Car
+ConsoleApp11.Car
+~~~
+	
+  - OrderBy() : ~에 따라 오름차순으로 정렬후 반환
+	
+~~~c#
+public class Program
+{
+    static void Main(string[] args)
+    {
+        List<Car> carlist = new List<Car>();
+        carlist.Add(new Car("3번",20));
+        carlist.Add(new Car("2번",40));
+        carlist.Add(new Car("1번",20));
+        carlist.Add(new Car("4번",30));
+        carlist.Add(new Car("5번",20));
+        var list_filter = carlist.OrderBy(m => m.Price);
+
+        foreach(var item in list_filter)
+        {
+            Console.WriteLine($"ID : {item.ID}, Price : {item.Price}");
+        }
+    }
+}
+
+public class Car
+{
+    public string ID { get; set; }
+    public int Price { get; set; }
+    public Car(string id, int price)
+    {
+        ID = id;
+        Price = price;
+    }
+}
+	
+출력
+ID : 3번, Price : 20
+ID : 1번, Price : 20
+ID : 5번, Price : 20
+ID : 4번, Price : 30
+ID : 2번, Price : 40
+~~~
+		
+  - OrderBy() : ~에 따라 오름차순으로 정렬후 반환	
+	
+~~~c#
+public class Program
+{
+    static void Main(string[] args)
+    {
+        List<Car> carlist = new List<Car>();
+        carlist.Add(new Car("3번",20));
+        carlist.Add(new Car("2번",40));
+        carlist.Add(new Car("1번",20));
+        carlist.Add(new Car("4번",30));
+        carlist.Add(new Car("5번",20));
+        var list_filter = carlist.OrderBy(m => m.Price)
+                                    .ThenBy(m => m.ID);
+
+        foreach(var item in list_filter)
+        {
+            Console.WriteLine($"ID : {item.ID}, Price : {item.Price}");
+        }
+    }
+}
+
+public class Car
+{
+    public string ID { get; set; }
+    public int Price { get; set; }
+    public Car(string id, int price)
+    {
+        ID = id;
+        Price = price;
+    }
+}
+	
+출력
+ID : 1번, Price : 20
+ID : 3번, Price : 20
+ID : 5번, Price : 20
+ID : 4번, Price : 30
+ID : 2번, Price : 40
+~~~	
+
+  - 그밖에등등
+    - OrderByDescending : 내림차순
+    - ThenByDescending : 내림차순
+    - First : 데이터 셋에서 가장 처음 요소를 반환, 만약 비어 있으면 예외 발생
+    - FirstOrDefault : 조건에 맞는 요소를 못 찾을 경우 기본값을 반환(클래스 = null)
+    - All : 모든 조건에 합당하면 true, 아니면 false를 반환 
+    - Any : 하나라도 조건에 맞으면 true, 아니면 false를 반환
+    - ToList : 현재 쿼리 결과를 리스트로 변환해줌
+    - ToArray : 현재 쿼리 결과를 배열로 변환해줌
+    - ToDictionary : 현재 쿼리 결과를 딕셔너리로 변환해줌
+    - Select : 큰 개체 하나에서 몇 개 멤버만 빼서 새로운 개체를 만듬
+  - 내부를 알고 써야 하고, 긴 LINQ는 쪼개 쓰기
+  - MS Docs문서 참고
+    - https://docs.microsoft.com/ko-kr/dotnet/csharp/programming-guide/concepts/linq/sorting-data
+	
+<br/>
+	
+##### 38. 파일 입출력(여기에 있는 함수들은 파일을 알아서 열고 알아서 닫아주는 함수들임)
+  - 파일 쓰기	
+    - WriteAllText
+    - WriteAllLines
+    - etc..
+
+~~~c#
+static void Main(string[] args)
+{
+    string message = "C#은 너무 재밌어";
+    File.WriteAllText(@"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt", message);
+}	
+~~~	
+
+<br/>
+	
+~~~c#
+static void Main(string[] args)
+{
+    string[] message = { "C#", "은 너무", "재밌어" };
+    File.WriteAllLines(@"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt", message);
+}
+~~~	
+
+  - 파일 읽기
+    - ReadAllLines
+    - ReadAllText
+	
+~~~c#
+static void Main(string[] args)
+{
+    string[] message = { "C#", "은 너무", "재밌어" };
+    string[] input = File.ReadAllLines(@"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt");
+
+    foreach(string line in input)
+    {
+        Console.WriteLine(line);
+    }
+}	
+~~~	
+	
+  - 이진 파일 읽고,쓰기(이진 파일은 ASCII 코드를 저장함, 텍스트를 저장한 것이 아님)
+    - 일반 텍스트 파일로는 내용을 알 수 없고, HxD같은 프로그램을 통해서 이진파일을 열면 확인 가능
+    - ReadAllBytes
+    - WriteAllBytes
+    - ReadAllBytes
+    - ReadAllBytes
+	
+<br/>	
+
+##### 39. 파일스트림
+  - 파일을 전체를 보는 것이 아니라, 일부를 보는것
+  - 파일 용량이 클 경우에 메모리에 부담도 되고, 조금씩 읽어 처리하는게 유리하기 때문
+	
+<br/>
+	
+  - FileMode
+    - CreateNew : 새로운 파일을 만듬, 이미 파일이 있다면 예외 발생
+    - Create : 새로운 파일을 만듬, 이미 파일이 있다면 덮어 씀(숨김 파일이면 예외 발생)
+    - Open : 이미 존재하는 파일을 염, 파일이 없다면 예외 발생
+    - OperaoCreate : 파일이 없다면 만들고, 있다면 존재하는 파일을 염
+    - Truncate : 이미 존재하는 파일을 염, 파일을 여는 순간에 기존에 있던 내용은 지워지고, 이 모드로 연 파일을 읽으려고 하면 예외 발생
+    - Append : 파일이 없다면 만들고, 있다면 존재하는 파일을 염. 열면 파일의 맨 뒤를 가리키고 있음. 파일 끝이 아닌 위치를 탐색하려고 하면 예외 발생 및 읽기 실패의 경우도 예외 발생
+
+<br/>
+	
+  - 파일스트림프로퍼티
+    - 	CanSeek : 스트림이 읽기를 지원하면 true, 아니면 false를 반환
+    - 	CanWrite : 스트림이 쓰기를 지원하면 true, 아니면 false를 반환
+    - 	CanRead : 스트림이 탐색를 지원하면 true, 아니면 false를 반환
+
+~~~c#
+public class Program
+{
+    static void Main(string[] args)
+    {
+        string path = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt";
+
+        FileStream fs = File.Open(path, FileMode.Open);
+
+        bool CanSeek = fs.CanSeek;
+        bool CanWrite = fs.CanWrite;
+        bool CanRead = fs.CanRead;
+
+        Console.WriteLine($"읽기지원 : {CanSeek}, 쓰기지원 : {CanWrite}, 탐색지원 : {CanRead}");
+
+        fs.Close();
+    }
+
+    public bool CanSeek { get; }
+    public bool CanWrite { get; }
+    public bool CanRead { get; }
+}
+	
+출력
+읽기지원 : True, 쓰기지원 : True, 탐색지원 : True
+~~~	
+	
+<br/>
+	
+  - 읽기
+    - ReadByte()
+      - 파일로부터 한 바이트씩 읽어옴(바이트만 읽을 수 있음)
+      - 파일을 모두 읽으려면 반복문을 돌려야함
+    - Read(byte[] array, int offset, int count)
+      - 스트림에서 count만큼의 바이트를 읽어와서 array[offset]부터 array[offset + count -1]에 집어넣는 함수 
+      - 바이트만 읽을 수 있음
+	
+~~~c#	
+public class Program
+{
+    static void Main(string[] args)
+    {
+        string path = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt";
+
+        FileStream fs = File.Open(path, FileMode.Open);
+
+        byte[] buffer = new byte[fs.Length];
+        fs.Read(buffer, 0, 3);
+
+        for(int i = 0; i < buffer.Length; i++)
+        {
+            Console.WriteLine(buffer[i]);
+        }
+
+        fs.Close();
+    }
+}
+
+출력
+99
+35
+236
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+~~~	
+	
+  - 쓰기
+    - WriteByte : 바이트 한개씩 쓰는 함수(바이트만 쓸 수 있음)
+    - write(byte[ ] array, int offset, int count)
+      - array[offset]부터 array[offset + count-1]의 내용을 씀
+
+~~~c#
+static void Main(string[] args)
+{
+    byte[] b = { 6, 1, 2, 4, 6, 8, 9, 10 };
+
+    string path = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt";
+
+    FileStream fs = File.Create(path);
+
+    fs.Write(b, 4, 2);
+
+    fs.Close();
+}
+~~~
+
+  - Seek(long offset, SeekOrigin origin)
+    - 현재 스트림의 위치를 origin + offset으로 이동시키는 함수
+    - Begin : 스트림의 제일 처음 위치
+    - Current : 스트림의 현재 위치
+    - End : 스트림의 제일 마지막 위치
+
+#파일 이어쓰기
+~~~c#
+static void Main(string[] args)
+{
+    byte[] b = { 6, 1, 2, 4, 6, 8, 9, 10 };
+
+    string path = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt";
+
+    FileStream fs = new FileStream(path, FileMode.Append);
+
+    fs.Write(b, 3, 2);
+    fs.Seek(0, SeekOrigin.End);
+
+    fs.Close();
+}
+~~~
+
+  - using문을 사용하여 Close()를 알아서 처리 할 수 있음
+    - 간단한 예시
+
+~~~c#
+static void Main(string[] args)
+{
+    using (FileStream fs = File.Open(path, FileMode.Append))
+    {
+        fs.Write(bytes, 0, bytes.Length);
+    }
+
+}
+~~~	
+	
+  - StreamWriter를 이용해서 문자열을 텍스트에 쓸 수 있음
+    - 텍스트를 스트림에 쉽게 저장할 수 있게 해주는 클래스
+    - var writer = new StreamWriter(File.Open(path, FileMode.OpenOrCreate)) = var <변수명> = new StreamWriter(Stream stream)
+					 
+~~~c#					 
+static void Main(string[] args)
+{
+    string str = "c#은 정말 재밌어";
+
+    string path = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt";
+
+    StreamWriter fs = new StreamWriter(File.Create(path));
+
+    fs.Write(str);
+
+    fs.Close();
+}
+~~~
+					 
+  - StreamReader를 이용해서 텍스트 읽기
+
+~~~c#
+static void Main(string[] args)
+{
+    string path = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt";
+
+    StreamReader fs = new StreamReader(File.Open(path, FileMode.Open));
+
+    string r = fs.ReadToEnd();
+
+    Console.WriteLine(r);
+
+    fs.Close();
+}
+~~~	
+
+  - 이런것들도 있음
+    - BinaryWriter
+    - BinaryReader
+    - MemoryStream
+					 
+<br/>	
+	
+##### 40. 예외
+  - 예외가 생겼을 경우 처리해 주는것
+  - try : 블록 안에 있는 코드를 순서대로 실행함, 아무 문제 없이 마지막 줄 까지 실행 됬다면 catch블록은 건너 뛰지만 문제가 생기면 catch블록으로 들어감. 문제가 발생하면 아직 실행되지 않은 try블록 안의 모든 코드를 건너 뜀
+  - catch : 예외가 생겼을 경우, 블록으로 들어오게 되며 예외를 잡아주거나 던지는곳, 'Exception <변수>'는 모든 Exception을 잡아줌 
+  - finally : 예외가 생기든, 생기지 않든 마지막에 항상 finally블록을 거쳐 가게 된다.
+  - 예외를 직접 만드는, 커스텀 예외도 가능함
+
+~~~c#
+static void Main(string[] args)
+{
+    string path = @"C:\Users\qnals\OneDrive\바탕 화면\PROJECT\message.txt";
+
+    string line = "";
+
+    try
+    {
+        line = File.ReadAllText(path);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+    finally
+    {
+        Console.WriteLine(line);
+    }
+
+}	
+~~~	
