@@ -4,7 +4,7 @@
 
 ### [Visual Studio](https://github.com/BuMinKyoo/TIL/tree/main/Visual%20Studio)
 
-### Computer science
+### [Computer science](https://github.com/BuMinKyoo/TIL/tree/main/Computer%20science)
 
 <br/>
 
