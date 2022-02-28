@@ -1,5 +1,9 @@
 ## TIL
 
+~~~
+공부한 내용 정리 합니다
+~~~
+
 <br/>
 
 ### [Visual Studio](https://github.com/BuMinKyoo/TIL/tree/main/Visual%20Studio)
