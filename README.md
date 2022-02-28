@@ -18,7 +18,7 @@
 ***
 
 ### C#
-- [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/Computer%20science%2C%EB%AC%B8%EB%B2%95)
+- [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
 - [꼼수...](https://github.com/BuMinKyoo/TIL/tree/main/C%23/%EA%BC%BC%EC%88%98...)
 - [XmlDocument](https://github.com/BuMinKyoo/TIL/tree/main/C%23/XmlDocument)
 
