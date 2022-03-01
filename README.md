@@ -5,6 +5,8 @@
 깃허브에 있는 모든 데이터 및 Repository 링크까지 기제 합니다.
 ~~~
 
+### [History](https://github.com/BuMinKyoo/TIL/tree/main/History)
+
 <br/>
 
 ### [Visual Studio](https://github.com/BuMinKyoo/TIL/tree/main/Visual%20Studio)
