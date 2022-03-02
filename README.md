@@ -18,6 +18,7 @@
 
 ### C
   - [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D,%EB%AC%B8%EB%B2%95)
+  - [Consol Game](https://github.com/BuMinKyoo/TIL/tree/main/C/consol%20game)
 
 <br/>
 
