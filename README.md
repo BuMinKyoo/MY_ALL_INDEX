@@ -2,7 +2,6 @@
 
 ~~~
 매일 매일 공부한 것을 기록합니다.
-깃허브에 있는 모든 데이터 및 Repository 링크까지 기제 합니다.
 ~~~
 
 ### [History](https://github.com/BuMinKyoo/TIL/tree/main/History)
