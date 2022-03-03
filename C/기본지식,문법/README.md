@@ -34,7 +34,7 @@ C에 관한 강의 하나를 쭉 보면서 기록을 남긴다..(상세하게는
     - 스트림 입출력에 관련된 함수들을 포함
     - C#의 System네임스페이스와 비슷한 역할
   - #include <stdio.h> == #include “stdio.h”
-    - <stdio.h>에 있는 텍스트 내용을 복사해서 가져옴\
+    - <stdio.h>에 있는 텍스트 내용을 복사해서 가져옴
     - <stdio.h> : 컴파일러가 제공하는 시스템 헤더 파일 인클루드
     - “stdio.h” : 개발자가 구현한 헤더 파일 인클루드
     - 파일을 컴파일 할때 <stdio.h>안에 있는 다른 함수들도 같이 컴파일
@@ -47,7 +47,7 @@ C에 관한 강의 하나를 쭉 보면서 기록을 남긴다..(상세하게는
 <br/>
 
 ~~~
-cmd에서 실행
+cmd에서 실행(clang 컴파일러를 사용 했을시)
 clang -std=c89 -W -Wall -pedantic-errors main.c
 clang -std=c89 -W -Wall -pedantic-errors -E main.c //전처리 단계만 보여줌
 clang -std=c89 -W -Wall -pedantic-errors -E adder.c > adder.pre //파일로 저장
@@ -73,8 +73,77 @@ a.exe //일반적으로 윈도우 콘솔에서의 실행파일
 
 <br/>
 
-##### 함수,변수
-  - 전부 전역 함수
-  - 함수 밖에서 선언 되면 전역 변수, 함수 안에서 선언되면 지역변수
+##### 기본자료형
+  - 부호있는 수의 최대값보다 더 큰수를 넣을때 뒤에 'U'자 붙여준다. -> 접미사
+  - 데스크탑에서는 비슷하게 사용 가능
+    - long(32비트)만 64비트가 아니라서 ㅡ.ㅡ
+  - 여기저기 사용하려면
+    - float,double을 사용하는데 주의해야 함(IEEE 754를 지원 안할 수도 있음)
+  - 음수는 1의 보수를 생각해서 값이 -1이 작음
+  - unsigned 와 signed -> 기본이 signed
+    - 앞에 ‘unsigned’를 붙여 주기(EX : unsigned  int)
+    - 예외 : char -> 컴파일러에 따라 다르다..ㅡ.ㅡ
+  - Char
+    - 최소8비트인 정수
+    - printf("%d", CHAR_BIT); -> char의 비트수
+      - #include <limits.h> -> 이걸 써야함
+    - CHAR_BIT는 가장작은 단위의 메모리가 된다. -> BIT단위의 표준이 되어 버림
+    - unsigned char(0~255), char(0~127), signed char(-127~127)
+  - Short
+    - 최소16비트인 정수(Char이상)
+  - int
+    - 최소16비트인 정수(Short이상)(일반적으로 32비트 사용)
+    - CPU의 산술논리장치의 기본 데이터
+    - 딱맞는 크기를 '워드'라고함
+  - long
+    - 최소32비트인 정수(일반적으로 int와 같음)(int 이상)
+    - 뒤에 접미사 l(영어 엘) 넣기
+  - float
+    - 최소8비트인 부동소수(Char 이상)
+    - 표준에 상관없이 안전하게 써도 되는 크기 32비트 -> 일반적 사용
+    - 부호없음
+    - 헤더파일 float.h
+    - 뒤에 접미사 F
+    - 접미사U는 없음 -> 부호X
+  - double
+    - float이상
+    - 표준에 상관없이 안전하게 써도 되는 크기 64비트 -> 일반적 사용
+    - CPU가 계산에 사용하는 기본크기
+    - 헤더파일 float.h
+    - 접미사U는 없음 -> 부호X
+  - long double
+    - 64비트 이상
+    - 헤더파일 float.h
+    - 접미사U는 없음 -> 부호X
+  - bool은 없음 -> 정수형으로 대체 가능
+    - 거짓 -> 0 반환
+    - 참 -> 1 반환
+
+
+<br/>
+
+  - 출력할때
+
+~~~c
+printf("int_value : %d\n", int_value);
+printf("long_value : %d\n", long_value);
+printf("float_value : %f\n", float_value);
+printf("char_value : %c\n", char_value);
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
