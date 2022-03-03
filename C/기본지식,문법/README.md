@@ -1,4 +1,4 @@
-C에 관한 강의 하나를 쭉 보면서 기록을 남긴다..(상세하게는 나중에 더 공부하도록 하고, 우선은 C는 이런거구나..라는 느낌으로 공부 시작)
+C에 관한 강의 하나를 쭉 보면서 기록을 남긴다..(상세하게는 나중에 더 공부하도록 하고, 우선은 C는 이런거구나..라는 느낌으로 공부 시작), 활용하려면 나중에 다시 공부하자..
 
 <br/>
 
@@ -131,9 +131,88 @@ printf("float_value : %f\n", float_value);
 printf("char_value : %c\n", char_value);
 ~~~
 
+<br/>
 
+##### 열거형
+  - enum <enum변수명> <사용할변수>
 
+~~~c
+enum E_food
+{
+	E_food_Apple,
+	E_food_Grape,
+	E_food_Orange
+};
+enum E_name
+{
+	E_name_KIKI,
+	E_name_MIMI,
+	E_name_DADA
+};
 
+int main()
+{
+	enum E_food food = E_food_Grape;
+	enum E_name name = food;
+
+	printf("%d", name);
+
+	return 0;
+}
+
+출력
+1
+~~~
+
+  - C#처럼 방지하는 부분이 안되니, 열거형문구를 앞에 써서 실수 방지하기
+  - int number = E_food_Apple -> 이런것도 가능 / 열거형은 단지 정수형일 뿐
+
+<br/>
+
+##### 올바른 변수 선언 위치
+  - 출력하기 전에 변수를 전부 지정 해야함
+  - 값을 안넣고 변수라도 지정 하고 나중에 대입하는것은 가능 
+
+<br/>
+
+##### sizeof()
+  - 피연산자의 크기를 바이트로 반환해줌
+  - 함수X, 연산자이기 때문에 컴파일 중에 평가 된다
+  - char형을 넣으면 반드시 1이 반환
+    - 바이트는 char가 기준이됨
+  - 부호 없는 정수형의 상수로 size_t형을 반환함
+
+~~~c
+#include <stdio.h>
+
+int main()
+{
+	char ch = 'a';
+	int num = 20;
+	char char_array[20];
+
+	size_t size_char = sizeof(ch);
+	size_t size_int = sizeof(num);
+	size_t size_float = sizeof(float);
+	size_t size_array = sizeof(char_array);
+
+	printf("size_char : %d\nsize_int : %d\nsize_float : %d\nsize_array : %d", size_char, size_int, size_float, size_array);
+
+	return 0;
+}
+
+출력
+size_char : 1
+size_int : 4
+size_float : 4
+size_array : 20
+~~~
+
+  - size_t 부호없는 정수형 but 실제 데이터형X -> 어떤것의 크기를 나타내기 위해
+  - \_t는 typedef를 했다는 힌트
+  - size_t 를 typedef 했다는것
+  - ex)반복문, 배열에 이용
+  - signed int -1과 unsigned int 4,294,967,295는 같은 비트패턴
 
 
 
