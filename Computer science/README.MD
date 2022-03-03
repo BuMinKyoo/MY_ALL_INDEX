@@ -387,7 +387,12 @@ static void Main(string[] args)
 123455999574016 <= 6자리 그 다음에 7번째에서 반올림 하면 123456이 나오게됨. 그러므로 어떤 유효숫자 다음의 수는 그 유효숫자가 되기 위한 근접 수로 표현 하게됨
 ~~~
 
+<br/>
 
+##### 불대수
+  - 드 모르간의 법칙 => 전체를 뒤집으면 결과가 같음
+  - if(!(age >= 20 && height >= 140)) = if(age < 20 || height < 140)
+  - if (!(student.Age < 25 || student.TermNum == 2)) = if(student.Age >= 25 && student.TermNum != 2)
 
 
 
