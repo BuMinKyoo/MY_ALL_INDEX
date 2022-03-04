@@ -214,9 +214,105 @@ size_array : 20
   - ex)반복문, 배열에 이용
   - signed int -1과 unsigned int 4,294,967,295는 같은 비트패턴
 
+<br/>
 
+##### 배열
+  - C# -> char[ ] data /  C -> char data[ ]  => C#과 C는 조금 문법이 조금 다름
 
+<br/>
 
+##### 포인터
+  - 주소연산자 : &
+  - 메모리 주소출력기호 : %p
+
+~~~c
+const unsiged char result = num1 & num2; /* 비트 연산자*/
+printf("%p\n", &num); /*주소연산자*/
+~~~
+
+<br/>
+
+##### 구조체와 공용체 맴버 접근자
+  - "."
+    - C#에서는 Class가 있었으니 멤버변수를 호출하는 것이였지만 C에서는 다름
+    - 구조체와 공용체의 멤버변수에 접근시 사용
+  - "->"
+    - 2개의 연산자 “ . ”와 “ * ”를 합친것
+    - 구조체와 공용체의 멤버변수에 접근시 사용
+
+<br/>
+
+##### 조건문 if
+  - 조건이 0이면 false, 1이면 true가 됨
+  - 일반 단일 숫자를 넣어도 true, false가 판단됨
+
+<br/>
+
+##### switch
+  - C는 정수형만 변수 대입 가능(int, char, enum)
+  - case안에 break를 빼먹는다면, switch문을 곧바로 탈출하지 않고 그 아래에 있는 코드를 계속 실행 -> fall-through라고 함
+의도를 가지고 ‘break’를 사용하지 않은 경우 "intentaional fallthrough" 주석을 달아 주자
+
+<br/>
+
+##### 함수
+  - 접근 제어자 없음(public, private)
+  - 함수 오버로딩 없음
+  - ANSI C에서 함수가 등장하기 전에 그것을 호출하면 컴파일러가 반환형은 int라고 가정하고, 나중에 컴파일러가 int가 아닌 다른것을 반환하는 함수를 찾으면 컴파일 오류를 뱉음
+    - C는 맨 위쪽에 함수 호출전에 전부 선언만 해주어도 실행은 잘 진행된다
+
+~~~c
+int main(void)
+{
+	Gedata();
+	return 0;
+}
+void Gedata(void) /*컴파일 오류*/
+{
+	printf("aaaa);
+}
+~~~
+
+<br/>
+
+~~~c
+void Gedata(void) /*잘 진행됨*/
+{
+	printf("aaaa);
+}
+
+int main(void)
+{
+	Gedata();
+	return 0;
+}
+
+~~~
+
+<br/>
+
+~~~c
+void Gedata(void)
+
+int main(void)
+{
+	Gedata();
+	return 0;
+}
+
+void Gedata(void)  /*잘 진행됨*/
+{
+	printf("aaaa);
+}
+~~~
+
+  - 함수의 매개변수 평가순서는 명시되어 있지 않음. 컴파일러 마음 -> add(), subtract()가 있다면 무엇이 먼저 실행될지는 알 수 없는것
+    - 한 줄에 있는 함수 호출 순서에 의존해서 코드를 작성하지 말 것
+      - ex) printf("%d, $d\n", add(num1, num2), subtract(num1, num2)); => add() 가 먼저 실행 될지, subtract()가 먼저 실행 될지 알 수 없음
+
+<br/>
+
+##### 블록범위
 
 
 
