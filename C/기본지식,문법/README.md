@@ -269,7 +269,7 @@ int main(void)
 }
 void Gedata(void) /*컴파일 오류*/
 {
-	printf("aaaa);
+	printf("aaaa");
 }
 ~~~
 
@@ -312,10 +312,62 @@ void Gedata(void)  /*잘 진행됨*/
 
 <br/>
 
-##### 블록범위
+##### 파일범위
+~~~c
+#include <stdio.h>
 
+static int s_sum = 1024;
 
+int main(void)
+{
+	int num1 = 10;
 
+	printf("num : %d\n", num1);
+
+	return 0;
+}
+
+/* static int s_sum = 1024는 전역 변수가 됨*/
+~~~
+
+<br/>
+
+##### goto
+  - goto를 사용하면 중간에 건너 뛸 수 있다..?
+  - 아래는 goto를 이용한 반복문
+~~~c
+#include <stdio.h>
+
+void human(void)
+{
+infinity:
+
+	printf("나이가 든다\n");
+	goto infinity;
+}
+
+int main(void)
+{
+	human();
+
+	return 0;
+}
+~~~
+
+<br/>
+
+##### 배열
+  - C#과 달리 new를 사용할 필요 없음
+    - int nums[5];
+    - char name[10];
+  - 배열의 요소개수 구하기
+    - 	const size_t num_vals = sizeof(value) / sizeof(value[0]);
+  - 배열의 모든 값을 0으로 초기화 하기
+    - int nums[10] = {o, } => 쉼표를 찍으면 쉼표 뒤가 전부 0으로 초기화됨	
+  - 다 차원 배열
+    - int nums1[2][3];
+
+<br/>
 
 
 
