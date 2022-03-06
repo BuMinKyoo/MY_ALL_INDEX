@@ -70,6 +70,7 @@
 - Control - [PasswordBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/PasswordBox)
 - Control - Thumb - [GridSplitter](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GridSplitter)
 - Control - RangeBase - [ProgressBar](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ProgressBar)
+- Control - RangeBase - [Slider](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Slider)
 - Control - TextBoxBase - [TextBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TextBox)
 
 <br/>
