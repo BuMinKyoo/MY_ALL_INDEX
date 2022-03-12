@@ -96,6 +96,7 @@
 - [Button + Command](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Button%20%2B%20Command)
 - [ItemsSource](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ItemsSource)
 - [Workspace를 통한 UserControl끼리의 값 전달](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Workspace%EB%A5%BC%20%ED%86%B5%ED%95%9C%20UserControl%EB%81%BC%EB%A6%AC%EC%9D%98%20%EA%B0%92%20%EC%A0%84%EB%8B%AC)
+- [ContentControl을 활용한 UserControl끼리의 값 전달](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ContentControl%EC%9D%84%20%ED%99%9C%EC%9A%A9%ED%95%9C%20UserControl%EB%81%BC%EB%A6%AC%EC%9D%98%20%EA%B0%92%20%EC%A0%84%EB%8B%AC)
 
 <br/>
 
