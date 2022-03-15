@@ -6,7 +6,7 @@
   - SelectedValuedPath 등등  
 사용 방법은 ListView, ListBox와 비슷 한 방법으로 사용 가능
 
-***
+<br/>
 
 ##### - ComboBox : ComboBox박스 생성
   - ComboBoxItem : ComboBox하위의 Item생성
@@ -18,8 +18,8 @@
 
   - ComboBoxItem
   
-#XAML
-~~~
+#MainWindow.xaml
+~~~c#
 <Grid>
     <ComboBox Width="100" Height="30">
         <ComboBoxItem Content="1"/>
@@ -41,8 +41,8 @@
 
   - IsEditable속성
 
-#XAML
-~~~
+#MainWindow.xaml
+~~~c#
 <StackPanel>
     <ComboBox Name="cbox" Width="100" Height="30" IsEditable="True">
         <ComboBoxItem Content="1"/>
@@ -57,8 +57,8 @@
 
 <br/>
 
-#XAML.cs
-~~~
+#MainWindow.xaml.cs
+~~~c#
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -91,8 +91,8 @@ public partial class MainWindow : Window
   - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가하기
   - 버튼을 이용해서 ComboBoxItem의 Content출력하기
 
-#XAML
-~~~
+#MainWindow.xaml
+~~~c#
 <StackPanel>
     <ComboBox Name="cbox" Width="100" Height="30" ItemsSource="{Binding GetDataList}">
         <ComboBox.ItemTemplate>
@@ -109,8 +109,8 @@ public partial class MainWindow : Window
 
 <br/>
 
-#XAML.cs
-~~~
+#MainWindow.xaml.cs
+~~~c#
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -175,8 +175,8 @@ public partial class MainWindow : Window
 
   - foreach를 활용해서 출력해주기
 
-#XAML
-~~~
+#MainWindow.xaml
+~~~c#
 <StackPanel>
     <ComboBox Name="cbox" Width="100" Height="30" IsEditable="True">
         <!--<ComboBox.ItemTemplate>
@@ -193,8 +193,8 @@ public partial class MainWindow : Window
 
 <br/>
 
-#XAML.cs
-~~~
+#MainWindow.xaml.cs
+~~~c#
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -260,3 +260,205 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152634765-c98a39f4-ec57-4510-a3a5-1ddf1d94e5af.png">  
+
+<br/><br/>
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/><br/>
+
+  - 각각의 ComboBoxitem을 분리해서 나타나게 하기
+
+#MainWindow.xaml
+~~~c#
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+    <ComboBox Width="100" Height="30" ItemsSource="{Binding Obser_Fruit_list}" Margin="10" SelectedItem="{Binding Fruit_list_SelectedItem}">
+        <ComboBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Fruit_name}"/>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <ComboBox Width="100" Height="30" ItemsSource="{Binding Obser_Price_list}" Margin="10">
+        <ComboBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Price_name}"/>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
+    </ComboBox>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        Getdata_Obser_Fruit_list();
+        this.DataContext = this;
+    }
+
+    private ObservableCollection<Fruit_list> m_Obser_Fruit_list = new ObservableCollection<Fruit_list>();
+    public ObservableCollection<Fruit_list> Obser_Fruit_list
+    {
+        get { return m_Obser_Fruit_list; }
+        set
+        {
+            if(m_Obser_Fruit_list != value)
+            {
+                m_Obser_Fruit_list = value;
+                Notify("Obser_Fruit_list");
+
+            }
+        }
+    }
+
+    private ObservableCollection<Price_list> m_Obser_Price_list = new ObservableCollection<Price_list>();
+    public ObservableCollection<Price_list> Obser_Price_list
+    {
+        get { return m_Obser_Price_list; }
+        set
+        {
+            if (m_Obser_Price_list != value)
+            {
+                m_Obser_Price_list = value;
+                Notify("Obser_Price_list");
+
+            }
+        }
+    }
+
+
+    private Fruit_list m_Fruit_list_SelectedItem;
+    public Fruit_list Fruit_list_SelectedItem
+    {
+        get { return m_Fruit_list_SelectedItem; }
+        set
+        {
+            if(m_Fruit_list_SelectedItem != value)
+            {
+                m_Fruit_list_SelectedItem = value;
+                Notify("Fruit_list_SelectedItem");
+
+                Obser_Price_list.Clear();
+
+                if (m_Fruit_list_SelectedItem != null)
+                {
+                    if (m_Fruit_list_SelectedItem.Fruit_name == "Apple")
+                    {
+                        Obser_Price_list.Add(new Price_list() { Price_name = "1000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "2000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "3000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "4000" });
+                    }
+                    else if (m_Fruit_list_SelectedItem.Fruit_name == "Banana")
+                    {
+                        Obser_Price_list.Add(new Price_list() { Price_name = "5000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "6000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "7000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "8000" });
+                    }
+                }
+            }
+        }
+    }
+    public void Getdata_Obser_Fruit_list()
+    {
+        Obser_Fruit_list.Add(new Fruit_list() { Fruit_name = "Apple"});
+        Obser_Fruit_list.Add(new Fruit_list() { Fruit_name = "Banana"});
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Fruit_list.cs
+~~~c#
+public class Fruit_list : INotifyPropertyChanged
+{
+    private string m_Fruit_name;
+    public string Fruit_name
+    {
+        get { return m_Fruit_name; }
+        set
+        {
+            if(m_Fruit_name != value)
+            {
+                m_Fruit_name = value;
+                Notify("Fruit_name");
+            }
+        }
+    }
+
+        
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Price_list.cs
+~~~c#
+public class Price_list : INotifyPropertyChanged
+{
+    private string m_Price_name;
+    public string Price_name
+    {
+        get { return m_Price_name; }
+        set
+        {
+            if (m_Price_name != value)
+            {
+                m_Price_name = value;
+                Notify("Price_name");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158348530-424eafe3-55b9-4882-a314-2d5b281d5e4a.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158348673-70cfd96b-2b96-4eed-8144-f0a2990f437a.png">
+
