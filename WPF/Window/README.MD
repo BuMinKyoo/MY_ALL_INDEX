@@ -1,6 +1,15 @@
+<br/>
 
-<br/><br/>
+  - [xmlns](#xmlns)
+  - [ResizeMode](#resizemode)
+  - [SizeToContent](#sizetocontent)
+  - [Window이벤트](#window이벤트)
 
+***
+
+<br/>
+
+## xmlns
 ##### - 내부적인 부분에 대한 상세한 설명은 아직 공부가 더 필요한듯하다..단순하게만 적고 넘어가자.
   - xmlns는 xml namespace의 줄임말이고, URI로 네임스페이스 이름을 정의한 형태이다.
 
@@ -10,27 +19,30 @@
 - xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 XAML의 네임 스페이스이고, 다양한 XAML유틸리티 기능을 포함하고 있는 네임 스페이스 이다. 접두사는 X로 매핑된다.
 
-<br/><br/>
+<br/>
 
-### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+***
 
-<br/><br/>
+<br/>
 
+## ResizeMode
 ##### - ResizeMode="NoResize"를 사용하면 Window창의 가로,세로 길이를 임의로 조절할 수 없게 만든다.
 
-#XAML
+#MainWindow.XAML
 ~~~
 Title="MainWindow" ResizeMode="NoResize"
 ~~~
 
+<br/>
 
-### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+***
 
-<br/><br/>
+<br/>
 
+## SizeToContent
 ##### - SizeToContent="WidthAndHeight"를 사용하면 윈도우창을 컨텐트 내용대로 자동으로 조절해 준다.
 
-#XAML
+#MainWindow.XAML
 ~~~
 Title="MainWindow" SizeToContent="WidthAndHeight"
 ~~~
@@ -41,23 +53,23 @@ Title="MainWindow" SizeToContent="WidthAndHeight"
 실행시 윈도우 창을 자동으로 맞게 조절해준다  
 <img src="https://user-images.githubusercontent.com/39178978/151297018-36f45f0d-3283-42df-96a8-c6133b93d9e0.png">
 
-<br/><br/>
-
-### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/><br/>
-
-##### - Window이벤트
-  - Activated : 메인 윈도우가 포커스 되었을때 발생
-  - Deactivated : 메인 윈도우가 포커스 되지 않았을 때 발생
-  - Closing : 메인 윈도우를 닫을때 이벤트 발생
+<br/>
 
 ***
 
 <br/>
 
-#XAML
-~~~
+## Window이벤트
+  - Activated : 메인 윈도우가 포커스 되었을때 발생
+  - Deactivated : 메인 윈도우가 포커스 되지 않았을 때 발생
+  - Closing : 메인 윈도우를 닫을때 이벤트 발생
+
+### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#MainWindow.XAML
+~~~c#
 <Window x:Class="WpfApp20.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -72,8 +84,8 @@ Title="MainWindow" SizeToContent="WidthAndHeight"
 
 <br/>
 
-#XAML.cs
-~~~
+##MainWindow.XAML.cs
+~~~c#
 public partial class MainWindow : Window
 {
     public MainWindow()
