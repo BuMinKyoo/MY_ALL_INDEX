@@ -35,8 +35,6 @@
 
 ### [WPF](https://github.com/BuMinKyoo/TIL/new/main/WPF)
 
-- [WPF로의시작...](https://github.com/BuMinKyoo/TIL/tree/main/WPF/WPF%EC%8B%9C%EC%9E%91...)
-- [Application](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Application)
 - [Window](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Window)
 - [다양한참조법](https://github.com/BuMinKyoo/TIL/tree/main/WPF/%EB%8B%A4%EC%96%91%ED%95%9C%EC%B0%B8%EC%A1%B0%EB%B2%95)
 
