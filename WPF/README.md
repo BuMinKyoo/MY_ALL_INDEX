@@ -11,7 +11,7 @@
 - [Application](#application)
   - [ShutdownMode](#shutdownmode)
   - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
-  
+
 </div>
 </details>
 
