@@ -2,50 +2,118 @@
 
 - [WPF class hierarchy](https://github.com/BuMinKyoo/TIL/blob/main/WPF/WPF%20class%20hierarchy.png)
 
+
+
 - [WPF로의시작...](#wpf의-시작)
 
-<details>
-<summary>Application</summary>
-<div markdown="1">
 
-- [Application](#application)
-  - [ShutdownMode](#shutdownmode)
-  - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
 
-</div>
-</details>
+- <details>
+  <summary>Application</summary>  
+  <div markdown="1">
+    
+    - [Application](#application)
+      - [ShutdownMode](#shutdownmode)
+      - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
 
-<details>
-<summary>Window</summary>
-<div markdown="1">
+  </div>
+  </details>
 
-- [Window](#window)
-  - [xmlns](#xmlns)
-  - [ResizeMode](#resizemode)
-  - [SizeToContent](#sizetocontent)
-  - [Window이벤트(Activated, Deactivated, Closing)](#window이벤트activated-deactivated-closing)
+
+
+- <details>
+  <summary>Window</summary>
+  <div markdown="1">
+
+    - [Window](#window)
+      - [xmlns](#xmlns)
+      - [ResizeMode](#resizemode)
+      - [SizeToContent](#sizetocontent)
+      - [Window이벤트(Activated, Deactivated, Closing)](#window이벤트activated-deactivated-closing)
   
-</div>
-</details>
+  </div>
+  </details>
 
-<details>
-<summary>다양한 참조법</summary>
-<div markdown="1">
 
-  - [다양한 참조법](#다양한-참조법)
-  - [xaml.cs에 있는 Class를 xaml안에 객체로 불러오기](#xamlcs에-있는-class를-xaml안에-객체로-불러오기)
-  - [같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기](#같은-프로젝트-cs에-있는-class를-xaml안에-객체로-불러오기)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-  - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
-  - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
-  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
+
+- <details>
+  <summary>다양한 참조법</summary>
+  <div markdown="1">
+
+    - [다양한 참조법](#다양한-참조법)
+    - [xaml.cs에 있는 Class를 xaml안에 객체로 불러오기](#xamlcs에-있는-class를-xaml안에-객체로-불러오기)
+    - [같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기](#같은-프로젝트-cs에-있는-class를-xaml안에-객체로-불러오기)
+    - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
+    - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
+    - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
+    - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
+    - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
   
-</div>
-</details>
+  </div>
+  </details>
 
 
 
+- <details>
+  <summary>Object - DispatcherObject</summary>
+  <div markdown="1">
+
+    - Style
+
+  </div>
+  </details>
+  
+  
+  
+- <details>
+  <summary>Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement</summary>
+  <div markdown="1">
+
+    - Decorator
+      - Border
+    - TextBlock
+    - Popup
+    - <details>
+      <summary>Panel</summary>
+      <div markdown="1">
+        
+        - Grid
+        - Canvas
+        - DockPanel
+        - StackPanel
+        - WrapPanel
+        - Viewbox
+        - UniformGrid
+        
+      </div>
+      </details>
+        
+    
+    
+    - <details>
+      <summary>Control</summary>
+      <div markdown="1">
+        
+        - Separator
+        - PasswordBox
+        - Thumb
+          - GridSplitter
+        - RangeBase 
+          - ProgressBar
+          - Slider
+        - TextBoxBase 
+          - TextBox
+    
+        
+        
+      </div>
+      </details>
+    
+    
+    
+  </div>
+  </details>
+  
 ***
 ***
 
