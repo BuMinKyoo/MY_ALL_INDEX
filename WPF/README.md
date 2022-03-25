@@ -48,21 +48,27 @@
     - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
     - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
     - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
-  
+    
   </div>
   </details>
 
-
+***
+***
 
 - <details>
   <summary>Object - DispatcherObject</summary>
   <div markdown="1">
 
-    - Style
+    - [Style](#style)
+      - [Style의 key값으로 각각의 컨트롤에 Style을 적용](#style의-key값으로-각각의-컨트롤에-style을-적용)
+        - Style x:Key="(사용할 name)" TargetType="(적용시킬 컨트롤)"
+      - [TargetType속성으로 적용시킬 컨트롤 지정](#targettype속성으로-적용시킬-컨트롤-지정)
+        - Style TargetType="{x:Type 적용시킬 컨트롤}"
+      - [각각의 자식 컨트롤에 Style 적용하기](#각각의-자식-컨트롤에-style-적용하기)
+      - [BasedOn을 이용한 Style상속](#basedon을-이용한-style상속)
 
   </div>
   </details>
-  
   
   
 - <details>
@@ -73,47 +79,85 @@
       - Border
     - TextBlock
     - Popup
-    - <details>
-      <summary>Panel</summary>
-      <div markdown="1">
-        
-        - Grid
-        - Canvas
-        - DockPanel
-        - StackPanel
-        - WrapPanel
-        - Viewbox
-        - UniformGrid
-        
-      </div>
-      </details>
-        
-    
-    
-    - <details>
-      <summary>Control</summary>
-      <div markdown="1">
-        
-        - Separator
-        - PasswordBox
-        - Thumb
-          - GridSplitter
-        - RangeBase 
-          - ProgressBar
-          - Slider
-        - TextBoxBase 
-          - TextBox
-    
-        
-        
-      </div>
-      </details>
-    
-    
+    - Panel
+      - Grid
+      - Canvas
+      - DockPanel
+      - StackPanel
+      - WrapPanel
+      - Viewbox
+      - UniformGrid
+    - Control
+      - Separator
+      - PasswordBox
+      - Thumb - GridSplitter
+      - RangeBase 
+        - ProgressBar
+        - Slider
+      - TextBoxBase - TextBox
+      - ContentControl
+        - ScrollViewer
+        - ButtonBase - RepeatButton
+        - HeaderedContentControl
+          - Expander
+          - GroupBox
+      - ItemsControl
+        - MenuBase
+          - Menu
+          - ContextMenu
+        - Selector
+          - TabControl
+          - ComboBox
+          - ListBox - ListView
+
     
   </div>
   </details>
   
+  
+  
+- <details>
+  <summary>자주 활용하는 Class, Interface</summary>
+  <div markdown="1">  
+
+    - ObservableCollection
+    - INotifyPropertyChanged
+    
+  </div>
+  </details>
+
+
+
+- <details>
+  <summary>Binding</summary>
+  <div markdown="1">  
+
+    - Button + Command
+    - ItemsSource
+    - Workspace를 통한 UserControl끼리의 값 전달
+    - ContentControl을 활용한 UserControl끼리의 값 전달
+    
+  </div>
+  </details>
+
+
+
+- JsonParsing
+
+- <details>
+  <summary>Try..</summary>
+  <div markdown="1">  
+
+    - [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_XML)
+    - [공공API 내용을 json파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_JSON)
+    - [화면에 있는 color값을 추출하는 color-picker]_Repository링크(https://github.com/BuMinKyoo/ColorPicker_WPF)
+    
+  </div>
+  </details>
+
+
+- etc...
+
 ***
 ***
 
@@ -872,4 +916,123 @@ public class Car
 <img src="https://user-images.githubusercontent.com/39178978/153421558-3042dbb3-c101-4a40-b134-7c8852b86186.png">
 
 ###### [다양한 참조법](#다양한-참조법)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Style
+
+##### - Style : 컨트롤 요소들을 미리 정의해 놓고, 사용하는 방법
+
+##### - Style적용 방식
+  - 정적바인딩 : StaticResource이용 : 코드를 통해서 리소스가 변경되었을 때 참조 항목에 실시간 반영되지 않음(성능면에서는 뛰어남)
+  - 동적바인딩 : DynamicResource이용 : 코드를 통해서 리소스가 변경되었을 때 참조 항목에 실시간 반영됨(성능떨어짐)
+
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+ ## Style의 key값으로 각각의 컨트롤에 Style을 적용
+  - Style x:Key="(사용할 name)" TargetType="(적용시킬 컨트롤)" : Style의 key값으로 각각의 컨트롤에 Style을 적용 시킨다. Style에서 지정한 '적용시킬 컨트롤'요소에 맞게 넣지 않는다면 예외가 발생한다
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window.Resources>
+    <Style x:Key="buttonMade" TargetType="Button">
+        <Setter Property="Background" Value="Green"/>
+    </Style>
+</Window.Resources>
+<Grid>
+    <Button Width="100" Height="30" Content="버튼" Style="{StaticResource buttonMade}"/>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153520278-e0b5509a-6be5-4c02-8952-480d1c4e8751.png">
+
+<br/>
+<br/>
+
+###### [Style](#style)
+###### [Top](#top)
+
+## TargetType속성으로 적용시킬 컨트롤 지정
+  - Style TargetType="{x:Type 적용시킬 컨트롤}" : Style에서 지정한 '적용시킬 컨트롤'에 합당한 컨트롤이 자동으로 Style이 지정된다.
+
+#MainWindow.xaml
+~~~c#
+<Window.Resources>
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="Green"/>
+    </Style>
+</Window.Resources>
+<Grid>
+    <Button Width="100" Height="30" Content="버튼"/>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153520278-e0b5509a-6be5-4c02-8952-480d1c4e8751.png">
+
+<br/>
+<br/>
+
+###### [Style](#style)
+###### [Top](#top)
+
+## 각각의 자식 컨트롤에 Style 적용하기
+  - 각각의 컨트롤 안쪽에만 적용하기 위해서는, 적용시킬 컨트롤을 포함하고 있는 상위 컨트롤에 Resources로 적용시키면됨
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <Button Width="100" Height="30" Content="버튼1"/>
+    <Button Width="100" Height="30" Content="버튼2"/>
+    <StackPanel>
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="Green"/>
+            </Style>
+        </StackPanel.Resources>
+        <Button Width="100" Height="30" Content="버튼3"/>
+        <Button Width="100" Height="30" Content="버튼4"/>
+    </StackPanel>
+</StackPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153521272-6ced1d45-fe90-44fa-aa44-453a75d3bb7a.png">
+
+<br/>
+<br/>
+
+###### [Style](#style)
+###### [Top](#top)
+
+## BasedOn을 이용한 Style상속
+
+#MainWindow.xaml
+~~~c#
+<Window.Resources>
+    <Style x:Key="buttonMade_basedon" TargetType="Button">
+        <Setter Property="Background" Value="Green"/>
+    </Style>
+
+    <Style x:Key="buttonMade" TargetType="Button" BasedOn="{StaticResource buttonMade_basedon}">
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+</Window.Resources>
+    
+<StackPanel>
+    <Button Width="100" Height="30" Content="버튼1" Style="{StaticResource buttonMade}"/>
+    <Button Width="100" Height="30" Content="버튼2" Style="{StaticResource buttonMade_basedon}"/>
+</StackPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153522477-2d98af56-993f-4ec3-9b60-0a369f38903a.png">
+
+###### [Style](#style)
 ###### [Top](#top)
