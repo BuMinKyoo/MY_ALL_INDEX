@@ -35,9 +35,6 @@
 
 ### [WPF](https://github.com/BuMinKyoo/TIL/tree/main/WPF)
 
-##### Object - DispatcherObject
-- [Style](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Style)
-
 <br/>
 
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - [FrameworkElement](https://github.com/BuMinKyoo/TIL/tree/main/WPF/FrameworkElement)
