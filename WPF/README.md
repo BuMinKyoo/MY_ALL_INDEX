@@ -72,43 +72,46 @@
   
   
 - <details>
-  <summary>Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement</summary>
+  <summary>Object - DispatcherObject - DependencyObject - Visual - UIElement</summary>
   <div markdown="1">
-
-    - Decorator
-      - Border
-    - TextBlock
-    - Popup
-    - Panel
-      - Grid
-      - Canvas
-      - DockPanel
-      - StackPanel
-      - WrapPanel
-      - Viewbox
-      - UniformGrid
-    - Control
-      - Separator
-      - PasswordBox
-      - Thumb - GridSplitter
-      - RangeBase 
-        - ProgressBar
-        - Slider
-      - TextBoxBase - TextBox
-      - ContentControl
-        - ScrollViewer
-        - ButtonBase - RepeatButton
-        - HeaderedContentControl
-          - Expander
-          - GroupBox
-      - ItemsControl
-        - MenuBase
-          - Menu
-          - ContextMenu
-        - Selector
-          - TabControl
-          - ComboBox
-          - ListBox - ListView
+    
+    - FrameworkElement
+      - Decorator
+        - Border
+      - [TextBlock](#textblock)
+        - [Run](#run)
+      - Popup
+      - Panel
+        - Grid
+        - Canvas
+        - DockPanel
+        - StackPanel
+        - WrapPanel
+        - Viewbox
+        - UniformGrid
+      - Control
+        - Separator
+        - PasswordBox
+        - Thumb - GridSplitter
+        - RangeBase 
+          - ProgressBar
+          - Slider
+        - TextBoxBase - TextBox
+        - [ContentControl](#contentcontrol)
+          - ScrollViewer
+          - [ToolTip](#tooltip)
+          - ButtonBase - RepeatButton
+          - HeaderedContentControl
+            - Expander
+            - GroupBox
+        - ItemsControl
+          - MenuBase
+            - Menu
+            - ContextMenu
+          - Selector
+            - TabControl
+            - ComboBox
+            - ListBox - ListView
 
     
   </div>
@@ -925,8 +928,8 @@ public class Car
 <br/>
 
 # Style
-
-##### - Style : 컨트롤 요소들을 미리 정의해 놓고, 사용하는 방법
+  - 상속 : Object - DispatcherObject - Style
+  - Style : 컨트롤 요소들을 미리 정의해 놓고, 사용하는 방법
 
 ##### - Style적용 방식
   - 정적바인딩 : StaticResource이용 : 코드를 통해서 리소스가 변경되었을 때 참조 항목에 실시간 반영되지 않음(성능면에서는 뛰어남)
@@ -1035,4 +1038,100 @@ public class Car
 <img src="https://user-images.githubusercontent.com/39178978/153522477-2d98af56-993f-4ec3-9b60-0a369f38903a.png">
 
 ###### [Style](#style)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# FrameworkElement
+
+***
+
+<br/>
+
+# TextBlock
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Border BorderBrush="Black" BorderThickness="1" Width="100" Height="100">
+        <TextBlock Width="100" Height="100">11111<LineBreak/>22222</TextBlock>
+    </Border>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151999032-9aa3f1e3-a989-4739-b5a4-fa33f103aedb.png">
+
+
+###### [FrameworkElement](#frameworkelement)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+## Run
+  - Text내용을 자체 텍스트 컨트롤로 취급할 수 있게 해준다.
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Border BorderBrush="Black" BorderThickness="1" Width="100" Height="100">
+        <TextBlock Width="100" Height="100">
+            <Run>[</Run>
+            <Run Text="{Binding tb1}"></Run>
+            <Run>,</Run>
+            <Run Text="{Binding tb2}"></Run>
+            <Run>]</Run>
+        </TextBlock>
+    </Border>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151999752-67c9fc8f-b853-430b-9d50-1f94e4139aa9.png">
+
+###### [FrameworkElement](#frameworkelement)
+###### [TextBlock](#textblock)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/>
+
+***
+
+<br/>
+
+# ContentControl
+
+## tooltip
+  - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <TextBox Width="100" Height="30">
+        <TextBox.ToolTip>
+            <TextBlock Text="숫자를 입력하세요"/>
+        </TextBox.ToolTip>
+    </TextBox>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152283585-98284fcf-ae1c-48b8-b6d9-2ba1f978d815.png">
+
+###### [ContentControl](#contentcontrol)
 ###### [Top](#top)
