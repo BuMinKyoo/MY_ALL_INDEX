@@ -37,8 +37,7 @@
 
 <br/>
 
-##### Object - DispatcherObject - DependencyObject - Visual - UIElement - [FrameworkElement](https://github.com/BuMinKyoo/TIL/tree/main/WPF/FrameworkElement)
-- [TextBlock](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TextBlock)
+##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
 - [Popup](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Popup)
 - Panel - [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
 - Panel - [Canvas](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Canvas)
