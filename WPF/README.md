@@ -80,15 +80,20 @@
         - Border
       - [TextBlock](#textblock)
         - [Run](#run)
-      - Popup
-      - Panel
-        - Grid
-        - Canvas
-        - DockPanel
-        - StackPanel
-        - WrapPanel
-        - Viewbox
-        - UniformGrid
+      - [Popup](#popup)
+        - [Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen](#placement-horizontaloffset-verticaloffset-allowstransparency-isopen)
+        - [AllowsTransparency(False일때)](#allowstransparencyfalse일때)
+        - [AllowsTransparency(True일때)](#allowstransparencytrue일때)
+      - [Panel](#panel)
+        - [Grid](#grid)
+          - [다양한 요소안에 Grid를 만들기](#다양한-요소안에-grid를-만들기)
+          - [IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기](#issharedsizescope속성을-이용해-grid의-폭과-넓이-맟주기)
+        - [Canvas](#canvas)
+        - [DockPanel](#dockpanel)
+        - [StackPanel](#stackpanel)
+        - [WrapPanel](#wrappanel)
+        - [Viewbox](#viewbox)
+        - [UniformGrid](#uniformgrid)
       - Control
         - Separator
         - PasswordBox
@@ -1044,6 +1049,9 @@ public class Car
 <br/>
 
 # FrameworkElement
+  - # TextBlock
+
+###### [Top](#top)
 
 ***
 
@@ -1051,6 +1059,9 @@ public class Car
 
 # TextBlock
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+  - [Run](#run)
+
+<br/>
 
 #MainWindow.xaml
 ~~~c#
@@ -1065,6 +1076,7 @@ public class Car
 
 
 ###### [FrameworkElement](#frameworkelement)
+###### [Top](#top)
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
@@ -1089,9 +1101,278 @@ public class Car
 
 <img src="https://user-images.githubusercontent.com/39178978/151999752-67c9fc8f-b853-430b-9d50-1f94e4139aa9.png">
 
-###### [FrameworkElement](#frameworkelement)
 ###### [TextBlock](#textblock)
+###### [Top](#top)
 
+<br/>
+
+***
+
+<br/>
+
+# Popup
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+  - [Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen](#placement-horizontaloffset-verticaloffset-allowstransparency-isopen)
+  - [AllowsTransparency(False일때)](#allowstransparencyfalse일때)
+  - [AllowsTransparency(True일때)](#allowstransparencytrue일때)
+
+<br/>
+
+  - Placement : 어디서 팝업창이 뜰지 알려줌
+  - HorizontalOffset : 팝업 위치를 옮길 수 있음
+  - VerticalOffset : 팝업 위치를 옮길 수 있음
+  - AllowsTransparency : 팝업창의 배경을 투명으로 할 수 있음
+  - IsOpen : 팝업을 띄워주고 닫아줌 
+
+###### [FrameworkElement](#frameworkelement)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Button Width="100" Height="25" Content="Popuptest" Click="Button_Click"/>
+    <Popup Name="Pop"
+        Placement="Top"
+        HorizontalOffset="-100"
+        VerticalOffset="0"
+        AllowsTransparency="True">
+        <Menu>
+            <StackPanel Orientation="Vertical">
+                <MenuItem Header="사과"/>
+                <MenuItem Header="포도"/>
+                <MenuItem Header="귤"/>
+                <MenuItem Header="배"/>
+            </StackPanel>
+        </Menu>
+    </Popup>
+</Grid>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        Pop.IsOpen = !(Pop.IsOpen);
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152073966-9993fda4-80c5-4aec-b2e2-7d0b6df20db6.png">
+
+###### [Popup](#popup)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## AllowsTransparency(False일때)
+  - False 일때, Ellipse주변에 검정색 Background가 남아 있다
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Button Width="100" Height="25" Content="Popuptest" Click="Button_Click"/>
+    <Popup Name="Pop"
+    Placement="Top"
+    HorizontalOffset="-100"
+    VerticalOffset="0"
+    AllowsTransparency="False">
+        <Ellipse Width="200" Height="200" Fill="Bisque"/>
+    </Popup>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152074233-11a3764f-b8a7-4724-ac7c-27b3dcaede9e.png">
+
+###### [Popup](#popup)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## AllowsTransparency(True일때)
+  - True 일때, Ellipse주변에 검정색 Background가 없어 진다
+
+#MainWindow.xaml
+~~~
+<Grid>
+    <Button Width="100" Height="25" Content="Popuptest" Click="Button_Click"/>
+    <Popup Name="Pop"
+    Placement="Top"
+    HorizontalOffset="-100"
+    VerticalOffset="0"
+    AllowsTransparency="True">
+        <Ellipse Width="200" Height="200" Fill="Bisque"/>
+    </Popup>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152074570-a17fe31b-78ef-4f8f-873d-0474d8229dbc.png">
+
+###### [Popup](#popup)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Panel
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+  - [Grid](#grid)
+  - [Canvas](#canvas)
+  - [DockPanel](#dockpanel)
+  - [StackPanel](#stackpanel)
+  - [WrapPanel](#wrappanel)
+  - [Viewbox](#viewbox)
+  - [UniformGrid](#uniformgrid)
+
+###### [FrameworkElement](#frameworkelement)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+# Grid
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+  - [다양한 요소안에 Grid를 만들기](#다양한-요소안에-grid를-만들기)
+  - [IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기](#issharedsizescope속성을-이용해-grid의-폭과-넓이-맟주기)
+
+<br/>
+
+  - number : number만큼의 크기를 설정(화면크기를 임의로 늘려도 요소가 늘어나지X)
+  - Auto : Grid가 가지고 있는 하위 content의 크기만큼의 크기를 가짐
+  - number* : 남은 공간을 등분하여 크기를 가짐 ex) 2* 과 1* : 남은 크기를 2:1비율로 가져감(화면크기를 임의로 늘리면 요소가 늘어남)  
+
+#MainWindow.xaml
+~~~c#
+    <Grid> 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Button Grid.Column="0" Grid.Row="0" Content="버튼1"/>
+        <Button Grid.Column="1" Grid.Row="0" Content="버튼2"/>
+        <Button Grid.Column="2" Grid.Row="0" Content="버튼3"/>
+        <Button Grid.Column="0" Grid.Row="1" Content="버튼4"/>
+        <Button Grid.Column="1" Grid.Row="1" Content="버튼5"/>
+        <Button Grid.Column="2" Grid.Row="1" Content="버튼6"/>
+        <Button Grid.Column="0" Grid.Row="2" Content="버튼7"/>
+        <Button Grid.Column="1" Grid.Row="2" Content="버튼8"/>
+        <Button Grid.Column="2" Grid.Row="3" Content="버튼9"/>
+    </Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/147874900-2aab4125-8b19-4c41-9804-d39d12ac353b.png">
+
+###### [Panel](#panel)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## 다양한 요소안에 Grid를 만들기
+
+#MainWindow.xaml
+~~~c#
+<Button Grid.Column="2" Height="150" Width="150">
+    <Grid Width="150" Height="150">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="3*"/>
+        </Grid.RowDefinitions>
+        <Image Source="사진" Grid.Row="0"/>
+    </Grid>
+</Button>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/148070083-3a53e213-6cbc-43dd-88b6-81cba330675f.png">
+
+###### [Grid](#grid)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
+
+#MainWindow.xaml
+~~~c#
+<Grid Grid.IsSharedSizeScope="True">
+    <Grid.RowDefinitions>
+        <RowDefinition/>
+        <RowDefinition/>
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" SharedSizeGroup="FirstLine"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="SecondLine"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ThedLine"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ForeLine"/>
+        </Grid.ColumnDefinitions>
+
+        <Border  Grid.Column="0" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock Text="사과" FontSize="30"/>
+        </Border>
+        <Border Grid.Column="1" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock Text="포도" FontSize="30"/>
+        </Border>
+        <Border Grid.Column="2" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock Text="바나나" FontSize="30"/>
+        </Border>
+        <Border Grid.Column="3" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock  Text="파인애플" FontSize="30"/>
+        </Border>
+    </Grid>
+
+    <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FirstLine"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="SecondLine"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ThedLine"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ForeLine"/>
+        </Grid.ColumnDefinitions>
+
+        <Border  Grid.Column="0" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock Text="asdfasdf" FontSize="30"/>
+        </Border>
+        <Border Grid.Column="1" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock Text="23123" FontSize="30"/>
+        </Border>
+        <Border Grid.Column="2" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock Text="cbnvmhikt" FontSize="30"/>
+        </Border>
+        <Border Grid.Column="3" Background="#dfdfdf" BorderBrush="#adadad" BorderThickness="3">
+            <TextBlock  Text="sekfj0384kjlsadfif" FontSize="30"/>
+        </Border>
+    </Grid>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/148079616-5703ff5f-5acd-4e5a-b50f-35f8e8008ad7.png">
+
+###### [Grid](#grid)
+###### [Top](#top)
 
 
 
@@ -1116,6 +1397,9 @@ public class Car
 <br/>
 
 # ContentControl
+
+###### [FrameworkElement](#frameworkelement)
+###### [Top](#top)
 
 ## tooltip
   - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
