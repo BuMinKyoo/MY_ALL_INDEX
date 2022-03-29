@@ -91,9 +91,17 @@
         - [Canvas](#canvas)
         - [DockPanel](#dockpanel)
         - [StackPanel](#stackpanel)
+          - [Orientation="Horizontal"](#orientationhorizontal)
         - [WrapPanel](#wrappanel)
+          - [Orientation="Vertical"](#orientationvertical)
         - [Viewbox](#viewbox)
+          - [Stretch](#stretch)
+          - [StretchDirection](#stretchdirection)
         - [UniformGrid](#uniformgrid)
+          - [Columns,Rows지정](#columnsrows지정)
+          - [ClipToBounds](#cliptobounds)
+          - [FirstColumn](#firstcolumn)
+          - [FlowDirection](#flowdirection)
       - Control
         - Separator
         - PasswordBox
@@ -1049,9 +1057,44 @@ public class Car
 <br/>
 
 # FrameworkElement
-  - # TextBlock
 
 ###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Decorator
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+
+###### [FrameworkElement](#frameworkelement)
+###### [Top](#top)
+
+# Border
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Decorator
+  - 모서리를 동그랗게 만들어줌
+
+<br/>
+
+- BorderBrush : 테두리 컬러 지정
+- BorderThickness : 테두리 두계 설정("2 2 2 2" 이런 형태로 왼쪽,위쪽,오른쪽,아래로 각각 설정도 가능)
+- CornerRadius : 모서리를 얼마나 동그랗게 만들껀지("2 2 2 2"이런식으로 모서리 별로 설정 가능)
+
+~~~
+<Grid>
+    <Border Width="100" Height="100" CornerRadius="10 2 2 2" BorderBrush="Coral" BorderThickness="2 2 2 10">
+    </Border>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151305860-78bd39a9-da06-4e70-8daf-318e54a4640f.png">
+
+###### [Decorator](#decorator)
+###### [Top](#top)
+
+<br/>
 
 ***
 
@@ -1233,6 +1276,9 @@ public partial class MainWindow : Window
 
 # Panel
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+
+<br/>
+
   - [Grid](#grid)
   - [Canvas](#canvas)
   - [DockPanel](#dockpanel)
@@ -1244,10 +1290,17 @@ public partial class MainWindow : Window
 ###### [FrameworkElement](#frameworkelement)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+
+***
+
+<br/>
 
 # Grid
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+
+<br/>
+
   - [다양한 요소안에 Grid를 만들기](#다양한-요소안에-grid를-만들기)
   - [IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기](#issharedsizescope속성을-이용해-grid의-폭과-넓이-맟주기)
 
@@ -1373,6 +1426,366 @@ public partial class MainWindow : Window
 
 ###### [Grid](#grid)
 ###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Canvas
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+  - 위치를 고정으로 정할때 사용함. 임의로 화면을 늘려도 상,하,좌,우 를 기준으로 고정된 지점에 요소가 놓아짐
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Canvas Name="canvas">
+    <TextBlock Name="txtBlock" Canvas.Left="10" TextWrapping="Wrap" Text="캔버스" Canvas.Top="80"/>
+    <Button Name="btn" Content="Button" Canvas.Left="172" Canvas.Top="30" Width="75"/>
+    <Image Name="image2"
+            Source="https://user-images.githubusercontent.com/39178978/148183688-8de89977-ca68-4450-87e7-6febcff80fd4.png"
+            Canvas.Left="10" Canvas.Top="150"/>
+</Canvas>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/148184087-350a7029-8e58-48b7-8297-5127d51825f7.png">
+
+###### [Panel](#panel)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# DockPanel
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+  - 자식요소를 기준으로 가로 또는 세로로 정렬 할 수 있는 영역을 정의
+
+#MainWindow.xaml
+~~~c#
+<DockPanel Name="dp1">
+    <Border DockPanel.Dock="Top" Background="Yellow" Height="20" BorderBrush="Red" BorderThickness="2">
+        <TextBlock Text="Dock=top"/>
+    </Border>
+    <Border DockPanel.Dock="Bottom" Background="Aqua" BorderBrush="Blue" BorderThickness="5">
+        <TextBlock Text="Dock=bottom"/>
+    </Border>
+    <Border DockPanel.Dock="Left" Background="DarkBlue" Width="100" BorderBrush="Bisque" BorderThickness="10">
+        <TextBlock Text="Left" Foreground="Wheat"/>
+    </Border>
+    <Border Background="Brown" BorderBrush="Azure" BorderThickness="10">
+        <TextBlock Text="All"/>
+    </Border>
+</DockPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/148200531-fbd1db72-a493-4b85-820a-ca096662102f.png">
+
+###### [Panel](#panel)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# StackPanel
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+  - 자식 요소들을 행이나 열로 나열
+
+<br/>
+
+  - [Orientation="Horizontal"](#orientationhorizontal)
+
+###### [Panel](#panel)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## Orientation="Horizontal"
+ - 정렬 방향을 수평으로 바꿀 수 있음
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <StackPanel Name="sp1" Width="90" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Button Name="btn1" Width="70" Height="25" Content="버튼1"/>
+        <Button Name="btn2" Width="70" Height="25" Content="버튼2"/>
+        <Button Name="btn3" Width="70" Height="25" Content="버튼3"/>
+        <Button Name="btn4" Width="70" Height="25" Content="버튼4"/>
+        <Button Name="btn5" Width="70" Height="55" Content="버튼5"/>
+    </StackPanel>
+    <StackPanel Name="sp2" Width="250" Margin="50 10 10 10" Orientation="Horizontal">
+        <Rectangle Height="50" Width="50" Stroke="Black" Fill="AntiqueWhite"/>
+        <Rectangle Height="50" Width="50" Stroke="Black" Fill="SaddleBrown"/>
+        <Rectangle Height="50" Width="50" Stroke="Black" Fill="Black"/>
+    </StackPanel>
+</Grid>
+~~~
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/148635073-d7d3a64d-81c6-48a3-b9d0-4f370a1d124c.png">
+
+###### [StackPanel](#stackpanel)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# WrapPanel
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+  - 자신의 영역보다 작은 자식요소들이 있는 경우에 stackPanel과 같은 기능, 반대로 자식요소들의 사이즈가 더 큰 경우에는 다음줄로 배치됨
+  - WrapPanel은 stackpanel과는 다르게 창을 줄였을 경우 요소들이 공간을 초과하면 밑으로 내려간다
+
+<br/>
+
+  - [Orientation="Vertical"](#orientationvertical)
+
+#MainWindow.xaml
+~~~c#
+<WrapPanel Name="wp1" VerticalAlignment="Top">
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="RosyBrown" Name="rec1"/>
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="BurlyWood" Name="rec2"/>
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="SeaShell" Name="rec3"/>
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="DarkSlateGray" Name="rec4"/>
+</WrapPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/148635573-8d994ef7-8c0f-403d-b535-78f0ab45cb80.png">
+
+<br/>
+
+여기서 창을 줄이면
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/148635594-dfe37a6a-08cf-49d8-baf5-a2a6e81e7874.png">
+
+###### [Panel](#panel)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## Orientation="Vertical"
+  - 수직으로 배치가능하게 함
+ 
+#MainWindow.xaml
+~~~c#
+<WrapPanel Name="wp1" VerticalAlignment="Top" Orientation="Vertical">
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="RosyBrown" Name="rec1"/>
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="BurlyWood" Name="rec2"/>
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="SeaShell" Name="rec3"/>
+    <Rectangle Height="60" Width="50" Stroke="Black" Fill="DarkSlateGray" Name="rec4"/>
+</WrapPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/148635530-4eef554c-df65-434b-9c70-a9e9bf3b31ec.png">
+
+<br/>
+
+여기서 창을 줄이면
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/148635557-b0904ba7-1de7-4d20-8548-d90ddbe79d16.png">
+
+###### [WrapPanel](#wrappanel)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Viewbox
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+  - 화면의 크기를 늘리고 줄였을때 그 안에 요소들을 일정한 비율로 늘리고 줄일 수 있음
+
+<br/>
+
+  - [Stretch](#stretch)
+  - [StretchDirection](#stretchdirection)
+
+###### [Panel](#panel)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## Stretch
+
+- None : 자식 컨트롤의 크기가 변경되지 않음.(ViewBox크기에 따라 여백이 생기거나 클리핑)
+- Fill : 자식 컨트롤이 ViewBox를 완전히 채우도록 크기가 조절된다.(절대 클리핑되지 않는다) 종횡비율(가로,세로 크기의 비율)이 다를 수 있으므로 ViewBox의 내용이 변형될 수 있다.
+- Uniform : ViewBox의 기본 옵션. 자식컨트롤이 가로, 세로 크기에 맞게 균일하게 크기조절
+- UniformToFill : ViewBox의 크기를 모두 채우는데,  자식 컨트롤의 가로와 세로의 비율을 동일한 비율로 조정한다.왜곡 현상이 없도록 하기 위해서 자식 컨트롤이 잘리는 현상이 일어날 수 있다.
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Viewbox>
+        <StackPanel>
+            <Button Width="100" Height="100" Content="1"/>
+            <Button Width="100" Height="100" Content="2"/>
+            <Button Width="100" Height="100" Content="3"/>
+            <Button Width="100" Height="100" Content="4"/>
+        </StackPanel>
+    </Viewbox>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/148673507-8e1abe94-d180-47ab-8db7-cbaea328c5f1.png">
+
+###### [Viewbox](#viewbox)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## StretchDirection
+
+- Both(기본값) : 콘텐츠의 기본 크기에 비례하여 위아래로 크기 조정
+- UpOnly : 기본 크기보다 큰 크기에서만 크기조정을 허용
+- DownOnly : 기본 크기보다 작은 크기에서만 조절이 가능
+
+###### [Viewbox](#viewbox)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# UniformGrid
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
+  - 모든 열,행을 자동으로 똑같이 맞춰줌, 크기를 조절 불가능함
+
+<br/>
+
+  - [Columns,Rows지정](#columnsrows지정)
+  - [ClipToBounds](#cliptobounds)
+  - [FirstColumn](#firstcolumn)
+  - [FlowDirection](#flowdirection)
+
+#MainWindow.xaml
+~~~c#
+<UniformGrid>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+</UniformGrid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/149927550-e3de207c-7c2b-4e82-b2ce-9ea0f9b95212.png" width="300" height="300">
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## Columns,Rows지정
+  - 지정한 열,행을 넘어가면 프로그램을 실행했을때 화면에 표현되지 않고 무시하게 됨
+
+#MainWindow.xaml
+~~~c#
+<UniformGrid Columns="2" Rows="3">
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+</UniformGrid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/149928111-0ae3e057-d526-4e0a-816f-97a899e85214.png">
+
+<br/>
+
+빨간색 테두리가 실행 화면
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/149928370-36e15e1c-c3e7-4e48-b6f5-fcd3c2f9c84a.png">
+
+<br/>
+<br/>
+
+## ClipToBounds
+  - 내 크기를 벗어난 요소들을 사라지게 할 수 있음
+
+#MainWindow.xaml
+~~~c#
+<UniformGrid Columns="2" Rows="3" ClipToBounds="True">
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+    <Button Content="버튼1"></Button>
+</UniformGrid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/149928819-757fbb07-4bc2-475d-9fd7-746c796cc6d4.png">
+
+<br/>
+<br/>
+
+## FirstColumn
+  - 그 순서 부터 시작할 수 있음
+
+#MainWindow.xaml
+~~~c#
+<UniformGrid Rows="3" Columns="3" FirstColumn="2">
+    <Button Content="button1"/>
+    <Button Content="button2"/>
+    <Button Content="button3"/>
+    <Button Content="button4"/>
+    <Button Content="button5"/>
+    <Button Content="button5"/>
+</UniformGrid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/149929403-9ba21762-33f5-4ed1-9982-c61cf276d527.png">
+
+<br/>
+<br/>
+
+## FlowDirection
+  - 방향을 반대로 바꿀 수 있음
+
+#MainWindow.xaml
+~~~c#
+<UniformGrid Rows="3" Columns="3" FirstColumn="2" FlowDirection="RightToLeft">
+    <Button Content="button1"/>
+    <Button Content="button2"/>
+    <Button Content="button3"/>
+    <Button Content="button4"/>
+    <Button Content="button5"/>
+    <Button Content="button5"/>
+</UniformGrid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/149929712-91144101-18c8-41fe-800e-e09e6dab4b03.png">
 
 
 
