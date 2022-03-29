@@ -38,18 +38,6 @@
 <br/>
 
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
-- [Popup](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Popup)
-- Panel - [Grid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Grid)
-- Panel - [Canvas](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Canvas)
-- Panel - [DockPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/DockPanel)
-- Panel - [StackPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/StackPanel)
-- Panel - [WrapPanel](https://github.com/BuMinKyoo/TIL/tree/main/WPF/WrapPanel)
-- Panel - [Viewbox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Viewbox)
-- Panel - [UniformGrid](https://github.com/BuMinKyoo/TIL/tree/main/WPF/UniformGrid)
-
-<br/>
-
-- Decorator - [Border](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Border)
 
 <br/>
 
