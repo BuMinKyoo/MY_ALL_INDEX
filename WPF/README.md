@@ -76,8 +76,8 @@
   <div markdown="1">
     
     - FrameworkElement
-      - Decorator
-        - Border
+      - [Decorator](#decorator)
+        - [Border](#border)
       - [TextBlock](#textblock)
         - [Run](#run)
       - [Popup](#popup)
@@ -102,29 +102,39 @@
           - [ClipToBounds](#cliptobounds)
           - [FirstColumn](#firstcolumn)
           - [FlowDirection](#flowdirection)
-      - Control
-        - Separator
-        - PasswordBox
-        - Thumb - GridSplitter
-        - RangeBase 
-          - ProgressBar
-          - Slider
-        - TextBoxBase - TextBox
+      - [Control](#control)
+        - [Separator](#separator)
+        - [PasswordBox](#passwordbox)
+        - [Thumb](#thumb)
+          - [GridSplitter](#gridsplitter)
+            - [DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag](#dragstarted-dragcompleted-dragdelta-isdragging-canceldrag)
+        - [RangeBase](#rangebase)
+          - [ProgressBar](#progressbar)
+            - [IsIndeterminate](#isindeterminate)
+          - [Slider](#slider)
+            - [ValueChanged이벤트로 R,G,B값 표현하기](#valuechanged이벤트로-rgb값-표현하기)
+            - [ValueChanged이벤트로 R,G,B,A값 표현하기](#valuechanged이벤트로-rgba값-표현하기)
+            - [Orientation속성](#orientation속성)
+            - [TickPlacement속성(눈금표시)](#tickplacement속성눈금표시)
+        - [TextBoxBase](#textboxbase)
+          - [TextBox](#textbox)
         - [ContentControl](#contentcontrol)
-          - ScrollViewer
+          - [ScrollViewer](#ScrollViewer)
           - [ToolTip](#tooltip)
-          - ButtonBase - RepeatButton
-          - HeaderedContentControl
-            - Expander
-            - GroupBox
-        - ItemsControl
-          - MenuBase
-            - Menu
-            - ContextMenu
-          - Selector
-            - TabControl
-            - ComboBox
-            - ListBox - ListView
+          - [ButtonBase](#ButtonBase)
+            - [RepeatButton](#RepeatButton)
+          - [HeaderedContentControl](#HeaderedContentControl)
+            - [Expander](#Expander)
+            - [GroupBox](#GroupBox)
+        - [ItemsControl](#ItemsControl)
+          - [MenuBase](#MenuBase)
+            - [Menu](#Menu)
+            - [ContextMenu](#ContextMenu)
+          - [Selector](#Selector)
+            - [TabControl](#TabControl)
+            - [ComboBox](#ComboBox)
+            - [ListBox](#ListBox)
+              - [ListView](#ListView)
 
     
   </div>
@@ -1694,6 +1704,9 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/149927550-e3de207c-7c2b-4e82-b2ce-9ea0f9b95212.png" width="300" height="300">
 
+###### [Panel](#panel)
+###### [Top](#top)
+
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 ## Columns,Rows지정
@@ -1724,6 +1737,9 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/149928370-36e15e1c-c3e7-4e48-b6f5-fcd3c2f9c84a.png">
 
+###### [UniformGrid](#uniformgrid)
+###### [Top](#top)
+
 <br/>
 <br/>
 
@@ -1747,6 +1763,9 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/149928819-757fbb07-4bc2-475d-9fd7-746c796cc6d4.png">
 
+###### [UniformGrid](#uniformgrid)
+###### [Top](#top)
+
 <br/>
 <br/>
 
@@ -1766,6 +1785,9 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/149929403-9ba21762-33f5-4ed1-9982-c61cf276d527.png">
+
+###### [UniformGrid](#uniformgrid)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -1787,12 +1809,401 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/149929712-91144101-18c8-41fe-800e-e09e6dab4b03.png">
 
+###### [UniformGrid](#uniformgrid)
+###### [Top](#top)
 
+<br/>
 
+***
 
+<br/>
 
+# Control
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
+  - TabIndex(int값) : Tab키를 눌렀을때 이동하는 순서를 나타낸다
+  - IsTabStop(boll값) : Tab키를 눌렀을때 지나치게 됨
 
+<br/>
 
+  - [Separator](#separator)
+  - [PasswordBox](#passwordbox)
+  - [Thumb](#thumb)
+  - [RangeBase](#rangebase)
+  - [TextBoxBase](#textboxbase)
+  - [ContentControl](#contentcontrol)
+  - [ItemsControl](#ItemsControl)
+
+###### [FrameworkElement](#frameworkelement)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Separator
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
+  - 구분짓는 선을 만들어줌
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <StatusBar Height="100" HorizontalAlignment="Center">
+        <TextBlock Text="구분"/>
+        <Separator/>
+        <Button Content="구분"/>
+        <Separator/>
+        <TextBlock Text="구분"/>
+    </StatusBar>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/150148233-147bd185-e175-42e1-9073-375bb2246c0d.png">
+
+###### [Control](#control)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# PasswordBox
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
+  - TextBox와는 다르게, 비밀번호처럼 감춰지는 형태로 사용할 수 있다
+  - 'Text'속성 대신 'Password'속성을 이용하여 글자 입력
+  - PasswordChar속성을 이용해서 비밀번호가 감춰질때 의 도형 설정 가능
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <PasswordBox Width="100" Password="비밀번호" VerticalAlignment="Center"/>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153541148-8bd20629-0fd4-4fed-a57e-2e193201a6ef.png">
+
+###### [Control](#control)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Thumb
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
+  - Thumb클래스 안에는 끌기와 관련된 것들을 제공하는것이 있음
+    - DragStarted 이벤트 : 드래그 하기 시작할 때 발생하는 이벤트
+    - DragCompleted 이벤트 : 사용자가 드래그를 중지하고 마우스 버튼을 놓았을 때 발생하는 이벤트
+    - DragDelta 이벤트 : 마우스를 움직이면 반복적으로 이벤트가 발생한다.
+    - IsDragging 속성 : 사용자가 드래그를 하는 동안에는 true, 드래그가 중지되면 false를 리턴한다.
+    - CancelDrag 메소드 : 이 메소드를 호출하면 드래그 작업이 즉시 중지된다.
+
+###### [Control](#control)
+###### [Top](#top)
+
+# GridSplitter
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - Thumb
+  - 마우스 드래그앤 드랍으로 끌수 있는 선을 만듬
+  - ShowsPreview : 마우스로 끌어서 옮길때 미리보기를 할지 안할지 설정
+
+<br/>
+
+  - [DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag](#dragstarted-dragcompleted-dragdelta-isdragging-canceldrag)
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="1*"/>
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0"/>
+
+    <GridSplitter Grid.Row="1" Height="5" Background="red" HorizontalAlignment="Stretch" ShowsPreview="True"/>
+
+    <Grid Grid.Row="2"/>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152299296-11475d66-9c58-438a-adda-bf7f81c905d4.png">
+
+###### [Thumb](#thumb)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
+  - Thumb클래스에서 상속받아 사용
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="1*"/>
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0"/>
+    <TextBox x:Name="tb" Grid.Row="0" Width="100" Height="30"/>
+
+    <GridSplitter Grid.Row="1" Height="5" Background="red" HorizontalAlignment="Stretch" ShowsPreview="True" DragStarted="GridSplitter_DragStarted"/>
+
+    <Grid Grid.Row="2"/>
+</Grid>
+~~~
+
+<br/>
+
+#XAML.cs
+~~~
+using System.Windows.Controls.Primitives;
+
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void GridSplitter_DragStarted(object sender, DragStartedEventArgs e)
+    {
+        tb.Text = "드래그 시작";
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152470717-b07933bd-b3a1-425d-b825-5a5f9af888a0.png">
+
+###### [GridSplitter](#gridsplitter)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# RangeBase
+  - [ProgressBar](#progressbar)
+  - [Slider](#slider)
+
+###### [Control](#control)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ProgressBar
+  - bar형태의 컨트롤 생성
+  - Minimum : ProgressBar의 최소값 설정
+  - Maximum : ProgressBar의 최대값 설정
+
+<br/>
+
+  - [IsIndeterminate](#isindeterminate)
+
+#MainWindow.xaml
+~~~c#
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+    <TextBlock Text="로딩중" VerticalAlignment="Center" Margin="0 0 10 0"/>
+    <ProgressBar Width="100" Height="30" Value="30"/>
+</StackPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152511866-40517ab8-2852-450b-b8a8-ac440eb24a36.png">
+
+###### [RangeBase](#rangebase)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## IsIndeterminate
+  - true일 경우
+
+#MainWindow.xaml
+~~~c#
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+    <TextBlock Text="로딩중" VerticalAlignment="Center" Margin="0 0 10 0"/>
+    <ProgressBar Width="100" Height="30" Value="30" IsIndeterminate="True"/>
+</StackPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152512413-748e0114-3c63-4fbd-859c-b79482c9efe3.png">
+
+###### [ProgressBar](#progressbar)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Slider
+  - Minimum 속성 : 최소 작은수 지정
+  - Maximum 속성 : 최대 큰 수 지정
+  - IsDirectionReversed : 슬라이더의 최대, 최소값의 위치가 바뀜(true이면 최대 최소의 방향이 바뀐다)
+
+<br/>
+
+  - [ValueChanged이벤트로 R,G,B값 표현하기](#valuechanged이벤트로-rgb값-표현하기)
+  - [ValueChanged이벤트로 R,G,B,A값 표현하기](#valuechanged이벤트로-rgba값-표현하기)
+  - [Orientation속성](#orientation속성)
+  - [TickPlacement속성(눈금표시)](#tickplacement속성눈금표시)
+
+###### [RangeBase](#rangebase)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## ValueChanged이벤트로 R,G,B값 표현하기
+  - 슬라이더의 Value값의 변경을 감지하면 발생하는 이벤트
+
+#MainWindow.xaml
+~~~c#
+<StackPanel VerticalAlignment="Center">
+    <Slider x:Name="Red_slider" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Slider x:Name="Green_slider" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Slider x:Name="Blue_slider" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Rectangle x:Name="rec" Width="100" Height="100"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        var colorR = (byte)Red_slider.Value;
+        var colorG = (byte)Green_slider.Value;
+        var colorB = (byte)Blue_slider.Value;
+
+        var color = Color.FromRgb(colorR, colorG, colorB);
+
+        rec.Fill = new SolidColorBrush(color);
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/156905759-405d0d68-7c25-43ea-a891-056f94ae35e8.png">
+
+###### [Slider](#slider)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## ValueChanged이벤트로 R,G,B,A값 표현하기
+  - 슬라이더의 Value값의 변경을 감지하면 발생하는 이벤트
+
+#MainWindow.xaml
+~~~c#
+<StackPanel VerticalAlignment="Center">
+    <Slider x:Name="Red_slider" Maximum="255" Minimum="0" Margin="10"
+        ValueChanged="ValueChanged"/>
+    <Slider x:Name="Green_slider" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Slider x:Name="Blue_slider" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Slider x:Name="A_silder" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Rectangle x:Name="rec" Width="100" Height="100"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.CS
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        var colorR = (byte)Red_slider.Value;
+        var colorG = (byte)Green_slider.Value;
+        var colorB = (byte)Blue_slider.Value;
+        var colorA = (byte)A_silder.Value;
+
+        var color = Color.FromArgb(colorA, colorR, colorG, colorB);
+
+        rec.Fill = new SolidColorBrush(color);
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/156906074-7f9e7cbb-1f3d-4b19-9e51-94728cc6973c.png">
+
+###### [Slider](#slider)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## Orientation속성
+  - 가로 및 세로 방향을 지정 가능
+
+#MainWindow.xaml
+~~~c#
+<StackPanel VerticalAlignment="Center">
+    <Slider x:Name="Red_slider" Maximum="255" Minimum="0" Margin="10" Orientation="Vertical"  ValueChanged="ValueChanged"
+        Height="100"/>
+    <Slider x:Name="Green_slider" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Slider x:Name="Blue_slider" Maximum="255" Minimum="0" Margin="10" ValueChanged="ValueChanged"/>
+    <Rectangle x:Name="rec" Width="100" Height="100"/>
+</StackPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/156905872-8881619d-6b72-424e-8cf3-4286f49b676b.png">
+
+###### [Slider](#slider)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## TickPlacement속성(눈금표시)
+  - None : 슬라이더의 기본값으로 눈금이 숨겨져 있는 상태
+  - TopLeft : 가로슬라이더는 위쪽에 표시 또는 세로슬라이더는 왼쪽에 표시
+  - BottomRight : 가로 슬라이더는 아래쪽에 표시 또는 세로 슬라이더는 오른쪽에 표시
+  - Both : 가로 슬라이더는 위아래 표시 또는 세로 슬라이더는 좌우에 표시
+  - TickFrequency : 눈금의 갯수를 조절
+
+#MainWindow.xaml
+~~~c#
+<StackPanel VerticalAlignment="Center">
+    <Slider x:Name="Red_slider" Maximum="255" Minimum="0" Margin="10"
+        ValueChanged="ValueChanged"
+        Height="100"
+        TickPlacement="Both"
+        TickFrequency="5"/>
+</StackPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/156905997-b90525ab-d615-42fc-9fdb-933676cab050.png">
+
+###### [Slider](#slider)
+###### [Top](#top)
 
 
 
