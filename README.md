@@ -39,13 +39,7 @@
 
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
 
-<br/>
 
-- Control - TextBoxBase - [TextBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/TextBox)
-
-<br/>
-
-- Control - ContentControl - [ScrollViewer](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ScrollViewer)
 - Control - ContentControl - ButtonBase - [RepeatButton](https://github.com/BuMinKyoo/TIL/tree/main/WPF/RepeatButton)
 - Control - ContentControl - HeaderedContentControl - [Expander](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Expander)
 - Control - ContentControl - HeaderedContentControl - [GroupBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GroupBox)
