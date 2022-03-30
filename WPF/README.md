@@ -118,8 +118,13 @@
             - [TickPlacement속성(눈금표시)](#tickplacement속성눈금표시)
         - [TextBoxBase](#textboxbase)
           - [TextBox](#textbox)
+            - [AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing](#acceptsreturn-acceptstab-verticalscrollbarvisibility-maxlength-charactercasing)
+            - [TextChanged이벤트, SelectionChanged이벤트](#textchanged이벤트-selectionchanged이벤트)
+            - [SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()](#selectedtext-caretindex-selectionstart-selectionlength-select14-selectallall)
         - [ContentControl](#contentcontrol)
           - [ScrollViewer](#ScrollViewer)
+            - [FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기](#frameworkelement를-이용해-scrollviewer의-시스템-whith사이즈를-불러오기)
+            - [HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)](#horizontalscrollbarvisibility-verticalscrollbarvisibilityvisible-hidden-auto-disabled)
           - [ToolTip](#tooltip)
           - [ButtonBase](#ButtonBase)
             - [RepeatButton](#RepeatButton)
@@ -1992,6 +1997,7 @@ public partial class MainWindow : Window
 <br/>
 
 # RangeBase
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
   - [ProgressBar](#progressbar)
   - [Slider](#slider)
 
@@ -2005,6 +2011,7 @@ public partial class MainWindow : Window
 <br/>
 
 # ProgressBar
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - RangeBase
   - bar형태의 컨트롤 생성
   - Minimum : ProgressBar의 최소값 설정
   - Maximum : ProgressBar의 최대값 설정
@@ -2051,6 +2058,7 @@ public partial class MainWindow : Window
 <br/>
 
 # Slider
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - RangeBase
   - Minimum 속성 : 최소 작은수 지정
   - Maximum 속성 : 최대 큰 수 지정
   - IsDirectionReversed : 슬라이더의 최대, 최소값의 위치가 바뀜(true이면 최대 최소의 방향이 바뀐다)
@@ -2205,14 +2213,64 @@ public partial class MainWindow : Window
 ###### [Slider](#slider)
 ###### [Top](#top)
 
+<br/>
 
+***
 
+<br/>
 
+# TextBoxBase
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
 
+###### [Control](#control)
+###### [Top](#top)
 
+# TextBox
+  - 사용자가 Box내부에 string을 적을 수 있는 컨텐트
+  - [AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing](#acceptsreturn-acceptstab-verticalscrollbarvisibility-maxlength-charactercasing)
+  - [TextChanged이벤트, SelectionChanged이벤트](#textchanged이벤트-selectionchanged이벤트)
+  - [SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()](#selectedtext-caretindex-selectionstart-selectionlength-select14-selectallall)
 
+<br/>
 
+###### [TextBoxBase](#textboxbase)
+###### [Top](#top)
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
+  - AcceptsReturn="True" 속성 : 엔터키를 사용 할 수 있게함
+  - AcceptsTab="True" 속성 : 텝키를 사용 할 수 있게함
+  - VerticalScrollBarVisibility="Auto" 속성 : TextBox안의 공간보다 길이 길어지면 자동으로 wrap해줌
+  - MaxLength 속성 : 글자수를 제한해줌
+  - CharacterCasing 속성 : 자동으로 대문자 소문자로 입력되게 함
+
+###### [TextBox](#textbox)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## TextChanged이벤트, SelectionChanged이벤트
+  - TextChanged 이벤트 : 글자가 바뀔 때마다 이벤트를 실행하게함(TextBox안에 글자가 지정되어 있으면 예외가 발생하여 실행이 안됨)
+  - SelectionChanged 이벤트 : 선택한 텍스트를 변경하거나 캐럿을 이동할 때 발생하는 이벤트, 마우스나 키보드 등의 입력장치를 사용해서 선택을 조정할 때마다 발생하는 이벤트
+
+###### [TextBox](#textbox)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
+  - SelectedText : 마우스 드래그로 선택한 텍스트를 가져옴
+  - CaretIndex : 캐럿의 위치를 설정
+  - SelectionStart : 선택한 텍스트가 시작되는 위치값(CaretIndex와 같은 값을 리턴)
+  - SelectionLength : 선택된 문자 수를 반환, 선택 문자가 없으면 0을 리턴
+  - Select(1,4) : 마우스로 드래그 하는 것과 같다, ex)현재 예시는 1이상 4미만의 인덱스를 표시함
+  - SelectAllAll() : 마우스로 드래그 하는 것과 같다, 전체 선택
+
+###### [TextBox](#textbox)
+###### [Top](#top)
 
 <br/>
 
@@ -2221,11 +2279,114 @@ public partial class MainWindow : Window
 <br/>
 
 # ContentControl
+  - [ScrollViewer](#ScrollViewer)
+  - [ToolTip](#tooltip)
+  - [ButtonBase](#ButtonBase)
+  - [HeaderedContentControl](#HeaderedContentControl)
 
-###### [FrameworkElement](#frameworkelement)
+###### [Control](#control)
 ###### [Top](#top)
 
-## tooltip
+<br/>
+
+***
+
+<br/>
+
+# ScrollViewer
+  - ScrollViewer내부에 있는 객체들을 스크롤로 나타내줌
+  - 기본적으로, VerticalScrollBarVisibility="Visible"로 되어 있기 때문에 VerticalScrollBarVisibility="Hidden"을 해줘야 수직 스크롤 막대가 없어짐
+  - [FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기](#frameworkelement를-이용해-scrollviewer의-시스템-whith사이즈를-불러오기)
+  - [HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)](#horizontalscrollbarvisibility-verticalscrollbarvisibilityvisible-hidden-auto-disabled)
+
+###### [ContentControl](#contentcontrol)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
+  - HorizontalScrollBarVisibility : 수평 스크롤 막대 속성
+  - VerticalScrollBarVisibility : 수직 스크롤 막대 속성
+    - visible : 스크롤바 막대를 항상 표시, ScrollViewer 크기가 자식 내용보다 작을 경우에는 활성화 상태, 반대로 ScrollViewer크기가 자식 내용보다 클 경우에는 비활성화 상태가 된다.
+    - Hidden : 스크롤 막대가 숨겨져 있도록 하는 속성, 자식 내용이 ScrollViewer보다 클 경우에는 내용이 잘리게 된다. 스크롤휠을 내려서 확인 가능하다
+    - Auto : 스크롤이 필요 없을 만큼 창크기를 늘려주면 스크롤이 없어짐(필요한 경우에만 표시됨)
+    - Disabled : 스크롤이 아예 없어짐, 창 크기를 밑으로 내려야지만 내용이 보임
+
+#Mainwindow.xaml
+~~~c#
+<ScrollViewer VerticalScrollBarVisibility="Visible">
+    <StackPanel>
+        <TextBlock Background="red" Text="tb1" Height="50" TextAlignment="Center" FontSize="20"/>
+        <TextBlock Background="DarkGray" Text="tb2" Height="50" TextAlignment="Center" FontSize="20"/>
+        <TextBlock Background="Cyan" Text="tb3" Height="50" TextAlignment="Center" FontSize="20"/>
+        <TextBlock Background="Blue" Text="tb4" Height="50" TextAlignment="Center" FontSize="20"/>
+        <TextBlock Background="DarkKhaki" Text="tb5" Height="50" TextAlignment="Center" FontSize="20"/>
+        <TextBlock Background="red" Text="tb6" Height="50" TextAlignment="Center" FontSize="20"/>
+        <TextBlock Background="DarkGray" Text="tb7" Height="50" TextAlignment="Center" FontSize="20"/>
+    </StackPanel>
+</ScrollViewer>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152088288-d03304dc-49c9-4aa8-b698-be87473247bd.png">
+
+###### [ScrollViewer](#ScrollViewer)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
+  - FrameworkElement : 아무것도 없는 공간이라고 생각하면 됨
+
+#Mainwindow.xaml
+~~~c#
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition Width="Auto"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="10*"/>
+    </Grid.RowDefinitions>
+
+    <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" Grid.Column="0">
+        <TextBlock Text="1" Background="#c1c1c1"/>
+    </Border>
+    <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" Grid.Column="1" >
+        <TextBlock Text="1" Background="#c1c1c1"/>
+    </Border>
+    <Border Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" Background="#c1c1c1">
+        <FrameworkElement Grid.Row="0" Grid.Column="2" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"/>
+    </Border>
+
+    <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+        <StackPanel>
+            <TextBlock Background="red" Text="tb1" Height="50" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Background="DarkGray" Text="tb2" Height="50" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Background="Cyan" Text="tb3" Height="50" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Background="Blue" Text="tb4" Height="50" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Background="DarkKhaki" Text="tb5" Height="50" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Background="red" Text="tb6" Height="50" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Background="DarkGray" Text="tb7" Height="50" TextAlignment="Center" FontSize="20"/>
+        </StackPanel>
+    </ScrollViewer>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152091900-c7834135-e50c-4e4f-a8d2-722a35cc0d70.png">
+
+###### [ScrollViewer](#ScrollViewer)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# tooltip
   - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
 
 #MainWindow.xaml
