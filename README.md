@@ -40,12 +40,6 @@
 ##### Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
 
 
-- Control - ContentControl - ButtonBase - [RepeatButton](https://github.com/BuMinKyoo/TIL/tree/main/WPF/RepeatButton)
-- Control - ContentControl - HeaderedContentControl - [Expander](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Expander)
-- Control - ContentControl - HeaderedContentControl - [GroupBox](https://github.com/BuMinKyoo/TIL/tree/main/WPF/GroupBox)
-
-<br/>
-
 - Control - ItemsControl - MenuBase - [Menu](https://github.com/BuMinKyoo/TIL/tree/main/WPF/Menu)
 - Control - ItemsControl - MenuBase - [ContextMenu](https://github.com/BuMinKyoo/TIL/tree/main/WPF/ContextMenu)
 
