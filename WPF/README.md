@@ -130,7 +130,9 @@
             - [RepeatButton](#RepeatButton)
           - [HeaderedContentControl](#HeaderedContentControl)
             - [Expander](#Expander)
+              - [Header를 따로 빼서 지정가능](#header를-따로-빼서-지정가능)
             - [GroupBox](#GroupBox)
+              - [FontFamily](#fontFamily)
         - [ItemsControl](#ItemsControl)
           - [MenuBase](#MenuBase)
             - [Menu](#Menu)
@@ -2226,6 +2228,7 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 # TextBox
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - TextBoxBase
   - 사용자가 Box내부에 string을 적을 수 있는 컨텐트
   - [AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing](#acceptsreturn-acceptstab-verticalscrollbarvisibility-maxlength-charactercasing)
   - [TextChanged이벤트, SelectionChanged이벤트](#textchanged이벤트-selectionchanged이벤트)
@@ -2279,6 +2282,7 @@ public partial class MainWindow : Window
 <br/>
 
 # ContentControl
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
   - [ScrollViewer](#ScrollViewer)
   - [ToolTip](#tooltip)
   - [ButtonBase](#ButtonBase)
@@ -2294,6 +2298,7 @@ public partial class MainWindow : Window
 <br/>
 
 # ScrollViewer
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
   - ScrollViewer내부에 있는 객체들을 스크롤로 나타내줌
   - 기본적으로, VerticalScrollBarVisibility="Visible"로 되어 있기 때문에 VerticalScrollBarVisibility="Hidden"을 해줘야 수직 스크롤 막대가 없어짐
   - [FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기](#frameworkelement를-이용해-scrollviewer의-시스템-whith사이즈를-불러오기)
@@ -2387,6 +2392,7 @@ public partial class MainWindow : Window
 <br/>
 
 # tooltip
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
   - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
 
 #MainWindow.xaml
@@ -2403,4 +2409,153 @@ public partial class MainWindow : Window
 <img src="https://user-images.githubusercontent.com/39178978/152283585-98284fcf-ae1c-48b8-b6d9-2ba1f978d815.png">
 
 ###### [ContentControl](#contentcontrol)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ButtonBase
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
+
+###### [ContentControl](#contentcontrol)
+###### [Top](#top)
+
+# RepeatButton
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - ButtonBase
+  - 클릭을 눌르고 있으면 계속 이벤트가 발생
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+    <RepeatButton Grid.Column="0" Width="50" Height="50" Content="버튼" Click="RepeatButton_Click"/>
+    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Width="90" Height="40">
+        <TextBlock x:Name="tb1" TextWrapping="Wrap"/>
+    </Border>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152261245-cadbc91f-47a7-4060-9c09-61077cdbc36d.png">
+
+###### [ButtonBase](#ButtonBase)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# HeaderedContentControl
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
+  - [Expander](#Expander)
+  - [GroupBox](#GroupBox)
+
+###### [ContentControl](#contentcontrol)
+###### [Top](#top)
+
+# Expander
+  - 눌렀을때 하위의 객체들이 튀어 나옴
+
+<br/>
+
+  - [Header를 따로 빼서 지정가능](#header를-따로-빼서-지정가능)
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Expander Grid.Row="1" Grid.Column="1" Header="규칙">
+        <TextBlock>
+            1.  규칙1
+            <LineBreak/>2. 규칙2
+            <LineBreak/>3. 규칙3
+            <LineBreak/>4. 규칙4
+        </TextBlock>
+    </Expander>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152100796-40fe916c-ad5f-4b0f-a92d-4b6e00ab1f21.png">
+<img src="https://user-images.githubusercontent.com/39178978/152100820-d0b4e2da-168d-47b0-9e35-b561147753e3.png">
+
+###### [HeaderedContentControl](#HeaderedContentControl)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## Header를 따로 빼서 지정가능
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Expander Grid.Row="1" Grid.Column="1">
+        <Expander.Header>
+            <TextBlock>
+                <Run Text="규" Foreground="Red"/><Run Text="칙" Foreground="Aqua"/>
+            </TextBlock>
+        </Expander.Header>
+        <TextBlock>
+            1.  규칙1
+            <LineBreak/>2. 규칙2
+            <LineBreak/>3. 규칙3
+            <LineBreak/>4. 규칙4
+        </TextBlock>
+    </Expander>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152101199-cbffb3c5-31db-40f3-968a-15d522948e79.png">
+<img src="https://user-images.githubusercontent.com/39178978/152101208-c43eb6b5-7ba8-4069-abf3-d820ec514f45.png">
+
+###### [Expander](#Expander)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# GroupBox
+  - 여러 객체들을 목록으로 묶어 표현해줌
+
+<br/>
+
+  - [FontFamily](#fontFamily)
+
+###### [HeaderedContentControl](#HeaderedContentControl)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## FontFamily
+  - 문자를 다양한 기호로 렌더링하는 일련의 딩뱃 글꼴
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <GroupBox Grid.Row="0" Width="100" Height="100">
+        <GroupBox.Header>
+            <StackPanel Orientation="Horizontal">
+                <Label FontFamily="wingdings" FontSize="17">1</Label>
+                <Label>폴더</Label>
+            </StackPanel>
+        </GroupBox.Header>
+        <StackPanel>
+            <RadioButton Content="열기" Margin="5"/>
+            <RadioButton Content="닫기" Margin="5" IsChecked="True"/>
+        </StackPanel>
+    </GroupBox>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152258610-a876a9c0-1bb5-4299-9462-5d42fd675097.png">
+
+###### [GroupBox](#GroupBox)
 ###### [Top](#top)
