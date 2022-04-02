@@ -122,26 +122,38 @@
             - [TextChanged이벤트, SelectionChanged이벤트](#textchanged이벤트-selectionchanged이벤트)
             - [SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()](#selectedtext-caretindex-selectionstart-selectionlength-select14-selectallall)
         - [ContentControl](#contentcontrol)
-          - [ScrollViewer](#ScrollViewer)
+          - [ScrollViewer](#scrollviewer)
             - [FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기](#frameworkelement를-이용해-scrollviewer의-시스템-whith사이즈를-불러오기)
             - [HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)](#horizontalscrollbarvisibility-verticalscrollbarvisibilityvisible-hidden-auto-disabled)
           - [ToolTip](#tooltip)
-          - [ButtonBase](#ButtonBase)
-            - [RepeatButton](#RepeatButton)
-          - [HeaderedContentControl](#HeaderedContentControl)
-            - [Expander](#Expander)
+          - [ButtonBase](#buttonbase)
+            - [RepeatButton](#repeatbutton)
+          - [HeaderedContentControl](#headeredcontentcontrol)
+            - [Expander](#expander)
               - [Header를 따로 빼서 지정가능](#header를-따로-빼서-지정가능)
-            - [GroupBox](#GroupBox)
-              - [FontFamily](#fontFamily)
-        - [ItemsControl](#ItemsControl)
-          - [MenuBase](#MenuBase)
-            - [Menu](#Menu)
-            - [ContextMenu](#ContextMenu)
-          - [Selector](#Selector)
-            - [TabControl](#TabControl)
-            - [ComboBox](#ComboBox)
-            - [ListBox](#ListBox)
-              - [ListView](#ListView)
+            - [GroupBox](#groupbox)
+              - [FontFamily](#fontfamily)
+        - [ItemsControl](#itemscontrol)
+          - [MenuBase](#menubase)
+            - [Menu](#menu)
+              - [MenuItem에 아이콘 넣기](#menuitem에-아이콘-넣기)
+              - [MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened](#menuitem-header-_단축키-inputgesturetext-ischeckable-submenuopened)
+            - [ContextMenu](#contextmenu)
+          - [Selector](#selector)
+            - [TabControl](#tabcontrol)
+            - [ComboBox](#combobox)
+              - [IsEditable속성](#iseditable속성)
+              - [ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력](#observablecollection을-이용한-combobox의-comboboxitem추가-comboboxitem의-content출력)
+              - [각각의 ComboBoxitem을 분리해서 나타나게 하기](#각각의-comboboxitem을-분리해서-나타나게-하기)
+            - [ListBox](#listbox)
+              - [ListBox바인딩 및 MessageBox로 출력하기](#listbox바인딩-및-messagebox로-출력하기)
+              - [ListBoxItem목록에서 Content출력하기](#listboxitem목록에서-content출력하기)
+              - [ListView](#listview)
+                - [SelectedItem](#selecteditem)
+                - [SelectedItem에 대한 Content만 뽑아내기](#selecteditem에-대한-content만-뽑아내기)
+                - [SelectedIndex](#selectedindex)
+                - [ListView헤더 크기를 비율로 조절하기(Binding활용)](#listview헤더-크기를-비율로-조절하기binding활용)
+                - [DisplayMemberBinding](#displaymemberbinding)
 
     
   </div>
@@ -153,8 +165,8 @@
   <summary>자주 활용하는 Class, Interface</summary>
   <div markdown="1">  
 
-    - ObservableCollection
-    - INotifyPropertyChanged
+    - [ObservableCollection](#observablecollection)
+    - [INotifyPropertyChanged](#inotifypropertychanged)
     
   </div>
   </details>
@@ -165,17 +177,19 @@
   <summary>Binding</summary>
   <div markdown="1">  
 
-    - Button + Command
-    - ItemsSource
-    - Workspace를 통한 UserControl끼리의 값 전달
-    - ContentControl을 활용한 UserControl끼리의 값 전달
+    - [Button + Command](#button--command)
+    - [ItemsSource](#itemssource)
+    - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+    - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
     
   </div>
   </details>
 
 
+- [JsonParsing](#jsonparsing)
+  - [JsonParsing하기](#jsonparsing하기)
+  - [Json직렬화하기](#json직렬화하기)
 
-- JsonParsing
 
 - <details>
   <summary>Try..</summary>
@@ -196,7 +210,7 @@
 
 <br/>
 
-## WPF의 시작...
+# WPF의 시작...
 
 <br/>
 
@@ -2461,6 +2475,7 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 # Expander
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - HeaderedContentControl
   - 눌렀을때 하위의 객체들이 튀어 나옴
 
 <br/>
@@ -2484,7 +2499,7 @@ public partial class MainWindow : Window
 <img src="https://user-images.githubusercontent.com/39178978/152100796-40fe916c-ad5f-4b0f-a92d-4b6e00ab1f21.png">
 <img src="https://user-images.githubusercontent.com/39178978/152100820-d0b4e2da-168d-47b0-9e35-b561147753e3.png">
 
-###### [HeaderedContentControl](#HeaderedContentControl)
+###### [HeaderedContentControl](#headeredcontentcontrol)
 ###### [Top](#top)
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
@@ -2513,7 +2528,7 @@ public partial class MainWindow : Window
 <img src="https://user-images.githubusercontent.com/39178978/152101199-cbffb3c5-31db-40f3-968a-15d522948e79.png">
 <img src="https://user-images.githubusercontent.com/39178978/152101208-c43eb6b5-7ba8-4069-abf3-d820ec514f45.png">
 
-###### [Expander](#Expander)
+###### [Expander](#expander)
 ###### [Top](#top)
 
 <br/>
@@ -2523,13 +2538,14 @@ public partial class MainWindow : Window
 <br/>
 
 # GroupBox
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - HeaderedContentControl
   - 여러 객체들을 목록으로 묶어 표현해줌
 
 <br/>
 
-  - [FontFamily](#fontFamily)
+  - [FontFamily](#fontfamily)
 
-###### [HeaderedContentControl](#HeaderedContentControl)
+###### [HeaderedContentControl](#headeredcontentcontrol)
 ###### [Top](#top)
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
@@ -2557,5 +2573,2484 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152258610-a876a9c0-1bb5-4299-9462-5d42fd675097.png">
 
-###### [GroupBox](#GroupBox)
+###### [GroupBox](#groupbox)
 ###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ItemsControl
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
+  - [MenuBase](#menubase)
+  - [Selector](#selector)
+
+###### [Control](#control)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# MenuBase
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl
+  - [Menu](#Menu)
+  - [ContextMenu](#ContextMenu)
+
+###### [ItemsControl](#itemscontrol)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Menu
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - MenuBase
+  - 메뉴를 생성
+
+<br/>
+
+  - [MenuItem에 아이콘 넣기](#menuitem에-아이콘-넣기)
+  - [MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened](#menuitem-header-단축키-inputgesturetext-ischeckable-submenuopened)
+
+###### [MenuBase](#menubase)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
+  - MenuItem : Menu안에 요소 생성
+  - Header : 이름을 바꿀 수 있음
+  - _(단축키) : 이것을 통해서 단축키를 설정 할 수 있음
+  - InputGestureText : 단축키 설정, 단지 표시용 이다. 실제 명령은 커맨드 바인딩 작업이 추가적으로 필요하다.
+  - IsCheckable 속성 값을 true/false로 설정
+  - SubmenuOpened : submenu를 오픈 했을때 발생하는 이벤트
+
+#MainWindow.xaml
+~~~c#
+<DockPanel>
+    <Menu DockPanel.Dock="Top">
+        <MenuItem Header="파일(_F)">
+            <MenuItem Header="새파일" InputGestureText="Ctrl+N" IsCheckable="True"/>
+            <MenuItem Header="종료" Click="Exit_Click"/>
+        </MenuItem>
+        <MenuItem Header="편집">
+            <MenuItem Header="찾기"/>
+            <MenuItem Header="다음 찾기"/>
+            <MenuItem Header="바꾸기"/>
+        </MenuItem>
+    </Menu>
+</DockPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152794008-a5828c1a-bba4-440d-98e6-630b2c633433.png">
+
+<br/>
+<br/>
+
+###### [Menu](#menu)
+###### [Top](#top)
+
+## MenuItem에 아이콘 넣기
+
+#MainWindow.xaml
+~~~c#
+<MenuItem Header="파일">
+    <MenuItem.Icon>
+        <Image Source=""
+    </MenuItem.Icon>
+</MenuItem>
+~~~
+
+###### [Menu](#menu)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ContextMenu
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - MenuBase
+  - 마우스 오른쪽 클릭 했을때 나오는 Menu창
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <TextBox>
+        <TextBox.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="전체 지우기"/>
+                <MenuItem Header="전체 선택" InputGestureText="Ctrl+A"/>
+            </ContextMenu>
+        </TextBox.ContextMenu>
+    </TextBox>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152800620-2a7e093c-cf50-45bb-8733-914bec5f3776.png">
+
+###### [MenuBase](#menubase)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Selector
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl
+  - Selector를 상속받은 클래스들은 여러 속성들을 사용 할 수 있음
+  - SelectedItem : ListView에 속해 있는 ListViewItem을 반환한다
+  - SelectedItems : ListView에 속해 있는 모든 ListViewItem을 반환한다
+  - SelectedIndex : ListViewItem을 클릭했을시 ListView가 가지고 있는 SelectedIndex은 숫자로 반환되며, 위부터 0부터 시작되어 반환해 준다
+  - SelectedValue
+  - SelectedValuedPath 등등  
+사용 방법은 ListView, ListBox와 비슷 한 방법으로 사용 가능
+
+<br/>
+
+  - [TabControl](#tabcontrol)
+  - [ComboBox](#combobox)
+  - [ListBox](#listbox)
+
+###### [ItemsControl](#itemscontrol)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# TabControl
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector
+  - TabItem : TabControl안에 요소를 생성
+
+#MainWindow.xaml
+~~~c#
+<TabControl>
+    <TabItem Header="사원">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock VerticalAlignment="Center" Text="이름"/>
+            <TextBox Grid.Column="1" Height="30"/>
+            <TextBlock VerticalAlignment="Center" Grid.Row="1" Text="번호"/>
+            <TextBox Grid.Column="1" Grid.Row="1" Height="30"/>
+        </Grid>
+    </TabItem>
+    <TabItem Header="대리">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock VerticalAlignment="Center" Text="이름"/>
+            <TextBox Grid.Column="1" Height="30"/>
+            <TextBlock VerticalAlignment="Center" Grid.Row="1" Text="번호"/>
+            <TextBox Grid.Column="1" Grid.Row="1" Height="30"/>
+        </Grid>
+    </TabItem>
+</TabControl>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152521030-86af5f22-62ed-4ba8-a504-64d2365e5a0f.png">
+
+###### [Selector](#selector)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ComboBox
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector
+  - ComboBox박스 생성
+  - ComboBoxItem : ComboBox하위의 Item생성
+  - DropDownOpende : 사용자가 목록을 펼칠 때 발생하는 이벤트
+  - DropDownClosed : 사용자가 목록을 접을 때 발생하는 이벤트
+
+<br/>
+
+  - [IsEditable속성](#iseditable속성)
+  - [ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력](#observablecollection을-이용한-combobox의-comboboxitem추가-comboboxitem의-content출력)
+  - [각각의 ComboBoxitem을 분리해서 나타나게 하기](#각각의-comboboxitem을-분리해서-나타나게-하기)
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <ComboBox Width="100" Height="30">
+        <ComboBoxItem Content="1"/>
+        <ComboBoxItem Content="2"/>
+        <ComboBoxItem Content="3"/>
+        <ComboBoxItem Content="4"/>
+        <ComboBoxItem Content="5"/>
+    </ComboBox>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152633117-b34d6a50-9cd7-411c-bb83-c942076b5b85.png">
+
+###### [Selector](#selector)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## IsEditable속성
+  - 텍스트를 직접 편집할 수 있는지 여부를 지정, 속성값이 true일 경우 사용자가 목록에서 항목을 선택하면 SelectedItem 속성이 설정된다
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <ComboBox Name="cbox" Width="100" Height="30" IsEditable="True">
+        <ComboBoxItem Content="1"/>
+        <ComboBoxItem Content="2"/>
+        <ComboBoxItem Content="3"/>
+        <ComboBoxItem Content="4"/>
+        <ComboBoxItem Content="5"/>
+    </ComboBox>
+    <Button Width="100" Content="버튼" Click="Button_Click"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        int index = cbox.SelectedIndex + 1;
+        if(index > 4)
+        {
+            index = 0;
+        }
+
+        cbox.SelectedIndex = index;
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152633424-730dd3cc-0dff-4d31-9376-deb7949e7414.png">
+  현재 버튼을 클릭하면 cbox.SelectedIndex가 1씩 증가하면서 ComboBoxItem을 차례로 보여주게 되고, IsEditable="True"이기 때문에 직접 박스를 클릭해 숫자를 바꿔 줘도 cbox.SelectedIndex가 같이 변하게 된다
+
+###### [ComboBox](#combobox)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <ComboBox Name="cbox" Width="100" Height="30" ItemsSource="{Binding GetDataList}">
+        <ComboBox.ItemTemplate>
+            <DataTemplate>
+                <Grid>
+                    <TextBlock Text="{Binding List1}"/>
+                </Grid>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
+    </ComboBox>
+    <Button Width="100" Content="버튼" Click="Button_Click"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+
+        GetDataList = new ObservableCollection<GetData>();
+        GetDataList.Add(new GetData() { List1 = "1번"});
+
+        this.DataContext = this;
+    }
+
+    private ObservableCollection<GetData> m_GetDataList;
+    public ObservableCollection<GetData> GetDataList
+    {
+        get { return m_GetDataList; }
+        set
+        {
+            if(m_GetDataList != value)
+            {
+                m_GetDataList = value;
+            }
+        }
+    }
+
+    public class GetData
+    {
+        private string m_List1;
+        public string List1
+        {
+            get { return m_List1; }
+            set
+            {
+                if (m_List1 != value)
+                {
+                    m_List1 = value;
+                }
+            }
+        }
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(((GetData)cbox.SelectedItem).List1.ToString());
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152634252-d19654b9-506d-42b8-a707-02941430e593.png">  
+<img src="https://user-images.githubusercontent.com/39178978/152634277-ec3dfa94-a10f-4fb3-bf1f-615db7f5e290.png">  
+
+<br/><br/>
+
+  - 하지만 여기서 ComboBox속성중 IsEditable="True"으로 하게 되면 ComboBoxItem의 Content가 잘 나오지 않게 된다
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/152634331-340e05c5-507d-481e-a1fd-3dad9d06c5df.png"> 
+
+  - 이럴땐 foreach를 활용해서 출력해주면 해결된다
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <ComboBox Name="cbox" Width="100" Height="30" IsEditable="True">
+        <!--<ComboBox.ItemTemplate>
+            <DataTemplate>
+                <Grid>
+                    <TextBlock Text="{Binding List1}"/>
+                </Grid>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>-->
+    </ComboBox>
+    <Button Width="100" Content="버튼" Click="Button_Click"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        GetData_ComboBoxItem();
+
+        this.DataContext = this;
+    }
+    public void GetData_ComboBoxItem()
+    {
+        cbox.Items.Clear();
+        foreach(var item in GetData_GetDataList())
+        {
+            ComboBoxItem cbi = new ComboBoxItem();
+            cbi.Content = item.List1.ToString();
+            cbox.Items.Add(cbi);
+        }
+    }
+
+    public ObservableCollection<GetData> GetData_GetDataList()
+    {
+        GetDataList = new ObservableCollection<GetData>();
+        GetDataList.Add(new GetData() { List1 = "1번"});
+
+        return GetDataList;
+    }
+
+    private ObservableCollection<GetData> m_GetDataList;
+    public ObservableCollection<GetData> GetDataList
+    {
+        get { return m_GetDataList; }
+        set
+        {
+            if(m_GetDataList != value)
+            {
+                m_GetDataList = value;
+            }
+        }
+    }
+
+    public class GetData
+    {
+        private string m_List1;
+        public string List1
+        {
+            get { return m_List1; }
+            set
+            {
+                if (m_List1 != value)
+                {
+                    m_List1 = value;
+                }
+            }
+        }
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(((ComboBoxItem)cbox.SelectedItem).Content.ToString());
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152634765-c98a39f4-ec57-4510-a3a5-1ddf1d94e5af.png">
+
+###### [ComboBox](#combobox)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## 각각의 ComboBoxitem을 분리해서 나타나게 하기
+
+#MainWindow.xaml
+~~~c#
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+    <ComboBox Width="100" Height="30" ItemsSource="{Binding Obser_Fruit_list}" Margin="10" SelectedItem="{Binding Fruit_list_SelectedItem}">
+        <ComboBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Fruit_name}"/>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <ComboBox Width="100" Height="30" ItemsSource="{Binding Obser_Price_list}" Margin="10">
+        <ComboBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Price_name}"/>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
+    </ComboBox>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        Getdata_Obser_Fruit_list();
+        this.DataContext = this;
+    }
+
+    private ObservableCollection<Fruit_list> m_Obser_Fruit_list = new ObservableCollection<Fruit_list>();
+    public ObservableCollection<Fruit_list> Obser_Fruit_list
+    {
+        get { return m_Obser_Fruit_list; }
+        set
+        {
+            if(m_Obser_Fruit_list != value)
+            {
+                m_Obser_Fruit_list = value;
+                Notify("Obser_Fruit_list");
+
+            }
+        }
+    }
+
+    private ObservableCollection<Price_list> m_Obser_Price_list = new ObservableCollection<Price_list>();
+    public ObservableCollection<Price_list> Obser_Price_list
+    {
+        get { return m_Obser_Price_list; }
+        set
+        {
+            if (m_Obser_Price_list != value)
+            {
+                m_Obser_Price_list = value;
+                Notify("Obser_Price_list");
+
+            }
+        }
+    }
+
+
+    private Fruit_list m_Fruit_list_SelectedItem;
+    public Fruit_list Fruit_list_SelectedItem
+    {
+        get { return m_Fruit_list_SelectedItem; }
+        set
+        {
+            if(m_Fruit_list_SelectedItem != value)
+            {
+                m_Fruit_list_SelectedItem = value;
+                Notify("Fruit_list_SelectedItem");
+
+                Obser_Price_list.Clear();
+
+                if (m_Fruit_list_SelectedItem != null)
+                {
+                    if (m_Fruit_list_SelectedItem.Fruit_name == "Apple")
+                    {
+                        Obser_Price_list.Add(new Price_list() { Price_name = "1000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "2000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "3000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "4000" });
+                    }
+                    else if (m_Fruit_list_SelectedItem.Fruit_name == "Banana")
+                    {
+                        Obser_Price_list.Add(new Price_list() { Price_name = "5000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "6000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "7000" });
+                        Obser_Price_list.Add(new Price_list() { Price_name = "8000" });
+                    }
+                }
+            }
+        }
+    }
+    public void Getdata_Obser_Fruit_list()
+    {
+        Obser_Fruit_list.Add(new Fruit_list() { Fruit_name = "Apple"});
+        Obser_Fruit_list.Add(new Fruit_list() { Fruit_name = "Banana"});
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Fruit_list.cs
+~~~c#
+public class Fruit_list : INotifyPropertyChanged
+{
+    private string m_Fruit_name;
+    public string Fruit_name
+    {
+        get { return m_Fruit_name; }
+        set
+        {
+            if(m_Fruit_name != value)
+            {
+                m_Fruit_name = value;
+                Notify("Fruit_name");
+            }
+        }
+    }
+
+        
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Price_list.cs
+~~~c#
+public class Price_list : INotifyPropertyChanged
+{
+    private string m_Price_name;
+    public string Price_name
+    {
+        get { return m_Price_name; }
+        set
+        {
+            if (m_Price_name != value)
+            {
+                m_Price_name = value;
+                Notify("Price_name");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158348530-424eafe3-55b9-4882-a314-2d5b281d5e4a.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158348673-70cfd96b-2b96-4eed-8144-f0a2990f437a.png">
+
+###### [ComboBox](#combobox)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ListBox
+  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector
+  - List목록을 만들어줌
+  - ListBoxItem : List내부의 목록을 만들어줌
+
+<br/>
+
+  - [ListBox바인딩 및 MessageBox로 출력하기](#listbox바인딩-및-messagebox로-출력하기)
+  - [ListBoxItem목록에서 Content출력하기](#listboxitem목록에서-content출력하기)
+  - [ListView](lListview)
+
+#MainWindow.xaml
+~~~c#
+<ListBox>
+    <ListBoxItem Content="사과"/>
+    <ListBoxItem Content="포도"/>
+    <ListBoxItem Content="배"/>
+    <ListBoxItem Content="딸기"/>
+    <ListBoxItem Content="메론"/>
+</ListBox>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152623676-b2a1e970-68a7-4c82-9c6a-9b2edbd7df18.png">
+
+
+###### [Selector](#selector)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## ListBoxItem목록에서 Content출력하기
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <ListBox x:Name="listbox">
+        <ListBoxItem Content="사과"/>
+        <ListBoxItem Content="포도"/>
+        <ListBoxItem Content="배"/>
+        <ListBoxItem Content="딸기"/>
+        <ListBoxItem Content="메론"/>
+    </ListBox>
+    <Button Width="100" Content="선택" Click="Button_Click"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(((ListBoxItem)listbox.SelectedItem).Content.ToString());
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152624081-24ddc690-9abe-4806-8450-6dd4b2128632.png">
+
+###### [ListBox](#listbox)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## ListBox바인딩 및 MessageBox로 출력하기
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <ListBox x:Name="listbox" ItemsSource="{Binding Apple_list}">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Price}" Margin="3 0"/>
+                </Grid>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+    <Button Width="100" Content="선택" Click="Button_Click"/>
+</StackPanel>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152624154-53635d8d-7488-4f20-8a47-f0c3e11f4f62.png">
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        Apple_list = new ObservableCollection<Apple>();
+        Apple_list.Add(new Apple() { Name = "사과", Price = 1000});
+        Apple_list.Add(new Apple() { Name = "포도", Price = 2000});
+        Apple_list.Add(new Apple() { Name = "배", Price = 3000});
+
+    }
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("이름 : " + ((Apple)listbox.SelectedItem).Name + "\n" + "가격 : " + ((Apple)listbox.SelectedItem).Price.ToString());
+    }
+
+    private ObservableCollection<Apple> m_Apple_list;
+    public ObservableCollection<Apple> Apple_list
+    {
+        get { return m_Apple_list; }
+        set
+        {
+            if (m_Apple_list != value)
+            {
+                m_Apple_list = value;
+                Norty("Apple_list");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+}
+
+public class Apple : INotifyPropertyChanged
+{
+    private string m_Name = "0";
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if (m_Name != value)
+            {
+                m_Name = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    private int m_Price = 0;
+    public int Price
+    {
+        get { return m_Price; }
+        set
+        {
+            if (m_Price != value)
+            {
+                m_Price = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    public Apple()
+    {
+
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152624201-265de94a-3442-4792-90ea-dbf127bebeea.png">
+
+###### [ListBox](#listbox)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ListView
+  - Selector를 상속받은 속성 활용
+  - SelectedItem, SelectedItems, SelectedIndex, SelectedValue, SelectedValuedPath
+
+<br/>
+
+  - [SelectedItem](#selecteditem)
+  - [SelectedItem에 대한 Content만 뽑아내기](#selecteditem에-대한-content만-뽑아내기)
+  - [SelectedIndex](#selectedindex)
+  - [ListView헤더 크기를 비율로 조절하기(Binding활용)](#listview헤더-크기를-비율로-조절하기binding활용)
+  - [DisplayMemberBinding](#displaymemberbinding)
+
+###### [ListBox](#listbox)
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## SelectedItem
+
+#MainWindow.xaml
+~~~c#
+<ListView x:Name="listv">
+    <ListViewItem Content="1일"/>
+    <ListViewItem Content="2일"/>
+    <ListViewItem Content="3일"/>
+    <ListViewItem Content="4일"/>
+    <ListViewItem Content="5일"/>
+    <ListViewItem Content="6일"/>
+    <Button Width="100" Height="30" Content="선택" Click="Button_Click"/>
+</ListView>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(listv.SelectedItem.ToString()); // 0부터 시작
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152518058-4cb3e9f6-b744-442e-a980-07786e121536.png">
+
+###### [ListView](#listview)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## SelectedItem에 대한 Content만 뽑아내기
+
+#MainWindow.xaml
+~~~c#
+<ListView x:Name="listv">
+    <ListViewItem Content="1일"/>
+    <ListViewItem Content="2일"/>
+    <ListViewItem Content="3일"/>
+    <ListViewItem Content="4일"/>
+    <ListViewItem Content="5일"/>
+    <ListViewItem Content="6일"/>
+    <Button Width="100" Height="30" Content="선택" Click="Button_Click"/>
+</ListView>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(((ListViewItem)listv.SelectedItem).Content.ToString()); // 0부터 시작
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152519055-3640bb45-fc94-499b-a3b9-959a3a7557f0.png">
+
+###### [ListView](#listview)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## SelectedIndex
+
+#MainWindow.xaml
+~~~c#
+<ListView x:Name="listv">
+    <ListViewItem Content="1일"/>
+    <ListViewItem Content="2일"/>
+    <ListViewItem Content="3일"/>
+    <ListViewItem Content="4일"/>
+    <ListViewItem Content="5일"/>
+    <ListViewItem Content="6일"/>
+    <Button Width="100" Height="30" Content="선택" Click="Button_Click"/>
+</ListView>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(listv.SelectedIndex.ToString()); // 0부터 시작
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152517500-e7a55889-e2d2-4388-9847-d321ef45fd06.png">
+
+###### [ListView](#listview)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## ListView헤더 크기를 비율로 조절하기(Binding활용)
+  - ListView안쪽에서는 Grid를 따로 만들어 RowDefinition, ColumnDefinition을 통한 Height="1*"의 조절이 되지 않기 때문에 Grid와 Border값을 새로 하나 만들어 GridViewColumn Width="{Binding ElementName=dummywidth1, Path=ActualWidth}"이 방법을 통해서 크기를 맞춰 줄 수 있다.
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Margin="10" Visibility="Hidden">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" x:Name="dummywidth1"/>
+        <Border Grid.Column="1" x:Name="dummywidth2"/>
+    </Grid>
+
+    <ListView Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Margin="10">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Width="{Binding ElementName=dummywidth1, Path=ActualWidth}" Header="RGB"/>
+                <GridViewColumn Width="{Binding ElementName=dummywidth2, Path=ActualWidth}" Header="HEX"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</Grid>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151750523-8d72597c-0fb8-4b9a-9de1-6fea134b7861.png">
+
+###### [ListView](#listview)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+## DisplayMemberBinding
+  - ListView에 Binding을 하기 위해서는ObservableCollection을 만들어 Binding을 해야
+  - GridViewColumn에 DisplayMemberBinding을 통해서 Binding 가능
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Margin="10" Visibility="Hidden">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" x:Name="dummywidth1"/>
+        <Border Grid.Column="1" x:Name="dummywidth2"/>
+    </Grid>
+
+    <ListView Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Margin="10" ItemsSource="{Binding RGB_HEX_List}">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Width="{Binding ElementName=dummywidth1, Path=ActualWidth}" Header="RGB" DisplayMemberBinding="{Binding RGB}"/>
+                <GridViewColumn Width="{Binding ElementName=dummywidth2, Path=ActualWidth}" Header="HEX" DisplayMemberBinding="{Binding HEX}"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</Grid>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+
+        RGB_HEX_List = new ObservableCollection<RGB_HEX>();
+        RGB_HEX_List.Add(new RGB_HEX { HEX = "1", RGB = 1 });
+    }
+
+    private ObservableCollection<RGB_HEX> m_RGB_HEX_List;
+    public ObservableCollection<RGB_HEX> RGB_HEX_List
+    {
+        get { return m_RGB_HEX_List; }
+        set
+        {
+            if (m_RGB_HEX_List != value)
+            {
+                m_RGB_HEX_List = value;
+                Notify("RGB_HEX_List");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify(string propName)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#RGB_HEX.cs
+~~~
+public class RGB_HEX : INotifyPropertyChanged
+    {
+        private int m_RGB;
+        public int RGB
+        {
+            get { return m_RGB; }
+            set
+            {
+                if(m_RGB != value)
+                {
+                    m_RGB = value;
+                }
+            }
+        }
+
+        private string m_HEX;
+        public string HEX
+        {
+            get { return m_HEX; }
+            set
+            {
+                if (m_HEX != value)
+                {
+                    m_HEX = value;
+                }
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify(string propName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
+        #endregion
+    }
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151805276-717892ef-8192-4150-9118-fd928e956dd2.png">
+
+###### [ListView](#listview)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# 자주 활용하는 Class, Interface
+  - [ObservableCollection](#observablecollection)
+  - [INotifyPropertyChanged](#inotifypropertychanged)
+
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ObservableCollection
+  - ObservableCollection 과 List차이 : WPF에서는 ListBox와ListView같은 곳에서 바인딩 사용시(ItemSource) ObserableColletion을 대부분 사용하게 된다. ObserableColletion는 UI에서 실시간으로 반영을 해주기 때문이다, 그러나 일반적인 List 는 변경된 List의 내용을 UI 에서 실시간으로 반영하지 않는다
+
+  - List
+  
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <ListBox ItemsSource="{Binding Apple_list}">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Price}"/>
+                </Grid>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+    <Button x:Name="btn" Width="100" Content="버튼" Click="btn_Click"/>
+</StackPanel>
+~~~
+
+<br/>
+  
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        Apple_list = new List<Apple>();
+
+    }
+
+    private List<Apple> m_Apple_list;
+    public List<Apple> Apple_list
+    {
+        get { return m_Apple_list; }
+        set
+        {
+            if (m_Apple_list != value)
+            {
+                m_Apple_list = value;
+                Norty("Apple_list");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+
+    private void btn_Click(object sender, RoutedEventArgs e)
+    {
+        Apple_list.Add(new Apple() { Name = "사과", Price = 1000 });
+    }
+}
+
+public class Apple : INotifyPropertyChanged
+{
+    private string m_Name = "0";
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if (m_Name != value)
+            {
+                m_Name = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    private int m_Price = 0;
+    public int Price
+    {
+        get { return m_Price; }
+        set
+        {
+            if (m_Price != value)
+            {
+                m_Price = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    public Apple()
+    {
+
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152622781-0aeb05bd-ffef-4ab3-a79c-a3df31d9b71d.png">
+  - 버튼 클릭시 List가 만들어 지고 있지만, UI에 실시간으로 반영되고 있지 않다.
+
+<br/><br/>
+
+  - ObservableCollection  
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        Apple_list = new ObservableCollection<Apple>();
+
+    }
+
+    private ObservableCollection<Apple> m_Apple_list;
+    public ObservableCollection<Apple> Apple_list
+    {
+        get { return m_Apple_list; }
+        set
+        {
+            if (m_Apple_list != value)
+            {
+                m_Apple_list = value;
+                Norty("Apple_list");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+
+    private void btn_Click(object sender, RoutedEventArgs e)
+    {
+        Apple_list.Add(new Apple() { Name = "사과", Price = 1000 });
+    }
+}
+
+public class Apple : INotifyPropertyChanged
+{
+    private string m_Name = "0";
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if (m_Name != value)
+            {
+                m_Name = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    private int m_Price = 0;
+    public int Price
+    {
+        get { return m_Price; }
+        set
+        {
+            if (m_Price != value)
+            {
+                m_Price = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    public Apple()
+    {
+
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152622892-24a626c9-c433-48a7-86e7-a229d61311ab.png">
+
+###### [자주 활용하는 Class, Interface](#자주-활용하는-class-interface)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# INotifyPropertyChanged
+  - 인터페이스로써, 속성 값이 변경 되었을 때 알림을 준다. 예를 들어 디자인 폼에서 속성을 변경 했을때 백단의 데이터까지 바뀌게 해준다.
+
+#.cs
+~~~
+public class Class1 : INotifyPropertyChanged
+{
+    private string m_Name;
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if(m_Name != value)
+            {
+                m_Name = value;
+                Notify("Name");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+###### [자주 활용하는 Class, Interface](#자주-활용하는-class-interface)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Binding
+  - [Button + Command](#button--command)
+  - [ItemsSource](#itemssource)
+  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+  - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
+
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Button + Command
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Button Width="100" Height="100" Content="버튼" Click="Button_Click"/>
+</Grid>
+~~~
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("클릭");
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151135525-1bbd60ec-f756-408b-9a57-7476f15ee9cc.png">
+
+<br/>
+<br/>
+
+  - MVVM패턴을 위 Button에 Command로 Click이벤트를 사용하는 방법
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Button Width="100" Height="100" Content="버튼" Command="{Binding OneClick}"/>
+</Grid>
+~~~
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows.Input; <- ICommand실행시 참조필요
+
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    private Command m_OneClick;
+    public ICommand OneClick
+    {
+        get { return m_OneClick = new Command(OneClickEvent); }
+    }
+
+    private void OneClickEvent(object obj)
+    {
+        MessageBox.Show("클릭 이벤트 발생");
+    }
+}
+~~~
+
+#Command.cs
+~~~
+using System.Windows.Input;
+
+public class Command : ICommand
+{
+    Action<object> _execute;
+
+    public event EventHandler? CanExecuteChanged;
+
+    public Command(Action<object> execute)
+    {
+        _execute = execute;
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        _execute(parameter);
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151136487-7cbf3db9-aa5e-41f8-aef9-1401baabe5af.png">
+
+<br/>
+<br/>
+
+  - #XAML.cs부분을 이렇게 따로 수정해서 사용하는것이 보기 편함
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows.Input;
+
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        OneClick = new Command(OneClickEvent);
+    }
+
+    public ICommand OneClick { get; set; }
+
+    private void OneClickEvent(object obj)
+    {
+        MessageBox.Show("클릭 이벤트 발생");
+    }
+}
+~~~
+
+###### [Binding](#binding)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ItemsSource
+  - ItemsControl을 상속받은 컨트롤들(TabControl, ComboBox, ListBox, ListView 등)을 Binding작업할때 사용
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <ListView ItemsSource="{Binding Class1_list}">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Width="100" DisplayMemberBinding="{Binding Name}"/>
+                <GridViewColumn Width="100" DisplayMemberBinding="{Binding Age}"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</Grid>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window,INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        Class1_list = new ObservableCollection<Class1>();
+        Class1_list.Add(new Class1() { Age=10, Name="PAPA"});
+        this.DataContext = this;
+    }
+
+    private ObservableCollection<Class1> m_Class1_list;
+    public ObservableCollection<Class1> Class1_list
+    {
+        get { return m_Class1_list; }
+        set
+        {
+            if(m_Class1_list != value)
+            {
+                m_Class1_list = value;
+                Notify("Class1_list");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Class1.cs
+~~~
+public class Class1 : INotifyPropertyChanged
+{
+    private string m_Name;
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if(m_Name != value)
+            {
+                m_Name = value;
+                Notify("Name");
+            }
+        }
+    }
+
+    private int m_Age;
+    public int Age
+    {
+        get { return m_Age; }
+        set
+        {
+            if (m_Age != value)
+            {
+                m_Age = value;
+                Notify("Age");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/154080138-6a6e136b-3475-446a-9ed4-8e56fdcc33b2.png">
+
+###### [Binding](#binding)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# Workspace를 통한 UserControl끼리의 값 전달
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+
+    <local:UserControl1 Grid.Column="0" Grid.Row="0"></local:UserControl1>
+    <local:UserControl2 Grid.Column="1" Grid.Row="0"></local:UserControl2>
+</Grid>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock Text="UserControl1" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl1_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    <Button Width="100" Height="30" Content="1->2" Margin="5" Command="{Binding Oneclick}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl1.xaml.cs
+~~~c#
+public partial class UserControl1 : UserControl
+{
+    public UserControl1()
+    {
+        InitializeComponent();
+        this.DataContext = Workspace.Instance.userControl1_model;
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1_model.cs
+~~~c#
+public class UserControl1_model : INotifyPropertyChanged
+{
+
+    private string m_UserControl1_text;
+    public string UserControl1_text
+    {
+        get { return m_UserControl1_text; }
+        set
+        {
+            if (m_UserControl1_text != value)
+            {
+                m_UserControl1_text = value;
+                Notify("UserControl1_text");
+                Workspace.Instance.userControl2_model.UserControl2_text = value;
+            }
+        }
+    }
+
+    private Command m_Oneclick;
+    public ICommand Oneclick
+    {
+        get { return m_Oneclick = new Command(Oneclickevent); }
+    }
+
+    private void Oneclickevent(object obj)
+    {
+        Workspace.Instance.userControl2_model.UserControl2_textblock = UserControl1_text;
+    }
+
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock x:Name="tblock" Text="UserControl2" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    <TextBlock Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_textblock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl2.xaml.cs
+~~~c#
+public partial class UserControl2 : UserControl
+{
+    public UserControl2()
+    {
+        InitializeComponent();
+        this.DataContext = Workspace.Instance.userControl2_model;
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2_model.cs
+~~~c#
+public class UserControl2_model : INotifyPropertyChanged
+{
+    public UserControl2_model()
+    {
+
+    }
+
+    private string m_UserControl2_text;
+    public string UserControl2_text
+    {
+        get { return m_UserControl2_text; }
+        set
+        {
+            if (m_UserControl2_text != value)
+            {
+                m_UserControl2_text = value;
+                Notify("UserControl2_text");
+                Workspace.Instance.userControl1_model.UserControl1_text = value;
+            }
+        }
+    }
+
+    private string m_UserControl2_textblock;
+    public string UserControl2_textblock
+    {
+        get { return m_UserControl2_textblock; }
+        set
+        {
+            if (m_UserControl2_textblock != value)
+            {
+                m_UserControl2_textblock = value;
+                Notify("UserControl2_textblock");
+            }
+        }
+    }
+        
+
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Workspace.cs
+~~~c#
+class Workspace : INotifyPropertyChanged
+{
+    static Workspace m_Instance = new Workspace();
+
+    public static Workspace Instance
+    {
+        get { return m_Instance; }
+    }
+
+    private UserControl1_model m_userControl1_model = new UserControl1_model();
+    public UserControl1_model userControl1_model
+    {
+        get { return m_userControl1_model; }
+        set
+        {
+            if (m_userControl1_model != value)
+            {
+                m_userControl1_model = value;
+                Notify("userControl1_model");
+
+            }
+        }
+    }
+
+    private UserControl2_model m_userControl2_model = new UserControl2_model();
+    public UserControl2_model userControl2_model
+    {
+        get { return m_userControl2_model; }
+        set
+        {
+            if (m_userControl2_model != value)
+            {
+                m_userControl2_model = value;
+                Notify("userControl2_model");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158002074-53c25c5e-e955-44b3-8f25-03c27f839310.gif" height="400" width="400">
+
+###### [Binding](#binding)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# ContentControl을 활용한 UserControl끼리의 값 전달
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+
+    <ContentControl Content="{Binding View1Content}"></ContentControl>
+    <ContentControl Grid.Column="1" Content="{Binding View2Content}"></ContentControl>
+</Grid>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock Text="UserControl1" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl1_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl1.xaml.cs
+~~~c#
+public partial class UserControl1 : UserControl, INotifyPropertyChanged
+{
+    public UserControl1()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    private string m_UserControl1_text;
+    public string UserControl1_text
+    {
+        get { return m_UserControl1_text; }
+        set
+        {
+            if (m_UserControl1_text != value)
+            {
+                m_UserControl1_text = value;
+                RaisePropertyChanged("UserControl1_text");
+                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>UserControl1_text 작동");
+                Workspace.Instance.View2Content.UserControl2_text = value;
+            }
+        }
+    }
+
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        if (PropertyChanged != null)
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock x:Name="tblock" Text="UserControl2" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox x:Name="tbox" Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl2.xaml.cs
+~~~c#
+public partial class UserControl2 : UserControl, INotifyPropertyChanged
+{
+    public UserControl2()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    private string m_UserControl2_text;
+    public string UserControl2_text
+    {
+        get { return m_UserControl2_text; }
+        set
+        {
+            if(m_UserControl2_text != value)
+            {
+                m_UserControl2_text = value;
+                RaisePropertyChanged("UserControl2_text");
+                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>UserControl2_text 작동");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        if (PropertyChanged != null)
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Workspace.cs
+~~~c#
+class Workspace : INotifyPropertyChanged
+{
+    static Workspace m_Instance = new Workspace();
+
+    public static Workspace Instance
+    {
+        get { return m_Instance; }
+    }
+
+    private UserControl1 m_View1Content = new UserControl1();
+    public UserControl1 View1Content
+    {
+        get { return m_View1Content; }
+        set
+        {
+            if (m_View1Content != value)
+            {
+                m_View1Content = value;
+                Notify("View1Content");
+
+            }
+        }
+    }
+
+    private UserControl2 m_View2Content = new UserControl2();
+    public UserControl2 View2Content
+    {
+        get { return m_View2Content; }
+        set
+        {
+            if (m_View2Content != value)
+            {
+                m_View2Content = value;
+                Notify("View1Content");
+
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158002648-4572bcdb-a67c-4d57-b337-67e14c2d493b.gif" width="400" height="400">
+
+###### [Binding](#binding)
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+# JsonParsing
+  - [JsonParsing하기](#jsonparsing하기)
+  - [Json직렬화하기](#json직렬화하기)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## JsonParsing하기
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <Button Width="100" Height="30" Content="버튼" Margin="10" Click="Button_Click"/>
+    <ListView x:Name="lv" Grid.Row="1" Margin="10" ItemsSource="{Binding Custlist}" >
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Width="100" Header="기업명칭" DisplayMemberBinding="{Binding CMPNY_NM}"/>
+                <GridViewColumn Width="70" Header="모집인원수" DisplayMemberBinding="{Binding RCRIT_NMPR_CO}"/>
+                <GridViewColumn Width="70" Header="학력" DisplayMemberBinding="{Binding ACDMCR_NM}"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+    }
+    #endregion
+
+    private ObservableCollection<Cust> m_Custlist = new ObservableCollection<Cust>();
+    public ObservableCollection<Cust> Custlist
+    {
+        get { return m_Custlist; }
+        set
+        {
+            if (m_Custlist != value)
+            {
+                m_Custlist = value;
+                Notify("Custlist");
+            }
+        }
+    }
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        string path = "http://openapi.seoul.go.kr:8088/68734f416a716e613535594b6d4f48/json/GetJobInfo/1/10/";
+
+        string result = null;
+
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(path);
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+        Stream stream = response.GetResponseStream();
+        StreamReader reader = new StreamReader(stream);
+        result = reader.ReadToEnd();
+        stream.Close();
+        response.Close();
+
+        JObject jobj = JObject.Parse(result);
+        JArray array = JArray.Parse(jobj["GetJobInfo"]["row"].ToString());
+
+        foreach (JObject itemobj in array)
+        {
+            string CMPNY_NM_IT = itemobj["CMPNY_NM"].ToString(); //기업명칭
+            string RCRIT_NMPR_CO_IT = itemobj["RCRIT_NMPR_CO"].ToString(); //모집인원수
+            string ACDMCR_NM_IT = itemobj["ACDMCR_NM"].ToString(); //학력
+
+            Custlist.Add(new Cust() { CMPNY_NM = CMPNY_NM_IT, RCRIT_NMPR_CO = RCRIT_NMPR_CO_IT, ACDMCR_NM = ACDMCR_NM_IT});
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+public class Cust : INotifyPropertyChanged
+{
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+    }
+    #endregion
+
+    private string m_CMPNY_NM; //기업명칭
+    public string CMPNY_NM  
+    {
+        get { return m_CMPNY_NM; }
+        set
+        {
+            if (m_CMPNY_NM != value)
+            {
+                m_CMPNY_NM = value;
+                Notify("CMPNY_NM");
+            }
+        }
+    }
+
+    private string m_RCRIT_NMPR_CO; //모집인원수
+    public string RCRIT_NMPR_CO  
+    {
+        get { return m_RCRIT_NMPR_CO; }
+        set
+        {
+            if (m_RCRIT_NMPR_CO != value)
+            {
+                m_RCRIT_NMPR_CO = value;
+                Notify("RCRIT_NMPR_CO");
+            }
+        }
+    }
+
+    private string m_ACDMCR_NM; //학력
+    public string ACDMCR_NM
+    {
+        get { return m_ACDMCR_NM; }
+        set
+        {
+            if (m_ACDMCR_NM != value)
+            {
+                m_ACDMCR_NM = value;
+                Notify("ACDMCR_NM");
+            }
+        }
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/158599886-515bdabd-6460-4130-bc50-ef0cf6f2fd2c.png">
+
+<br/>
+<br/>
+
+## Json직렬화하기
+
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <Button Width="100" Height="30" Content="버튼" Margin="10" Click="Button_Click"/>
+    <ListView x:Name="lv" Grid.Row="1" Margin="10" ItemsSource="{Binding Custlist}" >
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Width="100" Header="기업명칭" DisplayMemberBinding="{Binding CMPNY_NM}"/>
+                <GridViewColumn Width="70" Header="모집인원수" DisplayMemberBinding="{Binding RCRIT_NMPR_CO}"/>
+                <GridViewColumn Width="70" Header="학력" DisplayMemberBinding="{Binding ACDMCR_NM}"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</StackPanel>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+    }
+    #endregion
+
+    private ObservableCollection<Cust> m_Custlist = new ObservableCollection<Cust>();
+    public ObservableCollection<Cust> Custlist
+    {
+        get { return m_Custlist; }
+        set
+        {
+            if (m_Custlist != value)
+            {
+                m_Custlist = value;
+                Notify("Custlist");
+            }
+        }
+    }
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        string path = "http://openapi.seoul.go.kr:8088/68734f416a716e613535594b6d4f48/json/GetJobInfo/1/10/";
+
+        string result = null;
+
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(path);
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+        Stream stream = response.GetResponseStream();
+        StreamReader reader = new StreamReader(stream);
+        result = reader.ReadToEnd();
+        stream.Close();
+        response.Close();
+
+        JObject jobj = JObject.Parse(result);
+        JobInfo getJobInfo = JsonConvert.DeserializeObject<JobInfo>(result);
+
+        List<row> row = getJobInfo.GetJobInfo.row;
+
+        foreach(row item in row)
+        {
+            string CMPNY_NM_IT = item.CMPNY_NM;
+            string RCRIT_NMPR_CO_IT = item.RCRIT_NMPR_CO;
+            string ACDMCR_NM_IT = item.ACDMCR_NM;
+
+            Custlist.Add(new Cust() { CMPNY_NM = CMPNY_NM_IT, RCRIT_NMPR_CO = RCRIT_NMPR_CO_IT, ACDMCR_NM = ACDMCR_NM_IT });
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+public class Cust : INotifyPropertyChanged
+{
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+    }
+    #endregion
+
+    private string m_CMPNY_NM; //기업명칭
+    public string CMPNY_NM  
+    {
+        get { return m_CMPNY_NM; }
+        set
+        {
+            if (m_CMPNY_NM != value)
+            {
+                m_CMPNY_NM = value;
+                Notify("CMPNY_NM");
+            }
+        }
+    }
+
+    private string m_RCRIT_NMPR_CO; //모집인원수
+    public string RCRIT_NMPR_CO  
+    {
+        get { return m_RCRIT_NMPR_CO; }
+        set
+        {
+            if (m_RCRIT_NMPR_CO != value)
+            {
+                m_RCRIT_NMPR_CO = value;
+                Notify("RCRIT_NMPR_CO");
+            }
+        }
+    }
+
+    private string m_ACDMCR_NM; //학력
+    public string ACDMCR_NM
+    {
+        get { return m_ACDMCR_NM; }
+        set
+        {
+            if (m_ACDMCR_NM != value)
+            {
+                m_ACDMCR_NM = value;
+                Notify("ACDMCR_NM");
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Joblnfo.cs
+~~~c#
+public class JobInfo
+{
+    public GetJobInfo GetJobInfo { get; set; }
+}
+
+public class GetJobInfo
+{
+    public int list_total_count { get; set; }
+
+    public RESULT RESULT { get; set; }
+
+    public List<row> row { get; set; }
+}
+
+public class RESULT
+{
+    public string CODE { get; set; }
+
+    public string MESSAGE { get; set; }
+}
+
+public class row
+{
+    public string CMPNY_NM { get; set; }
+    public string RCRIT_NMPR_CO { get; set; }
+    public string ACDMCR_NM { get; set; }
+        
+            
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/158618347-73edf2a4-7526-41b7-b42c-001a5c3da837.png">
