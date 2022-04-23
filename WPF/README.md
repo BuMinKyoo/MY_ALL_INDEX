@@ -191,6 +191,20 @@
   - [Json직렬화하기](#json직렬화하기)
 
 
+
+- <details>
+  <summary>소캣통신</summary>
+  <div markdown="1">  
+
+    - [소캣통신](#소캣통신)
+    - [Task](#task)
+    - [Dispatcher](#dispatcher)
+    
+  </div>
+  </details>
+
+
+
 - <details>
   <summary>Try..</summary>
   <div markdown="1">  
@@ -5063,6 +5077,75 @@ public class row
 ###### [JsonParsing](#jsonparsing)
 ###### [Top](#top)
 
+<br/>
+
+***
+
+<br/>
+
+# 소캣통신
+  - [Task](#task)
+  - [Dispatcher](#dispatcher)
+
+###### [Top](#top)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+## Task
+  - 스레드를 돌리는것
+
+#cs(예시)
+~~~
+await Task.Run(new Action(() => 
+            {
+                while (true)
+                {
+                    TcpClient client = tcpListener.AcceptTcpClient();
+                    if (client.Connected == true)
+                    {
+                        this.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            lstClient.Items.Add(client.Client.RemoteEndPoint.ToString());
+                        }));
+                        OnReceive(client);
+                    }
+                }
+            }));
+~~~
+
+await Task.Run(new Action(() => {실행할 코드} )); 공식을 이용
+
+###### [소캣통신](#소캣통신)
+###### [Top](#top)
+<br/>
+<br/>
+
+## Dispatcher
+  - 스레드에서 다른 스레드로 접근
+
+#cs(예시)
+~~~
+await Task.Run(new Action(() => 
+            {
+                while (true)
+                {
+                    TcpClient client = tcpListener.AcceptTcpClient();
+                    if (client.Connected == true)
+                    {
+                        this.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            lstClient.Items.Add(client.Client.RemoteEndPoint.ToString());
+                        }));
+                        OnReceive(client);
+                    }
+                }
+            }));
+~~~
+
+this.Dispatcher.BeginInvoke(new Action(() => {실행할 코드} )); 공식을 이용
+
+###### [소캣통신](#소캣통신)
+###### [Top](#top)
 <br/>
 
 ***
