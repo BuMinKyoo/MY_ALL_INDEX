@@ -10,7 +10,6 @@
 
 ### [Visual Studio](https://github.com/BuMinKyoo/TIL/tree/main/Visual%20Studio)
 ### [Computer science](https://github.com/BuMinKyoo/TIL/tree/main/Computer%20science)
-### [algorithm](https://github.com/BuMinKyoo/TIL/tree/main/algorithm)
 
 <br/>
 
