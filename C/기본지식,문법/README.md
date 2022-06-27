@@ -772,6 +772,50 @@ num_pointer_array[2] = nums3;
     - 원래 숫자아랫자리 보다 아랫자리 수가 크면 0으로 채움
     - 기본 소수점 아랫자리 수 : 6
 
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+## 출력
+  - printf()
+  - fprintf( stdout, “hello” ) / fprintf( stderr, “hello” )
+  - sprintf( char* buffer, const char* format, ... )
+    - 문자열 buffer -1만큼 나오고 맨 뒤에 \0을 넣어줌
+  - puts( c ) = fputs(str, stdout) -> 문자열 출력
+    - int puts(const char* str)
+      - 문자열을 stdout에 출력
+      - 마지막에 줄도 바꿔줌 '\n'
+      - fputs(str, stdout)와 매우 비슷
+    - int fputs(const char* str, FILE* stream)
+  - putchar(c)  = fputc(ch, stdout) -> 문자 하나 출력
+    - int putchar(int ch)
+      - 문자를 stdout에 출력
+      - fputc(ch, stdout)하고 같음
+    - int fputc(int ch, FILE* stream)
+
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
