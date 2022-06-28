@@ -6,7 +6,6 @@
 
 
 
-
 <br/>
 
 ***
@@ -804,6 +803,88 @@ num_pointer_array[2] = nums3;
 ***
 
 <br/>
+
+## 입력
+  - getchar( ) -> 한 글자씩 읽기
+    - 순서
+      - getchar()함수가 입력 받기 전까지 대기함
+      - 키보드로 입력을 주고 엔터키를 누름
+      - 버퍼로 한 글자를 읽어옴
+      - 읽은 문자를 출력
+    - 성공하면 문자를, 실패하면 EOF를 반환(EOF = ctrl + z)
+      - 반환형은 int
+  - gets( ) -> 한 줄씩 읽기(절대 쓰면 안될것! 안전하지 않음!)
+    - char* gets(char* str)
+    - stdin에서 새 줄 문자('\n')또는 EOF를 만날 때까지 계속 문자들을 읽어서 str배열에 저장
+    - 마지막 문자 다음에 널문자('\0')도 넣어줌
+  - fgets( ) -> gets보다 fgets사용 할것
+    - char* fgets(char* str, int count, FILE* stream)
+    - 최대 count - 1개의 문자열을 읽어서 str에 저장
+    - 새 줄을 만나지 않아도 이 함수가 반환될 수 있음
+    - str에 새 줄 문자 넣어줌
+    - 입력한 문자열의 마지막에 개행('\n')도 항상 넣어줌
+    - 키보드 입력을 읽어오려면 stream이 아니라 stdin을 넣어주면 됨
+  - scanf( ) -> 한 데이터씩 읽기(어떤 포맷을 읽을지, 얼만큼 읽을지 원하는 것을 지정해서 그 데이터를 읽는것)
+    - 공백문자를 사용해서 단어를 분리하기 때문에, 중간에 공백이 30개 있어도 다시 읽을때 다 없어져 버림. 유리하게 공백문자를 표현하기 위해서는 %c로 읽어 드리면 된다.
+    - 몇개의 데이터를 읽었는지 반환함
+    - 숫자를 읽어 올때 123p이면 123만 출력
+    - 첫 데이터를 읽기 전에 실패했다면 EOF를 반환
+    - int scanf(const char* format, ...)
+      - stdin으로부터 읽음
+    - int fscanf(FILE* stream, const char* format, ...)
+      - 파일 스트림으로부터 읽음
+    - int sscanf(const char* buffer, const char* format, ...)
+      - c 스타일 문자열로부터 읽음
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/176063777-13ddb923-191f-4c32-aa4a-21391515103a.png">
+
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+    
+## 이진데이터
+  - 한 블록씩 읽기(이진 데이터)
+    - size_t fread(void* buffer, size_f size, size_t count, FILE* stream)
+      - EOF만나면 멈춤 -> count보다 적은 수를 읽을 수도 있다는 것
+      - 실제로 읽은 개수를 반환
+  - 한 블록씩 쓰기(이진 데이터)
+    - size_t fwrite(const void* buffer, size_f size, size_f count, FILE* stream)
+    
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/> 
+
+## 파일 입출력
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
