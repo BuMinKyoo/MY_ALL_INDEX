@@ -1182,6 +1182,69 @@ int main(void)
 
 <br/>
 
+## 동적메모리
+  - malloc()
+    - 메모리 할당(memory allocation)의 약자
+    - size 바이트 만큼의 메모리를 반환해줌
+    - void*형으로 메모리 반환
+    - 초기화 안해주기 때문에 반환된 메모리에는 쓰레기값이 들어가 있음
+  - free() <- malloc()의 짝꿍 함수, 메모리 반납하는 함수
+    - #include <stdlib.h>
+    - 해제한 메모리를 또 해제하면 데이터가 망가짐!!
+    - free( )함수가 몇바이트를 해체하면 되는지 알 수 있는 방법은, malloc( ) 으로 메모리를 할당했을때 앞쪽에 알수 있는 숫자로 표시해 둔다.
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/176101259-0d17bc0a-f2ad-426f-baf9-fd429ba77ca4.png">
+
+<br/>
+
+  - calloc()
+    - void* calloc(size_t num, size_t size)
+    - 메모리를 할당할 때 자료형의 크기와 수를 따로 지정
+    - 모든 바이트를 0으로 초기화 해 줌
+    - 잘 안씀! -> calloc( ) = malloc( ) + memset( ) 이기때문에 차라리 2개를 조합해서 씀. memset( )을 쓰면 0외의 값으로도 초기화 가능!
+    - memset -> nums를 0을 초기화 해주는데,  LENGTH * sizeof(int)길이 만큼 초기화 해줘, 라는 뜻
+  - memset()
+    - void* memset(void* dest, int ch, size_t count)
+    - <string.h>에 있음
+    - char로 초기화됨
+    - 그 외의 자료형으로 초기화하려면 직접 for 문을 써야함
+    - 항상 char로 초기화 되므로 int로 초기화 하고 싶다면 주소를 통한 값에 1000을 더해주는것으로 표현 가능
+  - realloc()
+    - void* realloc(void* ptr, size_t new_size)
+    - 이미 존재하는 메모리의 크기를new_size바이트로 변경
+    - 새로운 크기가 허용하는 한 기존 데이터를 그대로 유지
+    - 크기가 커져야 하지만, 뒤에 공간이 없으면 아예 뒤쪽으로 공간을 할당함(모두이동)
+    - NULL이 반환됐다면 재할당에 실패 했다는것
+    - realloc( ) = malloc( ) + memcpy( ) + free( )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  ## 함수 포인터
    - 함수를 매개변수로 전달 하는것
    - ‘함수 실행’ 이라는 것이 결국, 함수가 시작되는 주소로 가서 함수실행될 메모리를 읽고 다시 원주소로 돌아와서 코드를 읽어 가는것 
