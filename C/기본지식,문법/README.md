@@ -864,11 +864,315 @@ num_pointer_array[2] = nums3;
 
 <br/> 
 
-## 파일 입출력
+## 파일 open,close
 
+~~~c
+FILE* steam;
+stream = fopen( "파일이름", "모드")
+~~~
 
+<img src="https://user-images.githubusercontent.com/39178978/176065133-413c9ad6-39b5-46a7-abb5-3a36c25fd27e.png">
 
+ - rb,wb등 앞에 b를 붙이면 이진 모드로 여는 것
 
+<br/>
+
+  - 파일닫기
+    - int fclose(FILE* stream)
+    - 파일을 닫음
+    - 성공하면0, 실패하면 EOF를 반환
+    - 버퍼링 중인 스트림의 작동
+      - 출력 스트림 : 버퍼에 남아있는 데이터는 파일로 다 보냄
+      - 입력 스트림 : 무시됨
+
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/> 
+
+## 파일 탐색
+  - 스트림의 위치를 바꾸고 싶을때 사용!
+  - 키보드에서 입력 받는 stdin은 불가능!
+
+<br/>
+
+  - rewind -> 스트림의 처음 위치로 이동
+    - void rewind(FILE* stream)
+  - fseek -> 스트림의 임의의 위치로 옮기기
+    - int fseek(FILE* stream, long offset, int origin)
+      - 파일 위치 표시자를 origin으로부터 offset만큼 이동함
+      - origin에는 세종류(매크로)가 있음(SEEK_SET : 파일의 시작, SEEK_CUR : 현재파일 위치, SEEK_END : 파일의 끝)
+  - ftell -> 스트림의 위치를 알려줌
+    - long ftell(FILE* stream)
+
+###### [Top](#top)
+
+<br/>
+
+***
+
+<br/>
+
+## 구조체
+  - C에서는 모든 자료가 값형! 물론 주소를 전달하면 참조형이 되겠지!
+  - 따라서 구조체안에 데이터도 주소로 접근하지 않으면 데이터 변경이 안됨
+  - 매개변수가 많이 들어가야 하는 상황일때 구조체를 쓰면 훨씬 편해 진다
+  - 또한, 구조체를 반환하는 함수일 경우에, 구조체를 반환하게 되면 실질적으로 여러개의 값을 반환하는 것과 같다.(c언어를 반환값이 원래 하나!)
+
+<br/>
+
+  - 구조체 선언 및 초기화
+    - 데이터 선언시 세미콜론 잊지 말것
+~~~c
+#include <stdio.h>
+
+struct data
+{
+	int year;
+	int month;
+	int day;
+};
+
+int main(void)
+{
+	struct data data;
+	data.day = 1;
+	data.month = 10;
+	data.year = 2022;
+}
+~~~
+
+<br/>
+
+  - 구초제 접근
+    - 접근시에는 . 으로 접근하기
+~~~c
+#include <stdio.h>
+
+struct data
+{
+	int year;
+	int month;
+	int day;
+};
+
+int main(void)
+{
+	struct data data;
+	data.day = 1;
+	data.month = 10;
+	data.year = 2022;
+
+	//구조체 접근
+	printf("%d", data.year);
+}
+~~~
+
+<br/>
+
+  - 값을 바꾸려면 포인터로 전달해 줘야 함
+    - (*data).year가가 = (*data).year + 1;
+      - ( )를 넣어야 하는 이유는, 연산자 우선순위 때문
+      - . 연산자의 우선순위가 1, * 연산자의 우선순위가 2
+      - 따라서 괄호가 없다면 *data.year = *(data.year)
+    - data -> year = data -> year + 1;
+    - data -> year++;
+
+~~~c
+#include <stdio.h>
+
+struct data
+{
+	int year;
+	int month;
+	int day;
+};
+
+void data_increas(struct data* data)
+{
+	(*data).year = (*data).year + 1;
+	data->year = data->year + 1;
+}
+
+int main(void)
+{
+	struct data data;
+	data.day = 1;
+	data.month = 10;
+	data.year = 2022;
+
+	printf("%d\n", data.year);
+
+	data_increas(&data);
+
+	printf("%d", data.year);
+}
+~~~
+
+<br/>
+
+  - 구조체를 반환하는 함수
+
+~~~c
+#include <stdio.h>
+
+struct data
+{
+	int year;
+	int month;
+	int day;
+};
+
+struct data get_data(void)
+{
+	struct data data;
+	data.day = 1;
+	data.month = 10;
+	data.year = 2022;
+
+	return data;
+}
+
+int main(void)
+{
+	struct data data1;
+
+	data1 = get_data();
+}
+~~~
+
+<br/>
+
+  - 구조체 배열
+
+~~~c
+#include <stdio.h>
+
+struct data
+{
+	int year;
+	int month;
+	int day;
+};
+
+int main(void)
+{
+	struct data data[3];
+	data[0].day = 1;
+	data[0].month = 10;
+	data[0].year = 2022;
+
+	data[1].day = 2;
+	data[1].month = 11;
+	data[1].year = 2023;
+
+	data[2].day = 3;
+	data[2].month = 12;
+	data[2].year = 2024;
+}
+~~~
+
+<br/>
+
+  - 구조체의 요소 크기 확인하기
+
+~~~c
+#include <stdio.h>
+
+struct data
+{
+	int year;
+	int month;
+	int day;
+};
+
+int main(void)
+{
+	struct data data[3];
+	data[0].day = 1;
+	data[0].month = 10;
+	data[0].year = 2022;
+
+	data[1].day = 2;
+	data[1].month = 11;
+	data[1].year = 2023;
+
+	data[2].day = 3;
+	data[2].month = 12;
+	data[2].year = 2024;
+
+	printf("%d", sizeof(data[0]));
+}
+~~~
+
+<br/>
+
+  - 구조체 요소가 배열일 경우
+
+~~~c
+#include <stdio.h>
+#include <string.h>
+
+struct name
+{
+	char name1[10];
+};
+
+int main(void)
+{
+	//구조체 멤버가 배열일 경우 초기화 하는 방법
+	char string[] = "qwer";
+	struct name name_t;
+	strcpy_s(name_t.name1,sizeof(name_t.name1), string);
+	printf("%s", name_t.name1);
+	return 0;
+}
+~~~
+
+<br/>
+
+  - typedef 사용법
+    - 
+
+~~~c
+#include <stdio.h>
+
+typedef struct data
+{
+	int year;
+	int month;
+	int day;
+} data_t;
+
+int main(void)
+{
+	data_t data[3];
+	data[0].day = 1;
+	data[0].month = 10;
+	data[0].year = 2022;
+
+	data[1].day = 2;
+	data[1].month = 11;
+	data[1].year = 2023;
+
+	data[2].day = 3;
+	data[2].month = 12;
+	data[2].year = 2024;
+
+}
+~~~
+
+<br/>
+
+  - 구조체 패딩 줄이기
+    - 구조체의 경우 구조체 안에 있는 데이터의 전체 합이 총 바이트가 되는데, 일반적으로 4바이트 단위로 컴퓨터가 읽어 오려고 하기 때문에 short같은 2바이트 단위를 쓰고 그 밑에 int인 4바이트를 쓰면 short도 4바이트, int도 4바이트를 차지하게 됨. 따라서 패딩을 줄이기 위해서는 구조체 안에 있는 순서를 바꿔 주면 됨
+      - pragma pack 을 사용하면 패딩을 줄일 수 있음 -> 컴파일러가 지원해 주는것
+      - assert를 사용해서 크기를확인하는 것이 업계 일반적
+    - 바이트 정렬 요구사항 때문에 정확히 바이트가 딱 맞게 재어지지 않는다.!!!
+    - 시스템의 워드에서 읽어 오는것이 효율적이기 때문에
 
 
 
