@@ -2,33 +2,76 @@
 
 ###### Top
 
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-  - [](#)
-
-
-
+  - [C의 역사](#c의-역사)
+  - [C는 언매니지드 언어(매니지드 언어에서 얻는것)](#c는-언매니지드-언어매니지드-언어에서-얻는것)
+  - [<C89 / ANSI-C>](#c89--ansi-c)
+    - #include
+    - <stdio.h>
+    - “stdio.h”
+    - int main(void)
+  - [cmd에서 실행](#cmd에서-실행)
+    - clang
+    - 전처리, 컴파일, 어셈블리
+  - [라이브러리](#라이브러리)
+    - 정적 라이브러리
+    - 동적 라이브러리
+  - [기본자료형](#기본자료형)
+    - Long, float, double, Char, Short, int, long, float, double, long double
+  - [열거형](#열거형)
+    - enum <enum변수명> <사용할변수>
+  - [sizeof()](#sizeof)
+    - size_t
+  - [조건문 if](#조건문-if)
+  - [switch](#switch)
+  - [함수](#함수)
+  - [goto](#goto)
+  - [배열](#배열)
+  - [스택 메모리](#스택-메모리)
+  - [extern,static](#externstatic)
+  - [인클루드 가드(guard)](#인클루드-가드guard)
+  - [변수 정리](#변수-정리)
+    - 지역변수
+    - 정적 지역변수
+    - 전역변수
+    - 정적 전역변수
+    - 전역 함수
+    - 정적 전역 함수
+  - [포인터](#포인터)
+  - [문자열 초기화](#문자열-초기화)
+    - char day[]
+    - char* array
+  - [C스타일 문자열](#c스타일-문자열)
+    - \0
+  - [문자열 토큰화](#문자열-토큰화)
+  - [printf포맷팅](#printf포맷팅)
+  - [출력](#출력)
+    - printf()
+    - fprintf
+    - sprint
+    - puts
+    - putchar
+  - [입력](#입력)
+    - getchar
+    - gets
+    - fgets
+    - scanf
+  - [이진데이터](#이진데이터)
+  - [파일 open,close](#파일-openclose)
+  - [파일 탐색](#파일-탐색)
+    - Rewind
+    - Fseek
+    - ftell
+  - [구조체](#구조체)
+  - [동적메모리](#동적메모리)
+    - Malloc
+    - free
+  - [함수 포인터](#함수-포인터)
+  - [가변 인자 함수](#가변-인자-함수)
+  - [register 키워드](#register-키워드)
+  - [자료구조](#자료구조)
+  - [라이브러리](#라이브러리)
+  - [C99](#99)
+  - [추천사이트](#추천사이트)
 
 <br/>
 
@@ -446,15 +489,49 @@ int main(void)
 
 <br/>
 
-## 컴파일 오류(extern,static)
+## extern,static
   - .C파일은 따로 따로 컴파일 하기 때문에, 다른 .C파일에서 정의된 전역 변수를 다른 .C으로 호출할수X
+  - extern을 사용
+  - 함수는 선언하면 자동으로 extern이기 때문에 따로 쓰지 않음
+  - 하지만 static을 통해서 마음대로 쓰는 것을 막을 수 있다
 
+<br/>
 
+~~~c
+#include <stdio.h>
+int count = 5;
+~~~
 
-내용 추가 필요
+  - 이렇게 다른 .c파일에 있는 변수를 불러오기 위해서는 extern을 사용하여 불러 올 수 있음. 함수 같은 경우는 자동으로 extern이 되기 때문에 써주지 않아도 됨.
 
+~~~c
+#include <stdio.h>
 
+int main()
+{
+	extern int count;
+	printf("%d", count);
+}
+~~~
 
+<br/>
+
+~~~c
+#include <stdio.h>
+static int count = 5;
+~~~
+
+  - static을 쓰게 되면 현재 .c파일에서만 사용이 가능하게 됨.(함수도 똑같음!)
+
+~~~c
+#include <stdio.h>
+
+int main()
+{
+	extern int count;
+	printf("%d", count); //  컴파일 
+}
+~~~
 
 ###### [Top](#top)
 
@@ -1150,58 +1227,6 @@ int main(void)
     - 크기가 커져야 하지만, 뒤에 공간이 없으면 아예 뒤쪽으로 공간을 할당함(모두이동)
     - NULL이 반환됐다면 재할당에 실패 했다는것
     - realloc( ) = malloc( ) + memcpy( ) + free( )
-
-###### [Top](#top)
-
-<br/>
-
-***
-
-<br/>
-
-## 전역변수, 전역함수
-  - .C파일은 따로 따로 컴파일 하기 때문에, 다른 .C파일에서 정의된 전역 변수를 다른 .C으로 호출할수X
-  - extern을 사용
-  - 함수는 선언하면 자동으로 extern이기 때문에 따로 쓰지 않음
-  - 하지만 static을 통해서 마음대로 쓰는 것을 막을 수 있다
-
-<br/>
-
-~~~c
-#include <stdio.h>
-int count = 5;
-~~~
-
-  - 이렇게 다른 .c파일에 있는 변수를 불러오기 위해서는 extern을 사용하여 불러 올 수 있음. 함수 같은 경우는 자동으로 extern이 되기 때문에 써주지 않아도 됨.
-
-~~~c
-#include <stdio.h>
-
-int main()
-{
-	extern int count;
-	printf("%d", count);
-}
-~~~
-
-<br/>
-
-~~~c
-#include <stdio.h>
-static int count = 5;
-~~~
-
-  - static을 쓰게 되면 현재 .c파일에서만 사용이 가능하게 됨.(함수도 똑같음!)
-
-~~~c
-#include <stdio.h>
-
-int main()
-{
-	extern int count;
-	printf("%d", count); //  컴파일 
-}
-~~~
 
 ###### [Top](#top)
 
