@@ -99,6 +99,7 @@
 <br/>
 
 ## cmd에서 실행
+~~~c
 clang -std=c89 -W -Wall -pedantic-errors main.c
 clang -std=c89 -W -Wall -pedantic-errors -E main.c //전처리 단계만 보여줌
 clang -std=c89 -W -Wall -pedantic-errors -E adder.c > adder.pre //파일로 저장
@@ -108,6 +109,7 @@ clang -std=c89 -W -Wall -pedantic-errors -c main.c //어셈블리단계까지 �
 //커맨드라인컴파일러 / c표준 / 뒤에는 옵션
 a.exe //일반적으로 윈도우 콘솔에서의 실행파일
 //echo %errorlevel%  //return시 나오는 숫자
+~~~
 
 ###### [Top](#top)
 
@@ -243,18 +245,6 @@ int main()
 
 <br/>
 
-## 올바른 변수 선언 위치
-  - 출력하기 전에 변수를 전부 지정 해야함
-  - 값을 안넣고 변수라도 지정 하고 나중에 대입하는것은 가능 
-
-###### [Top](#top)
-
-<br/>
-
-***
-
-<br/>
-
 ## sizeof()
   - 피연산자의 크기를 바이트로 반환해줌
   - 함수X, 연산자이기 때문에 컴파일 중에 평가 된다
@@ -293,50 +283,6 @@ size_array : 20
   - size_t 를 typedef 했다는것
   - ex)반복문, 배열에 이용
   - signed int -1과 unsigned int 4,294,967,295는 같은 비트패턴
-
-###### [Top](#top)
-
-<br/>
-
-***
-
-<br/>
-
-## 배열
-  - C# -> char[ ] data /  C -> char data[ ]  => C#과 C는 조금 문법이 조금 다름
-
-###### [Top](#top)
-
-<br/>
-
-***
-
-<br/>
-
-## 포인터
-  - 주소연산자 : &
-  - 메모리 주소출력기호 : %p
-
-~~~c
-const unsiged char result = num1 & num2; /* 비트 연산자*/
-printf("%p\n", &num); /*주소연산자*/
-~~~
-
-###### [Top](#top)
-
-<br/>
-
-***
-
-<br/>
-
-## 구조체와 공용체 맴버 접근자
-  - "."
-    - C#에서는 Class가 있었으니 멤버변수를 호출하는 것이였지만 C에서는 다름
-    - 구조체와 공용체의 멤버변수에 접근시 사용
-  - "->"
-    - 2개의 연산자 “ . ”와 “ * ”를 합친것
-    - 구조체와 공용체의 멤버변수에 접근시 사용
 
 ###### [Top](#top)
 
@@ -434,32 +380,6 @@ void Gedata(void)  /*잘 진행됨*/
 
 <br/>
 
-## 파일범위
-~~~c
-#include <stdio.h>
-
-static int s_sum = 1024;
-
-int main(void)
-{
-	int num1 = 10;
-
-	printf("num : %d\n", num1);
-
-	return 0;
-}
-
-/* static int s_sum = 1024는 전역 변수가 됨*/
-~~~
-
-###### [Top](#top)
-
-<br/>
-
-***
-
-<br/>
-
 ## goto
   - goto를 사용하면 중간에 건너 뛸 수 있다..?
   - 아래는 goto를 이용한 반복문
@@ -492,6 +412,7 @@ int main(void)
 
 ## 배열
   - C#과 달리 new를 사용할 필요 없음
+  - C# -> char[ ] data /  C -> char data[ ]  => C#과 C는 조금 문법이 조금 다름
     - int nums[5];
     - char name[10];
   - 배열의 요소개수 구하기
