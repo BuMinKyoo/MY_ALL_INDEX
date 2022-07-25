@@ -1,7 +1,8 @@
-## TIL
+## MY_ALL_INDEX
 
 ~~~
 매일 매일 공부한 것을 기록합니다.
+GitHub에 있는 모든 내용을 목차로 정리합니다.
 ~~~
 
 ### [Visual Studio](https://github.com/BuMinKyoo/TIL/tree/main/Visual%20Studio)
