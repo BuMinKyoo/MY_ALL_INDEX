@@ -20,8 +20,8 @@
 ***
 
 ### C++
-  - [기본지식,문법]()
-  - [MFC]()
+  - [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%2B%2B/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
+  - [MFC](https://github.com/BuMinKyoo/TIL/tree/main/C%2B%2B/MFC)
 
 <br/>
 
