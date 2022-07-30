@@ -34,10 +34,10 @@
       - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
       - [Static Text Backgroud 제거](#static-text-backgroud-제거)
       - [버튼 Backgroud, Border, Text 그리기](#버튼-backgroud-border-text-그리기)
+      - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
       
   </div>
   </details>
-
 
 
 ***
