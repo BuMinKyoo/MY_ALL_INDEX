@@ -30,7 +30,7 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 
 ### C#
 - [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
-- [WPF](https://github.com/BuMinKyoo/TIL/tree/main/WPF)
+- [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/C%23/WPF)
 
 <br/>
 
