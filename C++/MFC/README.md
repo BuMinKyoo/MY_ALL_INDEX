@@ -16,7 +16,7 @@
   <summary>가상함수</summary>
   <div markdown="1">
   
-    - [VirtualFunction](#virtualfunction)
+    - [Virtual Function](#virtual-function)
       - [WindowProc](#windowproc)
       - [OnCommand](#oncommand)
       
@@ -24,10 +24,25 @@
   </details>
 
 
+
+- <details markdown="1">
+  <summary>드로잉</summary>
+  <div markdown="1">
+  
+    - [Drawing](#drawing)
+      - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
+      - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
+      - [Static Text Backgroud 제거](#static-text-backgroud-제거)
+      - [버튼 Backgroud, Border, Text 그리기](#버튼-backgroud-border-text-그리기)
+      
+  </div>
+  </details>
+
+
+
 ***
 ***
 
-<br/>
 
 # Message
 
@@ -38,10 +53,10 @@
 ###### [Message](#message)
 ###### [Top](#top)
 
-<br/>
 
 ***
 
+<br/>
 <br/>
 
 # ON_COMMAND_RANGE
@@ -51,42 +66,31 @@
 ###### [Top](#top)
 
 <br/>
-<br/><br/>
-<br/><br/>
-<br/><br/>
-<br/><br/>
-<br/>
-
-
-
-
-
 <br/>
 
 ***
 
-<br/>
 
-# VirtualFunction
+# Virtual Function
 
   - 기본적인 설명-----
   
       - [WindowProc](#windowproc)
       - [OnCommand](#oncommand)
   
-###### [VirtualFunction](#virtualfunction)
+###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
 
-<br/>
 
 ***
 
+<br/>
 <br/>
 
 # WindowProc
   -  설명
   
-###### [VirtualFunction](#virtualfunction)
+###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
 
 <br/>
@@ -95,18 +99,64 @@
 # OnCommand
   -  설명
 
-###### [VirtualFunction](#virtualfunction)
+###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
+***
 
 
+# Drawing
+
+  - 기본적인 설명-----
+  
+      - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
+      - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
+      - [Static Text Backgroud 제거](#static-text-backgroud-제거)
+      - [버튼 Backgroud, Border, Text 그리기](#버튼-backgroud--border--text그리기)
+  
+###### [Drawing](#drawing)
+###### [Top](#top)
 
 
+***
 
+<br/>
+<br/>
 
+# 문자 크기 바꾸기(CFont)
+
+###### [Drawing](#drawing)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 문자 크기 바꾸기(LOGFONT)
+
+###### [Drawing](#drawing)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Static Text Backgroud 제거
+
+###### [Drawing](#drawing)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 버튼 Backgroud, Border, Text 그리기
+
+###### [Drawing](#drawing)
+###### [Top](#top)
+
+<br/>
+<br/>
 
 
 
