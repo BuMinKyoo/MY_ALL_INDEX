@@ -1,6 +1,6 @@
 ###### Top
 
-- [WPF class hierarchy](https://github.com/BuMinKyoo/TIL/blob/main/WPF/WPF%20class%20hierarchy.png)
+- [WPF class hierarchy](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/C%23/WPF/WPF%20class%20hierarchy.png)
 
 
 
