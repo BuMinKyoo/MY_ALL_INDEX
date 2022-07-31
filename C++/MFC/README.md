@@ -544,76 +544,43 @@ Cchaild* chaild = NULL; // 자식 class선언
 
 #AppDlg.cpp(부모)
 ~~~c
-// 버튼 클릭시 만들려면,
-void CMFCApplication4Dlg::OnBnClickedButton1()
+// 버튼 클릭시 만들려면, 또한 자식 윈도우 생성시 부모윈도우의 포인터 전송
+void CMFCApplication5Dlg::OnBnClickedButton1()
 {
 	if (chaild == NULL)
 	{
 		chaild = new Cchaild;
-		chaild->Create(IDD_DIALOG1, this);
-		chaild->ShowWindow(SW_SHOW);
+		chaild->dilver(this);
+		chaild->DoModal(); // 모달리스로 만들때도 동일하게 부모를 포인터로 전송하면 된다.
 	}
 }
 ~~~
 
-<br/>
-
-  - 대화상자 종료
-  - 포인터로 할당한 후에 대화 상자를 만들기 때문에, 자식 대화 상자 종료시에 부모쪽에서 자식쪽으로 할당했던 메모리를 해제 시켜 주어야 한다.
-  - GetParent()를 사용하면 Create했을때 넣어 주었던 this가 부모가 되어, 부모의 포인터로 접근 할 수 있게 된다.
-    - 부모(this 사용 or 미사용) -> 자식(this 미사용) -> 자식 이면 마지막 자식은 GetParent() 사용시 최상위 부모 쪽에 접근 하게 된다.
-    - 부모(this 사용 or 미사용) -> 자식(this 사용) -> 자식 이면 마지막 자식은 GetParent() 사용시 바로 위 자식 쪽으로 접근 하게 된다.
-    - GetParent()를 사용하게 되면 직접 각각의 다이얼로그 class를 캐스팅 하지 않고서는,  PostMessage을 사용 하는 것과 직접 컨트롤 ID로 접근 하는 방법이 있다.
-
-#AppDlg.cpp(자식)
+#AppDlg.h(자식)
 ~~~c
-// 버튼 클릭시 종료 만들려면,
-void Cchaild::OnBnClickedOk()
-{
-	GetParent()->PostMessage(10000);
-}
-~~~
+class CMFCApplication5Dlg;
 
-  - 부모는, 프로젝트 -> 클래스마법사 -> 메시지 -> 사용자 지정 메시지 추가 -> 10000(현재 자식에서 보내는것) 만들기
-
-#AppDlg.cpp(부모)
-~~~c
-afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
+class Cchaild : public CDialogEx
 {
-	if (chaild != NULL)
+	DECLARE_DYNAMIC(Cchaild)
+	
+	CMFCApplication5Dlg* m_plg;
+	void dilver(CMFCApplication5Dlg* m_mlg)
 	{
-		chaild->DestroyWindow();
-		delete chaild;
-		chaild = NULL;
+		m_plg = m_mlg;
 	}
-	return 0;
+	
+...
+
 }
 ~~~
-
-<br/>
-
-  - 부모 -> 자식 데이터 전달
-
-#AppDlg.cpp(부모)
-~~~c
-// 자식 객체의 포인터로 직접 접근하기, 부모는 자식의 변수및 함수, 컨트롤에 이렇게 접근 할 수 있음
-void CMFCApplication4Dlg::fuction()
-{
-	chaild->SetDlgItemInt(IDC_EDIT1, 20000);
-}
-~~~
-
-<br/>
-
-  - 자식 -> 부모 데이터 전달
 
 #AppDlg.cpp(자식)
 ~~~c
-// 자식은 GetParent()을 사용해 PostMessage를 보내거나 컨트롤ID에 직접 접근 하는 방법이 있음
-void CD1::OnBnClickedButton1()
+// 부모 해더 파일 include
+void Cchaild::OnBnClickedButton1()
 {
-	GetParent()->SetDlgItemInt(IDC_EDIT1, 10);
-	GetParent()->PostMessage(10000, int);
+	m_plg->SetDlgItemInt(IDC_EDIT1, 100);
 }
 ~~~
 
@@ -622,29 +589,6 @@ void CD1::OnBnClickedButton1()
 
 <br/>
 <br/>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ***
 
