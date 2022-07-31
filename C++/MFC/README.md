@@ -6,6 +6,8 @@
   
     - [Message](#message)
       - [ON_COMMAND_RANGE](#on_command_range)
+      - [WM_CTLCOLOR](#wm_ctlcolor)
+      - [WM_DRAWITEM](#wm_drawitem)
       
   </div>
   </details>
@@ -32,7 +34,7 @@
     - [Drawing](#drawing)
       - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
       - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
-      - [Static Text Backgroud 제거](#static-text-backgroud-제거)
+      - [컨트롤의 글꼴, 배경색 변경](#컨트롤의-글꼴-배경색-변경)
       - [버튼 Backgroud, Border, Text 그리기](#버튼-backgroud-border-text-그리기)
       - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
       
@@ -49,6 +51,8 @@
   - 일반적으로 콘솔에서 만든 프로그램은 프로그래머가 정한 순서대로 차근 차근 진행 됩낟. 하지만, 윈도우 응용 프로그램은 메세지 구동 구조를 가지고 있으며, 프로그램에 어떤 변화가 생경을때 Windows가 프로그램에게 정보를 알려주고, 프로그램은 그 정보를 받아서 다양한 동작을 하게 된다.
 
       - [ON_COMMAND_RANGE](#on_command_range)
+      - [WM_CTLCOLOR](#wm_ctlcolor)
+      - [WM_DRAWITEM](#wm_drawitem)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -114,7 +118,27 @@ protected:
 };
 ~~~
 
+###### [Message](#message)
+###### [Top](#top)
 
+<br/>
+<br/>
+
+# WM_CTLCOLOR
+  - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다
+
+[컨트롤의 글꼴, 배경색 변경](#컨트롤의-글꼴-배경색-변경) 참고
+
+###### [Message](#message)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# WM_DRAWITEM
+  - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다
+
+[버튼 Backgroud, Border, Text 그리기](#버튼-backgroud-border-text-그리기) 참고
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -128,6 +152,7 @@ protected:
 # Virtual Function
   - 보통은 선언되어 있는 함수를 virtual로 선언하여 사용함이고, 프로젝트 -> 클래스 마법사 -> 가상함수 쪽에서 추가할 수 있다.
   - 프로젝트 -> 클래스 마법사 -> 가상함수에서 추가 한다면 AppDlg.h, AppDlg.cpp에 함수해더가 자동으로 추가 된다.
+
       - [WindowProc](#windowproc)
       - [OnCommand](#oncommand)
   
@@ -193,12 +218,10 @@ BOOL CMFCApplication3Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 
 # Drawing
-
-  - 기본적인 설명-----
   
       - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
       - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
-      - [Static Text Backgroud 제거](#static-text-backgroud-제거)
+      - [컨트롤의 글꼴, 배경색 변경](#컨트롤의-글꼴-배경색-변경)
       - [버튼 Backgroud, Border, Text 그리기](#버튼-backgroud--border--text그리기)
   
 ###### [Drawing](#drawing)
@@ -266,7 +289,26 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 <br/>
 <br/>
 
-# Static Text Backgroud 제거
+# 컨트롤의 글꼴, 배경색 변경
+  - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_CTLCOLOR 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+  - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다.
+  - Dialog ID가 “IDC_STATIC2”일때
+
+#AppDlg.cpp
+~~~c++
+HBRUSH CAlarm_talk::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+{
+	HBRUSH hbr = CBaseDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	if (pWnd->GetDlgCtrlID() == IDC_STATIC2)
+	{
+		pDC->SetBkMode(TRANSPARENT); // 배경 투명으로 변경
+		pDC->SetTextColor(RGB(255, 255, 255)); // 글자 컬러 흰색으로 변경
+		return (HBRUSH)::GetStockObject(NULL_BRUSH);
+	}
+
+	return hbr;
+~~~
 
 ###### [Drawing](#drawing)
 ###### [Top](#top)
@@ -275,6 +317,59 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 <br/>
 
 # 버튼 Backgroud, Border, Text 그리기
+  - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DRAWITEM 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+  - Dialog에서 Owner Draw속성을 True설정(해당 컨트롤을 스스로 그리지 않겠다)
+  - WM_DRAWITEM은 사용자가  직접 컨트롤을 그린다고 하는것 
+
+#AppDlg.cpp
+~~~c++
+void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	if (nIDCtl == IDC_PRINT)
+	{
+		RECT r = lpDrawItemStruct->rcItem;
+		HDC h_dc = lpDrawItemStruct->hDC;
+		HBRUSH h_brush = CreateSolidBrush(RGB(5, 81, 158));
+
+		FillRect(h_dc, &r, h_brush); // 백드라운드 그리기
+		DeleteObject(h_brush);
+
+		// 테두리 그리기
+		HPEN h_pen = CreatePen(PS_SOLID, 1, RGB(0, 67, 135));
+
+		HPEN h_pen_click = CreatePen(PS_SOLID, 1, RGB(255, 255, 255)); // 클릭했을시 교체할 흰색 테두리
+
+		HGDIOBJ h_old_pen = SelectObject(h_dc, h_pen);
+		HGDIOBJ h_old_brush = SelectObject(h_dc, GetStockObject(NULL_BRUSH));
+
+		Rectangle(h_dc, r.left, r.top, r.right, r.bottom);
+
+		// 클릭했을시 흰색 테두리로 교체하고, 흰색테두리와 글자를 2px만큼 움직여서 액팅 추가
+		if(lpDrawItemStruct->itemState & ODS_SELECTED)
+		{
+			r.top += 2;
+			r.left += 2;
+
+			SelectObject(h_dc, h_pen_click);
+			Rectangle(h_dc, r.left, r.top, r.right, r.bottom);
+		}
+
+		SelectObject(h_dc, h_old_pen);
+		DeleteObject(h_old_pen);
+
+		// 글자 출력
+		CString name;
+		int length = GetDlgItemText(lpDrawItemStruct->CtlID, name);
+
+		int old_mode = SetBkMode(h_dc, TRANSPARENT); // 글자 Background 투명화
+		SetTextColor(h_dc, RGB(255, 255, 255));
+		DrawText(h_dc, name, length, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		SetBkMode(h_dc, old_mode);
+	}
+
+	CBaseDialog::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+~~~
 
 ###### [Drawing](#drawing)
 ###### [Top](#top)
