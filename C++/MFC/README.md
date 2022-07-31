@@ -39,6 +39,8 @@
   </div>
   </details>
 
+- [모달(modal)](#모달modal)
+- [모달리스(modeless)](#모달리스modeless)
 
 <br/>
 <br/>
@@ -306,7 +308,6 @@ BOOL CMFCApplication3Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 ***
 
-
 <br/>
 <br/>
 
@@ -474,7 +475,68 @@ void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 <br/>
 <br/>
 
+***
 
+# 모달(modal)
 
+  - 대화상자가 실행될 때 제어권을 독점하게 되기 때문에, 대화 상자가 종료되기 전까지 기존 화면에 포커스를 맞출 수 없다.
+  - 데이터 전달 과정
+    - 부모 -> 자식
+      - 자식 대화상자 창을 띄우기 전에, 자식 객체만 만들어 졌을때 부모에서 자식으로 데이터 넘기기
+    - 자식 -> 부모
+      - 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장하고, 대화상자 창을 끝내고 난뒤에, 저장되어 있는 맴버 변수를 부모가 꺼내서 사용(자식의 대화상자가 종료 됬을때 Domodal()함수의 반환값은 Enddialog(int num)로 종료됬을 때의 int값이 된다)
 
+<br/>
 
+  - 부모 -> 자식
+
+#AppDlg.cpp(부모)
+~~~c
+// 이런식으로 자식의 객체가 만들어지고, Domodal로 대화상자를 실행하기 전에 데이터를 넘겨 주면 된다
+Cchaild chaild;
+chaild.Setdata();
+chaild.DoModal();
+~~~
+
+<br/>
+
+  - 자식 -> 부모
+
+#AppDlg.cpp(자식)
+~~~c
+// 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장한다.
+Setdata(k);
+chaild.Enddialog(num);
+~~~
+
+#AppDlg.cpp(부모)
+~~~c
+// 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장하고, 대화상자 창을 끝내고 난뒤에, 저장되어 있는 맴버 변수를 부모가 꺼내서 사용
+Cchaild chaild;
+chaild.Setdata();
+chaild.DoModal();
+
+int num = chaild.Getdata();
+~~~
+
+###### [모달(modal)](#모달modal)
+###### [Top](#top)
+
+***
+
+<br/>
+<br/>
+
+***
+
+# 모달리스(modeless)
+
+  - 대화상자가 실행되도 기존 화면을 포커스 할 수 있다. 
+
+###### [모달리스(modeless)](#모달리스modeless)
+###### [Top](#top)
+
+***
+
+<br/>
+<br/>
