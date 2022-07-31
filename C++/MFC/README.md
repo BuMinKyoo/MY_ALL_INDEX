@@ -36,7 +36,7 @@
   - [모달,모달리스](#모달모달리스)
     - [모달(modal)](#모달modal)
     - [모달리스(modeless)](#모달리스modeless)
-    - [포인터로 전부 접근 하는법](#포인터로-전부-접근-하는법)
+    - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
       
   </div>
   </details>
@@ -333,11 +333,11 @@ BOOL CMFCApplication3Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 # 모달,모달리스
 
-  - 여러가지 
+  - 대화상자 만들기
 
-    - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
-    - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
-    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+    - [모달(modal)](#모달modal)
+    - [모달리스(modeless)](#모달리스modeless)
+    - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
 
 
 ###### [모달,모달리스](#모달모달리스)
@@ -511,9 +511,117 @@ void CD1::OnBnClickedButton1()
 <br/>
 <br/>
 
+# 캐스팅 하여 전부 접근 하는법
+  - 모달이든, 모달리스든 전부다 포인터로하여 캐스팅하여 접근 할 수 있다.
+
+<br/>
+
+  - 부모1 -> 자식1
+    - 부모1 <-> 자식1
+  - 부모1 -> 자식1 -> 자식2
+    - 부모1 <->자식1
+    - 부모1 <-> 자식2
+    - 자식1 <-> 자식2
+  - 부모1 -> 자식1, 자식2
+    - 자식1 <-> 자식2 
+
+<br/>
+
+  - 방법 : 부모의 포인터값을 저장해서 사용
+    - 1. 부모 윈도우 생성
+    - 2. 부모 h에서 자식 h파일 include
+    - 3. 부모 윈도우에서 자식 윈도우 생성
+    - 4. 자식을 생성할때 부모의 class포인터 값을 넘겨줌 그것을 자식 h파일에서 받음
+    - 5. 사용할 자식 cpp파일에 상위에 있는 아무 부모 h파일 include후에 부모 포인터가 담긴 변수를 사용하여 캐스팅 하여 바로 접근하기
+    - 6. 메모리 해제 꼭 잘 해줘야함!
 
 
+#AppDlg.h(부모)
+~~~c
+// 자식 해더 파일 include
+Cchaild* chaild = NULL; // 자식 class선언
+~~~
 
+#AppDlg.cpp(부모)
+~~~c
+// 버튼 클릭시 만들려면,
+void CMFCApplication4Dlg::OnBnClickedButton1()
+{
+	if (chaild == NULL)
+	{
+		chaild = new Cchaild;
+		chaild->Create(IDD_DIALOG1, this);
+		chaild->ShowWindow(SW_SHOW);
+	}
+}
+~~~
+
+<br/>
+
+  - 대화상자 종료
+  - 포인터로 할당한 후에 대화 상자를 만들기 때문에, 자식 대화 상자 종료시에 부모쪽에서 자식쪽으로 할당했던 메모리를 해제 시켜 주어야 한다.
+  - GetParent()를 사용하면 Create했을때 넣어 주었던 this가 부모가 되어, 부모의 포인터로 접근 할 수 있게 된다.
+    - 부모(this 사용 or 미사용) -> 자식(this 미사용) -> 자식 이면 마지막 자식은 GetParent() 사용시 최상위 부모 쪽에 접근 하게 된다.
+    - 부모(this 사용 or 미사용) -> 자식(this 사용) -> 자식 이면 마지막 자식은 GetParent() 사용시 바로 위 자식 쪽으로 접근 하게 된다.
+    - GetParent()를 사용하게 되면 직접 각각의 다이얼로그 class를 캐스팅 하지 않고서는,  PostMessage을 사용 하는 것과 직접 컨트롤 ID로 접근 하는 방법이 있다.
+
+#AppDlg.cpp(자식)
+~~~c
+// 버튼 클릭시 종료 만들려면,
+void Cchaild::OnBnClickedOk()
+{
+	GetParent()->PostMessage(10000);
+}
+~~~
+
+  - 부모는, 프로젝트 -> 클래스마법사 -> 메시지 -> 사용자 지정 메시지 추가 -> 10000(현재 자식에서 보내는것) 만들기
+
+#AppDlg.cpp(부모)
+~~~c
+afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
+{
+	if (chaild != NULL)
+	{
+		chaild->DestroyWindow();
+		delete chaild;
+		chaild = NULL;
+	}
+	return 0;
+}
+~~~
+
+<br/>
+
+  - 부모 -> 자식 데이터 전달
+
+#AppDlg.cpp(부모)
+~~~c
+// 자식 객체의 포인터로 직접 접근하기, 부모는 자식의 변수및 함수, 컨트롤에 이렇게 접근 할 수 있음
+void CMFCApplication4Dlg::fuction()
+{
+	chaild->SetDlgItemInt(IDC_EDIT1, 20000);
+}
+~~~
+
+<br/>
+
+  - 자식 -> 부모 데이터 전달
+
+#AppDlg.cpp(자식)
+~~~c
+// 자식은 GetParent()을 사용해 PostMessage를 보내거나 컨트롤ID에 직접 접근 하는 방법이 있음
+void CD1::OnBnClickedButton1()
+{
+	GetParent()->SetDlgItemInt(IDC_EDIT1, 10);
+	GetParent()->PostMessage(10000, int);
+}
+~~~
+
+###### [모달,모달리스](#모달모달리스)
+###### [Top](#top)
+
+<br/>
+<br/>
 
 
 
