@@ -146,7 +146,7 @@ HBRUSH CAlarm_talk::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	return hbr;
 ~~~
 
-![image](https://user-images.githubusercontent.com/39178978/182018630-38c7671f-5a08-4591-ac44-be93d07331bb.png)
+![image](https://user-images.githubusercontent.com/39178978/182018722-c3094140-ff67-4d0c-9f9d-d398d719b057.png)
 
 여기서
 
