@@ -4,10 +4,10 @@
   <summary>메세지</summary>
   <div markdown="1">
   
-    - [Message](#message)
-      - [ON_COMMAND_RANGE](#on_command_range)
-      - [WM_CTLCOLOR](#wm_ctlcolor)
-      - [WM_DRAWITEM](#wm_drawitem)
+  - [Message](#message)
+    - [ON_COMMAND_RANGE](#on_command_range)
+    - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
+    - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
       
   </div>
   </details>
@@ -18,9 +18,9 @@
   <summary>가상함수</summary>
   <div markdown="1">
   
-    - [Virtual Function](#virtual-function)
-      - [WindowProc](#windowproc)
-      - [OnCommand](#oncommand)
+  - [Virtual Function](#virtual-function)
+    - [WindowProc](#windowproc)
+    - [OnCommand](#oncommand)
       
   </div>
   </details>
@@ -28,37 +28,37 @@
 
 
 - <details markdown="1">
-  <summary>드로잉</summary>
+  <summary>기타</summary>
   <div markdown="1">
   
-    - [Drawing](#drawing)
-      - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
-      - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
-      - [컨트롤의 글꼴, 배경색 변경](#컨트롤의-글꼴-배경색-변경)
-      - [버튼 Backgroud, Border, Text 그리기](#버튼-backgroud-border-text-그리기)
-      - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+  - [기타](#기타)
+    - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
+    - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
+    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
       
   </div>
   </details>
 
 
-***
-***
+<br/>
+<br/>
 
+
+***
 
 # Message
 
   - 일반적으로 콘솔에서 만든 프로그램은 프로그래머가 정한 순서대로 차근 차근 진행 됩낟. 하지만, 윈도우 응용 프로그램은 메세지 구동 구조를 가지고 있으며, 프로그램에 어떤 변화가 생경을때 Windows가 프로그램에게 정보를 알려주고, 프로그램은 그 정보를 받아서 다양한 동작을 하게 된다.
 
-      - [ON_COMMAND_RANGE](#on_command_range)
-      - [WM_CTLCOLOR](#wm_ctlcolor)
-      - [WM_DRAWITEM](#wm_drawitem)
+    - [ON_COMMAND_RANGE](#on_command_range)
+    - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
+    - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
 
 ###### [Message](#message)
 ###### [Top](#top)
 
-
 ***
+
 
 <br/>
 <br/>
@@ -124,10 +124,35 @@ protected:
 <br/>
 <br/>
 
-# WM_CTLCOLOR
-  - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다
+# WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)
+  - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_CTLCOLOR 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+  - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다.
+  - Dialog ID가 “IDC_STATIC2”일때
+  - button은 적용 안되는 모양??!
 
-[컨트롤의 글꼴, 배경색 변경](#컨트롤의-글꼴-배경색-변경) 참고
+#AppDlg.cpp
+~~~c++
+HBRUSH CAlarm_talk::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+{
+	HBRUSH hbr = CBaseDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	if (pWnd->GetDlgCtrlID() == IDC_STATIC2)
+	{
+		pDC->SetBkMode(TRANSPARENT); // 배경 투명으로 변경
+		pDC->SetTextColor(RGB(255, 255, 255)); // 글자 컬러 흰색으로 변경
+		return (HBRUSH)::GetStockObject(NULL_BRUSH);
+	}
+
+	return hbr;
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/182018125-0037da73-c183-4a30-bb23-3ec8e697d9ae.png)
+
+여기서
+
+![image](https://user-images.githubusercontent.com/39178978/182018134-52e84d7a-f123-42dd-be3b-9ae20ecb9f30.png)
+
+이렇게 된다
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -135,10 +160,62 @@ protected:
 <br/>
 <br/>
 
-# WM_DRAWITEM
-  - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다
+# WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)
+  - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DRAWITEM 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+  - Dialog에서 Owner Draw속성을 True설정(해당 컨트롤을 스스로 그리지 않겠다)
+  - WM_DRAWITEM은 사용자가  직접 컨트롤을 그린다고 하는것
 
-[버튼 Backgroud, Border, Text 그리기](#버튼-backgroud-border-text-그리기) 참고
+#AppDlg.cpp
+~~~c++
+void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	if (nIDCtl == IDC_BUTTON2)
+	{
+		RECT r = lpDrawItemStruct->rcItem;
+		HDC h_dc = lpDrawItemStruct->hDC;
+		HBRUSH h_brush = CreateSolidBrush(RGB(5, 81, 158));
+
+		FillRect(h_dc, &r, h_brush); // 백드라운드 그리기
+		DeleteObject(h_brush);
+
+		// 테두리 그리기
+		HPEN h_pen = CreatePen(PS_SOLID, 1, RGB(0, 67, 135));
+
+		HPEN h_pen_click = CreatePen(PS_SOLID, 1, RGB(255, 255, 255)); // 클릭했을시 교체할 흰색 테두리
+
+		HGDIOBJ h_old_pen = SelectObject(h_dc, h_pen);
+		HGDIOBJ h_old_brush = SelectObject(h_dc, GetStockObject(NULL_BRUSH));
+
+		Rectangle(h_dc, r.left, r.top, r.right, r.bottom);
+
+		// 클릭했을시 흰색 테두리로 교체하고, 흰색테두리와 글자를 2px만큼 움직여서 액팅 추가
+		if (lpDrawItemStruct->itemState & ODS_SELECTED) // ODS_SELECTED : 클릭 되었는지 확인
+		{
+			r.top += 2;
+			r.left += 2;
+
+			SelectObject(h_dc, h_pen_click);
+			Rectangle(h_dc, r.left, r.top, r.right, r.bottom);
+		}
+
+		SelectObject(h_dc, h_old_pen);
+		DeleteObject(h_old_pen);
+
+		// 글자 출력
+		CString name;
+		int length = GetDlgItemText(lpDrawItemStruct->CtlID, name);
+
+		int old_mode = SetBkMode(h_dc, TRANSPARENT); // 글자 Background 투명화
+		SetTextColor(h_dc, RGB(255, 255, 255));
+		DrawText(h_dc, name, length, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		SetBkMode(h_dc, old_mode);
+	}
+
+	CBaseDialog::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/182018423-52c61f02-1372-49d2-84f5-7234c0a43206.png)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -147,20 +224,19 @@ protected:
 <br/>
 
 ***
-
 
 # Virtual Function
   - 보통은 선언되어 있는 함수를 virtual로 선언하여 사용함이고, 프로젝트 -> 클래스 마법사 -> 가상함수 쪽에서 추가할 수 있다.
   - 프로젝트 -> 클래스 마법사 -> 가상함수에서 추가 한다면 AppDlg.h, AppDlg.cpp에 함수해더가 자동으로 추가 된다.
 
-      - [WindowProc](#windowproc)
-      - [OnCommand](#oncommand)
+    - [WindowProc](#windowproc)
+    - [OnCommand](#oncommand)
   
 ###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
 
-
 ***
+
 
 <br/>
 <br/>
@@ -216,25 +292,27 @@ BOOL CMFCApplication3Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 ***
 
+# 기타
 
-# Drawing
-  
-      - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
-      - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
-      - [컨트롤의 글꼴, 배경색 변경](#컨트롤의-글꼴-배경색-변경)
-      - [버튼 Backgroud, Border, Text 그리기](#버튼-backgroud--border--text그리기)
-  
-###### [Drawing](#drawing)
+  - 여러가지 
+
+    - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
+    - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
+    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+
+
+###### [기타](#기타)
 ###### [Top](#top)
 
-
 ***
+
 
 <br/>
 <br/>
 
 # 문자 크기 바꾸기(CFont)
   - 문자 크기 바꾸기
+  - 문자 Weight도 설정 
   - 다른 Dialog ID 전부다 가능
 
 #AppDlg.cpp
@@ -255,7 +333,7 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 }
 ~~~
 
-###### [Drawing](#drawing)
+###### [기타](#기타)
 ###### [Top](#top)
 
 <br/>
@@ -263,6 +341,7 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 
 # 문자 크기 바꾸기(LOGFONT)
   - 문자 크기 바꾸기
+  - 문자 Weight도 설정 가능
   - 다른 Dialog ID 전부다 가능
 
 #AppDlg.cpp
@@ -283,101 +362,117 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 }
 ~~~
 
-###### [Drawing](#drawing)
+###### [기타](#기타)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 컨트롤의 글꼴, 배경색 변경
-  - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_CTLCOLOR 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
-  - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다.
-  - Dialog ID가 “IDC_STATIC2”일때
+# 윈도우 특정 부분 투명화 하기
+  - Dialog속성 - 계층화 True 로 변경
+  - SetLayeredWindowAttributes키워드를 쓰면 지정된 컬러가 있는 곳을 투명화 시킴(하지만 이것을 쓰지 않고 계층화만 True이면 그냥 창 전부가 투명화가 되어서 안보이게 됨)
+  - SetLayeredWindowAttributes(0, 255, LWA_ALPHA); 이렇게 쓰면 완전히 보이게 되고 255를 낮춘 만큼 윈도우가 투명화가 진행됨
 
 #AppDlg.cpp
-~~~c++
-HBRUSH CAlarm_talk::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+~~~C++
+BOOL CMFCApplication1Dlg::OnInitDialog()
 {
-	HBRUSH hbr = CBaseDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+	CDialogEx::OnInitDialog();
 
-	if (pWnd->GetDlgCtrlID() == IDC_STATIC2)
+SetLayeredWindowAttributes(RGB(255, 100, 10), 0, LWA_COLORKEY);
+
+}
+
+...
+
+void CMFCApplication1Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
 	{
-		pDC->SetBkMode(TRANSPARENT); // 배경 투명으로 변경
-		pDC->SetTextColor(RGB(255, 255, 255)); // 글자 컬러 흰색으로 변경
-		return (HBRUSH)::GetStockObject(NULL_BRUSH);
-	}
 
-	return hbr;
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// 아이콘을 그립니다.
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		dc.FillSolidRect(10, 10, 100, 100, RGB(255, 100, 10));
+		//CDialogEx::OnPaint();
+	}
+}
+
 ~~~
 
-###### [Drawing](#drawing)
-###### [Top](#top)
+![image](https://user-images.githubusercontent.com/39178978/182017389-c0cd387a-37b0-4db3-beb0-407b8c44b1b9.png)
 
-<br/>
-<br/>
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-# 버튼 Backgroud, Border, Text 그리기
-  - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DRAWITEM 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
-  - Dialog에서 Owner Draw속성을 True설정(해당 컨트롤을 스스로 그리지 않겠다)
-  - WM_DRAWITEM은 사용자가  직접 컨트롤을 그린다고 하는것 
+  - 마우스 클릭한 후 투명화를 하고 싶을때
+  - 이때를 레이어 속성을 꺼두고 클릭시에 레이어 속성을 추가하는 방향으로 설정한다
+  - OnPaint()를 거치기 위한 Invalidate()를 따로 호출하지 않아도 적용 된다
 
 #AppDlg.cpp
-~~~c++
-void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+~~~C++
+void CMFCApplication1Dlg::OnPaint()
 {
-	if (nIDCtl == IDC_PRINT)
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
 	{
-		RECT r = lpDrawItemStruct->rcItem;
-		HDC h_dc = lpDrawItemStruct->hDC;
-		HBRUSH h_brush = CreateSolidBrush(RGB(5, 81, 158));
 
-		FillRect(h_dc, &r, h_brush); // 백드라운드 그리기
-		DeleteObject(h_brush);
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// 테두리 그리기
-		HPEN h_pen = CreatePen(PS_SOLID, 1, RGB(0, 67, 135));
+		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		HPEN h_pen_click = CreatePen(PS_SOLID, 1, RGB(255, 255, 255)); // 클릭했을시 교체할 흰색 테두리
-
-		HGDIOBJ h_old_pen = SelectObject(h_dc, h_pen);
-		HGDIOBJ h_old_brush = SelectObject(h_dc, GetStockObject(NULL_BRUSH));
-
-		Rectangle(h_dc, r.left, r.top, r.right, r.bottom);
-
-		// 클릭했을시 흰색 테두리로 교체하고, 흰색테두리와 글자를 2px만큼 움직여서 액팅 추가
-		if(lpDrawItemStruct->itemState & ODS_SELECTED)
-		{
-			r.top += 2;
-			r.left += 2;
-
-			SelectObject(h_dc, h_pen_click);
-			Rectangle(h_dc, r.left, r.top, r.right, r.bottom);
-		}
-
-		SelectObject(h_dc, h_old_pen);
-		DeleteObject(h_old_pen);
-
-		// 글자 출력
-		CString name;
-		int length = GetDlgItemText(lpDrawItemStruct->CtlID, name);
-
-		int old_mode = SetBkMode(h_dc, TRANSPARENT); // 글자 Background 투명화
-		SetTextColor(h_dc, RGB(255, 255, 255));
-		DrawText(h_dc, name, length, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		SetBkMode(h_dc, old_mode);
+		// 아이콘을 그립니다.
+		dc.DrawIcon(x, y, m_hIcon);
 	}
+	else
+	{
+		dc.FillSolidRect(10, 10, 100, 100, RGB(255, 100, 10));
+		//CDialogEx::OnPaint();
+	}
+}
 
-	CBaseDialog::OnDrawItem(nIDCtl, lpDrawItemStruct);
+...
+
+void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	int wnd_style = ::GetWindowLong(m_hWnd, GWL_EXSTYLE); // 윈도우의 확장 속성을 값을 얻어옴
+	if (!(wnd_style & WS_EX_LAYERED)) // 현재 윈도우에 레이어 속성이 없다면
+	{
+		::SetWindowLong(m_hWnd, GWL_EXSTYLE, wnd_style | WS_EX_LAYERED); // 레이어 속성을 추가한다
+	}
+	SetLayeredWindowAttributes(RGB(255, 100, 10), 0, LWA_COLORKEY);
+
+
+	CDialogEx::OnLButtonDown(nFlags, point);
 }
 ~~~
 
-###### [Drawing](#drawing)
+
+###### [기타](#기타)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-
 
 
 
