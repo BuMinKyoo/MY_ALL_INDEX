@@ -1,5 +1,7 @@
 ###### Top
 
+- [MFC메모리 누수 확인](#mfc메모리-누수-확인)
+
 - <details markdown="1">
   <summary>메세지</summary>
   <div markdown="1">
@@ -45,6 +47,36 @@
 <br/>
 <br/>
 
+***
+
+# MFC메모리 누수 확인
+
+  - #include <crtdbg.h> : 메모리 누수를 탐지하는데 필요한 함수들이 정의되어 있음
+  - #define _CRTDBG_MAP_ALLOC : 메모리 누수 결과를 더 자세히 보여주도록 하는 정의문
+
+<br/>
+
+  - _CrtDumpMemoryLeaks(); : 누수 결과를 디버그 창에 표시(프로그램이 종료되는 지점에 사용, 첫 누수 결과만 출력)
+  - _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF ); : 누수 결과를 디버그 창에 표시(프로그램 시작 부분에 사용, 모든 누수 결과 출력)
+
+<br/>
+
+~~~c++
+#include <crtdbg.h>
+#define _CRTDBG_MAP_ALLOC
+
+// 프로그램 시작 부분에
+_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+~~~
+
+
+###### [MFC메모리 누수 확인](#mfc메모리-누수-확인)
+###### [Top](#top)
+
+***
+
+<br/>
+<br/>
 
 ***
 
@@ -58,9 +90,6 @@
 
 ###### [Message](#message)
 ###### [Top](#top)
-
-***
-
 
 <br/>
 <br/>
@@ -237,9 +266,6 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 ###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
 
-***
-
-
 <br/>
 <br/>
 
@@ -305,8 +331,6 @@ BOOL CMFCApplication3Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 ###### [기타](#기타)
 ###### [Top](#top)
-
-***
 
 <br/>
 <br/>
@@ -484,7 +508,7 @@ void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
     - 부모 -> 자식
       - 자식 대화상자 창을 띄우기 전에, 자식 객체만 만들어 졌을때 부모에서 자식으로 데이터 넘기기
     - 자식 -> 부모
-      - 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장하고, 대화상자 창을 끝내고 난뒤에, 저장되어 있는 맴버 변수를 부모가 꺼내서 사용(자식의 대화상자가 종료 됬을때 Domodal()함수의 반환값은 Enddialog(int num)로 종료됬을 때의 int값이 된다)
+      - 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장하고, 대화상자 창을 끝내고 난뒤에, 저장되어 있는 맴버 변수를 부모가 꺼내서 사용(자식의 대화상자가 종료 됬을때 Domodal()함수의 반환값은 Enddialog(int num)로 종료됬을 때의 int값이 된다, int값은 넣지 않아도 됨)
 
 <br/>
 
