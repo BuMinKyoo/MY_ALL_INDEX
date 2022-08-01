@@ -23,6 +23,7 @@
   - [Virtual Function](#virtual-function)
     - [WindowProc](#windowproc)
     - [OnCommand](#oncommand)
+    - [PreTranslateMessage](#PreTranslateMessage)
       
   </div>
   </details>
@@ -273,6 +274,7 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 
     - [WindowProc](#windowproc)
     - [OnCommand](#oncommand)
+    - [PreTranslateMessage](#PreTranslateMessage)
   
 ###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
@@ -320,6 +322,46 @@ BOOL CMFCApplication3Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		SetDlgItemInt(IDC_SHOW_NUM_EDIT, ctrl_id - 1000);
 
 	return CDialogEx::OnCommand(wParam, lParam);
+}
+~~~
+
+###### [Virtual Function](#virtual-function)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# PreTranslateMessage
+  - 프로젝트 -> 클래스 마법사 -> 가상함수 -> PreTranslateMessage 추가하기(AppDlg.h, AppDlg.cpp에 함수해더 자동으로 추가됨)
+  - 메세지 경로
+    - PreTranslateMessage -> TranslateMessage or DispatchMessage
+  - TranslateMessage or DispatchMessage 에 전해지기 전에 처리할 필요가 있을때 사용
+  - 메시지 큐에서 메시지 정보를 읽어들인 다음에 호출되기 때문에 메시지 큐에 들어가는 모든 메시지를 받을 수 있고, 먼저 낚아 채어 그 메시지가 넘어가지 않게 할 수 있음
+  - return을 TRUE로 하면 PreTranslateMessage에서 더 이상 메시지가 넘어가지 않고 return을 FALSE로 하면 PreTranslateMessage에서 메시지가 다음으로 넘어 가게 된다
+  - SendMessage는 메시지를 큐에 넣는 것이 아니라 곧바로 윈도우 프로시저로 보내 즉각 처리하기 때문에 잡을 수 없다
+  - PostMessage는 메시지큐에 들어가기 때문에 잡을 수 있다
+
+#AppDlg.cpp
+~~~c++
+// 마우스 좌클릭시, PreTranslateMessage 함수가 return FALSE를 하기 때문에 AfxMessageBox(_T("123"));, AfxMessageBox(_T("456")); 두개다 작동됨
+BOOL CMFCApplication3Dlg::PreTranslateMessage(MSG* pMsg)
+{
+	if(pMsg->message == WM_LBUTTONDOWN)
+	{
+		AfxMessageBox(_T("123"));
+		return FALSE;
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+
+...
+
+void CMFCApplication3Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+
+	AfxMessageBox(_T("456"));
+
+	CDialogEx::OnLButtonDown(nFlags, point);
 }
 ~~~
 
