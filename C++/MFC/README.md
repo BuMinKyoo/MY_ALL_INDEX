@@ -10,6 +10,7 @@
     - [ON_COMMAND_RANGE](#on_command_range)
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
+    - [PostMessage(사용자 지정 메시지)](#postmessage사용자-지정-메시지)
       
   </div>
   </details>
@@ -112,6 +113,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [ON_COMMAND_RANGE](#on_command_range)
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
+    - [PostMessage(사용자 지정 메시지)](#postmessage사용자-지정-메시지)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -273,6 +275,54 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 ~~~
 
 ![image](https://user-images.githubusercontent.com/39178978/182018423-52c61f02-1372-49d2-84f5-7234c0a43206.png)
+
+###### [Message](#message)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# PostMessage(사용자 지정 메시지)
+  - 자기 자신에게 PostMessage를 보낼 수도 있지만 그것은 의미가 없고, 다른 dialog에서 보내는것을 받는것이 의미가 있다. 보통 자식 -> 부모로 보내는것이 일반적인다(부모 -> 자식은 접근이 쉽기 때문)
+  - 부모에서는, 프로젝트 -> 클래스마법사->메시지->사용자 지정 메시지 추가 -> ‘10000’ 입력 후 추가하기(10000은 예시를 든것임!)
+  - (AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+  - 자식이 ‘10000’메시지를 보내면 부모의 ‘10000’메시지를 받는 함수가 호출된다.
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+//함수원형
+BOOL PostMessage(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+
+HWND hWnd : 메시지를 받을 윈도우 핸들
+Msg : 어떤 메시지 번호를 넘길껀지
+WPARAM wParam, LPARAM lParam : 추가 데이터 송부?!
+~~~
+
+<br/>
+
+#AppDlg.cpp(자식)
+~~~c++
+// 부모의 핸들을 GetParent()로 얻어와서 이렇게 보낸다. 현재는 '10000' 메시지를 지정해서 만들어 보내겠다는것
+void Cchaild::OnBnClickedButton1()
+{
+	GetParent()->PostMessage(10000);
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(부모)
+~~~c++
+// 부모의 지정 메시지를 가진 함수 호출
+// 프로젝트 -> 클래스마법사->메시지->사용자 지정 메시지 추가 -> ‘10000’ 입력 후 추가하기(자식이 지정 메시지인 '10000' 메시지를 부모로 보내기 때문에)
+afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
+{
+	SetDlgItemInt(IDC_EDIT1, 10);
+	return 0;
+}
+~~~
 
 ###### [Message](#message)
 ###### [Top](#top)
