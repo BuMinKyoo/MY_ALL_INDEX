@@ -10,7 +10,7 @@
     - [ON_COMMAND_RANGE](#on_command_range)
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
-    - [PostMessage(사용자 지정 메시지)](#postmessage사용자-지정-메시지)
+    - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
       
   </div>
   </details>
@@ -46,7 +46,7 @@
 
 
 - <details markdown="1">
-  <summary>MoveWindows,SetWindowPos</summary>
+  <summary>MoveWindows,SetWindowPos(Dialog 크기변경, 무브 하기)</summary>
   <div markdown="1">
   
   - [MoveWindows,SetWindowPos](#movewindowssetwindowpos)
@@ -58,17 +58,24 @@
 
 
 
+- [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
+- [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+
+
 - <details markdown="1">
-  <summary>기타</summary>
+  <summary>문자 크기 바꾸기</summary>
   <div markdown="1">
   
-  - [기타](#기타)
+  - [문자 크기 바꾸기](#문자-크기-바꾸기)
     - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
     - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
-    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
       
   </div>
   </details>
+
+
+
+- [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
 
 
 
@@ -113,7 +120,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [ON_COMMAND_RANGE](#on_command_range)
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
-    - [PostMessage(사용자 지정 메시지)](#postmessage사용자-지정-메시지)
+    - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -282,7 +289,7 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 <br/>
 <br/>
 
-# PostMessage(사용자 지정 메시지)
+# PostMessage (사용자 지정 메시지)
   - 자기 자신에게 PostMessage를 보낼 수도 있지만 그것은 의미가 없고, 다른 dialog에서 보내는것을 받는것이 의미가 있다. 보통 자식 -> 부모로 보내는것이 일반적이다(부모 -> 자식은 접근이 쉽기 때문)
   - 부모에서는, 프로젝트 -> 클래스마법사->메시지->사용자 지정 메시지 추가 -> ‘10000’ 입력 후 추가하기(10000은 예시를 든것임!)
   - (AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
@@ -877,78 +884,40 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 
 ***
 
-# 기타
+# ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)
+  - ShowWindow() : 보이게, 안보이게
+    - ShowWindow(SW_SHOW) : 윈도우 보이기 활성화
+    - ShowWindow(SW_HIDE) :  윈도우 숨기기
+    - ShowWindow(SW_SHOWMAXIMIZED) : 윈도우 최대화 상태로 활성화
+    - ShowWindow(SW_SHOWMINIIMIZED) : 윈도우 최소화 상태로 활성화
 
-  - 여러가지 
+<br/>
 
-    - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
-    - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
-    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+~~~C++
+// 함수 원형
+BOOL ShowWindow(HWND hWnd, int nCmdShow)
+~~~
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-###### [기타](#기타)
+<br/>
+
+  - EnableWindow() :  윈도우 다이얼로그 또는, 컨트롤에 대한 활성화, 비활성화 조절
+    - EnableWindow(TRUE) : 활성화
+    - EnableWindow(FALSE) : 비활성화
+
+~~~C++
+// 함수 원형
+BOOL EnableWindow(BOOL bEnable = TRUE)
+~~~
+
+###### [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 문자 크기 바꾸기(CFont)
-  - 문자 크기 바꾸기
-  - 문자 Weight도 설정 
-  - 다른 Dialog ID 전부다 가능
-
-#AppDlg.cpp
-~~~C++
-CFont f;
-~~~
-
-#AppDlg.cpp
-~~~C++
-BOOL CMFCApplication1Dlg::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-	
-	f.CreatePointFont(300, L"굴림");
-	GetDlgItem(IDC_BUTTON1)->SetFont(&f);
-
-	return TRUE;
-}
-~~~
-
-###### [기타](#기타)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 문자 크기 바꾸기(LOGFONT)
-  - 문자 크기 바꾸기
-  - 문자 Weight도 설정 가능
-  - 다른 Dialog ID 전부다 가능
-
-#AppDlg.cpp
-~~~C++
-BOOL CMFCApplication1Dlg::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-	
-  LOGFONT lf2;
-  ::ZeroMemory(&lf2, sizeof(lf2));
-  lf2.lfHeight = 32;
-  lf2.lfWeight = FW_LIGHT;
-  m_fn010.CreateFontIndirect(&lf2);
-  ::lstrcpy(lf2.lfFaceName, _T("굴림"));
-  GetDlgItem(IDC_AT_NUM_12)->SetFont(&m_fn010);
-
-	return TRUE;
-}
-~~~
-
-###### [기타](#기타)
-###### [Top](#top)
-
-<br/>
-<br/>
+***
 
 # 윈도우 특정 부분 투명화 하기
   - Dialog속성 - 계층화 True 로 변경
@@ -1049,10 +1018,117 @@ void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 }
 ~~~
 
-
-###### [기타](#기타)
+###### [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
 ###### [Top](#top)
 
 <br/>
 <br/>
+
+***
+
+# 문자 크기 바꾸기
+
+  - 문자 크기를 바꾸는 변수 및, 어떻게 작동 시키는지 
+
+    - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
+    - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
+
+###### [문자 크기 바꾸기](#문자-크기-바꾸기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 문자 크기 바꾸기(CFont)
+  - 문자 크기 바꾸기
+  - 문자 Weight도 설정 
+  - 다른 Dialog ID 전부다 가능
+
+#AppDlg.cpp
+~~~C++
+CFont f;
+~~~
+
+#AppDlg.cpp
+~~~C++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	
+	f.CreatePointFont(300, L"굴림");
+	GetDlgItem(IDC_BUTTON1)->SetFont(&f);
+
+	return TRUE;
+}
+~~~
+
+###### [문자 크기 바꾸기](#문자-크기-바꾸기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 문자 크기 바꾸기(LOGFONT)
+  - 문자 크기 바꾸기
+  - 문자 Weight도 설정 가능
+  - 다른 Dialog ID 전부다 가능
+
+#AppDlg.cpp
+~~~C++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	
+  LOGFONT lf2;
+  ::ZeroMemory(&lf2, sizeof(lf2));
+  lf2.lfHeight = 32;
+  lf2.lfWeight = FW_LIGHT;
+  m_fn010.CreateFontIndirect(&lf2);
+  ::lstrcpy(lf2.lfFaceName, _T("굴림"));
+  GetDlgItem(IDC_AT_NUM_12)->SetFont(&m_fn010);
+
+	return TRUE;
+}
+~~~
+
+###### [문자 크기 바꾸기](#문자-크기-바꾸기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Dialog Control 포커스 맞추기
+
+  - 1. 리소스 편집시에 맞추는 방법
+    - 리소스편집 -> 서식 -> 탭순서 에서 처음으로 포커스를 맞출 컨트롤을 1번으로 설정한다
+  - 2. GotoDlgCtrl() 함수 사용하기
+    - OnInitDialog()에서 return을 FALSE로 해야함
+      - TRUR : VC에서 지정한 탭순서 대로 가장 처음에 설정한 객체에 포커스를 준다
+      - FLASE : 개발자가 지정한 위치에 포커스를 설정할 수 있게 한다.
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// IDC_EDIT1컨트롤에 포커스를 맞춘다
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	GotoDlgCtrl(GetDlgItem(IDC_EDIT1));
+
+	return FALSE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+###### [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 
