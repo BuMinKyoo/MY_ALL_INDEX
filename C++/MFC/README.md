@@ -283,7 +283,7 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 <br/>
 
 # PostMessage(사용자 지정 메시지)
-  - 자기 자신에게 PostMessage를 보낼 수도 있지만 그것은 의미가 없고, 다른 dialog에서 보내는것을 받는것이 의미가 있다. 보통 자식 -> 부모로 보내는것이 일반적인다(부모 -> 자식은 접근이 쉽기 때문)
+  - 자기 자신에게 PostMessage를 보낼 수도 있지만 그것은 의미가 없고, 다른 dialog에서 보내는것을 받는것이 의미가 있다. 보통 자식 -> 부모로 보내는것이 일반적이다(부모 -> 자식은 접근이 쉽기 때문)
   - 부모에서는, 프로젝트 -> 클래스마법사->메시지->사용자 지정 메시지 추가 -> ‘10000’ 입력 후 추가하기(10000은 예시를 든것임!)
   - (AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
   - 자식이 ‘10000’메시지를 보내면 부모의 ‘10000’메시지를 받는 함수가 호출된다.
@@ -299,6 +299,8 @@ HWND hWnd : 메시지를 받을 윈도우 핸들
 Msg : 어떤 메시지 번호를 넘길껀지
 WPARAM wParam, LPARAM lParam : 추가 데이터 송부?!
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -477,6 +479,8 @@ Cchaild chaild;
 chaild.DoModal();
 ~~~
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
 <br/>
 
   - 부모 -> 자식
@@ -488,6 +492,8 @@ Cchaild chaild;
 chaild.Setdata();
 chaild.DoModal();
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -525,6 +531,8 @@ int num = chaild.Getdata();
     - 자식 -> 부모
       - GetParent()를 사용하여 데이터 전달(PostMessage, 컨트롤 ID에 직접 접근)
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
 <br/>
 
   - 대화상자 생성
@@ -549,6 +557,8 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 	}
 }
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -584,6 +594,8 @@ afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
 }
 ~~~
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
 <br/>
 
   - 부모 -> 자식 데이터 전달
@@ -596,6 +608,8 @@ void CMFCApplication4Dlg::fuction()
 	chaild->SetDlgItemInt(IDC_EDIT1, 20000);
 }
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -641,6 +655,9 @@ void CD1::OnBnClickedButton1()
     - 5. 사용할 자식 cpp파일에 상위에 있는 아무 부모 h파일 include후에 부모 포인터가 담긴 변수를 사용하여 캐스팅 하여 바로 접근하기
     - 6. 메모리 해제 꼭 잘 해줘야함!
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
 
 #AppDlg.h(부모)
 ~~~c++
@@ -730,6 +747,8 @@ BOOL MoveWindow(
 );
 ~~~
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
 <br/>
 
 #AppDlg.cpp
@@ -742,6 +761,8 @@ BOOL CMFCApplication5Dlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 }
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -756,6 +777,8 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 	chaild->MoveWindow(0, 0, 500, 500);
 }
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -816,6 +839,8 @@ SWP_NOSIZE : 크기를 변경하지 않겠다. cx,cy 값 무시
 SWP_NOZORDER : Z-order 변경하지 않겠다. hWndInsertAfter 값 무시
 ~~~
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
 <br/>
 
 #AppDlg.cpp
@@ -828,6 +853,8 @@ BOOL Cchaild::OnInitDialog()
 	CDialogEx::OnInitDialog();
 }
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
