@@ -45,6 +45,19 @@
 
 
 - <details markdown="1">
+  <summary>MoveWindows,SetWindowPos</summary>
+  <div markdown="1">
+  
+  - [MoveWindows,SetWindowPos](#movewindowssetwindowpos)
+    - [MoveWindows](#movewindows)
+    - [SetWindowPos](#setwindowpos)
+      
+  </div>
+  </details>
+
+
+
+- <details markdown="1">
   <summary>기타</summary>
   <div markdown="1">
   
@@ -171,7 +184,7 @@ protected:
   - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_CTLCOLOR 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
   - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다.
   - Dialog ID가 “IDC_STATIC2”일때
-  - button은 적용 안되는 모양??!
+  - Owner Draw가 없는 컨트롤을 변경할 때 사용. 컬러를 바꿀 때 사용(그래서 버튼 같은 컨트롤은 WM_DRAWITEM 메시지로 해야함)
 
 #AppDlg.cpp
 ~~~c++
@@ -206,6 +219,7 @@ HBRUSH CAlarm_talk::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 # WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)
   - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DRAWITEM 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
   - Dialog에서 Owner Draw속성을 True설정(해당 컨트롤을 스스로 그리지 않겠다)
+  - Owner Draw가 있는 컨트롤을 변경할 때 사용, 즉 그리는 것을 제어 하는것
   - WM_DRAWITEM은 사용자가  직접 컨트롤을 그린다고 하는것
 
 #AppDlg.cpp
@@ -403,12 +417,12 @@ void CMFCApplication3Dlg::OnLButtonDown(UINT nFlags, CPoint point)
   - 부모 h파일에 자식 h파일 include가 필요함
 
 #AppDlg.h(부모)
-~~~c
+~~~c++
 // 자식 해더 파일 include
 ~~~
 
 #AppDlg.cpp(부모)
-~~~c
+~~~c++
 Cchaild chaild;
 chaild.DoModal();
 ~~~
@@ -418,7 +432,7 @@ chaild.DoModal();
   - 부모 -> 자식
 
 #AppDlg.cpp(부모)
-~~~c
+~~~c++
 // 이런식으로 자식의 객체가 만들어지고, Domodal로 대화상자를 실행하기 전에 데이터를 넘겨 주면 된다
 Cchaild chaild;
 chaild.Setdata();
@@ -430,14 +444,14 @@ chaild.DoModal();
   - 자식 -> 부모
 
 #AppDlg.cpp(자식)
-~~~c
+~~~c++
 // 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장한다.
 Setdata(k);
 chaild.Enddialog(num);
 ~~~
 
 #AppDlg.cpp(부모)
-~~~c
+~~~c++
 // 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장하고, 대화상자 창을 끝내고 난뒤에, 저장되어 있는 맴버 변수를 부모가 꺼내서 사용
 Cchaild chaild;
 chaild.Setdata();
@@ -467,13 +481,13 @@ int num = chaild.Getdata();
   - 부모 h파일에 자식 h파일 include가 필요함
 
 #AppDlg.h(부모)
-~~~c
+~~~c++
 // 자식 해더 파일 include
 Cchaild* chaild = NULL; // 자식 class선언
 ~~~
 
 #AppDlg.cpp(부모)
-~~~c
+~~~c++
 // 버튼 클릭시 만들려면,
 void CMFCApplication4Dlg::OnBnClickedButton1()
 {
@@ -496,7 +510,7 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
     - GetParent()를 사용하게 되면 직접 각각의 다이얼로그 class를 캐스팅 하지 않고서는,  PostMessage을 사용 하는 것과 직접 컨트롤 ID로 접근 하는 방법이 있다.
 
 #AppDlg.cpp(자식)
-~~~c
+~~~c++
 // 버튼 클릭시 종료 만들려면,
 void Cchaild::OnBnClickedOk()
 {
@@ -507,7 +521,7 @@ void Cchaild::OnBnClickedOk()
   - 부모는, 프로젝트 -> 클래스마법사 -> 메시지 -> 사용자 지정 메시지 추가 -> 10000(현재 자식에서 보내는것) 만들기
 
 #AppDlg.cpp(부모)
-~~~c
+~~~c++
 afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
 {
 	if (chaild != NULL)
@@ -525,7 +539,7 @@ afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
   - 부모 -> 자식 데이터 전달
 
 #AppDlg.cpp(부모)
-~~~c
+~~~c++
 // 자식 객체의 포인터로 직접 접근하기, 부모는 자식의 변수및 함수, 컨트롤에 이렇게 접근 할 수 있음
 void CMFCApplication4Dlg::fuction()
 {
@@ -538,7 +552,7 @@ void CMFCApplication4Dlg::fuction()
   - 자식 -> 부모 데이터 전달
 
 #AppDlg.cpp(자식)
-~~~c
+~~~c++
 // 자식은 GetParent()을 사용해 PostMessage를 보내거나 컨트롤ID에 직접 접근 하는 방법이 있음
 void CD1::OnBnClickedButton1()
 {
@@ -579,13 +593,13 @@ void CD1::OnBnClickedButton1()
 
 
 #AppDlg.h(부모)
-~~~c
+~~~c++
 // 자식 해더 파일 include
 Cchaild* chaild = NULL; // 자식 class선언
 ~~~
 
 #AppDlg.cpp(부모)
-~~~c
+~~~c++
 // 버튼 클릭시 만들려면, 또한 자식 윈도우 생성시 부모윈도우의 포인터 전송
 void CMFCApplication5Dlg::OnBnClickedButton1()
 {
@@ -599,7 +613,7 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 ~~~
 
 #AppDlg.h(자식)
-~~~c
+~~~c++
 class CMFCApplication5Dlg;
 
 class Cchaild : public CDialogEx
@@ -618,7 +632,7 @@ class Cchaild : public CDialogEx
 ~~~
 
 #AppDlg.cpp(자식)
-~~~c
+~~~c++
 // 부모 해더 파일 include
 void Cchaild::OnBnClickedButton1()
 {
@@ -628,6 +642,158 @@ void Cchaild::OnBnClickedButton1()
 
 ###### [모달,모달리스](#모달모달리스)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# MoveWindows,SetWindowPos
+
+  - Window Dialog를 Move하는 함수들
+
+    - [MoveWindows](#movewindows)
+    - [SetWindowPos](#setwindowpos)
+
+###### [MoveWindows,SetWindowPos](#movewindowssetwindowpos)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MoveWindows
+
+  - 윈도우의 위치와 크기를 변경하는 함수이다.
+  - 최상단 좌표는 최상위 윈도우일 경우에는 화면 좌표이고, 자식 윈도우 일때에는 부모윈도우의 작업영역 내에서의 좌표가 된다.(dialog의 style이 child일 경우를 말하는것 같다!)
+
+<br/>
+
+~~~c++
+// 함수의 원형
+BOOL MoveWindow(     
+	HWND hWnd,         	//변경할 윈도우의 핸들
+	int X,                 //x좌표
+	int Y,                 //y좌표
+	int nWidth,        	//윈도우의 넓이
+	int nHeight,           //윈도우의 높이
+	BOOL bRepaint      	//TRUE면 새로그림 FALSE면 새로 그리지 않음
+);
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 현재 윈도우 OnInitDialog 안에서 MoveWindow(0, 0, x, y); 를 사용하면 된다
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	MoveWindow(0, 0, x, y);
+
+	CDialogEx::OnInitDialog();
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(부모)
+~~~c++
+// 부모가 자식에 대하여 사용할 때, 자식 컨트롤을 핸들로 줘야 한다.
+void CMFCApplication5Dlg::OnBnClickedButton1()
+{
+	chaild = new Cchaild;
+	chaild->Create(IDD_DIALOG1);
+	chaild->ShowWindow(SW_SHOW);
+	chaild->MoveWindow(0, 0, 500, 500);
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(부모)
+~~~c++
+// GetWindowRect() 를 이용하여 다이얼로그의 자체의 width와 height를 알 수 있다.
+void CMFCApplication5Dlg::OnBnClickedButton1()
+{
+	CRect r;
+	chaild = new Cchaild;
+	chaild->Create(IDD_DIALOG1, this);
+	chaild->ShowWindow(SW_SHOW);
+	chaild->GetWindowRect(&r);
+	chaild->MoveWindow(0, 0, r.Width(), r.Height());
+}
+~~~
+
+###### [MoveWindows,SetWindowPos](#movewindowssetwindowpos)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# SetWindowPos
+
+  - MoveWindows의 역할 이상을 할 수 있음
+  - MoveWindows에서 추가적으로 크기만 또는 위치만 따로 이동 가능한 함수
+  - 다양한 플래그로 다양한 표현 가능
+  - z순서도 조절 가능
+
+<br/>
+
+~~~c++
+// 함수의 원형
+BOOL SetWindowPos(      
+	HWND hWnd,               //윈도우 핸들
+	const CWnd* pWndlnserAfter,	//z오더 설정
+	int X,               	//x좌표
+	int Y,               	//y좌표
+	int ox,                  //넓이
+	int oy,                  //높이
+	UINT uFlags          	//플래그
+);
+
+//pWndlnserAfter
+CWnd::wndTop : Z-order를 최상위로
+CWnd::wndBottom : Z-order를 최상위로
+CWnd::wndTopMost : Z-order를 최상위로 하고 시스템 윈도우 속성을 갖습니다.
+CWnd::wndNoTopMost : 일반 윈도우 중 최상위 윈도우가 되도록합니다.
+
+//uFlags
+SWP_HIDEWINDOW : 윈도우가 화면에서 사라저라
+SWP_SHOWWINDOW : 윈도우가 화면에 나타나라
+SWP_NOACTIVATE : 윈도우를 활성화시키지 않겠다
+SWP_NOMOVE : 윈도우를 움직이지 않겠다. X,Y값 무시 
+SWP_NOREDRAW : 윈도우를 다시 그리지 않겠다.
+SWP_NOSIZE : 크기를 변경하지 않겠다. cx,cy 값 무시
+SWP_NOZORDER : Z-order 변경하지 않겠다. hWndInsertAfter 값 무시
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 현재 윈도우 OnInitDialog 안에서 MoveWindow(0, 0, x, y); 를 사용하면 된다
+BOOL Cchaild::OnInitDialog()
+{
+	SetWindowPos(NULL, 0, 0, 500, 500, SWP_NOACTIVATE|SWP_NOOWNERZORDER);
+
+	CDialogEx::OnInitDialog();
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(부모)
+~~~c++
+// GetWindowRect() 를 이용하여 다이얼로그의 자체의 width와 height를 알 수 있다.
+void CMFCApplication5Dlg::OnBnClickedButton1()
+{
+	CRect r;
+	chaild = new Cchaild;
+	chaild->Create(IDD_DIALOG1, this);
+	chaild->ShowWindow(SW_SHOW);
+	chaild->GetWindowRect(&r);
+	chaild->SetWindowPos(&CWnd::wndTop, 0, 0, 500, 500, SWP_NOACTIVATE|SWP_NOOWNERZORDER);
+}
+~~~
 
 <br/>
 <br/>
