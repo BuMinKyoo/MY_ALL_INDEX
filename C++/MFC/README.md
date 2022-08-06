@@ -76,6 +76,7 @@
 
 
 - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
+- [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
 
 
 
@@ -1131,4 +1132,26 @@ BOOL CMFCApplication5Dlg::OnInitDialog()
 
 ***
 
+# GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)
 
+  - GetPrivateProfileString() : ini파일 읽기
+
+~~~c++
+// C:\\temp\\setup.ini 파일에서 Title1의 Name 값을 inbuffer 사이즈만큼 읽어와라, Name값이 없으면 No Info값을 inbuffer에 저장하라.
+// 첫번째 인자나 두번째 인자에 NULL을 넣으면,타이틀값이나, 키 값을 전부 가져옴(가져올때 '\0'을 넣어서 가져옴) (ex : "sdf\0xcv\0iop\0")
+GetPrivateProfileString( "Title1", "Name", "No Info", inbuffer, sizeof(inbuffer), "C:\\temp\\setup.ini" );
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+- WritePrivateProfileString() : ini파일 쓰기
+
+~~~c++
+// C:\\temp\\setup.ini 파일에서 Title1의 Name 값을 outbuffer에 정보(문자열)를 써라.
+WritePrivateProfileString( "Title1", "Name", outbuffer, "C:\\temp\\setup.ini" );
+~~~
+
+###### [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
+###### [Top](#top)
