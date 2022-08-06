@@ -79,6 +79,7 @@
 
 - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
 - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
+- [CImage (사진출력)](#cimage-사진출력)
 
 
 
@@ -1355,4 +1356,131 @@ WritePrivateProfileString( "Title1", "Name", outbuffer, "C:\\temp\\setup.ini" );
 ~~~
 
 ###### [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# CImage (사진출력)
+
+  - 사진을 출력하는 class
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// CImage클래스를 사용할 수 있게 해더파일에 선언 한다.
+CImage m_image;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// m_image.Draw(dc, 0, 0) : 0 ,0 위치에서부터 사진을 출력한다
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	m_image.Load(L"BarcodePrint.png");
+
+	CDialogEx::OnInitDialog();
+}
+
+. . .
+
+void CMFCApplication2Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+
+	if (IsIconic())
+	{
+	  . . .
+	}
+	else
+	{
+		m_image.Draw(dc, 0, 0);
+		
+		//CDialogEx::OnPaint();
+	}
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// m_image.Draw(dc, 0, 0, w/2, h/2) : 0 ,0 위치에서부터 사진을 출력하고, 원본의 사진을 w/2, h/2만큼 축소해서 출력한다
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	m_image.Load(L"BarcodePrint.png");
+
+	CDialogEx::OnInitDialog();
+}
+
+. . .
+
+void CMFCApplication2Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+
+	if (IsIconic())
+	{
+	  . . .
+	}
+	else
+	{
+		int w = m_image.GetWidth();
+		int h = m_image.GetHeight();
+		
+		m_image.Draw(dc, 0, 0, w/2, h/2);
+
+		//CDialogEx::OnPaint();
+	}
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// m_image.Draw(dc, 0, 0, 200, 200, 50, 50, 200, 200) : 0 ,0 위치에서부터 사진을 출력하고, 원본의 사진을 200, 200만큼 축소해서 출력하고, (50,50)에서 (200,200)사이의 부분만 잘라서 출력한다
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	m_image.Load(L"BarcodePrint.png");
+
+	CDialogEx::OnInitDialog();
+}
+
+. . .
+
+void CMFCApplication2Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+
+	if (IsIconic())
+	{
+	  . . .
+	}
+	else
+	{
+		/*int w = m_image.GetWidth();
+		int h = m_image.GetHeight();*/
+		
+		m_image.Draw(dc, 0, 0, 200, 200, 50, 50, 200, 200);
+
+
+		//CDialogEx::OnPaint();
+	}
+}
+~~~
+
+###### [CImage (사진출력)](#cimage-사진출력)
 ###### [Top](#top)
