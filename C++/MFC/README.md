@@ -12,6 +12,7 @@
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
+    - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
       
   </div>
   </details>
@@ -25,7 +26,7 @@
   - [Virtual Function](#virtual-function)
     - [WindowProc](#windowproc)
     - [OnCommand](#oncommand)
-    - [PreTranslateMessage](#PreTranslateMessage)
+    - [PreTranslateMessage](#pretranslatemessage)
       
   </div>
   </details>
@@ -80,6 +81,8 @@
 - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
 - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
 - [CImage (사진출력)](#cimage-사진출력)
+- [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
+- [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
 
 
 
@@ -126,6 +129,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
+    - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -461,6 +465,15 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 <br/>
 <br/>
 
+# WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)
+  - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기) 참고하기
+
+###### [Message](#message)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 ***
 
 # Virtual Function
@@ -469,7 +482,7 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 
     - [WindowProc](#windowproc)
     - [OnCommand](#oncommand)
-    - [PreTranslateMessage](#PreTranslateMessage)
+    - [PreTranslateMessage](#pretranslatemessage)
   
 ###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
@@ -1484,3 +1497,159 @@ void CMFCApplication2Dlg::OnPaint()
 
 ###### [CImage (사진출력)](#cimage-사진출력)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)
+
+#AppDlg.cpp
+~~~c++
+// time(NULL) : 현재 시간을 초단위로 환산하여 보여줌, 그래서 랜덤 시드로 많이 사용하게됨
+void CMFCApplication2Dlg::OnBnClickedButton1()
+{
+	int our_time = time(NULL);
+	SetDlgItemInt(IDC_EDIT1, our_time);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// struct tm time선언 후, localtime_s사용하여 변환
+void CMFCApplication2Dlg::OnBnClickedButton1()
+{
+	time_t our_time = time(NULL);
+	struct tm time;
+	localtime_s(&time, &our_time);
+
+	CString str;
+	str.Format(L"%d년 %d월 %d일 %d시 %d분 %d초", time.tm_year + 1900, time.tm_mon + 1, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
+
+	SetDlgItemText(IDC_EDIT1, str);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// SYSTEMTIME 을 이용하여 쉽게 날자, 시간 출력 가능
+void CMFCApplication2Dlg::OnBnClickedButton1()
+{
+	CString str;
+
+	SYSTEMTIME our_time;
+	GetLocalTime(&our_time);
+	str.Format(L"%d년 %d월 %d일 %d시 %d분 %d초 (%dms)", our_time.wYear, our_time.wMonth, our_time.wDay, our_time.wHour, our_time.wMinute, our_time.wSecond, our_time.wMilliseconds);
+	
+	SetDlgItemText(IDC_EDIT1, str);
+}
+~~~
+
+###### [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# SetTimer() (타이머 사용하기)
+  - SetTimer(1, 200, NULL)
+    - 첫번째 인자는 타이머의 번호로써, 같은 번호의 타이머는 2개를 만들 수 없다. 같은 번호의 타이머를 다시 만들면 전에 있었던 타이머를 덮어 씌우게 된다
+    - 두번째 인자는, 타이머의 속도 이며, 1000 = 1초 이다 200 = 0.2초 마다 타이머가 실행 된다
+    - 세번째 인자는, 타이머의 실행시 마다 실행할 함수이다. NULL값을 넣으면 타이머 실행시마다 WM_TIMER 메시지를 주게 된다.
+    - SetTimer의 제거는 WM_DESTROY 메시지를 추가하여 제거한다, WM_DESTROY 는 윈도우가 파괴될때 메시지가 들어온다.
+
+<br/>
+
+  - WM_TIMER 메시지
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_TIMER 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+
+<br/>
+
+  - WM_DESTROY  메시지
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DESTROY  추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - 윈도우가 파괴될때 메시지가 들어온다
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication2Dlg::OnBnClickedButton2()
+{
+	SetTimer(1, 200, NULL); //WM_TIMER
+}
+
+...
+
+// SetTimer에 NULL인자를 넣었기 때문에 WM_TIMER메시지 호출
+void CMFCApplication2Dlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == 1) // 타이머가 1번 이라면
+	{
+		// 실행할 함수나, 코드
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+...
+
+// WM_DESTROY 메시지가 들어올때 SetTimer제거
+void CMFCApplication2Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// 타이머가 만들어지지 않아도 KillTimer를 하는것에 문제는 발생하지 않는다.
+	KillTimer(1);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - SetTimer(1, 200, Fuction)
+    - 세번째 인자에 함수명을 넣어서, 함수를 호출 할 수 도 있음
+    - 함수는 정해져 있는 인자를 넣을 틀대로 콜백함수로 만들어 쓸 수 있음
+    - 함수의 인자
+      - 첫번째 : 윈도우핸들(타이머를 발생시킨 윈도우 핸들)
+      - 두번째 : WM_TIMER의 메시지 아이디
+      - 세번째 : SetTimer에서 만든 타이머의 번호
+      - 네번째 : 0이 들어오기 때문에 무시하면 된다.
+      - 하지만 콜백 함수를 사용하는 것에는 어려움이 있고, 해당 함수를 사용하려면 h파일에 static으로 콜백 함수를 등록해야 한다. 그러나 static이라는 것은 사실상 전역함수 이므로 여러 불편 사항들이 있다. 그래서 PostMessage와 SendMessage를 활용한다
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication2Dlg::OnBnClickedButton2()
+{
+	SetTimer(1, 200, Fuction); //WM_TIMER
+}
+
+...
+
+// CALLBACK함수의 인자를 이렇게 만들어 사용한다.
+void CALLBACK Fuction(HWND ah_wnd, UINT a_msg_id, UINT_PTR a_timer_id, DWORD a_system_time)
+{
+	if (a_timer_id == 1)
+	{
+		// 버튼은 눌렀을 때 WM_COMMAND를 발생 시키며, 어떤 버튼이 눌렸는지 확인하기 위해 MAKEWPARAM에 값을 넣어서 보낸다
+		// MAKEWPARAM에 해당 컨트롤의 ID가 적인 컨트롤이 눌러졌다는 의미 이다.
+		// SendMessage도 가능
+		::PostMessage(ah_wnd, WM_COMMAND, MAKEWPARAM(IDC_BUTTON1, BN_CLICKED), 0);
+	}
+}
+~~~
+
+###### [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
+###### [Top](#top)
+
