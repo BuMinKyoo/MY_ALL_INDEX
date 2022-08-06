@@ -11,6 +11,7 @@
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
+    - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
       
   </div>
   </details>
@@ -60,6 +61,7 @@
 
 - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
 - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+- [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
 
 
 - <details markdown="1">
@@ -122,6 +124,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
+    - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -333,6 +336,123 @@ afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 ~~~
+
+###### [Message](#message)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)
+  - WM_CREATE
+    - 프로젝트 -> 클래스 마법사 -> 메시지 -> WM_CREATE 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - 윈도우가 생성되면 보내주는 메시지
+  - WM_SIZE
+    - 프로젝트 -> 클래스 마법사 -> 메시지 -> WM_SIZE 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - 윈도우의 사이즈가 변경되면 발생되는 메시지
+
+<br/>
+
+#AppDlg.h
+~~~c++
+//함수원형
+// 생성된 윈도우의 사이즈를 담을 변수 선언
+int width;
+int height;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 생성된 윈도우의 사이즈 담기
+int CMFCApplication1Dlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CDialogEx::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	CRect r;
+	GetClientRect(&r);
+
+	width = r.Width();
+	height = r.Height();
+
+	return 0;
+}
+
+...
+
+// 만약 사각형 4개를, 가지런하게 줄이기 위해서는 가로, 세로를 다른 부분에 있는 사각형 보다 2배로 움직여야 하는 상황에 놓인다. 아래 코드를 참고 하면 된다.
+void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	CWnd* pCtl = GetDlgItem(IDC_BUTTON1);
+	if (pCtl != NULL) // 컨트롤이 현재 존재 한다면
+	{
+		// 바뀐 크기 저장
+		int changeW = cx - width; 
+		int changeH = cy - height;
+
+		CRect btnc;
+		pCtl->GetWindowRect(&btnc);
+		ScreenToClient(&btnc);
+
+		pCtl->MoveWindow(btnc.left + changeW, btnc.top + changeH, btnc.Width() + changeW , btnc.Height() + changeH);
+	}
+
+	pCtl = GetDlgItem(IDC_BUTTON2);
+
+	if (pCtl != NULL) // 컨트롤이 현재 존재 한다면
+	{
+		// 바뀐 크기 저장
+		int changeW = cx - width; 
+		int changeH = cy - height;
+
+		CRect btnc;
+		pCtl->GetWindowRect(&btnc);
+		ScreenToClient(&btnc);
+
+		pCtl->MoveWindow(btnc.left + 2*changeW, btnc.top + changeH, btnc.Width() + changeW , btnc.Height() + changeH); // 2배로 left움직이기
+	}
+
+	pCtl = GetDlgItem(IDC_BUTTON3);
+
+	if (pCtl != NULL) // 컨트롤이 현재 존재 한다면
+	{
+		// 바뀐 크기 저장
+		int changeW = cx - width; 
+		int changeH = cy - height;
+
+		CRect btnc;
+		pCtl->GetWindowRect(&btnc);
+		ScreenToClient(&btnc);
+
+		pCtl->MoveWindow(btnc.left + changeW, btnc.top + 2*changeH, btnc.Width() + changeW , btnc.Height() + changeH);  // 2배로 top움직이기
+	}
+
+	pCtl = GetDlgItem(IDC_BUTTON4);
+
+	if (pCtl != NULL) // 컨트롤이 현재 존재 한다면
+	{
+		// 바뀐 크기 저장
+		int changeW = cx - width; 
+		int changeH = cy - height;
+
+		CRect btnc;
+		pCtl->GetWindowRect(&btnc);
+		ScreenToClient(&btnc);
+
+		pCtl->MoveWindow(btnc.left + 2*changeW, btnc.top + 2*changeH, btnc.Width() + changeW , btnc.Height() + changeH); // 2배로 left, top움직이기
+
+		// 바뀐 크기를 기존 넓이, 높이로 변경
+		width = cx;
+		height = cy;
+	}
+}
+~~~
+
+![20220806_202502](https://user-images.githubusercontent.com/39178978/183246866-3e0fb0e0-d14c-4cf1-8591-1e16e509e4d8.png)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -920,10 +1040,91 @@ BOOL EnableWindow(BOOL bEnable = TRUE)
 
 ***
 
+# CDC, CPaintDC, CClientDC, CWindowDC (화면출력)
+  - CDC : CPaintDC, CClientDC, CWindowDC 클래스의 공통 부모 클래스
+    - 특정 상황에 맞춰서 생성하는 용도가 아닌 다형성을 사용하기 위해서 사용 하는 클래스, 직접 생성시에는 생성자에 인자가 없는 기본 생성자가 제공
+  - CPaintDC : 클라이언트 영역에 출력할 때 WM_PAINT 메시지 핸들러에서 사용시
+  - CClientDC : 클라이언트 영역에 출력할 때, WM_PAINT 메시지 핸들러를 제외한 다른 곳에서 사용시
+  - CWindowDC : 윈도우 제목 영역 같은 Non_Client 영역에 사용
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 도형그리기
+    - 직사각형 : Rectangle(x1, y1, x2, y2)
+    - 타원 : Ellipse(x1, y1, x2, y2)
+    - 테두리가 둥근 직사각형 : RoundRect(x1, y1, x2, y2, x3, y3)
+    - 다각형 : Polygon()
+
+#AppDlg.cpp
+~~~C++
+// 다각형 그리기
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	CClientDC dc(this);
+	POINT ap[3] = {{100,100}, {200,300}, {50, 300}};
+	dc.Polygon(ap, 3);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 선 그리기
+    - MoveTo(x, y) : x, y위치로 옮김
+    - LineTo(x, y) : 이전 x, y 위치에서 현재  x, y 위치로 선을 그림
+    - 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
+
+#AppDlg.cpp
+~~~C++
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	CClientDC dc(this);
+	dc.MoveTo(100,100);
+	dc.LineTo(200,200);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~C++
+// 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	CClientDC dc(this);
+	CPen p;
+	p.CreatePen(PS_SOLID, 5, RGB(255, 0, 0)); // 펜 모양, 펜 두께, 펜 색
+	CPen* oldpen = dc.SelectObject(&p);
+
+	dc.MoveTo(100,100);
+	dc.LineTo(200,200);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+###### [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # 윈도우 특정 부분 투명화 하기
   - Dialog속성 - 계층화 True 로 변경
   - SetLayeredWindowAttributes키워드를 쓰면 지정된 컬러가 있는 곳을 투명화 시킴(하지만 이것을 쓰지 않고 계층화만 True이면 그냥 창 전부가 투명화가 되어서 안보이게 됨)
   - SetLayeredWindowAttributes(0, 255, LWA_ALPHA); 이렇게 쓰면 완전히 보이게 되고 255를 낮춘 만큼 윈도우가 투명화가 진행됨
+
 
 #AppDlg.cpp
 ~~~C++
