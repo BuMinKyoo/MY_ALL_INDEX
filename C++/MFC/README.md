@@ -144,24 +144,6 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
   - 버튼 1번 ~ 3번까지 처리했을시 상황
   - Dialog ID가 “IDC_BUTTON1”, “IDC_BUTTON2”, “IDC_BUTTON3”일때(define정의가 순서대로 되어 있어야함)
 
-#AppDlg.cpp
-~~~c++
-BEGIN_MESSAGE_MAP(CMFCApplication3Dlg, CDialogEx)
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	ON_COMMAND_RANGE(IDC_BUTTON1,IDC_BUTTON3, OnSetNumber)
-END_MESSAGE_MAP()
-
-...
-
-void CMFCApplication3Dlg::OnSetNumber(UINT a_ctrl_id)
-{
-	SetDlgItemInt(IDC_SHOW_NUM_EDIT, a_ctrl_id - 1000);
-}
-~~~
-
-<br/>
-
 #AppDlg.h
 ~~~c++
 class CMFCApplication3Dlg : public CDialogEx
@@ -190,6 +172,24 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	void OnSetNumber(UINT a_ctrl_id);
 };
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BEGIN_MESSAGE_MAP(CMFCApplication3Dlg, CDialogEx)
+	ON_WM_PAINT()
+	ON_WM_QUERYDRAGICON()
+	ON_COMMAND_RANGE(IDC_BUTTON1,IDC_BUTTON3, OnSetNumber)
+END_MESSAGE_MAP()
+
+...
+
+void CMFCApplication3Dlg::OnSetNumber(UINT a_ctrl_id)
+{
+	SetDlgItemInt(IDC_SHOW_NUM_EDIT, a_ctrl_id - 1000);
+}
 ~~~
 
 ###### [Message](#message)
@@ -306,7 +306,6 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 <br/>
 
-#AppDlg.cpp
 ~~~c++
 //함수원형
 BOOL PostMessage(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
@@ -615,6 +614,8 @@ void CMFCApplication3Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 // 자식 해더 파일 include
 ~~~
 
+<br/>
+
 #AppDlg.cpp(부모)
 ~~~c++
 Cchaild chaild;
@@ -626,6 +627,13 @@ chaild.DoModal();
 <br/>
 
   - 부모 -> 자식
+
+#AppDlg.h(부모)
+~~~c++
+// 자식 해더 파일 include
+~~~
+
+<br/>
 
 #AppDlg.cpp(부모)
 ~~~c++
@@ -641,12 +649,21 @@ chaild.DoModal();
 
   - 자식 -> 부모
 
+#AppDlg.h(부모)
+~~~c++
+// 자식 해더 파일 include
+~~~
+
+<br/>
+
 #AppDlg.cpp(자식)
 ~~~c++
 // 자식이 스스로의 창을 닫기 전에 자신의 맴버 변수에 데이터를 저장한다.
 Setdata(k);
 chaild.Enddialog(num);
 ~~~
+
+<br/>
 
 #AppDlg.cpp(부모)
 ~~~c++
@@ -672,8 +689,6 @@ int num = chaild.Getdata();
       - 자식을 포인터로 만들기 때문에, 부모 -> 자식의 데이터 전달은 포인터를 이용해서 쉽게 할 수 있다.
     - 자식 -> 부모
       - GetParent()를 사용하여 데이터 전달(PostMessage, 컨트롤 ID에 직접 접근)
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -760,6 +775,7 @@ void CMFCApplication4Dlg::fuction()
 #AppDlg.cpp(자식)
 ~~~c++
 // 자식은 GetParent()을 사용해 PostMessage를 보내거나 컨트롤ID에 직접 접근 하는 방법이 있음
+// chaild->Create(IDD_DIALOG1, this) 에서, this를 해줘야 GetParent()를 사용했을때 부모의 포인터를 가져올 수 있다. 
 void CD1::OnBnClickedButton1()
 {
 	GetParent()->SetDlgItemInt(IDC_EDIT1, 10);
@@ -796,8 +812,6 @@ void CD1::OnBnClickedButton1()
     - 4. 자식을 생성할때 부모의 class포인터 값을 넘겨줌 그것을 자식 h파일에서 받음
     - 5. 사용할 자식 cpp파일에 상위에 있는 아무 부모 h파일 include후에 부모 포인터가 담긴 변수를 사용하여 캐스팅 하여 바로 접근하기
     - 6. 메모리 해제 꼭 잘 해줘야함!
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -1108,6 +1122,9 @@ void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
+
+  - 선 그리기
+    - 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
 
 #AppDlg.cpp
 ~~~C++
@@ -1424,6 +1441,14 @@ void CMFCApplication2Dlg::OnPaint()
 
 <br/>
 
+#AppDlg.h
+~~~c++
+// CImage클래스를 사용할 수 있게 해더파일에 선언 한다.
+CImage m_image;
+~~~
+
+<br/>
+
 #AppDlg.cpp
 ~~~c++
 // m_image.Draw(dc, 0, 0, w/2, h/2) : 0 ,0 위치에서부터 사진을 출력하고, 원본의 사진을 w/2, h/2만큼 축소해서 출력한다
@@ -1458,6 +1483,14 @@ void CMFCApplication2Dlg::OnPaint()
 ~~~
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// CImage클래스를 사용할 수 있게 해더파일에 선언 한다.
+CImage m_image;
+~~~
 
 <br/>
 
