@@ -1528,6 +1528,55 @@ void CMFCApplication2Dlg::OnPaint()
 }
 ~~~
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// CImage클래스를 사용할 수 있게 해더파일에 선언 한다.
+// 사진 크기 변경시 CRect 을 사용하여 변경할 수 있게, 해더파일에 선언 한다.
+CImage m_image;
+CRect r;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// Dialog 크기를 변경했을시 사진 크기를 Dialog 크기로 변경하기
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	GetClientRect(&r);
+	m_image.Load(_T("11.png"));
+}
+
+...
+
+void CMFCApplication1Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	else
+	{
+		m_image.Draw(dc, r);
+	}
+}
+
+...
+
+// WM_SIZE메시지 등록, Dialog크기변경시 호출
+void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	GetClientRect(&r);
+	Invalidate(); // OnPaint메시지 호출
+~~~
+
 ###### [CImage (사진출력)](#cimage-사진출력)
 ###### [Top](#top)
 
