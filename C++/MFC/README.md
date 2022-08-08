@@ -60,6 +60,7 @@
 
 
 
+- [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
 - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
 - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
 - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
@@ -1028,6 +1029,23 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 	chaild->SetWindowPos(&CWnd::wndTop, 0, 0, 500, 500, SWP_NOACTIVATE|SWP_NOOWNERZORDER);
 }
 ~~~
+
+<br/>
+<br/>
+
+***
+
+# GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)
+  - 일반적인 윈도우 화면에서 GetWindowRect() 함수를 사용하면 내 화면의 맨 왼쪽, 맨 오른쪽을 (0 , 0)으로 잡아서 표현된다
+    - 윈도우 안에 있는 자식 윈도우 또한 GetWindowRect() 함수를 쓰게 되면 내 화면의 맨 왼쪽, 맨 오른쪽을 (0 , 0)으로 잡아서 표현된다
+  - 일반적인 윈도우 화면에서 GetClientRect() 함수를 사용하면, 윈도우 화면의 위쪽 Non-Client영역을 제외한 Client영역의 맨 왼쪽, 맨 오른쪽을 (0, 0)으로 잡아서 윈도우의 크기만큼 표현하게 된다.
+
+<br/>
+
+![image](https://user-images.githubusercontent.com/39178978/183426758-62216562-ac99-4d2b-bf8e-39dc63e5e14a.png)
+
+###### [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
+###### [Top](#top)
 
 <br/>
 <br/>
