@@ -83,6 +83,7 @@
 - [CImage (사진출력)](#cimage-사진출력)
 - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
 - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
+- [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
 
 
 
@@ -1735,3 +1736,75 @@ void CALLBACK Fuction(HWND ah_wnd, UINT a_msg_id, UINT_PTR a_timer_id, DWORD a_s
 ###### [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# RegisterHotKey() (시스템 전역 단축키 지정하기)
+  - SetTimer(1, 200, NULL)
+    - 핫키를 등록하면 프로그램에 핸들을 쥐고 있지 않아도 어디서든 핫키로 작동 시킬 수 있다
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_HOTKEY 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - RegisterHotKey(m_hWnd, 26000, 0, VK_F5)
+      - 첫번째 인수 : 단축키를 눌렀을 때 발생하는 메시지를 받을 윈도우의 핸들
+      - 두번째 인수 : 보낼 임의 메시지
+      - 세번째 인수 : 네번째 인수에서 조합해 쓸 단축키
+      - 네번째 인수 : 핫키에 사용할 단축키
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DESTROY 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+      - 종료전에 WM_DESTROY이용하여 핫키 등록 제거 하기
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// 플레그로 이용할  int변수 하나 선언 하기
+public:
+	int flage;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication6Dlg::OnInitDialog()
+{
+	flage = 0;
+	RegisterHotKey(m_hWnd, 26000, 0, VK_F5);
+
+ ...
+ 
+}
+
+... 
+
+void CMFCApplication6Dlg::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
+{
+	if (nHotKeyId == 26000)
+	{
+		if(flage == 0)
+		{
+			ShowWindow(SW_HIDE);
+			flage = 1;
+		}
+		else
+		{
+			ShowWindow(SW_SHOW);
+			flage = 0;
+		}
+	}
+
+	CDialogEx::OnHotKey(nHotKeyId, nKey1, nKey2);
+}
+
+...
+
+void CMFCApplication6Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	UnregisterHotKey(m_hWnd, 26000);
+}
+~~~
+
+###### [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
+###### [Top](#top)
