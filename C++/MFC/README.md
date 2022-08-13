@@ -1044,6 +1044,28 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 
 ![image](https://user-images.githubusercontent.com/39178978/183426758-62216562-ac99-4d2b-bf8e-39dc63e5e14a.png)
 
+<br/>
+
+  - 아래 사진을 보면 긴 부분이 GetWindowRect()의 Width(), Height()이고, 짧은 부분이 GetClientRect()의 Width(), Height()이다.
+
+![20220813_183331](https://user-images.githubusercontent.com/39178978/184478110-c2c6d6f0-9999-4e14-82b0-57abd6eb923e.png)
+
+<br/>
+
+  - 만약, 사진을 화면에 출력할때 사진크기로 위도우의 화면 크기를 조정하고 싶다면 "사진크기 + GetWindowRect()의 Width(), - GetClientRect()의 Width()'를 해야 한다.(Height도 마찬가지)
+
+~~~C++
+CRect wr;
+GetWindowRect(&wr);
+CRect cr;
+GetClientRect(&cr);
+
+extra_w = wr.Width() - cr.Width();
+extra_h = wr.Height() - cr.Height();
+
+SetWindowPos(NULL, 0, 0, m_Small_image_width + extra_w, m_Small_image_height + extra_h, SWP_NOMOVE);
+~~~
+
 ###### [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
 ###### [Top](#top)
 
