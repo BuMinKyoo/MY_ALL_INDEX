@@ -1618,6 +1618,41 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 	Invalidate(); // OnPaint메시지 호출
 ~~~
 
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// CImage클래스를 사용할 수 있게 해더파일에 선언 한다.
+CImage m_image;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	m_image.Load(_T("11.png"));
+}
+
+...
+
+void CMFCApplication1Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	else
+	{
+		m_image.AlphaBlend(dc, 0, 0, 150); // 알파 값은  0~255 사이
+	}
+}
+~~~
+
 ###### [CImage (사진출력)](#cimage-사진출력)
 ###### [Top](#top)
 
