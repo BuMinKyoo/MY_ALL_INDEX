@@ -13,11 +13,11 @@
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
     - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
+    - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
     - [EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)](#en_update-en_change-edit-control-문자열-변경시)
       
   </div>
   </details>
-
 
 
 - <details markdown="1">
@@ -33,7 +33,6 @@
   </details>
 
 
-
 - <details markdown="1">
   <summary>모달,모달리스</summary>
   <div markdown="1">
@@ -47,7 +46,6 @@
   </details>
 
 
-
 - <details markdown="1">
   <summary>MoveWindows,SetWindowPos(Dialog 크기변경, 무브 하기)</summary>
   <div markdown="1">
@@ -58,7 +56,6 @@
       
   </div>
   </details>
-
 
 
 - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
@@ -80,10 +77,8 @@
   </details>
 
 
-
 - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
 - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
-
 
 
 - <details markdown="1">
@@ -100,13 +95,24 @@
   </details>
 
 
+- <details markdown="1">
+  <summary>Bitmap 리소스, 패턴 브러쉬</summary>
+  <div markdown="1">
+  
+  - [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+    - [Bitmap 리소스를 패턴 CBrush로 출력](#bitmap-리소스를-패턴-cbrush로-출력)
+    - [CBrush중심점 이동하여 출력](#cbrush중심점-이동하여-출력)
+    - [외부그림을 패턴 CBrush로 출력](#외부그림을-패턴-cbrush로-출력)
+      
+  </div>
+  </details>
+
 
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
 - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
 - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
-
 
 
 <br/>
@@ -153,6 +159,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
     - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
+    - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
     - [EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)](#en_update-en_change-edit-control-문자열-변경시)
 
 ###### [Message](#message)
@@ -497,13 +504,37 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 <br/>
 <br/>
 
+# WM_MOUSEWHEEL (마우스 휠)
+  - 마우스 휠을 돌리면 발생하는 메시지
+  - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_MOUSEWHEEL추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+  - zDelta > 0 : 휠을 위로 돌렸을때, zDelta < 0 휠을 아래로 돌렸을때
 
+<br/>
 
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication2Dlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	if (zDelta > 0)
+	{
+		if (r_size < 100)
+			r_size += 10;
+	}
+	else
+	{
+		if (r_size > 10)
+			r_size -= 10;
+	}
 
+	return CDialogEx::OnMouseWheel(nFlags, zDelta, pt);
+}
+~~~
 
+###### [Message](#message)
+###### [Top](#top)
 
-
-
+<br/>
+<br/>
 
 # EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)
   - EN_UPDATE
@@ -1819,6 +1850,196 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
   - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표) 참고하기
 
 ###### [CImage (사진출력)](#cimage-사진출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Bitmap 리소스, 패턴 CBrush
+  - MFC자체 에서 Bitmap 리소스를 그릴 수 있으며, 그것을 CBrush로 출력할 수 있다. 또한 외부에서 그림을 불러와서 CBrush로 출력이 가능하다.
+  - Bitmap 리소스 추가 방법은, Dialog 리소스 추가 화면에서 마우스 오른쪽 클릭을 통해서 Bitmap 리소스를 추가할 수 있다.
+
+    - [Bitmap 리소스를 패턴 CBrush로 출력](#bitmap-리소스를-패턴-cbrush로-출력)
+    - [CBrush중심점 이동하여 출력](#cbrush중심점-이동하여-출력)
+    - [외부그림을 패턴 CBrush로 출력](#외부그림을-패턴-cbrush로-출력)
+
+###### [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Bitmap 리소스를 패턴 CBrush로 출력
+  - 리소스에 Bitmap을 추가 하고, 도형을 마음대로 그릴 수 있음
+  - 만든 도형을 CBrush로 로드하여 사용함
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// Bitmap 리소스를 로드할 CBrush변수 선언
+private:
+	CBrush brush;
+	CBitmap my_bmp;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+my_bmp.LoadBitmap(IDB_BITMAP1); // Bitmap 로드
+brush.CreatePatternBrush(&my_bmp); // brush로 Bitmap을 설정
+}
+
+. . .
+
+void CMFCApplication2Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+		CBrush* old_brush = dc.SelectObject(&brush);
+		dc.Rectangle(0, 0, 96, 48);
+		dc.SelectObject(old_brush);
+
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 마우스 클릭으로 브러쉬 사용하기
+  - 마우스 클릭 메시지를 추가하여 작성
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// Bitmap 리소스를 로드할 CBrush변수 선언
+private:
+	CBrush brush;
+	CBitmap my_bmp;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 이렇게 패턴 브러쉬를 사용한다면, 내가 만들어 놓은 패턴 비트맵이 정확히 중간으로 잘 나올것 같지만 그렇지 않다.
+// 비트맵에 그려진 부분은 맨왼쪽, 맨 위쪽을 0, 0 기준으로 그려지기 때문에 마우스 클릭시 비트맵의 그림이 정 중간으로 나오지 않는다.
+
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+my_bmp.LoadBitmap(IDB_BITMAP1); // Bitmap 로드
+brush.CreatePatternBrush(&my_bmp); // brush로 Bitmap을 설정
+}
+
+. . .
+
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+
+	CClientDC dc(this);
+
+	CBrush* old_brush = dc.SelectObject(&brush);
+	dc.Rectangle(point.x - 24, point.y - 24, point.x + 24, point.y + 24);
+	dc.SelectObject(old_brush);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+###### [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# CBrush중심점 이동하여 출력
+  - 마우스 클릭으로 브러쉬 사용하기(비트맵 그림을 중간으로 나오게 하기)
+  - SetBrushOrg사용하기
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// Bitmap 리소스를 로드할 CBrush변수 선언
+private:
+	CBrush brush;
+	CBitmap my_bmp;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+//SetBrushOrg 을 사용하여 비트맵이 그려지는 중심을 바꿈으로써 마우스 클릭시에도, 비트맵에 그려놓은 것들이 중간으로 나오게 한다
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+my_bmp.LoadBitmap(IDB_BITMAP1); // Bitmap 로드
+brush.CreatePatternBrush(&my_bmp); // brush로 Bitmap을 설정
+}
+
+. . .
+
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+
+	CClientDC dc(this);
+
+	CBrush* old_brush = dc.SelectObject(&brush);
+	dc.SetBrushOrg(point.x - 24, point.y - 24);
+	dc.Rectangle(point.x - 24, point.y - 24, point.x + 24, point.y + 24);
+	dc.SelectObject(old_brush);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+###### [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 외부그림을 패턴 CBrush로 출력
+  - 외부의 그림을 CImage 불러온 다음, CBitmap으로 변환해서 CBrush의 패턴 브러쉬로 사용하기
+
+<br/>
+
+#AppDlg.h
+~~~c++
+private:
+	CImage m_image
+	CBrush m_brush
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	m_image.Load(_T("l.png"));
+
+	CBitmap* p_bmp = CBitmap::FromHandle(m_image);
+	m_brush.CreatePatternBrush(p_bmp);
+}
+~~~
+
+###### [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
 ###### [Top](#top)
 
 <br/>
