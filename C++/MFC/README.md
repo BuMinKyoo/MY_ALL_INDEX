@@ -81,7 +81,24 @@
 
 - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
 - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
-- [CImage (사진출력)](#cimage-사진출력)
+
+
+
+- <details markdown="1">
+  <summary>CImage (사진출력)</summary>
+  <div markdown="1">
+  
+  - [CImage (사진출력)](#cimage-사진출력)
+    - [확대, 축소, 부분 출력](#확대-축소-부분-출력)
+    - [AlphaBlend](#alphablend)
+    - [Dialog크기로 출력하기](#dialog크기로-출력하기)
+    - [사진 크기로 Dialog크기 변경하기](#사진-크기로-dialog크기-변경하기)
+      
+  </div>
+  </details>
+
+
+
 - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
 - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
 - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
@@ -1438,6 +1455,22 @@ WritePrivateProfileString( "Title1", "Name", outbuffer, "C:\\temp\\setup.ini" );
 
   - 사진을 출력하는 class
 
+    - [확대, 축소, 부분 출력](#확대-축소-부분-출력)
+    - [AlphaBlend](#alphablend)
+    - [Dialog크기로 출력하기](#dialog크기로-출력하기)
+    - [사진 크기로 Dialog크기 변경하기](#사진-크기로-dialog크기-변경하기)
+
+###### [CImage (사진출력)](#cimage-사진출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 확대, 축소, 부분 출력
+  - 위치 조절해서 출력
+  - 원본 사진 확대, 축소 출력 
+  - 부분만 출력
+
 <br/>
 
 #AppDlg.h
@@ -1569,7 +1602,54 @@ void CMFCApplication2Dlg::OnPaint()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+###### [CImage (사진출력)](#cimage-사진출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# AlphaBlend
+  - alphablend조절후 출력
+
+#AppDlg.h
+~~~c++
+// CImage클래스를 사용할 수 있게 해더파일에 선언 한다.
+CImage m_image;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	m_image.Load(_T("11.png"));
+}
+
+...
+
+void CMFCApplication1Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	else
+	{
+		m_image.AlphaBlend(dc, 0, 0, 150); // 알파 값은  0~255 사이
+	}
+}
+~~~
+
+###### [CImage (사진출력)](#cimage-사진출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Dialog크기로 출력하기
+  - Dialog의 크기를 알아낸후, 사진을 Dialog크기로 조절해 출력하기
 
 <br/>
 
@@ -1618,40 +1698,15 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 	Invalidate(); // OnPaint메시지 호출
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+###### [CImage (사진출력)](#cimage-사진출력)
+###### [Top](#top)
 
 <br/>
-
-#AppDlg.h
-~~~c++
-// CImage클래스를 사용할 수 있게 해더파일에 선언 한다.
-CImage m_image;
-~~~
-
 <br/>
 
-#AppDlg.cpp
-~~~c++
-BOOL CMFCApplication1Dlg::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-
-	m_image.Load(_T("11.png"));
-}
-
-...
-
-void CMFCApplication1Dlg::OnPaint()
-{
-	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
-
-	if (IsIconic())
-	else
-	{
-		m_image.AlphaBlend(dc, 0, 0, 150); // 알파 값은  0~255 사이
-	}
-}
-~~~
+# 사진 크기로 Dialog크기 변경하기
+  - 사진 크기를 확인한후, 그 크기로 Dialog의 크기를 조절하기
+  - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표) 참고하기
 
 ###### [CImage (사진출력)](#cimage-사진출력)
 ###### [Top](#top)
