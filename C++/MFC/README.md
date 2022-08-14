@@ -65,6 +65,7 @@
 - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
 - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
 - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+- [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 
 
 - <details markdown="1">
@@ -1379,6 +1380,46 @@ void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 ~~~
 
 ###### [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 장치 DC, 메모리 DC (깜박임 없애기)
+  - 보통은 장치 DC에 바로 연결해서 도형이나 그림을 출력하게 되지만, 많은 것들을 출력하려고 할때 작은 하나하나를 전부 장치 DC로 출력하려고 할때, 너무 많이 장치 DC가 출력되어 깜박임이 발생하게 된다. 이것을 발생하지 않게 하기위해서는 메모리 DC에 전부 출력한후, 마지막에 보여줄 1장을 장치 DC에 출력하게 되면, 장치 DC의 사용을 현저하게 줄일 수 있게 되기 때문에 깜박임이 발생하지 않게 된다.
+
+<br/>
+
+  - 메모리 DC를 사용할때에, 메모리 DC에 한번씩 그릴때마다 전체 화면을 FillSolidRect로 덮어 주어야 그림이 리셋되기 때문에 위쪽에 코드를 한줄 넣어 주어야 한다
+  - BitBlt함수를 OnPaint에 사용할때에, 어떤 상황에서 Invalidate()함수를 사용하여 WM_PAINT 메시지를 발생시켜 OnPaint를 호출하는데, 이때 Invalidate()를 사용하면 깜박임이 심해진다(이유 : Invalidate() == Invalidate(TRUE), WM_PAINT를 호출하는데 장치dc에 전체 화면을 한번 지우고 호출하라고함, 따라서 장치 dc가 전체 화면을 한번 지우고, 다시 장치 dc가 그림을 그림)
+  - 이때는 Invalidate(FALSE)를 해주면 장치 dc를 전체 화면을 다시 지우지 않음 즉, 메모리 dc 자체에서 화면을 한번 덮어서 지우기 때문에 장치 dc에서 전체 화면을 지울 필요가 없음
+
+<br/>
+
+#AppDlg.h
+~~~C++
+CDC mem_dc; // 장치 dc와 바꿔 채기할 dc
+CBitmap mem_bmp; // 메모리dc의 비트맵을 바꿔채기할 비트맵
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~C++
+CClientDC dc(this); // 메모리dc와 비트맵에게 정보를 줄 장치dc
+mem_dc.CreateCompatibleDC(&dc); // 장치 dc의 기본적인 정보를 가져가기
+mem_bmp.CreateCompatibleBitmap(&dc, w, h); // 장치 dc의 기본적인 정보를 가져가기, w,h로 장치 dc와 같은 크기 지정하기
+mem_dc.SelectObject(&mem_bmp); // 메모리dc가 만들어진 비트맵을 바꿔치기 하기
+
+// FillSolidRect 같은 것으로 맨 위쪽에서 한번 모든 화면을 덮어줘야 화면이 겹치지 않게 보인다, ,따라서 다른 곳에서 Invalidate() 호출시에 FALSE로 호출해줘도 무방하다
+// 여기서 mem_dc에 그림 그리기
+
+dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 바꿔치기 해서 출력하기
+~~~
+
+###### [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 ###### [Top](#top)
 
 <br/>
