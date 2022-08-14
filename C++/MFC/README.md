@@ -13,6 +13,7 @@
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
     - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
+    - [EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)](#en_update-en_change-edit-control-문자열-변경시)
       
   </div>
   </details>
@@ -99,9 +100,11 @@
 
 
 
+- [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
 - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
 - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
+- [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 
 
 
@@ -149,6 +152,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
     - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
+    - [EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)](#en_update-en_change-edit-control-문자열-변경시)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -485,6 +489,71 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 
 # WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)
   - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기) 참고하기
+
+###### [Message](#message)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+
+
+
+
+
+
+
+
+# EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)
+  - EN_UPDATE
+    - 프로젝트 -> 클래스 마법사 -> 명령(메시지를 입력할 Edit Control 컨트롤 ID클릭) -> 메시지 -> EN_UPDATE 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - 문자열이 변경된 후, 화면에 출력하기 전에 보내주는 메시지
+  - EN_CHANGE
+    - 프로젝트 -> 클래스 마법사 -> 명령(메시지를 입력할 Edit Control 컨트롤 ID클릭) -> 메시지 -> EN_CHANGE 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - 문자열이 화면에 출력된 후, 보내지는 메시지
+    - EN_UPDATE 와 비슷하지만 다름, 하지만 동일한 느낌으로 사용하는 것이기 때문에 예시는 넣지 않겠음
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// 숫자 확인할 변수 하나 선언
+public:
+	int num;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 변수 초기화 진행
+// 버튼 눌렀을시, 왼쪽 EDIT숫자가 증가 함에 따라 오른쪽 EDIT의 숫자도 같이 증가한다
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	num = 0;
+}
+
+...
+
+void CMFCApplication2Dlg::OnChangeEdit1()
+{
+
+	num--;
+	SetDlgItemInt(IDC_EDIT2, num);
+}
+
+...
+
+void CMFCApplication2Dlg::OnBnClickedButton1()
+{
+	num += 2;
+	SetDlgItemInt(IDC_EDIT1, num);
+}
+~~~
+
+![20220814_095310](https://user-images.githubusercontent.com/39178978/184518040-e5edb9cd-1b9e-415e-a2fa-a48a76628526.png)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -1716,6 +1785,58 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 
 ***
 
+# CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기
+  - MFC에서 제공하는 CFileDialog(파일 열기 대화 사장)의 사용법을 확인하고, 사진을 불러오는 방법에 대하여
+
+<br/>
+
+~~~c++
+CFileDialog my_filedialog(TRUE, _T(".jpg"), _T("*.jpg"), OFN_HIDEREADONLY | OFN_NOCHANGEDIR, name_filter)
+
+  - 첫번째 인자 : TRUE : 열기 대화상자, FALSE : 저장 대화상자
+  - 두번째 인자 : 디폴트 확장자
+  - 세번째 인자 : 필터
+  - 네번째 인자 부터 : 읽기에 이용할 속성들
+  - 마지막 인자 : 이름을 지정할 필터 목록
+    - ex) wchar_t name_filter[] = _T("모든 파일 (*.*)|*.*| Jpeg 파일 (*.jpg)|*.jpg | PNG 파일 (*.png)|*.png||");
+앞에 부분은 화면에 표시할 부분 뒤에 부분은 실제 작동하는 부분. 마지막에는 ||두개를 넣어서 끝을 낸다 
+~~~
+
+<br/>
+
+#AppDlg.h
+~~~c++
+public:
+	CImage m_image;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication3Dlg::OnBnClickedButton1()
+{
+	wchar_t name_filter[] = _T("모든 파일 (*.*)|*.*| Jpeg 파일 (*.jpg)|*.jpg | PNG 파일 (*.png)|*.png||");
+	CFileDialog my_filedialog(TRUE, _T(".jpg"), _T("*.jpg"), OFN_HIDEREADONLY | OFN_NOCHANGEDIR, name_filter);
+	my_filedialog.m_ofn.nFilterIndex = 2; // 처음에 어떤 것을 먼저 표시해 줄지 정한다. 현재는 두번째에 적혀 있는 jpg를 표현 하게 된다
+
+	if (IDOK == my_filedialog.DoModal())
+	{
+		CClientDC dc(this);
+		m_image.Load(my_filedialog.GetPathName()); // CFileDialog 불러온 사진의 경로를 얻을 수 있음
+		m_image.Draw(dc, 0, 0);
+	}
+}
+~~~
+
+###### [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)
 
 #AppDlg.cpp
@@ -1937,4 +2058,23 @@ void CMFCApplication6Dlg::OnDestroy()
 ~~~
 
 ###### [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# COLORREF (컬러 담는 변수)
+  - RGB컬러를 하나 담을 수 있는 변수이다
+
+<br/>
+
+~~~c++
+//변수 선언, 대입
+COLORREF color;
+color = RGB(200, 200, 200);
+~~~
+
+###### [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 ###### [Top](#top)
