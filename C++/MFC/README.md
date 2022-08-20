@@ -66,12 +66,14 @@
 
 
 - <details markdown="1">
-  <summary>문자 크기 바꾸기</summary>
+  <summary>문자 다루기</summary>
   <div markdown="1">
   
-  - [문자 크기 바꾸기](#문자-크기-바꾸기)
-    - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
-    - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
+  - [문자 다루기](#문자-다루기)
+    - [문자 크기 바꾸기 (CFont)](#문자-크기-바꾸기-cfont)
+    - [문자 크기 바꾸기 (LOGFONT)](#문자-크기-바꾸기-logfont)
+    - [DrawText (텍스트를 도형 안에 출력하기)](#drawtext-텍스트를-도형-안에-출력하기)
+    - [TextOut (텍스트를 원하는 위치에 출력)](#textout-텍스트를-원하는-위치에-출력)
       
   </div>
   </details>
@@ -1458,20 +1460,20 @@ dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 �
 
 ***
 
-# 문자 크기 바꾸기
+# 문자 다루기
 
   - 문자 크기를 바꾸는 변수 및, 어떻게 작동 시키는지 
 
-    - [문자 크기 바꾸기(CFont)](#문자-크기-바꾸기cfont)
-    - [문자 크기 바꾸기(LOGFONT)](#문자-크기-바꾸기logfont)
+    - [문자 크기 바꾸기 (CFont)](#문자-크기-바꾸기-cfont)
+    - [문자 크기 바꾸기 (LOGFONT)](#문자-크기-바꾸기-logfont)
 
-###### [문자 크기 바꾸기](#문자-크기-바꾸기)
+###### [문자 다루기](#문자-다루기)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 문자 크기 바꾸기(CFont)
+# 문자 크기 바꾸기 (CFont)
   - 문자 크기 바꾸기
   - 문자 Weight도 설정 
   - 다른 Dialog ID 전부다 가능
@@ -1494,13 +1496,13 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 }
 ~~~
 
-###### [문자 크기 바꾸기](#문자-크기-바꾸기)
+###### [문자 다루기](#문자-다루기)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 문자 크기 바꾸기(LOGFONT)
+# 문자 크기 바꾸기 (LOGFONT)
   - 문자 크기 바꾸기
   - 문자 Weight도 설정 가능
   - 다른 Dialog ID 전부다 가능
@@ -1523,7 +1525,78 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 }
 ~~~
 
-###### [문자 크기 바꾸기](#문자-크기-바꾸기)
+###### [문자 다루기](#문자-다루기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DrawText (텍스트를 도형 안에 출력하기)
+  - 텍스트를 출력할 위치는 CRect 구조체를 이용해서 값을 전달 해야 한다
+
+#AppDlg.cpp
+~~~C++
+// 여러줄을 표시하기 위해서 str안에 \n을 사용 했으며, top값을 더해줌으로써 임시로 텍스트의 위치를 맞출 수 있음
+void CMFCApplication2Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	else
+	{
+		CRect r;
+		r.SetRect(10, 10, 300, 300);
+		CString str = _T("아이우\n에오");
+		dc.Rectangle(r);
+		r.top += 130;
+		dc.DrawText(str, r, DT_CENTER | DT_VCENTER);
+	}
+}
+~~~
+
+<br/>
+
+![20220820_222146](https://user-images.githubusercontent.com/39178978/185748099-8b019eba-48f4-49e0-a3aa-d7820d9d3231.png)
+
+<br/>
+
+  - 마지막 인수
+
+<br/>
+
+![20220820_222130](https://user-images.githubusercontent.com/39178978/185748085-819b26c2-4a36-46a4-878b-7b10ec3c210b.png)
+
+###### [문자 다루기](#문자-다루기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# TextOut (텍스트를 원하는 위치에 출력)
+  - 여러줄 출력이 불가능
+
+#AppDlg.cpp
+~~~C++
+// 여러줄을 표시하기 위해서 str안에 \n을 사용 했으며, top값을 더해줌으로써 임시로 텍스트의 위치를 맞출 수 있음
+void CMFCApplication2Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	else
+	{
+		CString str = _T("아이우에오");
+		dc.SetBkMode(TRANSPARENT); // 글자의 배경을 투명으로 설정
+		dc.TextOut(100, 100, str, lstrlen(str));
+	}
+}
+~~~
+
+<br/>
+
+![20220820_222516](https://user-images.githubusercontent.com/39178978/185748206-a9fd8e37-4645-41fa-aff5-e51913f8a9fc.png)
+
+###### [문자 다루기](#문자-다루기)
 ###### [Top](#top)
 
 <br/>
