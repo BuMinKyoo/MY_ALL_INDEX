@@ -41,6 +41,7 @@
     - [모달(modal)](#모달modal)
     - [모달리스(modeless)](#모달리스modeless)
     - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
+    - [모달, 모달리스 만들때 다른 dialog호출하기](#모달, 모달리스 만들때 다른 dialog호출하기)
       
   </div>
   </details>
@@ -709,7 +710,7 @@ void CMFCApplication3Dlg::OnLButtonDown(UINT nFlags, CPoint point)
     - [모달(modal)](#모달modal)
     - [모달리스(modeless)](#모달리스modeless)
     - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
-
+    - [모달, 모달리스 만들때 다른 dialog호출하기](#모달, 모달리스 만들때 다른 dialog호출하기)
 
 ###### [모달,모달리스](#모달모달리스)
 ###### [Top](#top)
@@ -982,6 +983,50 @@ class Cchaild : public CDialogEx
 void Cchaild::OnBnClickedButton1()
 {
 	m_plg->SetDlgItemInt(IDC_EDIT1, 100);
+}
+~~~
+
+###### [모달,모달리스](#모달모달리스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 모달, 모달리스 만들때 다른 dialog호출하기
+  - 모달리스 : create할때 그 인자에, 꼭 연결되어 있는 dialog를 호출하지 않고 다른 dialog를 호출해도 호출이됨(모달리스는 예시 없이 간단하게 이렇게 끝..!)
+  - 모달 : 플래그를 주던, 다른 방법을 주던 어떠한 방법을 해서 생성자를 만들때 연결된 Dialog 를 생성시키면 된다(아래 예시 확인하기..!)
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// 생성자 추가하기
+CD1(int flage, CWnd* pParent = NULL);   // 표준 생성자입니다.
+
+// 대화 상자 Dialog 아이디 추가하기
+	enum {
+		IDD = IDD_DIALOG2,
+		IDD2 = IDD_DIALOG1
+		};
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 생성자를 통해서 생성자 만들기
+// 만들때 Dialog 아이디를 줘서 연결하면 됨
+CD1::CD1(int flage, CWnd* pParent /*=NULL*/)
+	: CDialogEx(CD1::IDD2, pParent)
+{
+
+}
+
+// 이런 식으로 사용 할 수도 있으니 편한 방법을 이용해서 쓰면 될듯함
+CD1::CD1(int Dialog, CWnd* pParent /*=NULL*/)
+	: CDialogEx(Dialog, pParent)
+{
+
 }
 ~~~
 
@@ -1466,6 +1511,8 @@ dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 �
 
     - [문자 크기 바꾸기 (CFont)](#문자-크기-바꾸기-cfont)
     - [문자 크기 바꾸기 (LOGFONT)](#문자-크기-바꾸기-logfont)
+    - [DrawText (텍스트를 도형 안에 출력하기)](#drawtext-텍스트를-도형-안에-출력하기)
+    - [TextOut (텍스트를 원하는 위치에 출력)](#textout-텍스트를-원하는-위치에-출력)
 
 ###### [문자 다루기](#문자-다루기)
 ###### [Top](#top)
@@ -1503,26 +1550,22 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 <br/>
 
 # 문자 크기 바꾸기 (LOGFONT)
+  - LOGFONT 를 선언해, 내용을 정하고, CFont 를 선언해서 그것을 적용 시키는 방식
   - 문자 크기 바꾸기
   - 문자 Weight도 설정 가능
   - 다른 Dialog ID 전부다 가능
 
 #AppDlg.cpp
 ~~~C++
-BOOL CMFCApplication1Dlg::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-	
-  LOGFONT lf2;
-  ::ZeroMemory(&lf2, sizeof(lf2));
-  lf2.lfHeight = 32;
-  lf2.lfWeight = FW_LIGHT;
-  m_fn010.CreateFontIndirect(&lf2);
-  ::lstrcpy(lf2.lfFaceName, _T("굴림"));
-  GetDlgItem(IDC_AT_NUM_12)->SetFont(&m_fn010);
+CFont m_fnstatic_num;
+LOGFONT lf = {0,};
+lf.lfHeight = 20;
+lf.lfWeight = FontStyleRegular;
+lstrcpy(lf.lfFaceName, _T("KoPub돋움체 Medium"));
+m_fnstatic_num.CreateFontIndirect(&lf);
+		GetDlgItem(IDC_STATIC_NUM)->SetFont(&m_fnstatic_num);
 
-	return TRUE;
-}
+// 다른곳에 위에 선언한 LOGFONT 를 똑같이 적용 시키는 것은 CFont 변수를 만들어서 연결 시켜 주기만 하면 된다..! 
 ~~~
 
 ###### [문자 다루기](#문자-다루기)
