@@ -66,10 +66,6 @@
   </details>
 
 
-- [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
-- [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
-
-
 - <details markdown="1">
   <summary>문자 다루기</summary>
   <div markdown="1">
@@ -110,7 +106,8 @@
   </div>
   </details>
 
-
+- [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+- [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 - [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
@@ -1324,6 +1321,112 @@ BOOL EnableWindow(BOOL bEnable = TRUE)
 <br/>
 <br/>
 
+# 윈도우 특정 부분 투명화 하기
+  - Dialog속성 - 계층화 True 로 변경
+  - SetLayeredWindowAttributes키워드를 쓰면 지정된 컬러가 있는 곳을 투명화 시킴(하지만 이것을 쓰지 않고 계층화만 True이면 그냥 창 전부가 투명화가 되어서 안보이게 됨)
+  - SetLayeredWindowAttributes(0, 255, LWA_ALPHA); 이렇게 쓰면 완전히 보이게 되고 255를 낮춘 만큼 윈도우가 투명화가 진행됨
+
+
+#AppDlg.cpp
+~~~C++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+SetLayeredWindowAttributes(RGB(255, 100, 10), 0, LWA_COLORKEY);
+
+}
+
+...
+
+void CMFCApplication1Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	{
+
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// 아이콘을 그립니다.
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		dc.FillSolidRect(10, 10, 100, 100, RGB(255, 100, 10));
+		//CDialogEx::OnPaint();
+	}
+}
+
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/182017389-c0cd387a-37b0-4db3-beb0-407b8c44b1b9.png)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+  - 마우스 클릭한 후 투명화를 하고 싶을때
+  - 이때를 레이어 속성을 꺼두고 클릭시에 레이어 속성을 추가하는 방향으로 설정한다
+  - OnPaint()를 거치기 위한 Invalidate()를 따로 호출하지 않아도 적용 된다
+
+#AppDlg.cpp
+~~~C++
+void CMFCApplication1Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	{
+
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// 아이콘을 그립니다.
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		dc.FillSolidRect(10, 10, 100, 100, RGB(255, 100, 10));
+		//CDialogEx::OnPaint();
+	}
+}
+
+...
+
+void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	int wnd_style = ::GetWindowLong(m_hWnd, GWL_EXSTYLE); // 윈도우의 확장 속성을 값을 얻어옴
+	if (!(wnd_style & WS_EX_LAYERED)) // 현재 윈도우에 레이어 속성이 없다면
+	{
+		::SetWindowLong(m_hWnd, GWL_EXSTYLE, wnd_style | WS_EX_LAYERED); // 레이어 속성을 추가한다
+	}
+	SetLayeredWindowAttributes(RGB(255, 100, 10), 0, LWA_COLORKEY);
+
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 # 윈도우 모양 바꾸기
   - 윈도우 모양이 항상 네모난 것이 아니라, 다양한 모양으로 만들어 낼 수 있다.
 
@@ -1640,237 +1743,6 @@ void CMFCApplication6Dlg::OnDestroy()
 ~~~
 
 ###### [다양한 함수](#다양한-함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# CDC, CPaintDC, CClientDC, CWindowDC (화면출력)
-  - CDC : CPaintDC, CClientDC, CWindowDC 클래스의 공통 부모 클래스
-    - 특정 상황에 맞춰서 생성하는 용도가 아닌 다형성을 사용하기 위해서 사용 하는 클래스, 직접 생성시에는 생성자에 인자가 없는 기본 생성자가 제공
-  - CPaintDC : 클라이언트 영역에 출력할 때 WM_PAINT 메시지 핸들러에서 사용시
-  - CClientDC : 클라이언트 영역에 출력할 때, WM_PAINT 메시지 핸들러를 제외한 다른 곳에서 사용시
-  - CWindowDC : 윈도우 제목 영역 같은 Non_Client 영역에 사용
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/>
-
-  - 도형그리기
-    - 직사각형 : Rectangle(x1, y1, x2, y2)
-    - 타원 : Ellipse(x1, y1, x2, y2)
-    - 테두리가 둥근 직사각형 : RoundRect(x1, y1, x2, y2, x3, y3)
-    - 다각형 : Polygon()
-
-#AppDlg.cpp
-~~~C++
-// 다각형 그리기
-void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	CClientDC dc(this);
-	POINT ap[3] = {{100,100}, {200,300}, {50, 300}};
-	dc.Polygon(ap, 3);
-
-	CDialogEx::OnLButtonDown(nFlags, point);
-}
-~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/>
-
-  - 선 그리기
-    - MoveTo(x, y) : x, y위치로 옮김
-    - LineTo(x, y) : 이전 x, y 위치에서 현재  x, y 위치로 선을 그림
-    - 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
-
-#AppDlg.cpp
-~~~C++
-void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	CClientDC dc(this);
-	dc.MoveTo(100,100);
-	dc.LineTo(200,200);
-
-	CDialogEx::OnLButtonDown(nFlags, point);
-}
-~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/>
-
-  - 선 그리기
-    - 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
-
-#AppDlg.cpp
-~~~C++
-// 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
-void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	CClientDC dc(this);
-	CPen p;
-	p.CreatePen(PS_SOLID, 5, RGB(255, 0, 0)); // 펜 모양, 펜 두께, 펜 색
-	CPen* oldpen = dc.SelectObject(&p);
-
-	dc.MoveTo(100,100);
-	dc.LineTo(200,200);
-
-	CDialogEx::OnLButtonDown(nFlags, point);
-}
-~~~
-
-###### [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# 윈도우 특정 부분 투명화 하기
-  - Dialog속성 - 계층화 True 로 변경
-  - SetLayeredWindowAttributes키워드를 쓰면 지정된 컬러가 있는 곳을 투명화 시킴(하지만 이것을 쓰지 않고 계층화만 True이면 그냥 창 전부가 투명화가 되어서 안보이게 됨)
-  - SetLayeredWindowAttributes(0, 255, LWA_ALPHA); 이렇게 쓰면 완전히 보이게 되고 255를 낮춘 만큼 윈도우가 투명화가 진행됨
-
-
-#AppDlg.cpp
-~~~C++
-BOOL CMFCApplication1Dlg::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-
-SetLayeredWindowAttributes(RGB(255, 100, 10), 0, LWA_COLORKEY);
-
-}
-
-...
-
-void CMFCApplication1Dlg::OnPaint()
-{
-	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
-
-	if (IsIconic())
-	{
-
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
-
-		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
-
-		// 아이콘을 그립니다.
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		dc.FillSolidRect(10, 10, 100, 100, RGB(255, 100, 10));
-		//CDialogEx::OnPaint();
-	}
-}
-
-~~~
-
-![image](https://user-images.githubusercontent.com/39178978/182017389-c0cd387a-37b0-4db3-beb0-407b8c44b1b9.png)
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-  - 마우스 클릭한 후 투명화를 하고 싶을때
-  - 이때를 레이어 속성을 꺼두고 클릭시에 레이어 속성을 추가하는 방향으로 설정한다
-  - OnPaint()를 거치기 위한 Invalidate()를 따로 호출하지 않아도 적용 된다
-
-#AppDlg.cpp
-~~~C++
-void CMFCApplication1Dlg::OnPaint()
-{
-	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
-
-	if (IsIconic())
-	{
-
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
-
-		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
-
-		// 아이콘을 그립니다.
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		dc.FillSolidRect(10, 10, 100, 100, RGB(255, 100, 10));
-		//CDialogEx::OnPaint();
-	}
-}
-
-...
-
-void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	int wnd_style = ::GetWindowLong(m_hWnd, GWL_EXSTYLE); // 윈도우의 확장 속성을 값을 얻어옴
-	if (!(wnd_style & WS_EX_LAYERED)) // 현재 윈도우에 레이어 속성이 없다면
-	{
-		::SetWindowLong(m_hWnd, GWL_EXSTYLE, wnd_style | WS_EX_LAYERED); // 레이어 속성을 추가한다
-	}
-	SetLayeredWindowAttributes(RGB(255, 100, 10), 0, LWA_COLORKEY);
-
-
-	CDialogEx::OnLButtonDown(nFlags, point);
-}
-~~~
-
-###### [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# 장치 DC, 메모리 DC (깜박임 없애기)
-  - 보통은 장치 DC에 바로 연결해서 도형이나 그림을 출력하게 되지만, 많은 것들을 출력하려고 할때 작은 하나하나를 전부 장치 DC로 출력하려고 할때, 너무 많이 장치 DC가 출력되어 깜박임이 발생하게 된다. 이것을 발생하지 않게 하기위해서는 메모리 DC에 전부 출력한후, 마지막에 보여줄 1장을 장치 DC에 출력하게 되면, 장치 DC의 사용을 현저하게 줄일 수 있게 되기 때문에 깜박임이 발생하지 않게 된다.
-
-<br/>
-
-  - 메모리 DC를 사용할때에, 메모리 DC에 한번씩 그릴때마다 전체 화면을 FillSolidRect로 덮어 주어야 그림이 리셋되기 때문에 위쪽에 코드를 한줄 넣어 주어야 한다
-  - BitBlt함수를 OnPaint에 사용할때에, 어떤 상황에서 Invalidate()함수를 사용하여 WM_PAINT 메시지를 발생시켜 OnPaint를 호출하는데, 이때 Invalidate()를 사용하면 깜박임이 심해진다(이유 : Invalidate() == Invalidate(TRUE), WM_PAINT를 호출하는데 장치dc에 전체 화면을 한번 지우고 호출하라고함, 따라서 장치 dc가 전체 화면을 한번 지우고, 다시 장치 dc가 그림을 그림)
-  - 이때는 Invalidate(FALSE)를 해주면 장치 dc를 전체 화면을 다시 지우지 않음 즉, 메모리 dc 자체에서 화면을 한번 덮어서 지우기 때문에 장치 dc에서 전체 화면을 지울 필요가 없음
-
-<br/>
-
-#AppDlg.h
-~~~C++
-CDC mem_dc; // 장치 dc와 바꿔 채기할 dc
-CBitmap mem_bmp; // 메모리dc의 비트맵을 바꿔채기할 비트맵
-~~~
-
-<br/>
-
-#AppDlg.cpp
-~~~C++
-CClientDC dc(this); // 메모리dc와 비트맵에게 정보를 줄 장치dc
-mem_dc.CreateCompatibleDC(&dc); // 장치 dc의 기본적인 정보를 가져가기
-mem_bmp.CreateCompatibleBitmap(&dc, w, h); // 장치 dc의 기본적인 정보를 가져가기, w,h로 장치 dc와 같은 크기 지정하기
-mem_dc.SelectObject(&mem_bmp); // 메모리dc가 만들어진 비트맵을 바꿔치기 하기
-
-// FillSolidRect 같은 것으로 맨 위쪽에서 한번 모든 화면을 덮어줘야 화면이 겹치지 않게 보인다, ,따라서 다른 곳에서 Invalidate() 호출시에 FALSE로 호출해줘도 무방하다
-// 여기서 mem_dc에 그림 그리기
-
-dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 바꿔치기 해서 출력하기
-~~~
-
-###### [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 ###### [Top](#top)
 
 <br/>
@@ -2468,6 +2340,129 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 ~~~
 
 ###### [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# CDC, CPaintDC, CClientDC, CWindowDC (화면출력)
+  - CDC : CPaintDC, CClientDC, CWindowDC 클래스의 공통 부모 클래스
+    - 특정 상황에 맞춰서 생성하는 용도가 아닌 다형성을 사용하기 위해서 사용 하는 클래스, 직접 생성시에는 생성자에 인자가 없는 기본 생성자가 제공
+  - CPaintDC : 클라이언트 영역에 출력할 때 WM_PAINT 메시지 핸들러에서 사용시
+  - CClientDC : 클라이언트 영역에 출력할 때, WM_PAINT 메시지 핸들러를 제외한 다른 곳에서 사용시
+  - CWindowDC : 윈도우 제목 영역 같은 Non_Client 영역에 사용
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 도형그리기
+    - 직사각형 : Rectangle(x1, y1, x2, y2)
+    - 타원 : Ellipse(x1, y1, x2, y2)
+    - 테두리가 둥근 직사각형 : RoundRect(x1, y1, x2, y2, x3, y3)
+    - 다각형 : Polygon()
+
+#AppDlg.cpp
+~~~C++
+// 다각형 그리기
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	CClientDC dc(this);
+	POINT ap[3] = {{100,100}, {200,300}, {50, 300}};
+	dc.Polygon(ap, 3);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 선 그리기
+    - MoveTo(x, y) : x, y위치로 옮김
+    - LineTo(x, y) : 이전 x, y 위치에서 현재  x, y 위치로 선을 그림
+    - 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
+
+#AppDlg.cpp
+~~~C++
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	CClientDC dc(this);
+	dc.MoveTo(100,100);
+	dc.LineTo(200,200);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 선 그리기
+    - 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
+
+#AppDlg.cpp
+~~~C++
+// 펜의 형태나, 두께, 컬러를 변경하고 싶다면 CPen 정의하여 바꾸기
+void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	CClientDC dc(this);
+	CPen p;
+	p.CreatePen(PS_SOLID, 5, RGB(255, 0, 0)); // 펜 모양, 펜 두께, 펜 색
+	CPen* oldpen = dc.SelectObject(&p);
+
+	dc.MoveTo(100,100);
+	dc.LineTo(200,200);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+###### [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 장치 DC, 메모리 DC (깜박임 없애기)
+  - 보통은 장치 DC에 바로 연결해서 도형이나 그림을 출력하게 되지만, 많은 것들을 출력하려고 할때 작은 하나하나를 전부 장치 DC로 출력하려고 할때, 너무 많이 장치 DC가 출력되어 깜박임이 발생하게 된다. 이것을 발생하지 않게 하기위해서는 메모리 DC에 전부 출력한후, 마지막에 보여줄 1장을 장치 DC에 출력하게 되면, 장치 DC의 사용을 현저하게 줄일 수 있게 되기 때문에 깜박임이 발생하지 않게 된다.
+
+<br/>
+
+  - 메모리 DC를 사용할때에, 메모리 DC에 한번씩 그릴때마다 전체 화면을 FillSolidRect로 덮어 주어야 그림이 리셋되기 때문에 위쪽에 코드를 한줄 넣어 주어야 한다
+  - BitBlt함수를 OnPaint에 사용할때에, 어떤 상황에서 Invalidate()함수를 사용하여 WM_PAINT 메시지를 발생시켜 OnPaint를 호출하는데, 이때 Invalidate()를 사용하면 깜박임이 심해진다(이유 : Invalidate() == Invalidate(TRUE), WM_PAINT를 호출하는데 장치dc에 전체 화면을 한번 지우고 호출하라고함, 따라서 장치 dc가 전체 화면을 한번 지우고, 다시 장치 dc가 그림을 그림)
+  - 이때는 Invalidate(FALSE)를 해주면 장치 dc를 전체 화면을 다시 지우지 않음 즉, 메모리 dc 자체에서 화면을 한번 덮어서 지우기 때문에 장치 dc에서 전체 화면을 지울 필요가 없음
+
+<br/>
+
+#AppDlg.h
+~~~C++
+CDC mem_dc; // 장치 dc와 바꿔 채기할 dc
+CBitmap mem_bmp; // 메모리dc의 비트맵을 바꿔채기할 비트맵
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~C++
+CClientDC dc(this); // 메모리dc와 비트맵에게 정보를 줄 장치dc
+mem_dc.CreateCompatibleDC(&dc); // 장치 dc의 기본적인 정보를 가져가기
+mem_bmp.CreateCompatibleBitmap(&dc, w, h); // 장치 dc의 기본적인 정보를 가져가기, w,h로 장치 dc와 같은 크기 지정하기
+mem_dc.SelectObject(&mem_bmp); // 메모리dc가 만들어진 비트맵을 바꿔치기 하기
+
+// FillSolidRect 같은 것으로 맨 위쪽에서 한번 모든 화면을 덮어줘야 화면이 겹치지 않게 보인다, ,따라서 다른 곳에서 Invalidate() 호출시에 FALSE로 호출해줘도 무방하다
+// 여기서 mem_dc에 그림 그리기
+
+dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 바꿔치기 해서 출력하기
+~~~
+
+###### [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 ###### [Top](#top)
 
 <br/>
