@@ -47,21 +47,25 @@
 
 
 - <details markdown="1">
-  <summary>MoveWindows,SetWindowPos(Dialog 크기변경, 무브 하기)</summary>
+  <summary>다양한 함수</summary>
   <div markdown="1">
   
-  - [MoveWindows,SetWindowPos](#movewindowssetwindowpos)
+  - [다양한 함수](#다양한-함수)
     - [MoveWindows](#movewindows)
     - [SetWindowPos](#setwindowpos)
-      
+    - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
+    - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
+    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+    - [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
+    - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
+    - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
+    - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
+    - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
+    - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
   </div>
   </details>
 
 
-- [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
-- [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
-- [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
-- [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
 - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
 - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 
@@ -78,10 +82,6 @@
       
   </div>
   </details>
-
-
-- [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
-- [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
 
 
 - <details markdown="1">
@@ -112,9 +112,6 @@
 
 
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
-- [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
-- [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
-- [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 - [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
 
@@ -1085,14 +1082,23 @@ CD1::CD1(int Dialog, CWnd* pParent /*=NULL*/)
 
 ***
 
-# MoveWindows,SetWindowPos
+# 다양한 함수
 
-  - Window Dialog를 Move하는 함수들
+  - 다양한 함수에 대한설명들
 
     - [MoveWindows](#movewindows)
     - [SetWindowPos](#setwindowpos)
+    - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
+    - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
+    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+    - [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
+    - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
+    - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
+    - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
+    - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
+    - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
 
-###### [MoveWindows,SetWindowPos](#movewindowssetwindowpos)
+###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
 
 <br/>
@@ -1166,7 +1172,7 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 }
 ~~~
 
-###### [MoveWindows,SetWindowPos](#movewindowssetwindowpos)
+###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
 
 <br/>
@@ -1242,10 +1248,11 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 }
 ~~~
 
-<br/>
-<br/>
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
 
-***
+<br/>
+<br/>
 
 # GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)
   - 일반적인 윈도우 화면에서 GetWindowRect() 함수를 사용하면 내 화면의 맨 왼쪽, 맨 오른쪽을 (0 , 0)으로 잡아서 표현된다
@@ -1278,13 +1285,11 @@ extra_h = wr.Height() - cr.Height();
 SetWindowPos(NULL, 0, 0, m_Small_image_width + extra_w, m_Small_image_height + extra_h, SWP_NOMOVE);
 ~~~
 
-###### [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
+###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)
   - ShowWindow() : 보이게, 안보이게
@@ -1313,13 +1318,11 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
 BOOL EnableWindow(BOOL bEnable = TRUE)
 ~~~
 
-###### [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
+###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # 윈도우 모양 바꾸기
   - 윈도우 모양이 항상 네모난 것이 아니라, 다양한 모양으로 만들어 낼 수 있다.
@@ -1357,7 +1360,286 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 
 ![20220827_113034](https://user-images.githubusercontent.com/39178978/187010807-7cf7a8db-f475-4eb0-9e99-9bc61b46a22b.png)
 
-###### [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Dialog Control 포커스 맞추기
+
+  - 1. 리소스 편집시에 맞추는 방법
+    - 리소스편집 -> 서식 -> 탭순서 에서 처음으로 포커스를 맞출 컨트롤을 1번으로 설정한다
+  - 2. GotoDlgCtrl() 함수 사용하기
+    - OnInitDialog()에서 return을 FALSE로 해야함
+      - TRUR : VC에서 지정한 탭순서 대로 가장 처음에 설정한 객체에 포커스를 준다
+      - FLASE : 개발자가 지정한 위치에 포커스를 설정할 수 있게 한다.
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// IDC_EDIT1컨트롤에 포커스를 맞춘다
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	GotoDlgCtrl(GetDlgItem(IDC_EDIT1));
+
+	return FALSE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)
+
+  - GetPrivateProfileString() : ini파일 읽기
+
+~~~c++
+// C:\\temp\\setup.ini 파일에서 Title1의 Name 값을 inbuffer 사이즈만큼 읽어와라, Name값이 없으면 No Info값을 inbuffer에 저장하라.
+// 첫번째 인자나 두번째 인자에 NULL을 넣으면,타이틀값이나, 키 값을 전부 가져옴(가져올때 '\0'을 넣어서 가져옴) (ex : "sdf\0xcv\0iop\0")
+GetPrivateProfileString( "Title1", "Name", "No Info", inbuffer, sizeof(inbuffer), "C:\\temp\\setup.ini" );
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+- WritePrivateProfileString() : ini파일 쓰기
+
+~~~c++
+// C:\\temp\\setup.ini 파일에서 Title1의 Name 값을 outbuffer에 정보(문자열)를 써라.
+WritePrivateProfileString( "Title1", "Name", outbuffer, "C:\\temp\\setup.ini" );
+~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)
+
+#AppDlg.cpp
+~~~c++
+// time(NULL) : 현재 시간을 초단위로 환산하여 보여줌, 그래서 랜덤 시드로 많이 사용하게됨
+void CMFCApplication2Dlg::OnBnClickedButton1()
+{
+	int our_time = time(NULL);
+	SetDlgItemInt(IDC_EDIT1, our_time);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// struct tm time선언 후, localtime_s사용하여 변환
+void CMFCApplication2Dlg::OnBnClickedButton1()
+{
+	time_t our_time = time(NULL);
+	struct tm time;
+	localtime_s(&time, &our_time);
+
+	CString str;
+	str.Format(L"%d년 %d월 %d일 %d시 %d분 %d초", time.tm_year + 1900, time.tm_mon + 1, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
+
+	SetDlgItemText(IDC_EDIT1, str);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// SYSTEMTIME 을 이용하여 쉽게 날자, 시간 출력 가능
+void CMFCApplication2Dlg::OnBnClickedButton1()
+{
+	CString str;
+
+	SYSTEMTIME our_time;
+	GetLocalTime(&our_time);
+	str.Format(L"%d년 %d월 %d일 %d시 %d분 %d초 (%dms)", our_time.wYear, our_time.wMonth, our_time.wDay, our_time.wHour, our_time.wMinute, our_time.wSecond, our_time.wMilliseconds);
+	
+	SetDlgItemText(IDC_EDIT1, str);
+}
+~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# SetTimer() (타이머 사용하기)
+  - SetTimer(1, 200, NULL)
+    - 첫번째 인자는 타이머의 번호로써, 같은 번호의 타이머는 2개를 만들 수 없다. 같은 번호의 타이머를 다시 만들면 전에 있었던 타이머를 덮어 씌우게 된다
+    - 두번째 인자는, 타이머의 속도 이며, 1000 = 1초 이다 200 = 0.2초 마다 타이머가 실행 된다
+    - 세번째 인자는, 타이머의 실행시 마다 실행할 함수이다. NULL값을 넣으면 타이머 실행시마다 WM_TIMER 메시지를 주게 된다.
+    - SetTimer의 제거는 WM_DESTROY 메시지를 추가하여 제거한다, WM_DESTROY 는 윈도우가 파괴될때 메시지가 들어온다.
+
+<br/>
+
+  - WM_TIMER 메시지
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_TIMER 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+
+<br/>
+
+  - WM_DESTROY  메시지
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DESTROY  추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - 윈도우가 파괴될때 메시지가 들어온다
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication2Dlg::OnBnClickedButton2()
+{
+	SetTimer(1, 200, NULL); //WM_TIMER
+}
+
+...
+
+// SetTimer에 NULL인자를 넣었기 때문에 WM_TIMER메시지 호출
+void CMFCApplication2Dlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == 1) // 타이머가 1번 이라면
+	{
+		// 실행할 함수나, 코드
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+...
+
+// WM_DESTROY 메시지가 들어올때 SetTimer제거
+void CMFCApplication2Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// 타이머가 만들어지지 않아도 KillTimer를 하는것에 문제는 발생하지 않는다.
+	KillTimer(1);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - SetTimer(1, 200, Fuction)
+    - 세번째 인자에 함수명을 넣어서, 함수를 호출 할 수 도 있음
+    - 함수는 정해져 있는 인자를 넣을 틀대로 콜백함수로 만들어 쓸 수 있음
+    - 함수의 인자
+      - 첫번째 : 윈도우핸들(타이머를 발생시킨 윈도우 핸들)
+      - 두번째 : WM_TIMER의 메시지 아이디
+      - 세번째 : SetTimer에서 만든 타이머의 번호
+      - 네번째 : 0이 들어오기 때문에 무시하면 된다.
+      - 하지만 콜백 함수를 사용하는 것에는 어려움이 있고, 해당 함수를 사용하려면 h파일에 static으로 콜백 함수를 등록해야 한다. 그러나 static이라는 것은 사실상 전역함수 이므로 여러 불편 사항들이 있다. 그래서 PostMessage와 SendMessage를 활용한다
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication2Dlg::OnBnClickedButton2()
+{
+	SetTimer(1, 200, Fuction); //WM_TIMER
+}
+
+...
+
+// CALLBACK함수의 인자를 이렇게 만들어 사용한다.
+void CALLBACK Fuction(HWND ah_wnd, UINT a_msg_id, UINT_PTR a_timer_id, DWORD a_system_time)
+{
+	if (a_timer_id == 1)
+	{
+		// 버튼은 눌렀을 때 WM_COMMAND를 발생 시키며, 어떤 버튼이 눌렸는지 확인하기 위해 MAKEWPARAM에 값을 넣어서 보낸다
+		// MAKEWPARAM에 해당 컨트롤의 ID가 적인 컨트롤이 눌러졌다는 의미 이다.
+		// SendMessage도 가능
+		::PostMessage(ah_wnd, WM_COMMAND, MAKEWPARAM(IDC_BUTTON1, BN_CLICKED), 0);
+	}
+}
+~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# RegisterHotKey() (시스템 전역 단축키 지정하기)
+  - SetTimer(1, 200, NULL)
+    - 핫키를 등록하면 프로그램에 핸들을 쥐고 있지 않아도 어디서든 핫키로 작동 시킬 수 있다
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_HOTKEY 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - RegisterHotKey(m_hWnd, 26000, 0, VK_F5)
+      - 첫번째 인수 : 단축키를 눌렀을 때 발생하는 메시지를 받을 윈도우의 핸들
+      - 두번째 인수 : 보낼 임의 메시지
+      - 세번째 인수 : 네번째 인수에서 조합해 쓸 단축키
+      - 네번째 인수 : 핫키에 사용할 단축키
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DESTROY 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+      - 종료전에 WM_DESTROY이용하여 핫키 등록 제거 하기
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// 플레그로 이용할  int변수 하나 선언 하기
+public:
+	int flage;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication6Dlg::OnInitDialog()
+{
+	flage = 0;
+	RegisterHotKey(m_hWnd, 26000, 0, VK_F5);
+
+ ...
+ 
+}
+
+... 
+
+void CMFCApplication6Dlg::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
+{
+	if (nHotKeyId == 26000)
+	{
+		if(flage == 0)
+		{
+			ShowWindow(SW_HIDE);
+			flage = 1;
+		}
+		else
+		{
+			ShowWindow(SW_SHOW);
+			flage = 0;
+		}
+	}
+
+	CDialogEx::OnHotKey(nHotKeyId, nKey1, nKey2);
+}
+
+...
+
+void CMFCApplication6Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	UnregisterHotKey(m_hWnd, 26000);
+}
+~~~
+
+###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
 
 <br/>
@@ -1731,67 +2013,6 @@ void CMFCApplication2Dlg::OnPaint()
 ![20220820_222516](https://user-images.githubusercontent.com/39178978/185748206-a9fd8e37-4645-41fa-aff5-e51913f8a9fc.png)
 
 ###### [문자 다루기](#문자-다루기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Dialog Control 포커스 맞추기
-
-  - 1. 리소스 편집시에 맞추는 방법
-    - 리소스편집 -> 서식 -> 탭순서 에서 처음으로 포커스를 맞출 컨트롤을 1번으로 설정한다
-  - 2. GotoDlgCtrl() 함수 사용하기
-    - OnInitDialog()에서 return을 FALSE로 해야함
-      - TRUR : VC에서 지정한 탭순서 대로 가장 처음에 설정한 객체에 포커스를 준다
-      - FLASE : 개발자가 지정한 위치에 포커스를 설정할 수 있게 한다.
-
-<br/>
-
-#AppDlg.cpp
-~~~c++
-// IDC_EDIT1컨트롤에 포커스를 맞춘다
-BOOL CMFCApplication5Dlg::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-
-	GotoDlgCtrl(GetDlgItem(IDC_EDIT1));
-
-	return FALSE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
-}
-~~~
-
-###### [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)
-
-  - GetPrivateProfileString() : ini파일 읽기
-
-~~~c++
-// C:\\temp\\setup.ini 파일에서 Title1의 Name 값을 inbuffer 사이즈만큼 읽어와라, Name값이 없으면 No Info값을 inbuffer에 저장하라.
-// 첫번째 인자나 두번째 인자에 NULL을 넣으면,타이틀값이나, 키 값을 전부 가져옴(가져올때 '\0'을 넣어서 가져옴) (ex : "sdf\0xcv\0iop\0")
-GetPrivateProfileString( "Title1", "Name", "No Info", inbuffer, sizeof(inbuffer), "C:\\temp\\setup.ini" );
-~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/>
-
-- WritePrivateProfileString() : ini파일 쓰기
-
-~~~c++
-// C:\\temp\\setup.ini 파일에서 Title1의 Name 값을 outbuffer에 정보(문자열)를 써라.
-WritePrivateProfileString( "Title1", "Name", outbuffer, "C:\\temp\\setup.ini" );
-~~~
-
-###### [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
 ###### [Top](#top)
 
 <br/>
@@ -2299,234 +2520,6 @@ void CMFCApplication3Dlg::OnBnClickedButton1()
 ~~~
 
 ###### [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)
-
-#AppDlg.cpp
-~~~c++
-// time(NULL) : 현재 시간을 초단위로 환산하여 보여줌, 그래서 랜덤 시드로 많이 사용하게됨
-void CMFCApplication2Dlg::OnBnClickedButton1()
-{
-	int our_time = time(NULL);
-	SetDlgItemInt(IDC_EDIT1, our_time);
-}
-~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/>
-
-#AppDlg.cpp
-~~~c++
-// struct tm time선언 후, localtime_s사용하여 변환
-void CMFCApplication2Dlg::OnBnClickedButton1()
-{
-	time_t our_time = time(NULL);
-	struct tm time;
-	localtime_s(&time, &our_time);
-
-	CString str;
-	str.Format(L"%d년 %d월 %d일 %d시 %d분 %d초", time.tm_year + 1900, time.tm_mon + 1, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
-
-	SetDlgItemText(IDC_EDIT1, str);
-}
-~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/>
-
-#AppDlg.cpp
-~~~c++
-// SYSTEMTIME 을 이용하여 쉽게 날자, 시간 출력 가능
-void CMFCApplication2Dlg::OnBnClickedButton1()
-{
-	CString str;
-
-	SYSTEMTIME our_time;
-	GetLocalTime(&our_time);
-	str.Format(L"%d년 %d월 %d일 %d시 %d분 %d초 (%dms)", our_time.wYear, our_time.wMonth, our_time.wDay, our_time.wHour, our_time.wMinute, our_time.wSecond, our_time.wMilliseconds);
-	
-	SetDlgItemText(IDC_EDIT1, str);
-}
-~~~
-
-###### [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# SetTimer() (타이머 사용하기)
-  - SetTimer(1, 200, NULL)
-    - 첫번째 인자는 타이머의 번호로써, 같은 번호의 타이머는 2개를 만들 수 없다. 같은 번호의 타이머를 다시 만들면 전에 있었던 타이머를 덮어 씌우게 된다
-    - 두번째 인자는, 타이머의 속도 이며, 1000 = 1초 이다 200 = 0.2초 마다 타이머가 실행 된다
-    - 세번째 인자는, 타이머의 실행시 마다 실행할 함수이다. NULL값을 넣으면 타이머 실행시마다 WM_TIMER 메시지를 주게 된다.
-    - SetTimer의 제거는 WM_DESTROY 메시지를 추가하여 제거한다, WM_DESTROY 는 윈도우가 파괴될때 메시지가 들어온다.
-
-<br/>
-
-  - WM_TIMER 메시지
-    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_TIMER 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
-
-<br/>
-
-  - WM_DESTROY  메시지
-    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DESTROY  추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
-    - 윈도우가 파괴될때 메시지가 들어온다
-
-<br/>
-
-#AppDlg.cpp
-~~~c++
-void CMFCApplication2Dlg::OnBnClickedButton2()
-{
-	SetTimer(1, 200, NULL); //WM_TIMER
-}
-
-...
-
-// SetTimer에 NULL인자를 넣었기 때문에 WM_TIMER메시지 호출
-void CMFCApplication2Dlg::OnTimer(UINT_PTR nIDEvent)
-{
-	if (nIDEvent == 1) // 타이머가 1번 이라면
-	{
-		// 실행할 함수나, 코드
-	}
-
-	CDialogEx::OnTimer(nIDEvent);
-}
-
-...
-
-// WM_DESTROY 메시지가 들어올때 SetTimer제거
-void CMFCApplication2Dlg::OnDestroy()
-{
-	CDialogEx::OnDestroy();
-
-	// 타이머가 만들어지지 않아도 KillTimer를 하는것에 문제는 발생하지 않는다.
-	KillTimer(1);
-}
-~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-<br/>
-
-  - SetTimer(1, 200, Fuction)
-    - 세번째 인자에 함수명을 넣어서, 함수를 호출 할 수 도 있음
-    - 함수는 정해져 있는 인자를 넣을 틀대로 콜백함수로 만들어 쓸 수 있음
-    - 함수의 인자
-      - 첫번째 : 윈도우핸들(타이머를 발생시킨 윈도우 핸들)
-      - 두번째 : WM_TIMER의 메시지 아이디
-      - 세번째 : SetTimer에서 만든 타이머의 번호
-      - 네번째 : 0이 들어오기 때문에 무시하면 된다.
-      - 하지만 콜백 함수를 사용하는 것에는 어려움이 있고, 해당 함수를 사용하려면 h파일에 static으로 콜백 함수를 등록해야 한다. 그러나 static이라는 것은 사실상 전역함수 이므로 여러 불편 사항들이 있다. 그래서 PostMessage와 SendMessage를 활용한다
-
-#AppDlg.cpp
-~~~c++
-void CMFCApplication2Dlg::OnBnClickedButton2()
-{
-	SetTimer(1, 200, Fuction); //WM_TIMER
-}
-
-...
-
-// CALLBACK함수의 인자를 이렇게 만들어 사용한다.
-void CALLBACK Fuction(HWND ah_wnd, UINT a_msg_id, UINT_PTR a_timer_id, DWORD a_system_time)
-{
-	if (a_timer_id == 1)
-	{
-		// 버튼은 눌렀을 때 WM_COMMAND를 발생 시키며, 어떤 버튼이 눌렸는지 확인하기 위해 MAKEWPARAM에 값을 넣어서 보낸다
-		// MAKEWPARAM에 해당 컨트롤의 ID가 적인 컨트롤이 눌러졌다는 의미 이다.
-		// SendMessage도 가능
-		::PostMessage(ah_wnd, WM_COMMAND, MAKEWPARAM(IDC_BUTTON1, BN_CLICKED), 0);
-	}
-}
-~~~
-
-###### [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# RegisterHotKey() (시스템 전역 단축키 지정하기)
-  - SetTimer(1, 200, NULL)
-    - 핫키를 등록하면 프로그램에 핸들을 쥐고 있지 않아도 어디서든 핫키로 작동 시킬 수 있다
-    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_HOTKEY 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
-    - RegisterHotKey(m_hWnd, 26000, 0, VK_F5)
-      - 첫번째 인수 : 단축키를 눌렀을 때 발생하는 메시지를 받을 윈도우의 핸들
-      - 두번째 인수 : 보낼 임의 메시지
-      - 세번째 인수 : 네번째 인수에서 조합해 쓸 단축키
-      - 네번째 인수 : 핫키에 사용할 단축키
-    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DESTROY 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
-      - 종료전에 WM_DESTROY이용하여 핫키 등록 제거 하기
-
-<br/>
-
-#AppDlg.h
-~~~c++
-// 플레그로 이용할  int변수 하나 선언 하기
-public:
-	int flage;
-~~~
-
-<br/>
-
-#AppDlg.cpp
-~~~c++
-BOOL CMFCApplication6Dlg::OnInitDialog()
-{
-	flage = 0;
-	RegisterHotKey(m_hWnd, 26000, 0, VK_F5);
-
- ...
- 
-}
-
-... 
-
-void CMFCApplication6Dlg::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
-{
-	if (nHotKeyId == 26000)
-	{
-		if(flage == 0)
-		{
-			ShowWindow(SW_HIDE);
-			flage = 1;
-		}
-		else
-		{
-			ShowWindow(SW_SHOW);
-			flage = 0;
-		}
-	}
-
-	CDialogEx::OnHotKey(nHotKeyId, nKey1, nKey2);
-}
-
-...
-
-void CMFCApplication6Dlg::OnDestroy()
-{
-	CDialogEx::OnDestroy();
-
-	UnregisterHotKey(m_hWnd, 26000);
-}
-~~~
-
-###### [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
 ###### [Top](#top)
 
 <br/>
