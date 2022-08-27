@@ -10,7 +10,7 @@
     - [ON_COMMAND_RANGE](#on_command_range)
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
-    - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
+    - [PostMessage (사용자 지정 메시지) + MAKEWPARAM](#postmessage-사용자-지정-메시지--makewparam)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
     - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
     - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
@@ -18,7 +18,6 @@
       
   </div>
   </details>
-
 
 - <details markdown="1">
   <summary>가상함수</summary>
@@ -62,6 +61,7 @@
 - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
 - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
 - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+- [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
 - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
 - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 
@@ -116,6 +116,7 @@
 - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
 - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
+- [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
 
 
 <br/>
@@ -159,7 +160,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [ON_COMMAND_RANGE](#on_command_range)
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
-    - [PostMessage (사용자 지정 메시지)](#postmessage-사용자-지정-메시지)
+    - [PostMessage (사용자 지정 메시지) + MAKEWPARAM](#postmessage-사용자-지정-메시지--makewparam)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
     - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
     - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
@@ -332,7 +333,7 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 <br/>
 <br/>
 
-# PostMessage (사용자 지정 메시지)
+# PostMessage (사용자 지정 메시지) + MAKEWPARAM
   - 자기 자신에게 PostMessage를 보낼 수도 있지만 그것은 의미가 없고, 다른 dialog에서 보내는것을 받는것이 의미가 있다. 보통 자식 -> 부모로 보내는것이 일반적이다(부모 -> 자식은 접근이 쉽기 때문)
   - 부모에서는, 프로젝트 -> 클래스마법사->메시지->사용자 지정 메시지 추가 -> ‘10000’ 입력 후 추가하기(10000은 예시를 든것임!)
   - (AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
@@ -374,6 +375,52 @@ afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 ~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+  - MAKEWPARAM
+    - 16비트 크기의 변수인 wLow 와 wHigh의 값을 32비트 크기로 합쳐서 반환하는 함수이다.
+    - wLow는 32비트중에서 하위 16비트에 저장되고 wHigh는 상위 16비트에 저장된다.
+    - 윈도우즈 메시지에 포함되어 전달되는 두개의 인자중 하나인 lParam 을 구성할때 사용한다.
+
+<br/>
+
+#AppDlg.cpp(자식)
+~~~c++
+void Cchaild::OnBnClickedButton1()
+{
+	int n = GetDlgCtrlID();
+	GetParent()->PostMessage(WM_COMMAND, MAKEWPARAM(10000, 20000), LPARAM(190));
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(부모)
+~~~c++
+// PostMessage의 인자를 이용해서 아래와 같이 OnCommand에 바로 메시지를 보낼 수 있으며, 보낼때 MAKEWPARAM을 이용해서 상위, 하위를 나누어서 데이터를 보낼 수 있고, 마지막 인자에도 추가 데이터를 보낼 수 있다
+// 하지만 진행 했을시에는, 마지막 인자인 lParam에 일정 작은 수를 넣으면 assertion error가 났었고 아직 그것은 이해 하지 못했음
+BOOL CMFCApplication2Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+
+	int n = LOWORD(wParam); // MAKEWPARAM
+	int n1 = HIWORD(wParam); // MAKEWPARAM
+	int n2 = lParam; // LPARAM
+
+	if(HIWORD(wParam) == 20000)
+	{
+		int value = GetDlgItemInt(IDC_EDIT1);
+		
+		if (LOWORD(wParam) == 10000)
+			value++;
+
+		SetDlgItemInt(IDC_EDIT1, value);
+	}
+	return CDialogEx::OnCommand(wParam, lParam);
+}
+~~~
+
+![20220827_113633](https://user-images.githubusercontent.com/39178978/187011001-0e9789d9-8db0-47ce-ab1c-e666853dfb81.png)
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -1267,6 +1314,50 @@ BOOL EnableWindow(BOOL bEnable = TRUE)
 ~~~
 
 ###### [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 윈도우 모양 바꾸기
+  - 윈도우 모양이 항상 네모난 것이 아니라, 다양한 모양으로 만들어 낼 수 있다.
+
+<br/>
+
+~~~C++
+//윈도우 리전을 생성하는 API
+- CreatePolygonRgn() : 다각형
+- CreateRectRgn() : 사각형
+- CreateEllipticRgn() : 원
+
+//만들어진 윈도우 리전을 화면에 세팅하는 함수
+- CombineRgn() : 만들어진 리전을 합침
+- SetWindowRgn() : 리전을 화면에 세팅
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~C++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	CRgn rgn;
+	rgn.CreateEllipticRgn(0, 0, 200, 200);
+	SetWindowRgn(rgn, TRUE);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+<br/>
+
+![20220827_113034](https://user-images.githubusercontent.com/39178978/187010807-7cf7a8db-f475-4eb0-9e99-9bc61b46a22b.png)
+
+###### [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
 ###### [Top](#top)
 
 <br/>
@@ -2456,3 +2547,49 @@ color = RGB(200, 200, 200);
 
 ###### [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 서브 클래싱(SubclassDlgItem)이용하여 기능변경
+  - 클래스 마법사 -> 클래스추가(MFC클래스) -> 기본클래스(여기서 내가 바꾸고 싶은 CLASS를 사용하면 된다)
+  - 클래스추가로 만든 cpp파일에서 메시지를 추가 하기 위한 페이지로 가면 앞에 ‘=’이 붙어 있는 경우가 있는데 이경우는 현재 이것을 사용하고 있다는 의미이다. 이것을 추가 정의 하기 위해 등록해 사용 할 수 있다.
+  - GetDlgCtrlID()을 이용해서 어떤 버튼을 누르던지 다른 각각의 해당하는 버튼 ID를 보냄으로써 작업을 할 수 있다.
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// 만들어둔 MyBtn 버튼 cpp의 해더를 정의하고, 클래스 변수를 정의함
+private:
+	MyBtn m_inc_btn, m_dec_btn;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 정의한 MyBtn버튼 클래스기능을 사용할 컨트롤 ID를 SubclassDlgItem으로 연결하여 사용
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	m_inc_btn.SubclassDlgItem(IDC_BUTTON1, this);
+	m_dec_btn.SubclassDlgItem(IDC_BUTTON2, this);
+
+}
+~~~
+
+<br/>
+
+#MyBtn.cpp
+~~~c++
+// MyBtn.cpp내에서는 PostMessage와 같은 것을 이용해 메시지를 부모 에게 전송 함으로써 그 기능을 사용 한다
+GetParent()->PostMessage(20000, MAKEWPARAM(GetDlgCtrlID(), 1), (LPARAM)m_hWnd);
+~~~
+
+###### [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
+###### [Top](#top)
+
