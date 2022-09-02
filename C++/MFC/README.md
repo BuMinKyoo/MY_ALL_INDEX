@@ -1,6 +1,7 @@
 ###### Top
 
 - [MFC메모리 누수 확인](#mfc메모리-누수-확인)
+- [ifdef DEBUG (디버그 모드 일때만 실행하기)](#ifdef-debug-디버그-모드-일때만-실행하기)
 
 - <details markdown="1">
   <summary>메세지</summary>
@@ -27,6 +28,7 @@
     - [WindowProc](#windowproc)
     - [OnCommand](#oncommand)
     - [PreTranslateMessage](#pretranslatemessage)
+    - [DrawItem](#drawitem)
       
   </div>
   </details>
@@ -111,6 +113,7 @@
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 - [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
+- [MFC라이브러리 만들기](#mfc라이브러리-만들기)
 
 
 <br/>
@@ -147,6 +150,27 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
 ***
 
+# ifdef DEBUG (디버그 모드 일때만 실행하기)
+
+  - 릴리스 모드와 디버그 모드에서, 디버그 모드 일때만 실행하게 해놓은 코드
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+#ifdef DEBUG
+// 코드
+#endif
+~~~
+
+###### [ifdef DEBUG (디버그 모드 일때만 실행하기)](#ifdef-debug-디버그-모드-일때만-실행하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # Message
 
   - 일반적으로 콘솔에서 만든 프로그램은 프로그래머가 정한 순서대로 차근 차근 진행 됩낟. 하지만, 윈도우 응용 프로그램은 메세지 구동 구조를 가지고 있으며, 프로그램에 어떤 변화가 생경을때 Windows가 프로그램에게 정보를 알려주고, 프로그램은 그 정보를 받아서 다양한 동작을 하게 된다.
@@ -167,6 +191,7 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 <br/>
 
 # ON_COMMAND_RANGE
+
   - ON_COMMAND_RANGE를 이용해서 함수하나로 버튼을 한꺼번에 처리 가능(꼭 버튼이 아니여도 다양한 처리 가능)
   - 주의할 사항은, 각 패널의 ID가 숫자로 define되어 있기 때문에 define부분이 연속으로 잘 정돈되어 있어야함
   - 프로젝트 -> 클래스 마법사 -> 메세지에 없는 메세지이기 때문에 따로 하나하나 추가해 주어야함
@@ -228,6 +253,7 @@ void CMFCApplication3Dlg::OnSetNumber(UINT a_ctrl_id)
 <br/>
 
 # WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)
+
   - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_CTLCOLOR 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
   - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다.
   - Dialog ID가 “IDC_STATIC2”일때
@@ -264,10 +290,33 @@ HBRUSH CAlarm_talk::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 <br/>
 
 # WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)
+
   - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DRAWITEM 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
   - Dialog에서 Owner Draw속성을 True설정(해당 컨트롤을 스스로 그리지 않겠다)
   - Owner Draw가 있는 컨트롤을 변경할 때 사용, 즉 그리는 것을 제어 하는것
   - WM_DRAWITEM은 사용자가  직접 컨트롤을 그린다고 하는것
+  - 만약 서브 클래싱(SubclassDlgItem)이용하여 버튼같은 Class를 상속받아 나 자신을 변경해야 할때
+    - WM_DRAWITEM 이 메시지를 받았다는 것은 내 자신의 윈도우 안에서 자식윈도우의 변경 때문에 이 메시지를 받게 된것 따라서 WM_DRAWITEM 메시지가 아니라 DrawItem함수를 등록해서 사용 하여야 한다, 그래서 WM_DRAWITEM 메시지에는 nIDCtl을 받는 변수를 받는 인자가 있으며 DrawItem함수에는 그 인자가 없다(왜냐면 어차피 자신을 가리키기 때문에)
+    - WM_DRAWITEM의 인자중 LPDRAWITEMSTRUCT이 있는데 F1을 눌러서 도움말을 보려고 하면 안되고 DRAWITEMSTRUC로 도움말을 봐야 한다 LP는 롱타입으로 define되어 있는것이다.
+
+<br/>
+
+~~~c++
+// LPDRAWITEMSTRUCT 원형
+typedef struct tagDRAWITEMSTRUCT {
+  UINT      CtlType;
+  UINT      CtlID;
+  UINT      itemID;
+  UINT      itemAction;
+  UINT      itemState;
+  HWND      hwndItem;
+  HDC       hDC;
+  RECT      rcItem;
+  ULONG_PTR itemData;
+} DRAWITEMSTRUCT, *PDRAWITEMSTRUCT, *LPDRAWITEMSTRUCT;
+~~~
+
+<br/>
 
 #AppDlg.cpp
 ~~~c++
@@ -328,6 +377,7 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 <br/>
 
 # PostMessage (사용자 지정 메시지) + MAKEWPARAM
+
   - 자기 자신에게 PostMessage를 보낼 수도 있지만 그것은 의미가 없고, 다른 dialog에서 보내는것을 받는것이 의미가 있다. 보통 자식 -> 부모로 보내는것이 일반적이다(부모 -> 자식은 접근이 쉽기 때문)
   - 부모에서는, 프로젝트 -> 클래스마법사->메시지->사용자 지정 메시지 추가 -> ‘10000’ 입력 후 추가하기(10000은 예시를 든것임!)
   - (AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
@@ -423,6 +473,7 @@ BOOL CMFCApplication2Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 <br/>
 
 # WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)
+
   - WM_CREATE
     - 프로젝트 -> 클래스 마법사 -> 메시지 -> WM_CREATE 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
     - 윈도우가 생성되면 보내주는 메시지
@@ -540,6 +591,7 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 <br/>
 
 # WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)
+
   - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기) 참고하기
 
 ###### [Message](#message)
@@ -549,6 +601,7 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
 <br/>
 
 # WM_MOUSEWHEEL (마우스 휠)
+
   - 마우스 휠을 돌리면 발생하는 메시지
   - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_MOUSEWHEEL추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
   - zDelta > 0 : 휠을 위로 돌렸을때, zDelta < 0 휠을 아래로 돌렸을때
@@ -581,6 +634,7 @@ BOOL CMFCApplication2Dlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 <br/>
 
 # EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)
+
   - EN_UPDATE
     - 프로젝트 -> 클래스 마법사 -> 명령(메시지를 입력할 Edit Control 컨트롤 ID클릭) -> 메시지 -> EN_UPDATE 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
     - 문자열이 변경된 후, 화면에 출력하기 전에 보내주는 메시지
@@ -640,12 +694,14 @@ void CMFCApplication2Dlg::OnBnClickedButton1()
 ***
 
 # Virtual Function
+
   - 보통은 선언되어 있는 함수를 virtual로 선언하여 사용함이고, 프로젝트 -> 클래스 마법사 -> 가상함수 쪽에서 추가할 수 있다.
   - 프로젝트 -> 클래스 마법사 -> 가상함수에서 추가 한다면 AppDlg.h, AppDlg.cpp에 함수해더가 자동으로 추가 된다.
 
     - [WindowProc](#windowproc)
     - [OnCommand](#oncommand)
     - [PreTranslateMessage](#pretranslatemessage)
+    - [DrawItem](#drawitem)
   
 ###### [Virtual Function](#virtual-function)
 ###### [Top](#top)
@@ -654,6 +710,7 @@ void CMFCApplication2Dlg::OnBnClickedButton1()
 <br/>
 
 # WindowProc
+
   - 모든 이벤트는 WindowProc를 거쳐 가기 때문에 이렇게 할 수 있지만 너무나 많은 이벤트가 들어가게됨(조금은 비효율적)
   - 프로젝트 -> 클래스 마법사 -> 가상함수 -> WindowProc 추가하기(AppDlg.h, AppDlg.cpp에 함수해더 자동으로 추가됨)
   - Dialog ID가 “IDC_BUTTON1”, “IDC_BUTTON2”, “IDC_BUTTON3”일때(저렇게 쓸려면 define정의가 순서대로 되어 있어야함)
@@ -733,6 +790,62 @@ void CMFCApplication3Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 	AfxMessageBox(_T("456"));
 
 	CDialogEx::OnLButtonDown(nFlags, point);
+}
+~~~
+
+###### [Virtual Function](#virtual-function)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DrawItem
+  - 프로젝트 -> 클래스 마법사 -> 가상함수 -> DrawItem 추가하기(AppDlg.h, AppDlg.cpp에 함수해더 자동으로 추가됨)
+  - 자기 자신의 윈도우를 다시 그리겠다고 선언 하는것, 들어오는 인자인 LPDRAWITEMSTRUCT구조체 안에 모든 정보가 들어 있다
+  - 보통 서브 클래싱(SubclassDlgItem)이용하여 내 자신의 컬러를 가진 컨트롤을 만들때 사용하게 된다
+  - 서브 클래싱(SubclassDlgItem)이용할때 DrawItem같은 것을 이용하기 위해서는 Owner Draw를 true로 해야한다
+
+#MyBtn.cpp
+~~~c++
+// CButton으로 상속받은 클래스를 만들었던 cpp
+void MyBtn::DrawItem(LPDRAWITEMSTRUCT lpD)
+{
+	CRect r(lpD->rcItem);  // RECT 구조체를 CRect 객체로 변환
+	CDC* dc = CDC::FromHandle(lpD->hDC); // HDC 핸들을 CDC 객체로 변환
+
+    CBrush new_brush, * old_brush = dc->GetCurrentBrush();
+
+    if (lpD->itemState & ODS_SELECTED) // 눌렀다면
+    {  
+        new_brush.CreateSolidBrush(RGB(255, 0, 0));
+        dc->SelectObject(new_brush);
+    }
+    else {  // 포커스 상태가 아닌 경우
+        new_brush.CreateSolidBrush(RGB(0, 255, 0));
+        dc->SelectObject(new_brush);
+    }
+    dc->Rectangle(r);   // Brush로 사각형 그리기
+
+    new_brush.DeleteObject();
+}
+~~~
+
+<br/>
+
+#AppDlg.h
+~~~c++
+#include "MyBtn.h"
+~~~
+
+<br/>
+
+#AppDlg.h
+~~~c++
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	mybtn.SubclassDlgItem(IDC_BUTTON1, this);
 }
 ~~~
 
@@ -2545,6 +2658,7 @@ color = RGB(200, 200, 200);
   - 클래스 마법사 -> 클래스추가(MFC클래스) -> 기본클래스(여기서 내가 바꾸고 싶은 CLASS를 사용하면 된다)
   - 클래스추가로 만든 cpp파일에서 메시지를 추가 하기 위한 페이지로 가면 앞에 ‘=’이 붙어 있는 경우가 있는데 이경우는 현재 이것을 사용하고 있다는 의미이다. 이것을 추가 정의 하기 위해 등록해 사용 할 수 있다.
   - GetDlgCtrlID()을 이용해서 어떤 버튼을 누르던지 다른 각각의 해당하는 버튼 ID를 보냄으로써 작업을 할 수 있다.
+  - DrawItem같은 것을 이용하기 위해서는 Owner Draw를 true로 해야한다
 
 <br/>
 
@@ -2581,3 +2695,59 @@ GetParent()->PostMessage(20000, MAKEWPARAM(GetDlgCtrlID(), 1), (LPARAM)m_hWnd);
 ###### [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# MFC라이브러리 만들기
+  - 1. ‘Windows 데스크톱 마법사’로 프로젝트 만들기
+  ![20220902_235502_1](https://user-images.githubusercontent.com/39178978/188176760-11bf5578-59f4-424d-83df-cd3470dca2f7.png)
+  
+<br/>
+  
+  - 2. 설정하기(정적 라이브러리, MFC 선택)
+  ![20220902_235502_2](https://user-images.githubusercontent.com/39178978/188176815-2afd92ee-dd73-4a1f-9164-e19ede7aaa81.png)
+  
+<br/>
+
+  - 3. 필요한 부분만 남기고 다 지우기
+#MyBtn.cpp
+~~~c++
+// MyBtn.cpp : 정적 라이브러리를 위한 함수를 정의합니다.
+
+#include "pch.h"
+#include "framework.h"
+#include "MyBtn.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+~~~
+![20220902_235502_3](https://user-images.githubusercontent.com/39178978/188176873-a1fa8a53-a297-446c-b251-1e3c09e34674.png)
+
+<br/>
+
+  - 4. 라이브러리를 위해 만들었던 cpp와 h파일을 라이브러리 솔루션 폴더 에 복사해 넣는다
+  - 5. cpp와 h파일을 솔루션에 추가한다
+  ![20220902_235502_4](https://user-images.githubusercontent.com/39178978/188177018-cbb939c6-963e-460e-90ae-f827db2ec982.png)
+  
+<br/>
+
+  - 6. 라이브러리로 만들려고 하던 cpp파일에 인클루드 되어 있는 h를 지운다.(cpp를 만들때, 기본적으로 들어가게 되는 h해더)
+  ![20220902_235502_5](https://user-images.githubusercontent.com/39178978/188177044-79b54b8f-3a1c-4375-b171-fdbc62bf5cca.png)
+
+<br/>
+
+  - 7. 솔루션 다시빌드를 해서 lib파일을 만든다  
+  ![20220902_235502_6](https://user-images.githubusercontent.com/39178978/188177074-6397bf5b-5994-41fb-bb82-8bc98d43be63.png)
+
+<br/>
+
+  - 8. Debug폴더에있는 lib파일을 복사해서 가져다 쓴다
+    - 가져다 쓸때는 A.cpp, A.h를 이용해서 B.lib를 만들었기 때문에 원래 A.cpp는 이제 필요 없어 지지만 A.h파일은 있어야 한다. 따라서 이제 부터 B.lib와 A.h파일을 이용해서 똑같이 작동 시킬 수 있다.
+  - 9. lib파일을 사용하기 위해서 선언해 준다
+    - #pragma comment (lib, "MyCtrolBtn.lib")
+
+###### [MFC라이브러리 만들기](#mfc라이브러리-만들기)
+###### [Top](#top)
