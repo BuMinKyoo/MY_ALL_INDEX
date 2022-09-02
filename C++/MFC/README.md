@@ -97,7 +97,26 @@
 
 
 - <details markdown="1">
-  <summary>Bitmap 리소스, 패턴 브러쉬</summary>
+  <summary>ListBox (리스트박스)</summary>
+  <div markdown="1">
+  
+  - [ListBox (리스트박스)](#listbox-리스트박스)
+    - [변수추가](#변수추가)
+    - [AddString](#addstring)
+    - [InsertString](#insertstring)
+    - [GetText](#gettext)
+    - [다양한 데이터 구조체로 보관해서 활용하기](#다양한-데이터-구조체로-보관해서-활용하기)
+      - SetItemDataPtr
+      - GetCurSel()
+      - LBN_SELCHANGE
+    - [SetItemHeight](#setitemheight)
+
+  </div>
+  </details>
+
+
+- <details markdown="1">
+  <summary>Bitmap 리소스, 패턴 CBrush</summary>
   <div markdown="1">
   
   - [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
@@ -2263,6 +2282,245 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
   - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표) 참고하기
 
 ###### [CImage (사진출력)](#cimage-사진출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ListBox (리스트박스)
+
+  - 목록을 편하게 보관하는 ListBox
+
+    - [변수추가](#변수추가)
+    - [AddString](#addstring)
+    - [InsertString](#insertstring)
+    - [GetText](#gettext)
+    - [다양한 데이터 구조체로 보관해서 활용하기](#다양한-데이터-구조체로-보관해서-활용하기)
+      - SetItemDataPtr
+      - GetCurSel()
+      - LBN_SELCHANGE
+    - [SetItemHeight](#setitemheight)
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 변수추가
+
+  - 리스트 박스에서 마우스 오른쪽 클릭 -> 변수 추가 -> 변수를 추가해서 사용한다
+  - 추가하게 되면, h파일에 ‘변수’, ccp파일에 ‘DDX_Control’이 추가 된다
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# AddString
+
+  - 오름차순(사전순)으로 스트링을 ListBox에 추가한다
+
+#AppDlg.cpp
+~~~c++
+// 현재 ListBox의 변수 : m_MyBox
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	CString str = _T("");
+	GetDlgItemText(IDC_EDIT1, str);
+	m_MyBox.AddString(str);
+}
+~~~
+
+<br/>
+
+![image](https://user-images.githubusercontent.com/39178978/188180052-bb811d75-4bb3-4d46-b749-5dd45b59020e.png)
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# InsertString
+
+  - 원하는 위치에 스트링을 추가한다
+
+#AppDlg.cpp
+~~~c++
+// 현재 ListBox의 변수 : m_MyBox
+// 0번째 자리에 스트링이 추가 된다
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	CString str = _T("");
+	GetDlgItemText(IDC_EDIT1, str);
+	m_MyBox.InsertString(0, str);
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 현재 ListBox의 변수 : m_MyBox
+// -1을 주면 맨 아래쪽에 스트링이 추가된다
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	CString str = _T("");
+	GetDlgItemText(IDC_EDIT1, str);
+	m_MyBox.InsertString(-1, str);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188180223-08da8e1b-bacc-4847-80f2-539fb6639895.png)
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# GetText
+
+  - 원하는 위치의 스트링을 가져온다
+
+#AppDlg.cpp
+~~~c++
+// 현재 ListBox의 변수 : m_MyBox
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	CString str1; //스트링 추가 1
+	CString str2; //스트링 추가 2
+	CString str3; //스트링 추가 3
+	GetDlgItemText(IDC_EDIT1, str1); //스트링 추가 1
+	GetDlgItemText(IDC_EDIT2, str2); //스트링 추가 2
+	GetDlgItemText(IDC_EDIT3, str3); //스트링 추가 3
+
+	CString str4;
+	str4.Format(_T("%s %s %s"), str1, str2, str3);
+
+	int index = m_MyBox.InsertString(0, str4); // 스트링 집어 넣기
+
+	CString s;
+	m_MyBox.GetText(0, s); // 스트링 가져오기
+	SetDlgItemText(IDC_EDIT4, s);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188180581-f59131e8-6d6f-4fe3-a800-e0f243bdebcf.png)
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 다양한 데이터 구조체로 보관해서 활용하기
+
+  - SetItemDataPtr
+    - 데이터를 효과적으로 저장하기 위해서 index에 구조체를 추가한다
+  - 이벤트 처리기추가
+    - ListBox에 마우스 오른쪽 클릭 -> 이벤트 처리기 추가 -> LBN_SELCHANGE 추가하기
+      - 내부 항목을 클릭또는 키보드로 포커스 시에 발생하는 메시지
+  - GetCurSel()
+    - 현재 포커스 되고 있는 커서의 index를 반환
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 현재 ListBox의 변수 : m_MyBox
+// SetItemDataPtr을 활용 하여 index에 같이 구조체 데이어를 보관한다
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	CString str1; //데이터 추가 1
+	CString str2; //데이터 추가 2
+	int str3; //데이터 추가 3
+	GetDlgItemText(IDC_EDIT1, str1); //데이터 추가 1
+	GetDlgItemText(IDC_EDIT2, str2); //데이터 추가 2
+	str3 = GetDlgItemInt(IDC_EDIT3); //데이터 추가 3
+
+	data *p = new data;
+	p->data1 = str1; // CString
+	wcscpy_s(p->data2, 24, str2); // char
+	p->data3 = str3; // int
+	
+	CString str4;
+	str4.Format(_T("%s %s %d"), str1, str2, str3);
+	int index = m_MyBox.InsertString(0, str4); // 스트링 집어 넣기
+	m_MyBox.SetItemDataPtr(index, p); // index에 구조체 데이터 넣기
+}
+
+. . .
+
+// List Box에 추가한 메시지
+// List Box안에 있는 데이터를 포커스 할시에 발생되는 메시지
+// GetItemDataPtr을 사용해서 현재 index에 구조체 데이터를 가져온다
+void CMFCApplication1Dlg::OnLbnSelchangeList1()
+{
+	int index = m_MyBox.GetCurSel(); // 현재 커서의 index가져오기
+	if(LB_ERR != index)
+	{
+		data *p = (data *)m_MyBox.GetItemDataPtr(index); // 저장했던 index에 있던 구조체 가져오기
+
+		SetDlgItemText(IDC_EDIT4, p->data1);
+		SetDlgItemText(IDC_EDIT5, p->data2);
+		SetDlgItemInt(IDC_EDIT6, p->data3);
+	}
+}
+
+. . .
+
+// 종료 전에 메모리 할당했던 구조체를 모두 해제해 준다
+void CMFCApplication1Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	int count = m_MyBox.GetCount(); // 현재 리스트에 있는 갯수
+	data *p;
+	for (int i = 0; i < count; i++)
+	{
+		p = (data *)m_MyBox.GetItemDataPtr(i);
+		delete p;
+	}
+	m_MyBox.ResetContent();
+}
+~~~
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# SetItemHeight
+
+  - 높이를 지정한다
+  - Owner Draw가 Variable일때 인덱스를 바꾸면 각각의 Height를 조절 가능하다
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	for(int i = 0; i < 10; i++)
+	{
+		m_MyBox.AddString(_T("1"));
+	}
+
+	m_MyBox.SetItemHeight(1, 50); 
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188181211-95125b4f-d185-4cbb-b659-062c970e0902.png)
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
 ###### [Top](#top)
 
 <br/>
