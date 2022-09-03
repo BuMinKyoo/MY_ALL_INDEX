@@ -122,6 +122,20 @@
 
 
 - <details markdown="1">
+  <summary>ListControl (리스트컨트롤)</summary>
+  <div markdown="1">
+  
+  - [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+    - [칼럼 초기 설정](#칼럼 초기 설정)
+    - [LVCF_FMT 및 기타 속성들](#LVCF_FMT 및 기타 속성들)
+    - [칼럼에 데이터 추가하기](#칼럼에 데이터 추가하기)
+    - [LVN_ITEMCHANGED 메시지](#LVN_ITEMCHANGED 메시지)
+
+  </div>
+  </details>
+
+
+- <details markdown="1">
   <summary>Bitmap 리소스, 패턴 CBrush</summary>
   <div markdown="1">
   
@@ -2732,6 +2746,333 @@ HBRUSH CMFCApplication2Dlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 ![image](https://user-images.githubusercontent.com/39178978/188250764-7a84478e-2bca-48a5-b44d-ff903f1fc732.png)
 
 ###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ListControl (리스트컨트롤)
+
+  - 목록을 편하게 보관하는 ListControl.
+  - ListBox 보다 더 기능이 많은 컨트롤이다
+  - 컨트롤 속성에 ‘View’에 다양한 모드가 있으며 Report모드가 일반적임으로 아래 예시는, Report모드를 사용하여 설명한다
+  - 변수추가
+    - 리스트 박스에서 마우스 오른쪽 클릭 -> 변수 추가 -> 변수를 추가해서 사용한다
+    - 추가하게 되면, h파일에 ‘변수’, ccp파일에 ‘DDX_Control’이 추가 된다
+    - 현재 List Control의 변수 : m_My_LCbox
+
+<br/>
+
+    - [칼럼 초기 설정](#칼럼 초기 설정)
+    - [LVCF_FMT 및 기타 속성들](#LVCF_FMT 및 기타 속성들)
+    - [칼럼에 데이터 추가하기](#칼럼에 데이터 추가하기)
+    - [LVN_ITEMCHANGED 메시지](#LVN_ITEMCHANGED 메시지)
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 칼럼 초기 설정
+
+~~~c++
+// 원형
+LVCOLUMN
+typedef struct tagLVCOLUMNW
+{
+    UINT mask;
+    int fmt;
+    int cx;
+    LPWSTR pszText;
+    int cchTextMax;
+    int iSubItem;
+    int iImage;
+    int iOrder;
+#if (NTDDI_VERSION >= NTDDI_VISTA) 
+    int cxMin;       // min snap point
+    int cxDefault;   // default snap point
+    int cxIdeal;     // read only. ideal may not eqaul current width if auto sized (LVS_EX_AUTOSIZECOLUMNS) to a lesser width.
+#endif
+} LVCOLUMNW, *LPLVCOLUMNW;
+~~~
+
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 초기 설정을 지정하기 위해서 LVCOLUMN을 살펴 보면 다양한 변수들이 있고 이중에서 넣을 변수만 쓴다고 하는 플래그를 사용해서 이용한다
+BOOL CMFCApplication3Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_My_LCbox.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 80;
+	m_My_LCbox.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188251051-d4a6d640-00a7-4344-8740-2344bde7f52b.png)
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# LVCF_FMT
+
+  - 설정중에서 LVCF_FMT을 이용해서 칼럼 중간에 표시하기
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication3Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_My_LCbox.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 100;
+	add_column.fmt = LVCFMT_CENTER;
+	m_My_LCbox.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188251087-9699762f-a2f9-42cf-aee8-e8eef5f1f19f.png)
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 컬럼에 데이터 추가하기
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication3Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_My_LCbox.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 100;
+	add_column.fmt = LVCFMT_CENTER;
+	m_My_LCbox.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+void CMFCApplication3Dlg::OnBnClickedButton1()
+{
+	CString str;
+	GetDlgItemText(IDC_EDIT1, str);
+
+	LV_ITEM add_item;
+	add_item.mask = LVIF_TEXT;
+	add_item.iItem = 0; // n번째 열에 입력
+
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 0; // 0번째 데이터에 입력
+	m_My_LCbox.InsertItem(&add_item);
+
+	GetDlgItemText(IDC_EDIT2, str);
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 1; // 0번째 데이터에 입력
+	m_My_LCbox.SetItem(&add_item);
+}
+~~~
+
+<br/>
+
+~~~c++
+add_item.pszText = (wchar_t *)(const wchar_t *)str;
+add_item.iSubItem = 1; // 0번째 데이터에 입력
+m_My_LCbox.SetItem(&add_item);
+이렇게 3줄 대신에
+
+m_My_LCbox.SetItemText(0, 1, str);
+
+이렇게 한줄로 대체 가능하다
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188251129-423543b5-ae99-4d8b-9efb-d4cb7b4b2bfd.png)
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# SetExtendedStyle (열 전체를 선택하기)
+
+  - 추가 속성을 지정 할 수 있다
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication3Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_My_LCbox.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 100;
+	add_column.fmt = LVCFMT_CENTER;
+	m_My_LCbox.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+
+	m_My_LCbox.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+void CMFCApplication3Dlg::OnBnClickedButton1()
+{
+	CString str;
+	GetDlgItemText(IDC_EDIT1, str);
+
+	LV_ITEM add_item;
+	add_item.mask = LVIF_TEXT;
+	add_item.iItem = 0; // n번째 열에 입력
+
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 0; // 0번째 데이터에 입력
+	m_My_LCbox.InsertItem(&add_item);
+
+	GetDlgItemText(IDC_EDIT2, str);
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 1; // 0번째 데이터에 입력
+	m_My_LCbox.SetItem(&add_item);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188251162-515f32b3-c43a-438e-9dde-1295a02fb64d.png)
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# LVN_ITEMCHANGED
+
+  - LVN_ITEMCHANGED
+    - 항목을 바꾸거나 갱신 및 변경 됐을때 들어오는 메시지
+    - List Control 마우스 오른쪽 클릭 -> 이벤트 처리기 추가 -> LVN_ITEMCHANGED
+  - GetItemText
+    - 문자열 반환 하기
+  - LVS_NOCOLUMNH
+    - 해더 제거
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication3Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_My_LCbox.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 100;
+	add_column.fmt = LVCFMT_CENTER;
+	m_My_LCbox.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+
+	m_My_LCbox.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+void CMFCApplication3Dlg::OnBnClickedButton1()
+{
+	CString str;
+	GetDlgItemText(IDC_EDIT1, str);
+
+	LV_ITEM add_item;
+	add_item.mask = LVIF_TEXT;
+	add_item.iItem = 0; // n번째 열에 입력
+
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 0; // 0번째 데이터에 입력
+	m_My_LCbox.InsertItem(&add_item);
+
+	GetDlgItemText(IDC_EDIT2, str);
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 1; // 0번째 데이터에 입력
+	m_My_LCbox.SetItem(&add_item);
+
+	m_My_LCbox.SetItemText(0, 1, str);
+}
+
+. . .
+
+// 리스트 목록을 클릭하면 IDC컨트롤에 그 목록을 추출해서 출력한다
+void CMFCApplication3Dlg::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// NMLISTVIEW *pNMLV == LPNMLISTVIEW pNMLV
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	
+	if(pNMLV->uNewState & LVIS_SELECTED) // 선택 되었을때
+	{
+		SetDlgItemText(IDC_EDIT1, m_My_LCbox.GetItemText(pNMLV->iItem, 0));
+		SetDlgItemText(IDC_EDIT2, m_My_LCbox.GetItemText(pNMLV->iItem, 1));
+	}
+	
+	*pResult = 0;
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188251223-905c437e-5f87-4bf2-bfe0-40922dfce700.png)
+
+<br/>
+
+~~~c++
+// 이것을 추가 하게 되면 맨 위 컬럼이 숨기기가 된다
+m_My_LCbox.ModifyStyle(0, LVS_NOCOLUMNHEADER);
+~~~
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
 ###### [Top](#top)
 
 <br/>
