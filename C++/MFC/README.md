@@ -110,6 +110,12 @@
       - GetCurSel()
       - LBN_SELCHANGE
     - [SetItemHeight](#setitemheight)
+    - [OwnerDraw 사용하기](#ownerdraw-사용하기)
+      - 배경 컬러 바꾸기
+      - 텍스트 출력하기
+      - itemAction을 이용해 상황에 따른 그리기
+      - ODS_SELECTED, ODA_DRAWENTIRE...Etc
+      - List Box 배경색 지정
 
   </div>
   </details>
@@ -2302,6 +2308,12 @@ void CMFCApplication1Dlg::OnSize(UINT nType, int cx, int cy)
       - GetCurSel()
       - LBN_SELCHANGE
     - [SetItemHeight](#setitemheight)
+    - [OwnerDraw 사용하기](#ownerdraw-사용하기)
+      - 배경 컬러 바꾸기
+      - 텍스트 출력하기
+      - itemAction을 이용해 상황에 따른 그리기
+      - ODS_SELECTED, ODA_DRAWENTIRE...Etc
+      - List Box 배경색 지정
 
 ###### [ListBox (리스트박스)](#listbox-리스트박스)
 ###### [Top](#top)
@@ -2519,6 +2531,205 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 ~~~
 
 ![image](https://user-images.githubusercontent.com/39178978/188181211-95125b4f-d185-4cbb-b659-062c970e0902.png)
+
+###### [ListBox (리스트박스)](#listbox-리스트박스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# OwnerDraw 사용하기
+
+  - Owner Draw 를 사용할때는 Has Strings도 꼭 True로 해야 한다 Has Strings을 하지 않으면 String을 저장하는데 에러가 있으며  InsertString, AddString을 사용하는데 문제가 된다
+  - Owner Draw 로 바꾸고 에러가 생기는 것은 Owner Draw작업을 전혀 하지 않았기 때문이다.(작업을 해줘야 없어짐 ㅇㅇ)
+    - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_DRAWITEM 추가하고 작업하면 에러가 없어 진다
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - Owner Draw 에러 없애기
+
+#AppDlg.cpp
+~~~c++
+// List Box의 ID가 IDC_LIST1일 경우
+// 이렇게 하면 에러가 없어 진다.
+// 아무것도 그리지 않았으면 안에 내용물도 다 없어 진다
+void CMFCApplication2Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+
+	}
+	else CDialogEx::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 배경 컬러 바꾸기
+
+#AppDlg.cpp
+~~~c++
+// 현재 추가한 string이 10개 정도 되고, 따로 지정하지 않으면 10개 전부 따로 WM_DRAWITEM가 들어오게 된다. string을 출력하지 않았지만 배경만 출력 했으므로, string이 있는 공간 만큼의 배경이 바뀌게 된다 
+void CMFCApplication2Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		CDC *p_dc = CDC::FromHandle(lp->hDC); //위도우 핸들이 넘어오기 때문에 그것을 그림을 그리는 CD로 변환해서 MFC에서 사용하기(win32는 그냥 사용가능)
+		p_dc->FillSolidRect(&lp->rcItem, RGB(128, 0, 128));
+
+	}
+	else CDialogEx::OnDrawItem(nIDCtl, lp);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188250631-5122e91b-ea6b-4098-925f-34eea5de647f.png)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 텍스트 출력하기
+
+#AppDlg.cpp
+~~~c++
+// 현재 추가한 string이 10개 정도 되고, 따로 지정하지 않으면 10개 전부 따로 WM_DRAWITEM가 들어오게 된다. 각각이 TextOut으로 지정된 곳에 출력된다
+void CMFCApplication2Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		CDC *p_dc = CDC::FromHandle(lp->hDC); //위도우 핸들이 넘어오기 때문에 그것을 그림을 그리는 CD로 변환해서 MFC에서 사용하기(win32는 그냥 사용가능)
+
+		CString str;
+		m_MyBox.GetText(lp->itemID, str);
+		p_dc->SetTextColor(RGB(0, 255, 0)); // 텍스트 컬러 지정
+		p_dc->TextOut(lp->rcItem.left + 2, lp->rcItem.top + 2, str); // 왼쪽에서 2만큼 위쪽에서 2만큼 떨어진 곳에서 텍스트를 그리라는것
+		
+	}
+	else CDialogEx::OnDrawItem(nIDCtl, lp);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188250658-62f8d974-516a-4f25-a647-90c3a3e0560a.png)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - itemAction을 이용해 상황에 따른 그리기
+    - OnDrawItem은 다른 이유때문에 호출이 많기 때문에 계속 호출하게 되면 장치 DC가 무리가 되어 깜박거리는 현상이 발생하게 된다. 따라서 특정한 상황에서만 다시 그리는 것이 좋다
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication2Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
+{
+	// ODA_DRAWENTIRE : 일부나 전체가 지워져서 다시 그림
+	// ODA_FOCUS : 포커스되서 다시 그림
+	// ODA_SELECT : 선택되서 다시 그림
+
+	if (nIDCtl == IDC_LIST1)
+	{
+		if((lp->itemAction & ODA_DRAWENTIRE) || (lp->itemAction & ODA_FOCUS) || (lp->itemAction & ODA_SELECT))
+		{
+			CDC *p_dc = CDC::FromHandle(lp->hDC); //위도우 핸들이 넘어오기 때문에 그것을 그림을 그리는 CD로 변환해서 MFC에서 사용하기(win32는 그냥 사용가능)
+			p_dc->FillSolidRect(&lp->rcItem, RGB(128, 0, 128));
+
+			CString str;
+			m_MyBox.GetText(lp->itemID, str);
+			p_dc->SetTextColor(RGB(0, 255, 0)); // 텍스트 컬러 지정
+			p_dc->TextOut(lp->rcItem.left + 2, lp->rcItem.top + 2, str); // 왼쪽에서 2만큼 위쪽에서 2만큼 떨어진 곳에서 텍스트를 그리라는것
+		}
+	}
+	else CDialogEx::OnDrawItem(nIDCtl, lp);
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 선택 되어 있는 항목, 안되어 있는 항목 컬러 변경
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication2Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
+{
+	// ODA_DRAWENTIRE : 일부나 전체가 지워져서 다시 그림
+	// ODA_FOCUS : 포커스되서 다시 그림
+	// ODA_SELECT : 선택되서 다시 그림
+
+	if (nIDCtl == IDC_LIST1)
+	{
+		if((lp->itemAction & ODA_DRAWENTIRE) || (lp->itemAction & ODA_FOCUS) || (lp->itemAction & ODA_SELECT))
+		{
+			CDC *p_dc = CDC::FromHandle(lp->hDC); //위도우 핸들이 넘어오기 때문에 그것을 그림을 그리는 CD로 변환해서 MFC에서 사용하기(win32는 그냥 사용가능)
+
+			if(lp->itemState & ODS_SELECTED)
+				p_dc->FillSolidRect(&lp->rcItem, RGB(0, 0, 128));
+			else
+				p_dc->FillSolidRect(&lp->rcItem, RGB(128, 0, 128));
+			CString str;
+			m_MyBox.GetText(lp->itemID, str);
+			p_dc->SetTextColor(RGB(0, 255, 0)); // 텍스트 컬러 지정
+			p_dc->TextOut(lp->rcItem.left + 2, lp->rcItem.top + 2, str); // 왼쪽에서 2만큼 위쪽에서 2만큼 떨어진 곳에서 텍스트를 그리라는것
+		}
+	}
+	else CDialogEx::OnDrawItem(nIDCtl, lp);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188250703-69d5ee54-57f3-4869-9806-4eea761d5ade.png)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - List Box 배경색 지정(OnCtlColor 사용)
+    - 리스트가 많지 않을때 List Box 의 배경색은 바껴있지 않고, 리스트 목록 배경색만 바껴 있게 되기 때문에 일반 배경색도 바꿔줘야 한다.
+
+#AppDlg.h
+~~~c++
+private:
+	CBrush m_MyBox_bk;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// CBrush는 생성자에 만들어도 되며 OnInitDialog에 만들어도 되고 OnCtlColor에 만들어도 된다(OnCtlColor는 다른이유로도 작동 되기 때문에 비효율적)
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	m_MyBox_bk.CreateSolidBrush(RGB(128, 0, 128));
+
+}
+
+. . .
+
+// WM_CTLCOLOR메시지를 추가하여 작업한다
+HBRUSH CMFCApplication2Dlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	if (pWnd->GetDlgCtrlID() == IDC_LIST1)
+	{
+		hbr = m_MyBox_bk;
+	}
+
+	return hbr;
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188250754-2a4503a4-2f3c-43c3-81c5-a5450e66d9cd.png)
+
+<br/>
+
+![image](https://user-images.githubusercontent.com/39178978/188250764-7a84478e-2bca-48a5-b44d-ff903f1fc732.png)
 
 ###### [ListBox (리스트박스)](#listbox-리스트박스)
 ###### [Top](#top)
