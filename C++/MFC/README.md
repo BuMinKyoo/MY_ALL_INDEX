@@ -153,6 +153,7 @@
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 - [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
 - [MFC라이브러리 만들기](#mfc라이브러리-만들기)
+- [사용자정의 윈도우 만들기](#사용자정의-윈도우-만들기)
 
 
 <br/>
@@ -3560,4 +3561,46 @@ GetParent()->PostMessage(20000, MAKEWPARAM(GetDlgCtrlID(), 1), (LPARAM)m_hWnd);
     - #pragma comment (lib, "MyCtrolBtn.lib")
 
 ###### [MFC라이브러리 만들기](#mfc라이브러리-만들기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 사용자정의 윈도우 만들기
+
+  - 윈도우안에 개별 윈도우를 만들어서 관리를 편하게 할 수 있다.
+  - 클래스마법사 -> 클래스 추가 -> MFC클래스 -> 기본 클래스 (CWnd)
+    - 일반 적인 사용자 정의 윈도는 기본 클래스인 CWnd을 상속 받아서 만드는 것이 좋다
+    - CWnd로 만들어진 윈도우를 생성하는 클래스는 Create() 클래스를 사용 하면 된다
+    - 그림을 그리기 위해서는 CWnd를 상속받은 클래스 안에 onPaint를 받는 함수를 정의해서 그림을 그리면 된다.
+
+<br/>
+
+#AppDlg.h
+~~~c++
+// 인클루드 하기, 선언하기
+#include "m_MyWin.h"
+private:
+	m_MyWin m_Mywin;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication3Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	m_Mywin.Create(NULL, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, CRect(50, 50, 200, 200), this, 25000);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/188251366-0a0629c4-0550-42b1-abb3-9b7024c2de56.png)
+
+###### [사용자정의 윈도우 만들기](#사용자정의-윈도우-만들기)
 ###### [Top](#top)
