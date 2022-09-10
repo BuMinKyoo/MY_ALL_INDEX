@@ -153,6 +153,7 @@
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 - [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
 - [MFC라이브러리 만들기](#mfc라이브러리-만들기)
+- [dll 만들어 사용하기](#dll-만들어-사용하기)
 - [사용자정의 윈도우 만들기](#사용자정의-윈도우-만들기)
 
 
@@ -3561,6 +3562,105 @@ GetParent()->PostMessage(20000, MAKEWPARAM(GetDlgCtrlID(), 1), (LPARAM)m_hWnd);
     - #pragma comment (lib, "MyCtrolBtn.lib")
 
 ###### [MFC라이브러리 만들기](#mfc라이브러리-만들기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# dll 만들어 사용하기
+  - 1. ‘Windows 데스크톱 마법사’로 프로젝트 만들기
+![20220910_232004](https://user-images.githubusercontent.com/39178978/189487566-59866a5a-f4a2-43de-953a-5d859a76527c.png)
+
+<br/>
+  
+  - 2. 동적 연결 라이브러리, 미리 컴파일된 헤더 클릭
+![20220910_232052](https://user-images.githubusercontent.com/39178978/189487591-3820a3b1-0958-4f47-b32d-5fb1080a2b9a.png)
+  
+<br/>
+
+  - 3. dllmain.cpp에서 작업 진행하기
+![20220910_232156](https://user-images.githubusercontent.com/39178978/189487640-3182dbbc-99d2-4df4-a3b6-e58860cbc204.png)
+
+<br/>
+
+아래 공간에 작업 진행  
+![20220910_232200](https://user-images.githubusercontent.com/39178978/189487665-940b96d1-8472-4fdd-81a5-443f6f0b8ee6.png)
+
+<br/>
+
+  - 4. 작업진행
+    - __declspec(dllexport) : 일반적으로 함수를 어떤 cpp안에서 선언하면, 다른 cpp에서 사용이 불가 하지만, 그것을 밖에서 함수를 호출할 수 있게 해준다
+    - extern "C" : c++컴파일러는 함수를 컴파일할때 함수의 이름을 임의로 수정하기 때문에 함수의 이름을 유지시켜줘야 밖에서 호출 할 수 있는데, C언어 방식으로 컴파일을 하면 가능하다, 즉 C언어 방식으로 컴파일 하게 해준다
+
+#dllmain.cpp
+~~~c++
+// dllmain.cpp : DLL 애플리케이션의 진입점을 정의합니다.
+#include "pch.h"
+
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+                     )
+{
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+    case DLL_PROCESS_DETACH:
+        break;
+    }
+    return TRUE;
+}
+
+extern "C" __declspec(dllexport) int Sum(int a, int b)
+{
+    return a + b;
+}
+~~~
+
+<br/>
+
+  - 5. 솔루션 빌드 해서 dll파일 만들기
+![20220910_232422](https://user-images.githubusercontent.com/39178978/189487734-bfa51e7c-f262-42b3-ae57-15369f9d27fe.png)
+
+<br/>
+
+  - 6. dll파일을, 사용할 프로젝트 폴더에 복사해 넣기
+![20220910_232456](https://user-images.githubusercontent.com/39178978/189487764-219a128b-31df-4d40-a3ff-1e49a3bd29fd.png)
+
+<br/>
+
+  - 7. LoadLibrary함수를 사용해서 DLL파일 연결하기
+  - 8. GetProcAddress함수를 사용해서, DLL파일에서 사용할 함수 이름을 찾아서 사용하기
+    - 함수포인터 선언 필요
+    - GetProcAddress함수는 FARPROC형식으로 값을 반환하기 때문에 함수에 맞게 형식 변환 필요
+  - 9. 함수 사용
+  - 10. DLL연결 해제하기
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	HMODULE dll = LoadLibrary(_T("Mydll.dll")); // LoadLibrary함수를 사용해서 DLL파일 연결하기
+
+	int (*p)(int, int); // 함수포인터 선언 필요
+
+	// GetProcAddress함수를 사용해서, DLL파일에서 사용할 함수 이름을 찾아서 사용하기
+	// GetProcAddress함수는 FARPROC형식으로 값을 반환하기 때문에 함수에 맞게 형식 변환 필요
+	p = (int(*)(int, int))GetProcAddress(dll, "Sum");
+
+	int n = (*p)(1, 2); // 함수 사용
+	SetDlgItemInt(IDC_EDIT1, n);
+	FreeLibrary(dll); // DLL연결 해제하기
+}
+~~~
+
+###### [dll 만들어 사용하기](#dll-만들어-사용하기)
 ###### [Top](#top)
 
 <br/>
