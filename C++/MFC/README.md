@@ -126,10 +126,11 @@
   <div markdown="1">
   
   - [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
-    - [칼럼 초기 설정](#칼럼 초기 설정)
-    - [LVCF_FMT 및 기타 속성들](#LVCF_FMT 및 기타 속성들)
-    - [칼럼에 데이터 추가하기](#칼럼에 데이터 추가하기)
-    - [LVN_ITEMCHANGED 메시지](#LVN_ITEMCHANGED 메시지)
+    - [칼럼 초기 설정](#칼럼-초기-설정)
+    - [LVCF_FMT 및 기타 속성들](#lvcf_fmt-및-기타-속성들)
+    - [칼럼에 데이터 추가하기](#칼럼에-데이터-추가하기)
+    - [SetExtendedStyle (열 전체를 선택하기)](#setextendedstyle-열-전체를-선택하기)
+    - [LVN_ITEMCHANGED 메시지](#lvn_itemchanged-메시지)
 
   </div>
   </details>
@@ -2767,10 +2768,11 @@ HBRUSH CMFCApplication2Dlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 
 <br/>
 
-    - [칼럼 초기 설정](#칼럼 초기 설정)
-    - [LVCF_FMT 및 기타 속성들](#LVCF_FMT 및 기타 속성들)
-    - [칼럼에 데이터 추가하기](#칼럼에 데이터 추가하기)
-    - [LVN_ITEMCHANGED 메시지](#LVN_ITEMCHANGED 메시지)
+  - [칼럼 초기 설정](#칼럼-초기-설정)
+  - [LVCF_FMT 및 기타 속성들](#lvcf_fmt-및-기타-속성들)
+  - [칼럼에 데이터 추가하기](#칼럼에-데이터-추가하기)
+  - [SetExtendedStyle (열 전체를 선택하기)](#setextendedstyle-열-전체를-선택하기)
+  - [LVN_ITEMCHANGED 메시지](#lvn_itemchanged-메시지)
 
 ###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
 ###### [Top](#top)
@@ -2832,7 +2834,7 @@ BOOL CMFCApplication3Dlg::OnInitDialog()
 <br/>
 <br/>
 
-# LVCF_FMT
+# LVCF_FMT 및 기타 속성들
 
   - 설정중에서 LVCF_FMT을 이용해서 칼럼 중간에 표시하기
 
@@ -2865,7 +2867,7 @@ BOOL CMFCApplication3Dlg::OnInitDialog()
 <br/>
 <br/>
 
-# 컬럼에 데이터 추가하기
+# 칼럼에 데이터 추가하기
 
 #AppDlg.cpp
 ~~~c++
@@ -2990,7 +2992,7 @@ void CMFCApplication3Dlg::OnBnClickedButton1()
 <br/>
 <br/>
 
-# LVN_ITEMCHANGED
+# LVN_ITEMCHANGED 메시지
 
   - LVN_ITEMCHANGED
     - 항목을 바꾸거나 갱신 및 변경 됐을때 들어오는 메시지
