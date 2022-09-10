@@ -116,6 +116,7 @@
       - itemAction을 이용해 상황에 따른 그리기
       - ODS_SELECTED, ODA_DRAWENTIRE...Etc
       - List Box 배경색 지정
+      - Owner Draw : Variable을 사용해서 각각의 데이터의 height를 조절하기
 
   </div>
   </details>
@@ -2747,6 +2748,57 @@ HBRUSH CMFCApplication2Dlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 <br/>
 
 ![image](https://user-images.githubusercontent.com/39178978/188250764-7a84478e-2bca-48a5-b44d-ff903f1fc732.png)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - Owner Draw : Variable을 사용해서 각각의 데이터의 height를 조절하기
+    - Owner Draw : Variable을 사용하게 되면 오류가 발생할때가 있는데 그것은 WM_MEASUREITEM메시지가 없기 때문임으로 추가해 주면 된다.
+      - 프로젝트 -> 클래스 마법사 -> 메세지 -> WM_MEASUREITEM 추가하기(AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
+    - Owner Draw : Fixed 일때는 WM_MEASUREITEM가 단1번만 들어오는데 반해서 Owner Draw : Variable일때는 데이터 갯수마다 메시지가 들어오게된다
+
+#AppDlg.cpp
+~~~c++
+// itemID으로 각 데이터를 구분해서 필요한 데이터행에만 적용 시킬 수 있다.
+void CMFCApplication4Dlg::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		if (lp->itemID == 0)
+			lp->itemHeight += 20;
+	}
+	else
+		CDialogEx::OnMeasureItem(nIDCtl, lp);
+}
+
+
+void CMFCApplication4Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		if((lp->itemAction & ODA_DRAWENTIRE) || (lp->itemAction & ODA_FOCUS) || (lp->itemAction & ODA_SELECT))
+		{
+			CDC *p_dc = CDC::FromHandle(lp->hDC); //위도우 핸들이 넘어오기 때문에 그것을 그림을 그리는 CD로 변환해서 MFC에서 사용하기(win32는 그냥 사용가능)
+
+			if(lp->itemState & ODS_SELECTED)
+				p_dc->FillSolidRect(&lp->rcItem, RGB(0, 0, 128));
+			else
+				p_dc->FillSolidRect(&lp->rcItem, RGB(128, 0, 128));
+			CString str;
+			m_MyBox.GetText(lp->itemID, str);
+			p_dc->SetTextColor(RGB(0, 255, 0)); // 텍스트 컬러 지정
+			p_dc->TextOut(lp->rcItem.left + 2, lp->rcItem.top + 2, str); // 왼쪽에서 2만큼 위쪽에서 2만큼 떨어진 곳에서 텍스트를 그리라는것
+		}
+	}
+	else
+		CDialogEx::OnDrawItem(nIDCtl, lp);
+}
+~~~
+
+<br/>
+
+![20220910_235222](https://user-images.githubusercontent.com/39178978/189488804-029e7d34-0d10-4d5b-a4f3-4c5d257196e8.png)
 
 ###### [ListBox (리스트박스)](#listbox-리스트박스)
 ###### [Top](#top)
