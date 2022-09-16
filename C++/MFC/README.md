@@ -132,6 +132,9 @@
     - [칼럼에 데이터 추가하기](#칼럼에-데이터-추가하기)
     - [SetExtendedStyle (열 전체를 선택하기)](#setextendedstyle-열-전체를-선택하기)
     - [LVN_ITEMCHANGED 메시지](#lvn_itemchanged-메시지)
+    - [SetTextColor,SetTextBkColor](#settextcolorsettextbkcolor)
+    - [Owner Draw,GetItemText,MeasureItem](#owner-drawgetitemtextmeasureitem)
+    - [추가 작업 진행](#추가-작업-진행)
 
   </div>
   </details>
@@ -2825,6 +2828,9 @@ void CMFCApplication4Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
   - [칼럼에 데이터 추가하기](#칼럼에-데이터-추가하기)
   - [SetExtendedStyle (열 전체를 선택하기)](#setextendedstyle-열-전체를-선택하기)
   - [LVN_ITEMCHANGED 메시지](#lvn_itemchanged-메시지)
+  - [SetTextColor,SetTextBkColor](#settextcolorsettextbkcolor)
+  - [Owner Draw,GetItemText,MeasureItem](#owner-drawgetitemtextmeasureitem)
+  - [추가 작업 진행](#추가-작업-진행)
 
 ###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
 ###### [Top](#top)
@@ -3127,6 +3133,290 @@ void CMFCApplication3Dlg::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 // 이것을 추가 하게 되면 맨 위 컬럼이 숨기기가 된다
 m_My_LCbox.ModifyStyle(0, LVS_NOCOLUMNHEADER);
 ~~~
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# SetTextColor,SetTextBkColor
+
+  - SetTextColor(목록 텍스트 컬러 변경)
+  - SetTextBkColor(목록 텍스트 배경 컬러 변경)
+
+#AppDlg.cpp
+~~~c++
+// m_MyList : List Control의 멤버 변수 이름
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_MyList.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 100;
+	m_MyList.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+
+	m_MyList.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+
+	m_MyList.SetTextColor(RGB(100,200,100)); // 텍스트 컬러 변경
+m_MyList.SetTextBkColor(RGB(0, 0, 0)); // 텍스트 배경 컬러 변경
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+
+void CMFCApplication5Dlg::OnBnClickedButton1()
+{
+	CString str;
+	GetDlgItemText(IDC_EDIT1, str);
+
+	LV_ITEM add_item;
+	add_item.mask = LVIF_TEXT;
+	add_item.iItem = 0; // n번째 열에 입력
+
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 0; // 0번째 데이터에 입력
+	m_MyList.InsertItem(&add_item);
+
+	GetDlgItemText(IDC_EDIT2, str);
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 1; // 0번째 데이터에 입력
+	m_MyList.SetItem(&add_item);
+}
+~~~
+
+![20220916_220044](https://user-images.githubusercontent.com/39178978/190644763-c2c9e30a-9b4c-4638-bb4c-5f3101ba28b9.png)
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Owner Draw,GetItemText,MeasureItem
+
+  - Owner Draw로 커스텀으로 그리기 위해서는, 속성창에서 Owner Draw Fixed : True로 수정후 작업을 진행해야함
+    - 클릭시 컬러 변경 및 텍스트 출력 및 목록별 컬러변경 등 다양한 작업 가능
+  - MeasureItem : 그려질때 한번 호출되기 때문에, 여기서 각 행의 높이를 설정함
+  - GetItemText : 텍스트 가져오기
+
+#AppDlg.cpp
+~~~c++
+// m_MyList : List Control의 멤버 변수 이름
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_MyList.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 100;
+	m_MyList.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+
+	m_MyList.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+void CMFCApplication5Dlg::OnBnClickedButton1()
+{
+	CString str;
+	GetDlgItemText(IDC_EDIT1, str);
+
+	LV_ITEM add_item;
+	add_item.mask = LVIF_TEXT;
+	add_item.iItem = 0; // n번째 열에 입력
+
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 0; // 0번째 데이터에 입력
+	m_MyList.InsertItem(&add_item);
+
+	GetDlgItemText(IDC_EDIT2, str);
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 1; // 0번째 데이터에 입력
+	m_MyList.SetItem(&add_item);
+}
+
+. . .
+
+void CMFCApplication5Dlg::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		lp->itemHeight += 20;
+	}
+	else
+		CDialogEx::OnMeasureItem(nIDCtl, lp);
+}
+
+. . .
+
+void CMFCApplication5Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		if((lp->itemAction & ODA_DRAWENTIRE) || (lp->itemAction & ODA_FOCUS) || (lp->itemAction & ODA_SELECT))
+		{
+			CDC *p_dc = CDC::FromHandle(lp->hDC);
+
+			if(lp->itemState & ODS_SELECTED)
+				p_dc->FillSolidRect(&lp->rcItem, RGB(100, 235, 235));
+			else if(lp->itemID % 2 == 0)
+				p_dc->FillSolidRect(&lp->rcItem, RGB(235, 235, 235));
+			else
+				p_dc->FillSolidRect(&lp->rcItem, RGB(255, 255, 255));
+
+			CString str1 = m_MyList.GetItemText(lp->itemID, 0);
+			CString str2 = m_MyList.GetItemText(lp->itemID, 1);
+
+			p_dc->TextOut(lp->rcItem.left + 2, lp->rcItem.top + 2, str1);
+			p_dc->TextOut(lp->rcItem.left + 86, lp->rcItem.top + 2, str2);
+		}
+	}
+	else
+		CDialogEx::OnDrawItem(nIDCtl, lp);
+}
+~~~
+
+![20220916_221049](https://user-images.githubusercontent.com/39178978/190646567-d5df0643-baa7-4d23-9865-bc1e8f465959.png)
+
+###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 추가 작업 진행
+
+  - ctrl을 클릭 하지않고 메뉴를 선택하는 것처럼 클릭된 곳에 컬러 표시를 나게 하는 작업진행
+  - 항목 데이터를 클릭하게 되면 연속으로 OnDrawItem이 두번 호출되서 ODS_SELECTED로 두번 넘어오게 되는 현상이 발생하게 되어서, 마우스 클릭시 에러사항이 발생함
+    - GotoDlgCtrl을 사용하여 선택 포커스를 다른곳으로 옮김으로써 옮길때 한번 발생되는 메시지로 컬러를 변경하도록 함
+
+
+#AppDlg.h
+~~~c++
+public:
+	int flage[10];
+~~~
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	for (int i = 0; i < 10; i++)
+	{
+		flage[i] = 0;
+	}
+
+	LVCOLUMN add_column;
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("aaaa");
+	add_column.cx = 80;
+	m_MyList.InsertColumn(0, &add_column); // 0번째 칼럼에 설정한다
+
+	add_column.mask = LVCF_TEXT | LVCF_WIDTH;
+	add_column.pszText = _T("bbbb");
+	add_column.cx = 100;
+	m_MyList.InsertColumn(1, &add_column); // 0번째 칼럼에 설정한다
+
+	//m_MyList.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+	m_MyList.SetExtendedStyle(LVS_EX_GRIDLINES);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+void CMFCApplication5Dlg::OnBnClickedButton1()
+{
+	CString str;
+	GetDlgItemText(IDC_EDIT1, str);
+
+	LV_ITEM add_item;
+	add_item.mask = LVIF_TEXT;
+	add_item.iItem = 0; // n번째 열에 입력
+
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 0; // 0번째 데이터에 입력
+	m_MyList.InsertItem(&add_item);
+
+	GetDlgItemText(IDC_EDIT2, str);
+	add_item.pszText = (wchar_t *)(const wchar_t *)str;
+	add_item.iSubItem = 1; // 0번째 데이터에 입력
+	m_MyList.SetItem(&add_item);
+}
+
+. . .
+
+void CMFCApplication5Dlg::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		lp->itemHeight += 20;
+	}
+	else
+		CDialogEx::OnMeasureItem(nIDCtl, lp);
+}
+
+. . .
+
+void CMFCApplication5Dlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lp)
+{
+	if (nIDCtl == IDC_LIST1)
+	{
+		if((lp->itemAction & ODA_DRAWENTIRE) || (lp->itemAction & ODA_FOCUS) || (lp->itemAction & ODA_SELECT))
+		{
+			CDC *p_dc = CDC::FromHandle(lp->hDC);
+
+			if(lp->itemState & ODS_SELECTED)
+			{
+				GotoDlgCtrl(GetDlgItem(IDC_BUTTON1)); // 컨트롤 포커스를 다른 곳으로 넘기면서 더이상 호출되지 않게 만든다
+
+				if (flage[lp->itemID] == 1)
+					flage[lp->itemID] = 0;
+				else
+					flage[lp->itemID] = 1;	
+			}
+
+			if (flage[lp->itemID] == 1)
+				p_dc->FillSolidRect(&lp->rcItem, RGB(100, 235, 235));
+			else
+				p_dc->FillSolidRect(&lp->rcItem, RGB(255, 255, 255));
+
+			CString str1 = m_MyList.GetItemText(lp->itemID, 0);
+			CString str2 = m_MyList.GetItemText(lp->itemID, 1);
+
+			p_dc->TextOut(lp->rcItem.left + 2, lp->rcItem.top + 2, str1);
+			p_dc->TextOut(lp->rcItem.left + 86, lp->rcItem.top + 2, str2);
+		}
+	}
+	else
+		CDialogEx::OnDrawItem(nIDCtl, lp);
+}
+~~~
+
+![20220916_221049](https://user-images.githubusercontent.com/39178978/190647390-23489e9f-fb36-47be-8189-c2e222bdbcf4.png)
 
 ###### [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
 ###### [Top](#top)
