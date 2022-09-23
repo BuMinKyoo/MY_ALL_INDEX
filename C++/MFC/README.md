@@ -65,6 +65,9 @@
     - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
     - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
     - [GetTickCount](#gettickcount)
+    - [ShellExecute](#shellexecute)
+    - [AnimateWindow](#animatewindow)
+    - [FindWindow, FindWindowEx](#findwindow-findwindowex)
 
   </div>
   </details>
@@ -1257,6 +1260,9 @@ CD1::CD1(int Dialog, CWnd* pParent /*=NULL*/)
     - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
     - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
     - [GetTickCount](#gettickcount)
+    - [ShellExecute](#shellexecute)
+    - [AnimateWindow](#animatewindow)
+    - [FindWindow, FindWindowEx](#findwindow-findwindowex)
 
 ###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
@@ -1934,8 +1940,218 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 
 	return TRUE;
 }
+~~~
 
 ![20220916_222805](https://user-images.githubusercontent.com/39178978/190650020-ef753e2e-6a75-4236-a9d0-59515111cc3d.png)
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ShellExecute
+  - 1. 인터넷 열기
+    - 두번째 인자에 “open”을 사용하고, 세번째 인자에 어떤 브라우저를 사용할지 명시하고, 네번째에 url주소를 입력하면 된다
+  - 2. 응용프로그램 실행
+    - 두번째 인자에 “open”을 사용하고 세번째 인자에 실행할 응용 프로그램의 경로를 명시하면 된다
+  - 3. 특정 프로그램으로 원하는 파일 열기
+    - 두번째 인자에 “open”을 사용하고, 세번째 인자에 프로그램 이름을 명시하고, 네번째 인자에 파일 경로를 명시한다
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 1. 인터넷 열기
+// 인터넷 창이 오픈 된다
+// 세번째 인자에 iexplore를 넣으면 iexplore가 켜진다
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	CString csUrl = _T("https://www.naver.com/");
+	::ShellExecute(NULL, _T("OPEN"),_T("CHROME"),(LPCTSTR)csUrl,0,SW_SHOW);
+
+	return TRUE;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 2. 응용프로그램 실행
+// 메모장 실행
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	::ShellExecute(NULL, _T("OPEN"),_T("C:\\Users\\Astems\\Desktop\\test.txt"),NULL, NULL, SW_SHOW);
+
+	return TRUE;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 3. 특정 프로그램으로 원하는 파일 열기
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	::ShellExecute(NULL, _T("open"), _T("Notepad++") , _T("C:\\Users\\Astems\\Desktop\\test.txt"), NULL, SW_SHOW);
+
+	return TRUE;
+}
+~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# AnimateWindow
+  - 애니메이션을 줄 수 있는 함수
+
+<br/>
+
+~~~c++
+// 함수원형
+BOOL AnimateWindow(
+  [in] HWND  hWnd,
+  [in] DWORD dwTime,
+  [in] DWORD dwFlags
+);
+
+// HWND : 애니메이션할 창에 대한 핸들입니다. 호출 스레드는 이 창을 소유해야 합니다.
+// DWORD : 애니메이션을 재생하는 데 걸리는 시간(밀리초)입니다. 일반적으로 애니메이션을 재생하는 데 200밀리초가 걸립니다.
+// DWORD : 애니메이션의 유형입니다
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 2. 응용프로그램 실행
+// 메모장 실행
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	::ShellExecute(NULL, _T("OPEN"),_T("C:\\Users\\Astems\\Desktop\\test.txt"),NULL, NULL, SW_SHOW);
+
+	return TRUE;
+}
+~~~
+
+![20220923_233426](https://user-images.githubusercontent.com/39178978/191985349-05b5782e-7496-4b42-8f4b-5d0ff46192f6.png)
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 컨트롤을 띄울때
+void CMFCApplication2Dlg::OnBnClickedButton2()
+{
+	CWnd *p_wnd = GetDlgItem(IDC_BUTTON1); // 버튼의 핸들 얻기
+	HWND hWnd = p_wnd->m_hWnd; // 버튼의 핸들 치환하기
+	::AnimateWindow(hWnd, 200, AW_SLIDE| AW_CENTER); // 애니메이션 사용하기
+}
+~~~
+
+![20220923_233703](https://user-images.githubusercontent.com/39178978/191985906-40419fc0-fdf7-4f54-8c37-bf98a0660300.png)
+
+  - 컨트롤이 아닌, 윈도우 자체를 띄울때는 적용 시키고자 하는 윈도우의 OnInitDialog() 에서 함수를 이용 하면 된다.
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# FindWindow, FindWindowEx
+  - FindWindow : Window의 핸들 값을 얻는 함수
+    - Window Class의 이름이나 Window의 캡션이름으로 원하는 Window의 핸들 값을 얻는 함수이다
+    - Top-Level Window만 검색이 가능하기 때문에 제한적이다. FindWindowEx을 사용하는 것이 더 좋다
+
+<br/>
+
+~~~c++
+// FindWindow원형
+HWND FindWindow(LPCTSTR lpClassName, LPCTSTR lpWindowName);
+~~~
+
+![20220923_234305](https://user-images.githubusercontent.com/39178978/191987269-7cde8231-debd-44b2-bfea-fee301ce133b.png)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+~~~c++
+// FindWindowEx원형
+FindWindowEx(Parent, Child: HWND; ClassName, WindowName: PChar);
+~~~
+
+#AppDlg.cpp
+~~~c++
+// while문을 사용해서 찾을게 없을때 null이 나올때 까지 계속 찾는 방식을 이용, 전부 다 돌아서 null이 나오면 멈추게됨
+void CMFCApplication3Dlg::OnBnClickedButton1()
+{
+	HWND h_wnd = NULL, h_edit_wnd = NULL;
+	while(h_wnd = ::FindWindowEx(NULL, h_wnd, _T("#32770"),NULL)) // 윈도우 클래스 이름이 #32770인 것을 다 찾음
+	{
+		if (h_wnd != NULL)
+		{
+			while(h_edit_wnd = ::FindWindowEx(h_wnd, h_edit_wnd, _T("RICHEDIT50W"), NULL)) // 찾은 윈도우 클래스 에서 자식 클래스이름이 RICHEDIT50W인것을 다 찾음
+			{
+				if (h_edit_wnd  != NULL)
+				{
+					::SendMessage(h_edit_wnd, WM_SETTEXT, 0, (LPARAM)(CONST wchar_t *)_T("11111"));
+				}
+			}
+		}
+	}
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 주의 사항!! 
+// KEYDOWN같은 것을 할때는 PostMessage메세지를 써야 하는데 그 이유는 SendMessage는 메시지 큐에 들어가지 않고, 메시지를 처리하고 반환 할때 까지 기다리기 때문에 각각이 따로 따로 처리 되어 진다. 하지만 KEYDOWN같은 경우는 조합된 메시지를 줬을때 처리되는 경우가 있기 때문에 이 경우는 PostMessage메세지를 사용하여야 작동 하는 경우도 있으니 참고할것
+void CMFCApplication3Dlg::OnBnClickedButton1()
+{
+	HWND h_wnd = NULL, h_edit_wnd = NULL;
+	while(h_wnd = ::FindWindowEx(NULL, h_wnd, _T("#32770"),NULL)) // 윈도우 클래스 이름이 #32770인 것을 다 찾음
+	{
+		if (h_wnd != NULL)
+		{
+			while(h_edit_wnd = ::FindWindowEx(h_wnd, h_edit_wnd, _T("RICHEDIT50W"), NULL)) // 찾은 윈도우 클래스 에서 자식 클래스이름이 RICHEDIT50W인것을 다 찾음
+			{
+				if (h_edit_wnd  != NULL)
+				{
+					::SendMessage(h_edit_wnd, WM_SETTEXT, 0, (LPARAM)(CONST wchar_t *)_T("11111"));
+
+					Sleep(200);
+
+					::PostMessage(h_edit_wnd, WM_KEYDOWN, 0x0000000D, 0x001C0001);
+					::PostMessage(h_edit_wnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
+				}
+			}
+		}
+	}
+}
+~~~
 
 ###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
@@ -4092,6 +4308,9 @@ BOOL CMFCApplication3Dlg::OnInitDialog()
 
 # Windows Media Player ActiveX컨트롤 사용하기
 
+  - Windows Media Player ActiveX컨트롤 ui변경
+  	- uiMode : mini -> 컨트롤이 조금 더 간소화 된다
+	- uiMode : none -> 컨트롤이 아예 없어짐
   - 1. MFC프로젝트 만들때 ‘ActiveX컨트롤’ 추가하기  
 ![20220916_223124](https://user-images.githubusercontent.com/39178978/190650732-63e207cd-4ae1-4fb4-bd86-ed22fd319fa7.png)
   - 만약 MFC프로젝트 생성시에 ‘ActiveX컨트롤’을 체크하지 않았다면, 초기 CPP파일에 ‘AfxEnableControlContainer()’ 과 stdafx.h파일에 #include <afxdisp.h>을 추가해주면 된다
