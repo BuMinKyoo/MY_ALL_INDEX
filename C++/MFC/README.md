@@ -157,6 +157,18 @@
   </div>
   </details>
 
+
+- <details markdown="1">
+  <summary>기능별 정리</summary>
+  <div markdown="1">
+  
+  - [기능별 정리](#기능별-정리)
+    - [캡쳐하기](#캡쳐하기)
+      
+  </div>
+  </details>
+
+
 - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
 - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
@@ -3861,6 +3873,74 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 ~~~
 
 ###### [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 기능별 정리
+  - 기능별로 정리해 놓은 목록
+
+    - [캡쳐하기](#캡쳐하기)
+
+###### [기능별 정리](#기능별-정리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 캡쳐하기
+  - 윈도우 화면을 캡쳐해서, 클라이언트에 보여주기
+
+<br/>
+
+#AppDlg.h
+~~~c++
+public:
+	HDC mh_mem_dc;
+	CRect m_target_rect;
+	HBITMAP mh_mem_bitmap;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	GetDlgItem(IDC_DISPLAY_RECT)->GetWindowRect(m_target_rect); // 다이얼로그에 있는 사진을 출력할 공간의 좌표를 얻기 위함
+	ScreenToClient(m_target_rect); // 얻은 좌표를 윈도우 클라이언트 좌표로 변경
+
+	HDC h_dc = ::GetDC(m_hWnd); // DC와 bitmap에 정보를 제공해 주기 위해 생성
+	mh_mem_dc = ::CreateCompatibleDC(h_dc);
+	mh_mem_bitmap = ::CreateCompatibleBitmap(h_dc, m_target_rect.Width(), m_target_rect.Height());
+	::SelectObject(mh_mem_dc, mh_mem_bitmap); // 메모리 DC에, 만들어놓은 bitmap을 적용
+	::ReleaseDC(m_hWnd, h_dc);
+
+	return TRUE;
+}
+
+. . .
+
+void CMFCApplication5Dlg::OnBnClickedButton1()
+{
+	HDC h_dc = ::GetWindowDC(NULL); // 캡쳐하기 위해 화면 영역을 사용할 수 있는 DC를 얻기
+	::BitBlt(mh_mem_dc, 0, 0, m_target_rect.Width(), m_target_rect.Height(), h_dc, 100, 100, SRCCOPY); // 메모리 DC에 현재 캡쳐해 놓은 DC의 bitmap을 복사해 넣기
+	::ReleaseDC(NULL, h_dc);
+
+	 CClientDC dc(this); // 클라이언트에 출력하기 위해 사용
+	 ::BitBlt(dc.m_hDC, m_target_rect.left, m_target_rect.top,
+		 m_target_rect.Width(), m_target_rect.Height(), mh_mem_dc, 0, 0, SRCCOPY);
+}
+~~~
+
+![20220923_235233](https://user-images.githubusercontent.com/39178978/191989588-11f3ee5c-6a05-4c1f-8868-06608c3606e1.png)
+
+###### [기능별 정리](#기능별-정리)
 ###### [Top](#top)
 
 <br/>
