@@ -1,16 +1,9 @@
 ###### Top
-
-- <details markdown="1">
-  <summary>출력</summary>
-  <div markdown="1">
   
   - [출력](#출력)
     - [Hello World 출력하기](#hello-world-출력하기)
     - [using namespace](#using-namespace)
     - [조정자(Manipulator)](#조정자manipulator)
-      
-  </div>
-  </details>
 
 <br/>
 <br/>
