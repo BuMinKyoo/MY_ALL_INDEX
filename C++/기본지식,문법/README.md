@@ -25,6 +25,23 @@
     - [파일에 쓰기](#파일에-쓰기)
     - [파일 안에서 탐색하기](#파일-안에서-탐색하기)
 
+  - [접근 제어자(Access Modifier)](#접근-제어자access-modifier)
+  
+  - [개체](#개체)
+    - [개체 생성(스택, 힙 메모리), 개체소멸](#개체-생성스택-힙-메모리-개체소멸)
+    - [생성자, 생성자 초기화](#생성자-생성자-초기화)
+    - [c++에서 일반적인 클래스 사용법](#c에서-일반적인-클래스-사용법)
+    - [소멸자](#소멸자)
+    - [Const함수](#const함수)
+    - [복사생성자](#복사생성자)
+    - [연산자 오버로딩](#연산자-오버로딩)
+    - [friend클래스](#friend클래스)
+    - [c++ 클래스에 암시적으로 만들어 주는것](#c-클래스에-암시적으로-만들어-주는것)
+    - [상속](#상속)
+    - [오버라이딩, 다형성, 정적 바인딩, 가상함수(virtual), 동적 바인딩](#오버라이딩-다형성-정적-바인딩-가상함수virtual-동적-바인딩)
+    - [추상클래스](#추상클래스)
+    - [인터페이스](#인터페이스)
+
 <br/>
 <br/>
 
@@ -458,24 +475,6 @@ const char* cLine = line.c_str();
 ###### [문자열](#문자열)
 ###### [Top](#top)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <br/>
 <br/>
 
@@ -798,4 +797,1194 @@ int main()
 등등등…나중에 다시 공부해보기
 
 ###### [파일 입출력](#파일-입출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 접근 제어자(Access Modifier)
+
+  - public
+    - 누구나 접근 가능
+  - protected
+    - 자식 클래스에서 접근 가능
+  - private
+    - 해당 클래스에서만 접근 가능
+
+~~~c++
+class NumBerClass
+{
+public:
+	int Num1;
+protected:
+	int Num2;
+private:
+	int Num3;
+};
+~~~
+
+###### [접근 제어자(Access Modifier)](#접근-제어자access-modifier)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 개체
+
+    - [개체 생성(스택, 힙 메모리), 개체소멸](#개체-생성스택-힙-메모리-개체소멸)
+    - [생성자, 생성자 초기화](#생성자-생성자-초기화)
+    - [c++에서 일반적인 클래스 사용법](#c에서-일반적인-클래스-사용법)
+    - [소멸자](#소멸자)
+    - [Const함수](#const함수)
+    - [복사생성자](#복사생성자)
+    - [연산자 오버로딩](#연산자-오버로딩)
+    - [friend클래스](#friend클래스)
+    - [c++ 클래스에 암시적으로 만들어 주는것](#c-클래스에-암시적으로-만들어-주는것)
+    - [상속](#상속)
+    - [오버라이딩, 다형성, 정적 바인딩, 가상함수(virtual), 동적 바인딩](#오버라이딩-다형성-정적-바인딩-가상함수virtual-동적-바인딩)
+    - [추상클래스](#추상클래스)
+    - [인터페이스](#인터페이스)
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 개체 생성(스택, 힙 메모리), 개체소멸
+
+  - 클래스이름 변수;
+    - NumberClass num; // 개체 스택 메모리
+  - 클래스이름 *변수 = new 클래스이름;
+    - NumberClass* num = new NumberClass; // 개체 힙 메모리
+    - delete num; // 메모리 해제(num = NULL 할 필요 없음)
+  - 클래스이름 *변수 = new 클래스이름();
+    - NumberClass* num = new NumberClass(); // 개체 힙 메모리
+    - delete num; // 메모리 해제(num = NULL 할 필요 없음)
+  - 클래스이름 *변수 = new 클래스이름(생성자매개변수리스트);
+    - NumberClass* num = new NumberClass(10, 20); // 개체 힙 메모리
+    - delete num; // 메모리 해제(num = NULL 할 필요 없음)
+  - 클래스이름 *변수 = new 클래스이름[갯수]
+    - NumberClass* num = new NumberClass[10]; // 개체 힙 메모리 배열
+    - delete[] num; // 메모리 해제(num = NULL 할 필요 없음)
+  - 클래스이름 **변수 = new 클래스이름*[갯수]
+    - NumberClass** num = new NumberClass*[10]; // 개체 포인터의 힙 메모리 배열
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 생성자, 생성자 초기화
+
+  - 생성자 만들기
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+class NumberClass
+{
+public:
+	int num;
+
+	// 매개변수 없는 생성자, 내부 변수 초기화
+	NumberClass()
+	{
+		num = 10;
+	}
+};
+
+int main()
+{
+	NumberClass numberclass;
+	cout << numberclass.num;
+}
+
+// 출력값
+// 10
+~~~
+
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 생성자 내에서 초기화 하기
+  - ‘:’ 초기화를 시작 한다는것, 그 다음 것을 초기화 할때 ‘,’을 이용 한다
+  - 이런식으로 초기화를 진행 해야 하는 이유는 상수와 참조 변수도 초기화를 할 수 있다는것
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+class NumberClass
+{
+public:
+	int num1;
+	int num2;
+
+	NumberClass()
+		: num1(10)
+		, num2(20)
+	{	
+	}
+};
+
+int main()
+{
+	NumberClass numberclass;
+	cout << numberclass.num1 << endl;
+	cout << numberclass.num2 << endl;
+}
+
+// 출력값
+// 10
+// 20
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 상수, 참조변수 초기화 하기(대입이 아닌 초기화리스트!)
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+class NumberClass
+{
+public:
+	int num1;
+	const int num2;
+	int& num3;
+
+
+	NumberClass()
+		: num1(10)
+		, num2(20)
+		, num3(num1)
+	{	
+	}
+};
+
+int main()
+{
+	NumberClass numberclass;
+	cout << numberclass.num1 << endl;
+	cout << numberclass.num2 << endl;
+	cout << numberclass.num3 << endl;
+}
+
+// 출력값
+// 10
+// 20
+// 10
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# c++에서 일반적인 클래스 사용법
+
+  - 일반적으로는 h파일에 클래스의 형태를 만들고, cpp파일안에서 정의 및 사용 하게 된다
+
+#source.h
+~~~c++
+class NumberClass
+{
+public:
+	int num1;
+	int num2;
+
+	NumberClass();
+	NumberClass(int x, int y);
+};
+~~~
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include "source.h"
+
+using namespace std;
+
+NumberClass::NumberClass()
+	: num1(10)
+	, num2(20)
+{
+}
+
+NumberClass::NumberClass(int x, int y)
+	: num1(x)
+	, num2(y)
+{
+}
+
+int main()
+{
+	NumberClass numberclass1;
+	cout << numberclass1.num1 << " " << numberclass1.num2 << endl;
+
+	NumberClass numberclass2(30, 40);
+	cout << numberclass2.num1 << " " << numberclass2.num2 << endl;
+}
+
+// 출력값
+// 10 20
+// 30 40
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소멸자
+
+  - 객체 내에서 메모리 동적 할당을 했을때 필요하다
+
+#ConsoleApp.cpp
+~~~c++
+// Function함수가 끝나게 되면 Function함수에 안에 있는 모든 스택들을 사라지기 때문에 할당되었던 str의 첫번째 포인터 주소도 사라지게 된다. 따라서 메모리 누수가 발생되기 때문에 함수가 끝나기 전에 소멸자에서 메모리 할당을 해제해야 한다
+#include <iostream>
+
+class NumberClass
+{
+public:
+	NumberClass()
+		: num1(10)
+		, num2(20)
+	{
+		str = new char[num1];
+	}
+
+	~NumberClass()
+	{
+		delete[] str;
+	}
+
+private:
+	int num1;
+	int num2;
+	char* str;
+};
+
+void Function()
+{
+	NumberClass numberclass;
+}
+
+int main()
+{
+	Function();
+	return 0;
+}
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Const함수
+
+  - 이 함수 안에서는 어떤 변수도 바꿀 수 없다는것
+  - const함수 안에서 다른 함수를 호출 할때 const함수만 호출 할 수 있다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+class NumberClass
+{
+public:
+	NumberClass()
+		: num1(10)
+		, num2(20)
+	{
+	}
+
+	int GetNum0()
+	{
+		return num1;
+	}
+
+	int GetNum1() const
+	{
+		return num1;
+	}
+
+	int GetNum2() const
+	{
+		GetNum0(); // 컴파일 error
+		GetNum1(); // 컴파일 ok
+	}
+
+private:
+	int num1;
+	int num2;
+};
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 복사생성자
+
+  - 같은 클래스에 속한 다른 개체를 이용하여 새로운 개체를 초기화 하는것
+
+<br/>
+
+  - 복사 생성자 만들기
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+class NumberClass
+{
+public:
+	NumberClass()
+		: num1(10)
+		, num2(20)
+	{
+	}
+
+	NumberClass(const NumberClass& other) // 복사 생성자
+		: num1(other.num1)
+		, num2(other.num2)
+	{
+	}
+
+private:
+	int num1;
+	int num2;
+};
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 복사 생성자 호출하기
+
+#ConsoleApp.cpp
+~~~c++
+NumberClass(const NumberClass& other);
+
+NumberClass a; // 매개변수 없는 생성자를 호출
+NumberClass b(a); // 복사 생성자를 호출
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 복사 생성자는 자동으로 컴파일러가 생성해줌, 하지만 따로 프로그래머가 정의해 놓는다면 기본 복사 생성자를 만들지 않음
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+public:
+	NumberClass(int x, int y)
+		: mNum1(x)
+		, mNum2(y)
+	{
+	}
+
+	int mNum1;
+	int mNum2;
+};
+
+int main()
+{
+	NumberClass numberclass(10,20);
+	NumberClass numberclass1(numberclass); // 컴파일 ok
+
+	cout << numberclass1.mNum1 << " " << numberclass1.mNum2;
+}
+
+// 출력값
+// 10 20
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 복사생성자을 사용 할때에 클래스 내부에서 메모리 할당을 한다면 얕은 복사가 되었을때 문제가 됨으로, 깊은 복사를 해야 한다.
+
+#ConsoleApp.cpp
+~~~c++
+// 얕은 복사
+#include <iostream>
+
+class NumberClass
+{
+public:
+	NumberClass(const int* scores, int count)
+		: num1(count)
+	{
+		p_num2 = new int[num1];
+		memcpy(p_num2, scores, num1 * sizeof(int));
+	}
+
+	NumberClass(const NumberClass& other) // 복사 생성자
+		: num1(other.num1)
+		, p_num2(other.p_num2) // 대입과 같다고 생각할 수 있기 때문에 여기서는 배열의 첫번째인 포인터의 주소를 주게 된다. 여기서 문제는, 이 주소를 가지고 있는 어느 객체가 파괴 될때, 소멸자에서 할당 해제를 하게 된다면 다른쪽 객체에서 가지고 있던 포인터 주소는 할당 해체된 주소를 가지고 있게 됨으로 문제가 된다.
+	{
+	}
+
+private:
+	int num1;
+	int* p_num2;
+};
+
+
+// 깊은 복사
+#include <iostream>
+
+class NumberClass
+{
+
+public:
+	NumberClass(const int* scores, int count)
+		: num1(count)
+	{
+		p_num2 = new int[num1];
+		memcpy(p_num2, scores, num1 * sizeof(int));
+	}
+
+	NumberClass(const NumberClass& other) // 복사 생성자
+		: num1(other.num1)
+	{
+		p_num2 = new int[num1]; // 새롭게 힙메모리에 메모리 할당
+		memcpy(p_num2, other.p_num2, num1 * sizeof(int)); // 메모리 할당된 곳에 가지고 왔던 배열의 데이터를 그대로 깊은 복사, 이렇게 하게 되면, 각 객체가 가리키는 포인터의 주소가 다르고, 서로 각각 독립적으로 데이터를 가지고 있게 된다. 따라서 이때는 객체 하나가 소멸자로 인해서 할당된 메모리를 모두 해체 했다고 해도, 각각의 객체에는 큰 에러가 없다
+	}
+
+private:
+	int num1;
+	int* p_num2;
+};
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 연산자 오버로딩
+
+  - c++을 우리가 사용하는 언어에서 일반적으로 사용하는 연산에 대한 것까지도 프로그래밍 하여 재 정의 할 수 있다.
+
+#ConsoleApp.cpp
+~~~c++
+// 연산자 오버로딩
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+public:
+	NumberClass(int x, int y)
+		: mNum1(x)
+		, mNum2(y)
+	{
+	}
+
+	NumberClass()
+		: mNum1(0)
+		, mNum2(0)
+	{
+	}
+
+	NumberClass operator+(const NumberClass& other) const
+	{
+		NumberClass sum;
+		sum.mNum1 = mNum1 + other.mNum1;
+		sum.mNum2 = mNum2 + other.mNum2;
+		
+		return sum;
+	}
+
+	int GetNum1()
+	{
+		return mNum1;
+	}
+
+	int GetNum2()
+	{
+		return mNum2;
+	}
+
+private:
+	int mNum1;
+	int mNum2;
+};
+
+int main()
+{
+	NumberClass A(5,10);
+	NumberClass B(10,20);
+	NumberClass C = A + B;
+	NumberClass D = A.operator+(B); // 위와 동일
+
+	cout << C.GetNum1() << " " << C.GetNum2() << endl;
+	cout << D.GetNum1() << " " << D.GetNum2() << endl;
+	
+	// 출력값
+	// 15 30
+	// 15 30
+}
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# friend클래스
+
+  - friend클래스를 사용하게 되면, 다른 곳에서 private멤버 함수,변수를 호출할 수 있게 해준다
+  - 1. class내에서 private를 호출 할 수 있게 해주는것
+  - 2. 전역함수 내에서 private를 호출 할 수 있게 해주는것
+
+#ConsoleApp.cpp
+~~~c++
+// 1. class내에서 private를 호출 할 수 있게 해주는것
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+	friend class NumberClass2; // NumberClass2는 NumberClass의 private함수,변수를 직접적으로 호출 할 수 있게 된다
+
+public:
+	NumberClass()
+		: mNum1(10)
+		, mNum2(20)
+	{
+	}
+
+private:
+	int mNum1;
+	int mNum2;
+};
+
+class NumberClass2
+{
+public:
+	void Function()
+	{
+		NumberClass numberclass;
+		cout << numberclass.mNum1 << endl; // NumberClass의 private인 mNum1멤버 변수를 호출
+	}
+};
+
+int main()
+{
+	NumberClass2 numberclass2;
+	numberclass2.Function();
+}
+
+// 출력값
+// 10
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 2. 전역함수 내에서 private를 호출 할 수 있게 해주는것
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+	friend void Function();
+public:
+	NumberClass()
+		: mNum1(10)
+		, mNum2(20)
+	{
+	}
+
+private:
+	int mNum1;
+	int mNum2;
+};
+
+void Function()
+{
+	NumberClass numberclass;
+	cout << numberclass.mNum1;
+}
+
+int main()
+{
+	Function();
+}
+
+// 출력값
+// 10
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// operator<< 연산자 오버로딩 하기
+// 이부분은 좀 어려우니 일단 이렇게 한다는 것만 알아두고 넘어가기
+#include <iostream>
+
+class NumberClass
+{
+	friend std::ostream& operator<<(std::ostream& os, const NumberClass& rhs);
+public:
+	NumberClass()
+		: mNum1(10)
+		, mNum2(20)
+	{
+	}
+
+private:
+	int mNum1;
+	int mNum2;
+};
+
+std::ostream& operator<<(std::ostream& os, const NumberClass& rhs)
+{
+	os << rhs.mNum1 << ", " << rhs.mNum2;
+	return os;
+}
+
+int main()
+{
+	NumberClass numberclass;
+	std::cout << numberclass << std::endl;
+}
+
+// 출력값
+// 10, 20
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# c++ 클래스에 암시적으로 만들어 주는것
+
+  - 매개변수 없는 생성자
+  - 복사 생성자
+  - 소멸자
+  - 대입(=) 연산자
+
+<br/>
+
+  - 암시적 기본 생성자 지우기
+  - 기본 생성자는, class내에서 다른 생성자가 있으면 만들지 않기 때문에 호출 할 수 없는 private안에 생성자를 만든다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+class NumberClass
+{
+private:
+	NumberClass()
+	{
+	}
+
+	int mNum1;
+	int mNum2;
+
+};
+
+int main()
+{
+	NumberClass n; // 생성자가 없으니 컴파일 에러
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 암시적 복사 생성자 지우기
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+public:
+	NumberClass(int x, int y)
+		: mNum1(x)
+		, mNum2(y)
+	{
+	}
+
+	int mNum1;
+	int mNum2;
+
+private:
+	NumberClass(const NumberClass& other)
+	{
+	}
+
+};
+
+int main()
+{
+	NumberClass numberclass(10,20);
+	NumberClass numberclass1(numberclass); // 컴파일 에러
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 암시적 소멸자 지우기
+  - 하지만 소멸자를 지우는것은 큰 에러가 발생할 수 있음;;; 소멸자는 중요함
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+private:
+	int mNum1;
+	int mNum2;
+
+	~NumberClass()
+	{
+
+	}
+};
+
+int main()
+{
+	NumberClass* numberclass = new NumberClass();
+}
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 상속
+
+  - 다른 클래스의 특성들을 내려받는것
+
+![20221008_172512](https://user-images.githubusercontent.com/39178978/194697984-ae5a32e5-8106-4738-9c85-a04c7ce468dd.png)
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+public:
+	int m_Snum1;
+	int m_Snum2;
+	int sum()
+	{
+		return m_Snum1 + m_Snum2;
+	}
+
+};
+
+class Number_one : public NumberClass // 부모 클래스에 생성자가 있는 경우 public NumberClass(인자)로 호출하면 된다
+{
+public:
+	Number_one(int x)
+		: num1(x)
+	{
+
+	}
+
+private:
+	int num1;
+};
+
+int main()
+{
+	Number_one numberone(10);
+	numberone.m_Snum1 = 1;
+	numberone.m_Snum2 = 2;
+
+	cout << numberone.sum();
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 상속시에, 부모클래스의 생성자를 암시적으로 호출해 주기 때문에 만약, 부모클래스를 명시적으로 써놨다면 그것을 꼭 호출해야 컴파일 에러를 피 할 수 있음
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+public:
+	int m_Snum1;
+	int m_Snum2;
+
+	NumberClass(int x, int y) // 생성자를 만들었기 때문에 컴파일러가 기본 생성자인 NumberClass() {} 를 만들지 않음
+		: m_Snum1(x)
+		, m_Snum2(y)
+	{
+
+	}
+};
+
+class Number_one : public NumberClass
+{
+public:
+	int num1;
+
+	Number_one() // 부모 생성자를 호출해야 되기 때문에 자식 생성자를 만들때 부모 생성자를 호출
+		: NumberClass(10, 20)
+	{
+
+	}
+};
+
+int main()
+{
+	Number_one numberone;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 상속된 부모에게 데이터 전달
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+public:
+	int m_Snum1;
+	int m_Snum2;
+
+	NumberClass(int x, int y)
+		: m_Snum1(x)
+		, m_Snum2(y)
+	{
+
+	}
+};
+
+class Number_one : public NumberClass
+{
+public:
+	int num1;
+
+	Number_one(int x, int y)
+		: NumberClass(x, y)
+	{
+
+	}
+};
+
+int main()
+{
+	Number_one numberone(10, 20);
+}
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 오버라이딩, 다형성, 정적 바인딩, 가상함수(virtual), 동적 바인딩
+
+  - 오버라이딩
+    - 부모 클래스가 가지고 있는 기능의 형태만 가져와서, 자식 클래스에서 그 기능에 맞게 바꿔서 쓰는것(하는 행동의 정의는 똑같은데, 실제 하는 행동의 디테일이 다르다), ex) 말한다는 것은 똑같지만, 무엇을 말하는지가 다르다
+    - ex) 부모 : 말을 한다 / 자식 고양이 : 야옹 할꺼다 / 자식 강아지 : 멍멍 할꺼다
+    - 오버라이딩을 통해서 다형성을 형성한다
+  - 정적 바인딩
+    - 가상 함수를 쓰지 않을때, 컴파일을 했을때 바로 어떤 함수를 쓸지 결정 되는 것
+  - 가상함수
+    - 동적 바인딩 이라고 함, 늦은 바인딩이라고함(실행 중에 어떤 함수를 호출할지 결정)
+    - 자식 클래스의 멤버 함수가 언제나 호출됨
+    - 가상 테이블이 꼭 필요하게 되고, 그 가상 테이블을 통해서 작동하게 된다
+
+#ConsoleApp.cpp
+~~~c++
+// 오버라이딩, 다형성의 기본적인 사용 방법
+#include <iostream>
+
+using namespace std;
+
+class Animal
+{
+public:
+	void Speak()
+	{
+		cout << "Animal Speak" << endl;
+	}
+};
+
+class Dog : public Animal
+{
+public:
+	void Speak()
+	{
+		cout << "bark bark" << endl;
+	}
+};
+
+int main()
+{
+	Dog* dog = new Dog();
+	dog->Speak();  // bark bark;
+	Animal* animal = new Dog();
+	animal->Speak();  // Animal Speak;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 가상함수(virtual) 사용하기
+
+#ConsoleApp.cpp
+~~~c++
+// 가상함수는 부모에게 적용하면 그 밑에 자식에게 모두 적용되어짐. 따라서 아래의 virtual를 쓴 부분은 좋은 코딩 표준은 아니고, 자식에게도 전부 virtual을 달아 주는것이 나중에 그 자식이 다시 상속을 할때 판단하기 쉽게 해줌
+#include <iostream>
+
+using namespace std;
+
+class Animal
+{
+public:
+	virtual void Speak()
+	{
+		cout << "Animal Speak" << endl;
+	}
+};
+
+class Dog : public Animal
+{
+public:
+	void Speak()
+	{
+		cout << "bark bark" << endl;
+	}
+};
+
+int main()
+{
+	Dog* dog = new Dog();
+	dog->Speak();  // bark bark;
+	Animal* animal = new Dog();
+	animal->Speak();  // bark bark;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 가상소멸자
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+class Animal
+{
+public:
+	virtual ~Animal()
+	{
+
+	}
+
+private:
+	int mNum1;
+};
+
+class Dog : public Animal
+{
+public:
+	virtual ~Dog()
+	{
+		delete[] mNums;
+	}
+private:
+	int* mNums;
+};
+
+int main()
+{
+	Dog* dog = new Dog();
+	delete dog; // 자식을 지우게 되면, 자식 소멸자가 실행된후, 부모 소멸자가 실행된다
+
+	Animal* animal = new Animal();
+	delete animal; // 부모를 지우개 되면, 부모 소멸자만 실행되기 때문에 자식쪽에 메모리 할당된 곳이 있다면 메모리 누수가 발생된다. 따라서 소멸자도 가상 소멸자를 사용하여야 한다
+
+}
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 추상클래스
+
+  - 구체적인 함수의 구현이 되어 있지 않은 클래스
+  - 추상 클래스에서 개체를 만들 수 없음
+  - 추상 클래스를 포인터나 참조 형으로는 만들 수 있음
+  - 추상 클래스를 상속받으면 구현이 되어 있지 않은 함수를 무조건 구현해야 한다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+class Animal
+{
+public:
+	virtual ~Animal(){};
+	virtual void Speak() = 0; // 자식 클래스에서 무조건 구현 해야함
+
+private:
+	int mNum1;
+};
+
+class Dog : public Animal
+{
+public:
+	virtual ~Dog() {};
+	virtual void Speak() // 추상 클래스를 구현한것
+	{
+
+	}
+private:
+	int mNums;
+};
+
+int main()
+{
+	Animal animal; // Animal클래스는 추상 클래스 이므로 객체를 만들 수 없음, 컴파일 error
+	Animal* animal1 = new Animal(); // Animal클래스는 추상 클래스 이므로 객체를 만들 수 없음, 컴파일 error
+
+	Animal* dog = new Dog(); // Animal클래스는 virtual이 되어 있기 때문에, 결국 함수는 자식 클래스를 향하게 되있기 때문에 요렇게 사용 할 수 있음, 컴파일 ok
+
+	Animal& dogRef = *dog; // 레퍼런스도 포인터와 같기 때문에, Animal* dog = new Dog(); 를 하나더 가지는 것과 같다. 즉, Dog의 함수를 사용하기 때문에, 컴파일 ok
+}
+~~~
+
+###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 인터페이스
+
+  - 추상 클래스와 비슷한 형태 이지만, 추상클래스가 함수 이외의 변수들이 있는데 반해서, 인터페이스는 변수가 존재하지 않고, 함수만 존재함
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+class IAnimal
+{
+public:
+	virtual void Speak() = 0;
+};
+
+class IFunction
+{
+public:
+	virtual void Jump() = 0;
+};
+
+class Dog : public IAnimal, public IFunction
+{
+public:
+	virtual void Speak()
+	{
+
+	}
+
+	virtual void Jump()
+	{
+
+	}
+
+private:
+	int mNums;
+};
+
+int main()
+{
+	Dog dog;
+}
+~~~
+
+###### [개체](#개체)
 ###### [Top](#top)
