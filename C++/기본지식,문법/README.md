@@ -11,6 +11,20 @@
     - [입력하기](#입력하기)
     - [입력버리기](#입력버리기)
 
+  - [참조(Reference)](#참조reference)
+
+  - [문자열](#문자열)
+    - [std::string](#stdstring)
+    - [함수](#함수)
+
+  - [파일 입출력](#파일-입출력)
+    - [파일 스트림](#파일-스트림)
+    - [open 함수 모드플래그](#open-함수-모드플래그)
+    - [파일 오픈 상태 확인](#파일-오픈-상태-확인)
+    - [파일 읽기](#파일-읽기)
+    - [파일에 쓰기](#파일에-쓰기)
+    - [파일 안에서 탐색하기](#파일-안에서-탐색하기)
+
 <br/>
 <br/>
 
@@ -322,3 +336,197 @@ int main()
 
 ###### [입력](#입력)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 참조(Reference)
+
+  - 포인터를 사용하게 되면, 여러가지 신경써야할 부분이 많아지지만 참조를 이용하면 훨씬더 안전하게 성능좋게 사용할 수 있다
+  - 별칭이다
+    - 그냥 이 변수를 다른 이름으로 부르겠다고 하는것이 전부이다
+    - int& reference = number;
+  - NULL이 될 수 없다
+    - int& reference = NULL;  // error
+  - 초기화 중에 반드시 선언되어야 한다
+    - int& reference;   // error
+  - 참조하는 대상을 바꿀 수 없음 // 선언시 참조의 대상이 결정되고 그 이후에 대입은 그냥 값을 그대로 대입하여 바꾼다는것
+  - 소유하지 않은 메모리 장소를 가리킬 수 없음
+    - 포인터 처럼 플러스하여 다음 메모리를 참조 할 수 없음
+
+#ConsoleApp.cpp
+~~~c++
+int number1 = 100;
+int number2 = 200;
+
+int& reference = number1;
+reference = number2; // reference가 number2를 다시 새롭게 참조하는것이 아니라, number2의 값을 reference에 대입 하는것이 되기 때문에 변수 3개 모두 값이 200이됨
+~~~
+
+###### [참조(Reference)](#참조reference)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 문자열
+
+  - c++ 입력받는법
+
+    - [std::string](#stdstring)
+    - [함수](#함수)
+
+###### [문자열](#문자열)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# std::string
+
+  - 길이가 증가 할 수 있음(할당을 따로 하지 않아도?!)
+
+#ConsoleApp.cpp
+~~~c++
+// 입력 받기 가능
+#include <string>
+std::string firstName;
+std::cin >> firstName;
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 대입가능, '+' 연산 가능
+string firstName = "AAA";
+string firstName_c = "BBB";
+
+// 대입
+firstName_c = firstName;
+
+// 붙이기
+firstName_c = firstName_c  + " CCC" + firstName_c
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+string firstName = "AAA";
+string firstName_c = "BBB";
+
+if (firstName  == firstName_c)
+{
+} 
+
+// 사전 상의 순서를 비교(cmp 함수와 같다고 생각하면 됨)
+if (firstName > firstName_c)
+{
+}
+~~~
+
+###### [문자열](#문자열)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 함수
+
+  - size(), length()
+    - 문자열의 길이를 반환
+  - c_str()
+    - const char*
+    - 해당 string이 가지고 있는 문자 배열의 시작 주소를 가리키는 포인터를 반환
+
+#ConsoleApp.cpp
+~~~c++
+string line;
+cin >> line;
+const char* cLine = line.c_str();
+~~~
+
+###### [문자열](#문자열)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/>
+<br/>
+
+***
+
+# 파일 입출력
+
+    - [파일 스트림](#파일-스트림)
+    - [open 함수 모드플래그](#open-함수-모드플래그)
+    - [파일 오픈 상태 확인](#파일-오픈-상태-확인)
+    - [파일 읽기](#파일-읽기)
+    - [파일에 쓰기](#파일에-쓰기)
+    - [파일 안에서 탐색하기](#파일-안에서-탐색하기)
+
+###### [파일 입출력](#파일-입출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 파일 스트림
+
+  - 파일 스트림에 <<, >>, 조정자 등도 사용 할 수 있다.
+  - include <fstream> 해더를 사용한다.
+    - ifstream : 파일 입력(읽기 전용으로 파일을 오픈)
+    - ofstream : 파일 출력(쓰기 전용으로 파일을 오픈, 파일이 없으면 만듦)
+    - fstream : 파일 입력 및 출력(읽기와 쓰기 범용으로 파일을 오픈)
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+ifstream filestream;
+filestream.open("aaaaa.txt")
+
+// 나머지 ofstream , fstream 의 사용법도위와 같음
+~~~
+
+###### [[파일 입출력](#파일-입출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# open 함수 모드플래그
+
+  - in, out, ate, app, trunc, binary
+  - ex) filestream.open(“aaaaa.txt”, ios_base::in | ios_base::binary);
+
+###### [[파일 입출력](#파일-입출력)
+###### [Top](#top)
+
