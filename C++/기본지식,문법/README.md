@@ -499,7 +499,7 @@ const char* cLine = line.c_str();
 # 파일 스트림
 
   - 파일 스트림에 <<, >>, 조정자 등도 사용 할 수 있다.
-  - include <fstream> 해더를 사용한다.
+  - "fstream" 해더를 사용한다.
     - ifstream : 파일 입력(읽기 전용으로 파일을 오픈)
     - ofstream : 파일 출력(쓰기 전용으로 파일을 오픈, 파일이 없으면 만듦)
     - fstream : 파일 입력 및 출력(읽기와 쓰기 범용으로 파일을 오픈)
@@ -516,7 +516,7 @@ filestream.open("aaaaa.txt")
 // 나머지 ofstream , fstream 의 사용법도위와 같음
 ~~~
 
-###### [[파일 입출력](#파일-입출력)
+###### [파일 입출력](#파일-입출력)
 ###### [Top](#top)
 
 <br/>
@@ -527,6 +527,275 @@ filestream.open("aaaaa.txt")
   - in, out, ate, app, trunc, binary
   - ex) filestream.open(“aaaaa.txt”, ios_base::in | ios_base::binary);
 
-###### [[파일 입출력](#파일-입출력)
+###### [파일 입출력](#파일-입출력)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+# 파일 오픈 상태 확인
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+fstream fs;
+fs.open("aaaaa.txt");
+
+if (fs.is_open())
+{
+    // 처리할 코드
+}
+~~~
+
+###### [파일 입출력](#파일-입출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 파일 읽기
+
+#ConsoleApp.cpp
+~~~c++
+// fin >> word; 한 문자 읽기
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main()
+{
+	ifstream fin;
+	fin.open("qqqqq.txt");
+
+	char word;
+
+	if (fin.fail())
+	{
+		return 0;
+	}
+	fin >> word;
+	cout << word;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// fin.get(character); 한 문자 읽기
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main()
+{
+	ifstream fin;
+	fin.open("qqqqq.txt");
+
+		char character;
+
+	fin.get(character);
+	if (fin.fail())
+	{
+		return 0;
+	}
+	cout << character;
+	fin.close();
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 한 단어 읽기
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main()
+{
+	ifstream fin;
+	fin.open("qqqqq.txt");
+
+	string word;
+
+	if (fin.fail())
+	{
+		return 0;
+	}
+	fin >> word;
+	cout << word;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 한 줄 읽기
+// getline(fin, line); 한 줄 읽기, #include <string> 이 필요하다
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+	ifstream fin;
+	fin.open("qqqqq.txt");
+
+	string line;
+	if (fin.fail())
+	{
+		return 0;
+	}
+	getline(fin, line);
+	cout << line;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 파일 끝날 때 까지 읽기(예시는 한개만 보여주고, 나머지도 while을 통해서 동일하게 진행하면 된다)
+while (!fin,eof())
+{
+   getline(fin, line);
+   cout << line << endl;
+{
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 복잡한 상황 읽어 내기
+// 파일의 데이터 : 100 qwer 200
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main()
+{
+	ifstream fin;
+	fin.open("qqqqq.txt");
+
+	string str;
+	int num;
+
+	while (true)
+	{
+		fin >> num;
+
+		if (!fin.fail())
+		{
+			cout << num << endl;
+			continue;
+		}
+
+		if (fin.eof())
+		{
+			break;
+		}
+		else
+		{
+			fin.clear(); // clear()을 하기 전에는 다른 것을 읽을 수 없기 때문에 다른 것을 읽기 전에 무조건 clear()를 해야 한다
+			fin >> str;
+		}
+	}
+}
+
+// 출력값
+// 100
+// 200
+~~~
+
+###### [파일 입출력](#파일-입출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 파일에 쓰기
+
+#ConsoleApp.cpp
+~~~c++
+// 한줄 넣기
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+	ofstream fin;
+	fin.open("qqqqq.txt");
+
+	string line;
+	getline(cin, line);
+
+	if (!cin.fail())
+	{
+		fin << line;
+	}
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 한글자 넣기
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main()
+{
+	ofstream fin;
+	fin.open("qqqqq.txt");
+
+	char character = 'q';
+	fin.put(character);
+}
+~~~
+
+###### [파일 입출력](#파일-입출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 파일 안에서 탐색하기
+
+  - seekp()
+    - fout.seekp(0); // 처음 위치로 이동
+    - fout.seekp(20, ios_base::cur) // 현재 위치로부터 20 바이트 뒤로 이동
+등등등…나중에 다시 공부해보기
+
+###### [파일 입출력](#파일-입출력)
+###### [Top](#top)
