@@ -1,9 +1,52 @@
 ###### Top
   
+  - [메모리 누수 확인](#메모리-누수-확인)
+
   - [출력](#출력)
     - [Hello World 출력하기](#hello-world-출력하기)
     - [using namespace](#using-namespace)
     - [조정자(Manipulator)](#조정자manipulator)
+
+  - [입력](#입력)
+    - [입력하기](#입력하기)
+    - [입력버리기](#입력버리기)
+
+<br/>
+<br/>
+
+***
+
+# 메모리 누수 확인
+
+  - 메모리 누수를 확인 하는 방법
+
+#ConsoleApp.cpp
+~~~c++
+// 메모리 누수 확인
+#include <iostream>
+#include <crtdbg.h> // 메모리 할당 및 할당 해제를 추적하는 함수들이 정의되어 있음.
+
+// 몇 행에서 메모리가 누수 되는지 알려줌
+#if _DEBUG
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
+
+int main()
+{
+	int* num = new int;
+
+	_CrtDumpMemoryLeaks(); // 맨 마지막에 넣기
+	return 0;
+}
+~~~
+
+![20221008_161457](https://user-images.githubusercontent.com/39178978/194695111-b864da98-fb20-4db9-b182-032a558fa94e.png)
+
+  - 첫번째는 몇행에서 누수가 발생 했는지, 그리고 두번째는 몇번째 메모리 할당에서 오류가 나는지 알려준다
+
+###### [메모리 누수 확인](#메모리-누수-확인)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -67,6 +110,8 @@ int main()
 ~~~
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
 
   - 같은 이름을 가진 함수라도 namespace를 이용해서 사용할 수 있게 된다
   - 아래와 같이 사용할때, main함수 위쪽에 namespace를 정의해야 된다!(잊지 말기!)
@@ -143,6 +188,8 @@ int main()
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
+<br/>
+
   - setw, setfill 등과 같은 것을 이용하기 위해서는 iomanip를 include해줘야 한다
 
 #ConsoleApp.cpp
@@ -169,4 +216,109 @@ int main()
 ~~~
 
 ###### [출력](#출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 입력
+
+  - c++ 입력받는법
+
+    - [입력하기](#입력하기)
+    - [입력버리기](#입력버리기)
+
+###### [입력](#입력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 입력하기
+
+  - cin은 배열에 입력을 받을때, 배열의 길이를 알 수 없기 때문에 더 큰 데이터가 들어오면 예외가 발생될 수 있다. 
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+	char str[4];
+	cin >> str;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - c++로 안전하게 배열에 입력 받는 방법은 setw를 이용하는 방법이다 
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+
+int main()
+{
+	char str[4]; // pppp
+	cin >> setw(4) >> str; // ppp \O
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 숫자를 입력받을시에, 숫자로 입력 받을 수 있는 부분까지 입력 된다는 것을 기억하기 
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+	int num; // 1234QWER
+	cin >> num; // 1234
+}
+~~~
+
+###### [입력](#입력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 입력버리기
+
+  - clear()
+    - 스트림을 좋은 상태로 돌려 줌
+      - cin.clear();
+  - ignore()
+    - 파일 끝에 도달하거나, 지정한 수만큼 문자를 버리면 멈춤
+      - cin.ignore(); // 문자1개 버림
+      - cin.ignore(10); // 문자10개 버림
+      - cin.ignore(10, ‘\n’); // 문자 10개를 버림, 단 그 전에 뉴라인을 만나면 멈춤
+      - cin.ignore(LLONG_MAX, ‘\n’); // 최대 문자 수를 버림, 단 그 전에 뉴라인을 만나면 멈춤
+  - get()
+    - 뉴라인 문자를 만나기까지 모든 문자를 가져옴
+    - 뉴라인 문자는 입력 스트림에 남아 있음
+      - get(firstName, 100); // 99개 가져오거나, 뉴라인 문자를 만날때까지 가져옴
+      -  get(firstName, 100, ‘#’) // 99개 가져오거나, ‘#’ 문자를 만날때까지 가져옴
+  - getline()
+    - 뉴라인 문자를 만나기까지 모든 문자를 가져옴
+    - 뉴라인 문자는 입력 스트림에 남아 있지 않음
+      - get(firstName, 100);
+      - get(firstName, 100, ‘#’)
+
+###### [입력](#입력)
 ###### [Top](#top)
