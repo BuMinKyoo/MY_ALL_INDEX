@@ -159,6 +159,21 @@
 
 
 - <details markdown="1">
+  <summary>소켓통신</summary>
+  <div markdown="1">
+  
+  - [소켓통신](#소켓통신)
+    - [소켓통신 사용 준비](#소켓통신-사용-준비)
+    - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
+    - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
+    - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
+    - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
+      
+  </div>
+  </details>
+
+
+- <details markdown="1">
   <summary>기능별 정리</summary>
   <div markdown="1">
   
@@ -3873,6 +3888,638 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 ~~~
 
 ###### [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 소켓통신
+
+    - [소켓통신 사용 준비](#소켓통신-사용-준비)
+    - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
+    - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
+    - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
+    - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓통신 사용 준비
+  - 소켓 통신을 사용하기 위해서 여러가지를 추가해 주어야 한다.
+  - 컴파일을 위해서 추가해 줘야 하는 것도 있고, 전에 있던 함수들을 막아놓은 부분을 쓰기 위해서도 선언해 주어야 하는 부분들이 있다.
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 컴파일 하기 위해 사용
+#include <WinSock2.h> // 해더파일
+#pragma comment(lib, "WS2_32.lib") // 라이브러리
+#include <ws2tcpip.h>     // 서버쪽의 InetPton 함수를 사용하기 위해! (서버쪽에만 정의해 주면됨!)
+
+. . .
+
+CMFCApplication1Dlg::CMFCApplication1Dlg(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CMFCApplication1Dlg::IDD, pParent)
+{
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	// 실질적으로 사용하기 위한것
+	WSADATA temp;
+	WSAStartup(0x0202, &temp); // 윈도우 소캣 2.2를 쓰겠다는 뜻(초기화 할때 한번만 하면됨)
+}
+
+. . .
+
+void CMFCApplication1Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	WSACleanup();  // 소켓 라이브러리를 그만 사용하도록 설정한다.
+}
+~~~
+
+<br/>
+
+#framework.h or stdafx.h
+~~~c++
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // 이전의 함수를 사용하고 싶어서 이용
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 기본적인 비동기 통신 형태
+  - 위쪽에 소개된 기본적인 통신을 하기위한 것들을 정의 해주기
+  - WSAAsyncSelect 함수를 이용해 소켓이 클라이언트가 접속과, 데이터를 보냈을때 메시지를 호출하고 그에 따라서 작업할 것들을 정의해서 사용하게 됨
+
+<br/>
+
+#framework.h(서버)
+~~~c++
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // 이전의 함수를 사용하고 싶어서 이용
+~~~
+
+<br/>
+
+#AppDlg.h(서버)
+~~~c++
+private:
+	CListBox m_list_box;
+	SOCKET mh_listen_socket;
+	SOCKET mh_client_socket;
+	afx_msg LRESULT On25001(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT On25002(WPARAM wParam, LPARAM lParam);
+~~~
+
+<br/>
+
+#AppDlg.cpp(서버)
+~~~c++
+#include <WinSock2.h> // 해더파일
+#pragma comment(lib, "WS2_32.lib") // 라이브러리
+#include <ws2tcpip.h>     // InetPton 함수를 사용하기 위해!
+
+CServerDlg::CServerDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_SERVER_DIALOG, pParent)
+{
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	// 실질적으로 사용하기 위한것
+	WSADATA temp;
+	WSAStartup(0x0202, &temp); // 윈도우 소캣 2.2를 쓰겠다는 뜻(초기화 할때 한번만 하면됨)
+
+	mh_client_socket = INVALID_SOCKET;
+}
+
+. . .
+
+BOOL CServerDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// 소켓을 네트워크 장치에 바인딩하기 위해 정보를 저장할 변수
+	// IP 주소 체계, 프로그램 식별 번호(포트 번호)
+	// htons 라디언, 인디언 바이트 정렬이 다를 경우 그것을 통일 해줌
+	sockaddr_in addr_data = { AF_INET, htons(1900) };
+	addr_data.sin_addr.s_addr = inet_addr("192.168.0.3");  // IP 주소 설정
+
+	// 클라이언트 접속에 사용할 Listen 소켓 생성!!
+	// AF_INET : ip주소를 어떤 형식으로 사용 할 것인지
+	// SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지
+	// 0 : 소켓 방식에 맞는 프로토콜을 자동으로 써줌
+	mh_listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+	// addr_data에 설정된 정보를 사용하여 소켓을 네트워크 시스템에 연결한다.
+	bind(mh_listen_socket, (sockaddr*)&addr_data, sizeof(addr_data));
+
+	// 수신을 하기 위해서 사용하는 함수, 이것이 없으면 발신밖에 되지 않음
+	// 클라이언트는 listen을 사용하지 않지만 서버는 클라이언트에게 받아야 하기 때문에 사용
+	listen(mh_listen_socket, 1);
+
+	// mh_listen_socket에 사용자가 접속을 시도(FD_ACCEPT)했을 때
+	// 현재 대화 상자(m_hWnd)에 25001번 메시지가 발생하도록 비동기를 설정한다.
+	WSAAsyncSelect(mh_listen_socket, m_hWnd, 25001, FD_ACCEPT);
+
+	return TRUE;
+}
+
+. . .
+
+void CServerDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	WSACleanup();  // 소켓 라이브러리를 그만 사용하도록 설정한다.
+}
+
+. . .
+
+afx_msg LRESULT CServerDlg::On25001(WPARAM wParam, LPARAM lParam)
+{
+	// 접속한 클라이언트의 정보를 저장할 구조체를 초기화한다.
+	sockaddr_in addr_data = { 0, };
+	int data_size = sizeof(addr_data);  // 구조체의 크기를 저장한다.
+	// 클라이언트 소켓의 접속을 허락한다. (복제 소켓 생성)
+	SOCKET h_client_socket = accept(mh_listen_socket, (sockaddr*)&addr_data, &data_size);
+
+	wchar_t temp_ip_address[32];
+	// addr_data 변수에 정수 형태로 저장되어 있는 IP 주소를 문자열 형태로
+	// 변경해서 temp_ip_address에 저장한다.
+	InetNtop(AF_INET, &addr_data.sin_addr, temp_ip_address, 32);
+	m_list_box.InsertString(-1, temp_ip_address + CString(L" 에서 서버에 접속 시도를 하고 있습니다."));
+
+	CString str;
+	// 현재 클라이언트 접속을 한 개만 유지할 거라서 클라이언트 접속 여부를 체크한다.
+	if (mh_client_socket != INVALID_SOCKET) {
+		m_list_box.InsertString(-1, L"이미 접속한 클라이언트가 있어 접속을 허락하지 않습니다.");
+		closesocket(h_client_socket); // 클라이언트와 통신하려고 만든 소켓을 제거한다.
+	}
+	else {
+		m_list_box.InsertString(-1, L"클라이언트가 접속했습니다.");
+		// 현재 접속한 클라이언트의 핸들 값을 멤버 변수에 보관해서 접속을 유지한다.
+		mh_client_socket = h_client_socket;
+		// mh_client_socket에서 체크해야 할 상황은 크게 두 가지이다.
+		// 이 소켓에 '데이터가 수신된 경우'와 '클라이언트가 접속을 해제한 경우'이다.
+		// 그래서 이 두 가지 사황을 비동기로 설정하여 계속 기다리지 않고 상황이
+		// 발생하면 이 대화 상자에 25002번 메시지가 발생하도록 한다.
+		WSAAsyncSelect(mh_client_socket, m_hWnd, 25002, FD_READ | FD_CLOSE);
+	}
+
+	return 0;
+}
+
+. . .
+
+afx_msg LRESULT CServerDlg::On25002(WPARAM wParam, LPARAM lParam)
+{
+	// lParam의 하위 16비트에 이 메시지(25002)를 발생시킨 이벤트 종류가 저장되어 있음!
+	if (WSAGETSELECTEVENT(lParam) == FD_READ) {  // 데이터가 수신됨!!
+		int temp = 0;
+		recv(mh_client_socket, (char*)&temp, 4, 0);  // 수신된 4 바이트 값을 얻는다.
+
+		CString str;
+		str.Format(L"%d", temp);  // 정숫값을 문자열로 변환한다.
+		m_list_box.InsertString(-1, str);  // 리스트 박스에 출력한다.
+	}
+	else {  // FD_CLOSE, 상대편 이 종료됨!
+		closesocket(mh_client_socket);  // 클라이언트와 통신하던 소켓을 제거한다.
+		mh_client_socket = INVALID_SOCKET;  // 소켓을 사용 안함으로 설정한다.
+		m_list_box.InsertString(-1, L"클라이언트가 접속을 해제습니다.");
+	}
+
+	return 0;
+}
+~~~
+
+<br/>
+
+#framework.h(클라이언트)
+~~~c++
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // 이전의 함수를 사용하고 싶어서 이용
+~~~
+
+<br/>
+
+#AppDlg.h(클라이언트)
+~~~c++
+SOCKET mh_socket;     // 서버에 접속해서 통신할 소켓
+	char m_is_connected;  // 접속 상태 (0:접속 안됨, 1:접속중, 2:접속됨)
+	CListBox m_event_list;
+	afx_msg LRESULT On26002(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT On26001(WPARAM wParam, LPARAM lParam);
+~~~
+
+<br/>
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+// 컴파일 하기 위해 사용
+#include <WinSock2.h> // 해더파일
+#pragma comment(lib, "WS2_32.lib") // 라이브러리
+
+CClientDlg::CClientDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_CLIENT_DIALOG, pParent)
+{
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	// 실질적으로 사용하기 위한것
+	WSADATA temp;
+	WSAStartup(0x0202, &temp); // 윈도우 소캣 2.2를 쓰겠다는 뜻(초기화 할때 한번만 하면됨)
+
+	mh_socket = INVALID_SOCKET;  // 소켓 핸들 초기화
+	m_is_connected = 0;  // 접속 상태 초기화
+}
+
+
+. . .
+
+void CClientDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// 서버와 접속 상태라면 접속에 사용하던 소켓을 제거한다.
+	if (mh_socket != INVALID_SOCKET) closesocket(mh_socket);
+	WSACleanup();  // 소켓 라이브러리를 그만 사용하도록 설정한다.
+	
+}
+
+. . .
+
+void CClientDlg::OnBnClickedSenddata()
+{
+	// 서버와 연결된 상태이면서 소켓 사용이 가능하다면 정숫값을 전송한다.
+	if (m_is_connected == 2 && mh_socket != INVALID_SOCKET) {
+		int num = GetDlgItemInt(IDC_NUM_EDIT); // 입력된 정숫값을 얻는다.
+		// mh_socket 소켓을 사용하여 서버로 정숫값을 보낸다.
+		send(mh_socket, (char*)&num, sizeof(int), 0);
+		// 전송 결과를 리스트 박스에 보여준다.
+		CString str;
+		str.Format(L"서버로 정숫값( %d )을 전송했습니다!", num);
+		m_event_list.InsertString(-1, str);
+	}
+}
+
+. . . 
+
+void CClientDlg::OnBnClickedClickedconnect()
+{
+	if (mh_socket == INVALID_SOCKET) {  // 소켓이 만들어졌는지 여부를 체크한다.
+		// IP 주소 체계, 프로그램 식별 번호(포트 번호)
+		sockaddr_in addr_data = { AF_INET, htons(1900), };
+		addr_data.sin_addr.s_addr = inet_addr("192.168.0.3");  // 접속할 서버 IP 주소 설정
+
+		mh_socket = socket(AF_INET, SOCK_STREAM, 0);  // 서버에 접속해서 정숫값을 전송할 소켓 생성
+		// 서버 접속에 사용하는 connect 함수가 서버에 문제가 있거나 네트워크에 문제가 있으면
+		// 최대 28초간 '응답 없음' 상태가 될수 있기 때문에 접속을 체크해주는 비동기를 설정한다.
+		// mh_socket에 FD_CONNECT 이벤트가 발생하면 현재 대화 상자에 26001번 메시지가 발생한다.
+		WSAAsyncSelect(mh_socket, m_hWnd, 26001, FD_CONNECT);
+		// 서버에 접속을 시도한다.
+		connect(mh_socket, (sockaddr*)&addr_data, sizeof(addr_data));
+		m_is_connected = 1;  // 접속 시도중으로 상태를 변경한다.
+		m_event_list.InsertString(-1, L"서버에 접속을 시도합니다");
+	}
+	else {
+		// 접속을 시도중이거나 접속이 된 상태라는 것을 보여준다.
+		if (m_is_connected == 2) m_event_list.InsertString(-1, L"이미 접속된 상태입니다!");
+		else m_event_list.InsertString(-1, L"서버에 접속을 시도하고 있습니다! 기다려주세요...");
+	}
+}
+
+. . .
+
+void CClientDlg::OnBnClickedClickeddisconnect()
+{
+	// 소켓이 만들어져 있다면 소켓을 제거하는 작업을 한다.
+	if (mh_socket != INVALID_SOCKET) {
+		m_is_connected = 0;  // 접속 해제 상태로 변경한다.
+		closesocket(mh_socket);  // 종료된 소켓을 제거한다.
+		mh_socket = INVALID_SOCKET;  // 소켓 변수 초기화
+		m_event_list.InsertString(-1, L"서버와 접속을 해제했습니다!!");
+	}
+	else m_event_list.InsertString(-1, L"서버와 연결되어 있지 않습니다.");
+}
+
+. . .
+
+afx_msg LRESULT CClientDlg::On26001(WPARAM wParam, LPARAM lParam)
+{
+	if (WSAGETSELECTERROR(lParam)) {   // 상위 16비트에 오류 값이 들어있음
+		closesocket(mh_socket);  // 접속을 실패한 소켓 제거
+		mh_socket = INVALID_SOCKET;  // 변수 초기화!
+		m_event_list.InsertString(-1, L"서버에 접속하지 못했습니다!");
+		m_is_connected = 0;  // 접속 해제 상태로 변경한다.
+	}
+	else {  // 접속에 성공!
+	 // mh_socket에서 체크해야 할 상황은 크게 두 가지이다.
+	 // 이 소켓에 '데이터가 수신된 경우'와 '서버가 접속을 해제한 경우'이다.
+	 // 그래서 이 두 가지 사황을 비동기로 설정하여 계속 기다리지 않고 상황이
+	 // 발생하면 이 대화 상자에 26002번 메시지가 발생하도록 한다.
+		WSAAsyncSelect(mh_socket, m_hWnd, 26002, FD_READ | FD_CLOSE);
+		m_event_list.InsertString(-1, L"서버에 접속했습니다!");
+		m_is_connected = 2;  // 접속 상태로 변경한다.
+	}
+
+	return 0;
+}
+
+
+. . . 
+
+afx_msg LRESULT CClientDlg::On26002(WPARAM wParam, LPARAM lParam)
+{
+	if (WSAGETSELECTEVENT(lParam) == FD_READ) {  // 데이터가 수신됨!!
+		// 현재 사용 안 함
+	}
+	else {  // FD_CLOSE, 상대편 이 종료됨!
+		closesocket(mh_socket);  // 종료된 소켓을 제거한다.
+		mh_socket = INVALID_SOCKET;  // 소켓 변수 초기화
+		m_event_list.InsertString(-1, L"서버에서 접속을 해제했습니다!!");
+		m_is_connected = 0;  // 접속 해제 상태로 변경한다.
+	}
+
+	return 0;
+}
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 일정한 크기의 데이터 보내기
+
+  - 위에서 바꿔야 되는부분만 수정(클라이언트는 데이터를 보내는 send부분, 서버는 데이터를 받는 receive부분)
+
+<br/>
+
+#AppDlg.cpp(서버)
+~~~c++
+afx_msg LRESULT CServerDlg::On25002(WPARAM wParam, LPARAM lParam)
+{
+	// lParam의 하위 16비트에 이 메시지(25002)를 발생시킨 이벤트 종류가 저장되어 있음!
+	if (WSAGETSELECTEVENT(lParam) == FD_READ)
+	{  // 데이터가 수신됨!!
+		wchar_t recv_str[50];
+
+		recv(mh_client_socket, (char*)recv_str, 100, 0);  // 수신된 100 바이트 값을 얻는다.
+
+		m_list_box.InsertString(-1, recv_str);  // 리스트 박스에 출력한다.
+	}
+	else
+	{  // FD_CLOSE, 상대편 이 종료됨!
+		closesocket(mh_client_socket);  // 클라이언트와 통신하던 소켓을 제거한다.
+		mh_client_socket = INVALID_SOCKET;  // 소켓을 사용 안함으로 설정한다.
+		m_list_box.InsertString(-1, L"클라이언트가 접속을 해제습니다.");
+	}
+
+	return 0;
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+void CClientDlg::OnBnClickedSenddata()
+{
+	// 서버와 연결된 상태이면서 소켓 사용이 가능하다면 스트링을 전송한다.
+	if (m_is_connected == 2 && mh_socket != INVALID_SOCKET)
+	{
+		CString str;
+		GetDlgItemText(IDC_NUM_EDIT, str);
+
+		wchar_t send_str[50];
+		wcscpy_s(send_str, 50, str);
+
+		send(mh_socket, (char*)send_str, 100, 0);
+		// 전송 결과를 리스트 박스에 보여준다.
+
+		str.Format(L"서버로 텍스트( %s )을 전송했습니다!", str);
+		m_event_list.InsertString(-1, str);
+	}
+}
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 크기가 일정하지 않은 데이터 보내기
+
+  - 위에서 바꿔야 되는부분만 수정(클라이언트는 데이터를 보내는 send부분, 서버는 데이터를 받는 receive부분)
+
+<br/>
+
+#AppDlg.cpp(서버)
+~~~c++
+afx_msg LRESULT CServerDlg::On25002(WPARAM wParam, LPARAM lParam)
+{
+	// lParam의 하위 16비트에 이 메시지(25002)를 발생시킨 이벤트 종류가 저장되어 있음!
+	if (WSAGETSELECTEVENT(lParam) == FD_READ)
+	{  // 데이터가 수신됨!!
+
+		unsigned short body_size;
+
+		recv(mh_client_socket, (char*)&body_size, 2, 0);  // 수신된 값중 2바이트 읽는다
+
+		char* p_recv_data = new char[body_size];
+
+		recv(mh_client_socket, (char*)p_recv_data, body_size, 0);  // 수신된 2 바이트 값을 얻는다.
+		
+		m_list_box.InsertString(-1, (wchar_t*)p_recv_data);  // 리스트 박스에 출력한다.
+
+		delete[] p_recv_data;
+	}
+	else
+	{  // FD_CLOSE, 상대편 이 종료됨!
+		closesocket(mh_client_socket);  // 클라이언트와 통신하던 소켓을 제거한다.
+		mh_client_socket = INVALID_SOCKET;  // 소켓을 사용 안함으로 설정한다.
+		m_list_box.InsertString(-1, L"클라이언트가 접속을 해제습니다.");
+	}
+
+	return 0;
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+void CClientDlg::OnBnClickedSenddata()
+{
+	// 서버와 연결된 상태이면서 소켓 사용이 가능하다면 스트링을 전송한다.
+	if (m_is_connected == 2 && mh_socket != INVALID_SOCKET)
+	{
+		CString str;
+		GetDlgItemText(IDC_NUM_EDIT, str);
+
+		int send_data_size = (str.GetLength() + 1) * 2;
+
+		char* p_send_data = new char[2 + send_data_size];
+		*(unsigned short*)p_send_data = send_data_size;
+		memcpy(p_send_data + 2, (const wchar_t*)str, send_data_size);
+
+		send(mh_socket, p_send_data, 2 + send_data_size, 0);
+		// 전송 결과를 리스트 박스에 보여준다.
+
+		delete[] p_send_data;
+
+		str.Format(L"서버로 텍스트( %s )을 전송했습니다!", str);
+		m_event_list.InsertString(-1, str);
+	}
+}
+~~~
+
+<br/>
+
+  - 위쪽 서버에서의 문제점은 수신받은 데이터를 2번 끊어 읽는 다는것에 문제가 있다. 코드에서 두번째로 읽기 전에, 아직 읽어야할 데이터가 남아 있다는 것을 인지하고 다시 읽어 내라고 25002메시지를 한번더 보내주기 때문에(WSAAsyncSelect 함수의 FD_READ옵션이 있기 때문!), 한번씩 보내지도 않은 쓰레기 데이터를 읽어 오게 되는 문제가 있다, 그것을 해결 하기 위해서는 아래와 같이 코드를 바꿔 줘야 한다.
+
+<br/>
+
+#AppDlg.cpp(서버)
+~~~c++
+afx_msg LRESULT CServerDlg::On25002(WPARAM wParam, LPARAM lParam)
+{
+	// lParam의 하위 16비트에 이 메시지(25002)를 발생시킨 이벤트 종류가 저장되어 있음!
+	if (WSAGETSELECTEVENT(lParam) == FD_READ)
+	{  // 데이터가 수신됨!!
+
+		WSAAsyncSelect(mh_client_socket, m_hWnd, 25002, FD_CLOSE);
+
+		unsigned short body_size;
+
+		recv(mh_client_socket, (char*)&body_size, 2, 0);  // 수신된 값중 2바이트 읽는다
+
+		char* p_recv_data = new char[body_size];
+
+		recv(mh_client_socket, (char*)p_recv_data, body_size, 0);  // 수신된 2 바이트 값을 얻는다.
+		
+		m_list_box.InsertString(-1, (wchar_t*)p_recv_data);  // 리스트 박스에 출력한다.
+
+		delete[] p_recv_data;
+
+		WSAAsyncSelect(mh_client_socket, m_hWnd, 25002, FD_READ | FD_CLOSE);
+	}
+	else
+	{  // FD_CLOSE, 상대편 이 종료됨!
+		closesocket(mh_client_socket);  // 클라이언트와 통신하던 소켓을 제거한다.
+		mh_client_socket = INVALID_SOCKET;  // 소켓을 사용 안함으로 설정한다.
+		m_list_box.InsertString(-1, L"클라이언트가 접속을 해제습니다.");
+	}
+
+	return 0;
+}
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓통신 암호코드 및 메시지 판단 코드 넣기
+
+  - 암호코드 - 메시지판단 코드 - 메시지 길이코드 - 실제 메시지
+  - 위에서 바꿔야 되는부분만 수정(클라이언트는 데이터를 보내는 send부분, 서버는 데이터를 받는 receive부분)
+
+<br/>
+
+#AppDlg.cpp(서버)
+~~~c++
+afx_msg LRESULT CServerDlg::On25002(WPARAM wParam, LPARAM lParam)
+{
+	// lParam의 하위 16비트에 이 메시지(25002)를 발생시킨 이벤트 종류가 저장되어 있음!
+	if (WSAGETSELECTEVENT(lParam) == FD_READ)
+	{  // 데이터가 수신됨!!
+
+		WSAAsyncSelect(mh_client_socket, m_hWnd, 25002, FD_CLOSE);
+
+		char key, message_id;
+		// 첫 바이트를 읽어서 정상적인 키 값이 들어있는지 확인한다.
+		recv(mh_client_socket, &key, 1, 0);
+		if (key == 27) {  // 27인 경우에만 처리한다.
+			// Message ID를 읽는다.
+			recv(mh_client_socket, &message_id, 1, 0);
+
+			unsigned short body_size;
+			// 수신된 데이터 중에 2바이트를 먼저 읽어서 Body 데이터의 크기를 알아낸다.
+			recv(mh_client_socket, (char*)&body_size, 2, 0);
+			// Body 데이터를 수신하기 위해 메모리를 할당한다.
+			char* p_recv_data = new char[body_size];
+			// 수신된 Body 데이터를 읽는다.
+			recv(mh_client_socket, p_recv_data, body_size, 0);
+			// message_id값이 1이면 채팅 정보이다. 따라서 리스트 박스에 문자열을 추가한다.
+			if (message_id == 1) {
+				// 수신된 문자열을 리스트 박스에 출력한다.
+				m_list_box.InsertString(-1, (wchar_t*)p_recv_data);
+			}
+
+			delete[] p_recv_data;
+
+			WSAAsyncSelect(mh_client_socket, m_hWnd, 25002, FD_READ | FD_CLOSE);
+		}
+	}
+	else
+	{  // FD_CLOSE, 상대편 이 종료됨!
+		closesocket(mh_client_socket);  // 클라이언트와 통신하던 소켓을 제거한다.
+		mh_client_socket = INVALID_SOCKET;  // 소켓을 사용 안함으로 설정한다.
+		m_list_box.InsertString(-1, L"클라이언트가 접속을 해제습니다.");
+	}
+
+	return 0;
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+void CClientDlg::OnBnClickedSenddata()
+{
+	// 서버와 연결된 상태이면서 소켓 사용이 가능하다면 스트링을 전송한다.
+	if (m_is_connected == 2 && mh_socket != INVALID_SOCKET)
+	{
+		CString str;
+		GetDlgItemText(IDC_NUM_EDIT, str);
+
+		int send_data_size = (str.GetLength() + 1) * 2;
+
+		// Packet을 구성하기 위한 메모리를 할당한다.
+		char* p_send_data = new char[4 + send_data_size];
+		// 첫 바이트에 고유 식별 키를 기록한다.
+		*p_send_data = 27;
+		// 메시지 종류를 기록한다. (1번은 채팅 데이터를 의미)
+		*(p_send_data + 1) = 1;
+		// 실제 전송할 데이터의 크기를 기록한다.
+		*(unsigned short*)(p_send_data + 2) = send_data_size;
+		// 4바이트 뒤에 실제 전송할 데이터를 복사한다.
+		memcpy(p_send_data + 4, (const wchar_t*)str, send_data_size);
+
+		// mh_socket 소켓을 사용하여 서버로 문자열을 보낸다.
+		send(mh_socket, p_send_data, 4 + send_data_size, 0);
+
+		delete[] p_send_data;
+
+		CString str2;
+		str2.Format(L"서버로 텍스트( %s )을 전송했습니다!", str);
+		m_event_list.InsertString(-1, str2);
+	}
+}
+~~~
+
+###### [소켓통신](#소켓통신)
 ###### [Top](#top)
 
 <br/>
