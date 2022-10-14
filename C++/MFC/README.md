@@ -2365,7 +2365,7 @@ CImage m_image;
 // m_image.Draw(dc, 0, 0) : 0 ,0 위치에서부터 사진을 출력한다
 BOOL CMFCApplication2Dlg::OnInitDialog()
 {
-	m_image.Load(L"BarcodePrint.png");
+	m_image.Load(L"BarcodePrint.png"); // 이 경로는 현제 사진이, 프로그램 솔루션안에 이 있어야 하는경로!
 
 	CDialogEx::OnInitDialog();
 }
@@ -2407,7 +2407,7 @@ CImage m_image;
 // m_image.Draw(dc, 0, 0, w/2, h/2) : 0 ,0 위치에서부터 사진을 출력하고, 원본의 사진을 w/2, h/2만큼 축소해서 출력한다
 BOOL CMFCApplication2Dlg::OnInitDialog()
 {
-	m_image.Load(L"BarcodePrint.png");
+	m_image.Load(L"BarcodePrint.png"); // 이 경로는 현제 사진이, 프로그램 솔루션안에 이 있어야 하는경로!
 
 	CDialogEx::OnInitDialog();
 }
@@ -2452,7 +2452,7 @@ CImage m_image;
 // m_image.Draw(dc, 0, 0, 200, 200, 50, 50, 200, 200) : 0 ,0 위치에서부터 사진을 출력하고, 원본의 사진을 200, 200만큼 축소해서 출력하고, (50,50)에서 (200,200)사이의 부분만 잘라서 출력한다
 BOOL CMFCApplication2Dlg::OnInitDialog()
 {
-	m_image.Load(L"BarcodePrint.png");
+	m_image.Load(L"BarcodePrint.png"); // 이 경로는 현제 사진이, 프로그램 솔루션안에 이 있어야 하는경로!
 
 	CDialogEx::OnInitDialog();
 }
