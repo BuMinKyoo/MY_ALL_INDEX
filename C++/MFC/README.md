@@ -68,6 +68,7 @@
     - [ShellExecute](#shellexecute)
     - [AnimateWindow](#animatewindow)
     - [FindWindow, FindWindowEx](#findwindow-findwindowex)
+    - [AfxExtractSubString](#afxextractsubstring)
 
   </div>
   </details>
@@ -544,6 +545,48 @@ BOOL CMFCApplication2Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 ~~~
 
 ![20220827_113633](https://user-images.githubusercontent.com/39178978/187011001-0e9789d9-8db0-47ce-ab1c-e666853dfb81.png)
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+  - SendMessage를 통해서 Cstring문자열 전송하기!
+    - 가장주의할점!!! Cstring을 전송할때 PostMessage는 데이터가 안갈 수도 있다는것을 꼭 주의하고 SendMessage로 보내도록 하자!!
+
+#AppDlg.cpp(부모)
+~~~c++
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	Cchaild* chaild = new Cchaild;
+	chaild->Create(IDD_DIALOG1, this);
+	chaild->ShowWindow(SW_SHOW);
+}
+
+
+afx_msg LRESULT CMFCApplication1Dlg::On40000(WPARAM wParam, LPARAM lParam)
+{
+	CString* ptrStr = (CString*)lParam;
+	CString str = _T("");
+	str.Format(_T("%s"), *ptrStr);
+
+	return 0;
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp(자식)
+~~~c++
+BOOL Cchaild::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	CString str = _T("qwer");
+
+	GetParent()->SendMessageW(40000, 0, (LPARAM)&str);
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
+}
+~~~
 
 ###### [Message](#message)
 ###### [Top](#top)
@@ -1290,6 +1333,7 @@ CD1::CD1(int Dialog, CWnd* pParent /*=NULL*/)
     - [ShellExecute](#shellexecute)
     - [AnimateWindow](#animatewindow)
     - [FindWindow, FindWindowEx](#findwindow-findwindowex)
+    - [AfxExtractSubString](#afxextractsubstring)
 
 ###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
@@ -2177,6 +2221,36 @@ void CMFCApplication3Dlg::OnBnClickedButton1()
 			}
 		}
 	}
+}
+~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# AfxExtractSubString
+  - 특정한 글자로 잘라낼 수 있다
+
+<br/>
+
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	CString str = _T("q^w^e^");
+
+	CString own = _T("");
+	CString two = _T("");
+	CString three = _T("");
+
+	AfxExtractSubString(own, str, 0, '^'); // q
+	AfxExtractSubString(own, str, 1, '^'); // w
+	AfxExtractSubString(own, str, 2, '^'); // e
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 ~~~
 
