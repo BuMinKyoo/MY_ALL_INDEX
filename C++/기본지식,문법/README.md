@@ -42,6 +42,16 @@
     - [추상클래스](#추상클래스)
     - [인터페이스](#인터페이스)
 
+  - [캐스팅](#캐스팅)
+    - [static_cast](#static_cast)
+    - [reinterpret_cast](#reinterpret_cast)
+    - [const_cast](#const_cast)
+    - [dynamic_cast](#dynamic_cast)
+
+  - [인라인 함수](#인라인-함수)
+  - [static](#static)
+  - [벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿](#벡터vector-맵map-셋set-stl컨테이너-템플릿)
+
 <br/>
 <br/>
 
@@ -1987,4 +1997,229 @@ int main()
 ~~~
 
 ###### [개체](#개체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 캐스팅
+
+  - 형변환(캐스팅) 하는 방법에는 여러가지가 있는데, 컴파일러가 해주는 묵시적 형변환, 프로그래머가 따로 지정하는 명시적 형변환 이 있다. 또한 이 장에서 설명하는 c++에서 제공되는 다양한 형변환 방법들이 있다. 이렇게 C++에 다양한 방법이 있는 이유는, C방법에서는 그 어떤 상황도 묘상하게 캐스팅해 바꿔 버릴 수 있기 때문에 C++에서는 그것을 안전하게 방지하고, 프로그래머의 실수를 방지해 주는 방법들이 많이 있기 때문이다
+
+    - [static_cast](#static_cast)
+    - [reinterpret_cast](#reinterpret_cast)
+    - [const_cast](#const_cast)
+    - [dynamic_cast](#dynamic_cast)
+
+###### [캐스팅](#캐스팅)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# static_cast
+
+  - 두 숫자 형 간의 변환
+
+#ConsoleApp.cpp
+~~~c++
+//사용법
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	float num1 = 3.1f;
+	int num2 = static_cast<int>(num1);
+
+	cout << num2;
+}
+~~~
+
+  - 개체 포인터
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class Animal
+{
+	void Sound()
+	{
+		cout << "나는 동물 클래스" << endl;
+	}
+
+};
+
+class Cat : Animal
+{
+	void Sound()
+	{
+		cout << "나는 고양이 클래스" << endl;
+	}
+};
+
+class Dog : Animal
+{
+	void Sound()
+	{
+		cout << "나는 강아지 클래스" << endl;
+	}
+};
+
+class Table
+{
+	void Sound()
+	{
+		cout << "나는 책상 클래스" << endl;
+	}
+};
+
+int main()
+{
+	Cat* cat = new Cat;
+	Cat* cat1 = new Cat;
+	Dog* dog = new Dog;
+
+	Table* table = new Table;
+
+	cat = (Cat*)dog; // 명시적 형변환, 컴파일 ok 지만 말도 안되는 상황 발생함
+	cat1 = static_cast<Cat*>(dog); // static_cast 형변환, 이런 맞지 않은 상황에서 에러를 밷기 때문에 안정적
+
+	table = (Table*)dog; // 명시적 형변환, 컴파일 ok 지만 말도 안되는 상황 발생함
+	table = static_cast<Table*>(dog); // static_cast 형변환, 이런 맞지 않은 상황에서 에러를 밷기 때문에 안정적, class의 부모 자식관의 상속 관계가 아니기 때문에 말이 안됨
+
+}
+~~~
+
+###### [캐스팅](#캐스팅)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# reinterpret_cast
+
+  - 가장 위험한 캐스팅
+  - 말도 안되는 형변환을 할 수 있음
+  - 따라서,  일반적인 상황에서는 static_cast 을 쓰면 될것이고, 정말 희한하게 사용할 그 상황에서는 reinterpret_cast를 쓰게 될 수도 있을 것 같다
+  - 더 공부하기!!
+
+###### [캐스팅](#캐스팅)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# const_cast
+
+  - 다음에 쓸때 자세히 공부하기
+
+###### [캐스팅](#캐스팅)
+###### [Top](#top)
+
+# dynamic_cast
+
+  - 다음에 쓸때 자세히 공부하기
+
+###### [캐스팅](#캐스팅)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 인라인 함수
+
+  - 복붙과 같은것
+  - 매크로와 같은것
+  - 하지만 디버깅을 할 수 있음
+
+#ConsoleApp.cpp
+~~~c++
+/#include <iostream>
+using namespace std;
+
+inline int Outnum(int num)
+{
+	return num * num;
+}
+
+int main()
+{
+	int num1 = Outnum(5);
+	int num2 = Outnum(25);
+	return 0;
+}
+
+//단지 아래와 같이 복붙으로 바꿔 줄 뿐인것
+
+#include <iostream>
+using namespace std;
+
+inline int Outnum(int num)
+{
+	return num * num;
+}
+
+int main()
+{
+	int num1 = Outnum(5); // 5 * 5
+	int num2 = Outnum(25); // 25 * 25
+	return 0;
+}
+~~~
+
+###### [인라인 함수](#인라인-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# static
+
+  - 클래스 속 정적 변수, 함수
+    - 개체를 만들지 않고도 호출 할 수 있고, 개체를 많이 만든다해도 한개만 존재하며 각각의 개체가 그것을 서로 공유한다
+    - 정적 맴버 함수안에서 비정적 맴버 변수를 호출 할 수 없음. 왜냐하면 비정적 변수는 각각의 객체가 별도로 가지기 때문에 어떤 객체를 호출 하는지 알 수 없기 때문에
+  - 함수속 정적 맴버 변수
+    - 함수가 종료 됐을때 스택은 전부 사라지지만 함수속에 있는 정적 변수는 없어 지지 않고 누수가 될 수 있다.
+
+###### [static](#static)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿
+
+  - 벡터
+    - 어떤 자료형도 넣을 수 있는 동적 배열
+    - include “vector” 필요
+    - 나중에 필요할때 더 공부하기
+
+  - 맵
+    - 딕셔너리 처럼 키와 값의 쌍을 저장함
+
+  - 셋
+    - 맵에서 값을 뺀 데이터와 같다
+    - 나중에 필요할때 더 공부하기
+
+  - STL컨테이너
+    - 링크드리스트
+    - 큐
+    - 스택
+    - 등등
+
+  - 템플릿
+    - 어떤 자료형이든 필요할때 컴파일러가 대신 만들어줌. 그러한 틀을 가질 수 있게 해주는것
+
+###### [벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿](#벡터vector-맵map-셋set-stl컨테이너-템플릿)
 ###### [Top](#top)
