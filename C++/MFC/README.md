@@ -502,6 +502,8 @@ afx_msg LRESULT CMFCApplication4Dlg::On10000(WPARAM wParam, LPARAM lParam)
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
+<br/>
+
   - MAKEWPARAM
     - 16비트 크기의 변수인 wLow 와 wHigh의 값을 32비트 크기로 합쳐서 반환하는 함수이다.
     - wLow는 32비트중에서 하위 16비트에 저장되고 wHigh는 상위 16비트에 저장된다.
@@ -547,6 +549,8 @@ BOOL CMFCApplication2Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
 ![20220827_113633](https://user-images.githubusercontent.com/39178978/187011001-0e9789d9-8db0-47ce-ab1c-e666853dfb81.png)
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
 
   - SendMessage를 통해서 Cstring문자열 전송하기!
     - 가장주의할점!!! Cstring을 전송할때 PostMessage는 데이터가 안갈 수도 있다는것을 꼭 주의하고 SendMessage로 보내도록 하자!!
