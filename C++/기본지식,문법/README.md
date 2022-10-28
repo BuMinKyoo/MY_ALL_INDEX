@@ -54,6 +54,9 @@
 
 <br/>
   - c++11 / 14/ 17 / … 이후의 추된 부분들
+
+<br/>
+
   - [auto](#auto)
   - [static_assert](#static_assert)
   - [default](#default)
@@ -61,6 +64,21 @@
   - [final](#final)
   - [override](#override)
   - [nullptr](#nullptr)
+  - [enum class](#enum-class)
+  - [unordered_map](#unordered_map)
+  - [unordered_set](#unordered_set)
+  - [범위기반 for반복문](#범위기반-for반복문)
+  - [unique_ptr](#unique_ptr)
+    - [유니크 포인터 선언하기](#유니크-포인터-선언하기)
+    - [유니크 포인터는 복사, 대입이 안된다](#유니크-포인터는-복사-대입이-안된다)
+    - [유니크 포인터를 사용하는 좋은 장소 3가지](#유니크-포인터를-사용하는-좋은-장소-3가지)
+  - [make_unique](#make_unique)
+    - [make_unique선언하기](#make_unique선언하기)
+    - [make_unique는 복사와, 대입이 불가능](#make_unique는-복사와-대입이-불가능)
+    - [reset](#reset)
+    - [get](#get)
+    - [release](#release)
+    - [move](#move)
 
 <br/>
 <br/>
@@ -2648,4 +2666,851 @@ int* num2 = nullptr // 컴파일 성공
 ~~~
 
 ###### [nullptr](#nullptr)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# enum class
+
+  - 전에 있었던 c++ enum은 단지 정수를 정의 해놓은 것이 다라서 마음대로 쓸 수 있어 문제가 많았지만, c#의 enum처럼 사용 할 수 있게 enum class를 만들었다
+
+~~~c++
+#include <iostream>
+
+enum class Enumbers
+{
+	num0,
+	num1,
+	num2,
+	num3,
+	count
+};
+
+enum class Eanimal
+{
+	num0,
+	num1,
+	num2,
+	num3,
+	count
+};
+
+int main()
+{
+	Enumbers a = Enumbers::num0; // 컴파일 ok
+	int num = Enumbers::num1; // 컴파일 X
+	Eanimal b = Enumbers::num0; // 컴파일 x
+
+}
+~~~
+
+###### [enum class](#enum-class)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# unordered_map
+
+  - 초기의 STL은 자동으로 정렬해 주는 기능 때문에, 속도가 저하되는 부분이 있으니, 이번에 나온 unordered_map은 정렬을 해주지 않기 때문에 속도가 빨라 진다.
+
+<br/>
+
+  - unordered_map 출력하기(먼저입력된 것이 맨 첫번째에 나오지 않게 된다!)
+
+~~~c++
+#include <iostream>
+#include <unordered_map>
+
+int main()
+{
+	std::unordered_map<std::string, int> scores;
+
+	scores["qweqwe"] = 40;
+	scores["xcvxcv"] = 30;
+	scores["uikiu"] = 10;
+
+	for (auto it = scores.begin(); it != scores.end(); it++)
+	{
+		std::cout << it->first << " : " << it->second << std::endl;
+	}
+
+	return 0;
+}
+
+// 출력값
+// xcvxcv : 30
+// qweqwe : 40
+// uikiu : 10
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - unordered_map 버킷 내용 보기
+
+~~~c++
+#include <iostream>
+#include <unordered_map>
+
+int main()
+{
+	std::unordered_map<std::string, int> scores;
+
+	scores["qweqwe"] = 40;
+	scores["xcvxcv"] = 30;
+	scores["uikiu"] = 10;
+
+	for (size_t i = 0; i < scores.bucket_count(); i++)
+	{
+		std::cout << "Bucket #" << i << " : ";
+		for (auto it = scores.begin(i); it != scores.end(i); it++)
+		{
+			std::cout << it->first << " : " << it->second;
+		}
+		std::cout << std::endl;
+	}
+	
+
+	return 0;
+}
+
+// 출력값
+// Bucket #0 :
+// Bucket #1 :
+// Bucket #2 : uikiu : 10
+// Bucket #3 :
+// Bucket #4 :
+// Bucket #5 :
+// Bucket #6 :
+// Bucket #7 : xcvxcv : 30qweqwe : 40
+~~~
+
+  - map vs unordered_map
+    - map
+      - 자동으로 정렬됨
+      - 이진 탐색 트리
+      - 탐색 시간 : O(log n)
+      - 삽입과 제거가 빈번하면 느림
+    - unordered_map
+      - 자동으로 정렬되지 않음
+      - 해시 테이블
+      - 탐색 시간 : O(1) -> 해쉬 충돌이 없을 경우
+      - 탐색 시간 : O(n) -> 최악의 경우
+      - 버킷 때문에 메모리 사용량 증가
+
+###### [unordered_map](#unordered_map)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# unordered_set
+
+  - 정렬되지 않는셋~~
+
+<br/>
+
+  - set vs unorderd_set 
+    - set
+      - 자동으로 정렬됨
+      - 키를 저장
+      - 이진 탐색 트리
+      - 탐색 시간 : O(log n)
+      - 삽입과 제거가 빈번하면 느림
+    - unorderd_set 
+      - 자동으로 정렬되지 않음
+      - 키를 저장
+      - 해시 테이블
+      - 탐색 시간 : O(1) -> 해쉬 충돌이 없을 경우
+      - 탐색 시간 : O(n) -> 최악의 경우
+      - 버킷 때문에 메모리 사용량 증가
+
+###### [unordered_set](#unordered_set)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 범위기반 for반복문
+
+  - c#에서의 foreach문 처럼 c++에서도 이와 같은 것이 있음
+  - 배열과 컨테이너에서 모두 사용 가능(값, 참조 모두 이용 가능)
+
+~~~c++
+#include  <iostream>
+
+int main()
+{
+	int scores[4] = { 10,20,30,40 };
+
+	for (int N : scores)
+	{
+		std::cout << N << std::endl;
+	}
+}
+
+// 출력값
+// 10
+// 20
+// 30
+// 40
+~~~
+
+~~~c++
+#include  <iostream>
+#include <map>
+
+int main()
+{
+	std::map<std::string, int> scoreMap;
+
+	scoreMap["a"] = 10;
+	scoreMap["b"] = 20;
+	scoreMap["c"] = 30;
+
+	for (auto& N : scoreMap)
+	{
+		std::cout << N.first << " : " << N.second << std::endl;
+	}
+}
+
+// 출력값
+// a : 10
+// b : 20
+// c : 30
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 사용시 주의 사항
+    - 참조와 값에 대한 부분을 잘 분별해서 사용할것!
+
+~~~c++
+#include  <iostream>
+#include <map>
+
+int main()
+{
+	std::map<std::string, int> scoreMap;
+
+	scoreMap["a"] = 10;
+	scoreMap["b"] = 20;
+	scoreMap["c"] = 30;
+
+	// 값으로 복사해서, 그 복사한 값을 프린트 하니 10점씩 깎여 있을 것이고,
+	for (auto N : scoreMap)
+	{
+		N.second -= 10;
+		std::cout << N.first << " : " << N.second << std::endl;
+	}
+
+	std::cout << std::endl;
+
+	// 값으로 복사한것이 아닌 다시 원본을 프린트 할 예정이니 원본 그대로의 값이 나오게 된다
+	for (auto& N : scoreMap)
+	{
+		std::cout << N.first << " : " << N.second << std::endl;
+	}
+}
+
+// 출력값
+// a : 0
+// b : 10
+// c : 20
+
+// a : 10
+// b : 20
+// c : 30
+~~~
+
+~~~c++
+#include  <iostream>
+#include <map>
+
+int main()
+{
+	std::map<std::string, int> scoreMap;
+
+	scoreMap["a"] = 10;
+	scoreMap["b"] = 20;
+	scoreMap["c"] = 30;
+
+	// 원본을 -10 해버리니, 깍인 것이 프린트 될것이고,
+	for (auto& N : scoreMap)
+	{
+		N.second -= 10;
+		std::cout << N.first << " : " << N.second << std::endl;
+	}
+
+	std::cout << std::endl;
+
+	// 원본이 깍겨 있고, 그 원본을 복사해서 프린트 할것이니, 위와 같은 값이 나오게 된다
+	for (auto N : scoreMap)
+	{
+		std::cout << N.first << " : " << N.second << std::endl;
+	}
+}
+
+// 출력값
+// a : 0
+// b : 10
+// c : 20
+
+// a : 0
+// b : 10
+// c : 20
+~~~
+
+###### [범위기반 for반복문](#범위기반-for반복문)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# unique_ptr
+
+  - delete 해줄 필요가 없음
+  - 복사나 대입을 할 수 없기 때문에 주의!
+  - unique_ptr는 항상 범위와 함께 쓴다는것을 주의하기! scope를 벗어나는 순간 사라지는 스택처럼!
+
+    - [유니크 포인터 선언하기](#유니크-포인터-선언하기)
+    - [유니크 포인터는 복사, 대입이 안된다](#유니크-포인터는-복사-대입이-안된다)
+    - [유니크 포인터를 사용하는 좋은 장소 3가지](#유니크-포인터를-사용하는-좋은-장소-3가지)
+
+###### [unique_ptr](#unique_ptr)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 유니크 포인터 선언하기
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	};
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myAnimal(new Animal(10));
+	myAnimal->Print();
+}
+~~~
+
+###### [unique_ptr](#unique_ptr)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 유니크 포인터는  복사, 대입이 안된다
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	};
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myAnimal(new Animal(10));
+	std::unique_ptr<Animal> copyMyAnimal = myAnimal; // 컴파일 에러
+	std::unique_ptr<Animal> copyMyAnimal(myAnimal); // 컴파일 에러
+
+}
+~~~
+
+###### [unique_ptr](#unique_ptr)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 유니크 포인터를 사용하는 좋은 장소 3가지
+
+  - 클래스에서 생성자, 소멸자
+
+~~~c++
+// 원래 클래스 안에서 메모리 할당을 할 경우, 소멸자로 메모리 해체를 해줘야함
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+	char* m_name;
+
+	Animal(int age, int L)
+		: m_age(age)
+	{
+		m_name = new char[L];
+	};
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+
+	~Animal()
+	{
+		delete m_name;
+	}
+};
+
+int main()
+{
+
+}
+~~~
+~~~c++
+// 메모리를 해제해주는 소멸자가 필요 없어 진다
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+	std::unique_ptr<char> m_name;
+
+	Animal(int age, int L)
+		: m_age(age)
+		, m_name(new char[L])
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	Animal aa(10, 10);
+
+
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 지역변수
+
+~~~c++
+// 지연변수는 어차피 종료 전에 또는 그 해당 함수가 끝나기 전에 delete하여 메모리 할당을 해재해 주어야한다
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age, int L)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	Animal* myAnimal = new Animal(10, 10);
+
+	// 기능 코드
+
+	delete myAnimal;
+
+}
+~~~
+
+~~~c++
+// 지역변수에 선언할때는 따로 메모리 할당을 애초에 고민하지 않아도 된다.
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age, int L)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myAnimal(new Animal(10, 10));
+
+	// 기능 코드
+}
+~~~
+
+  - 벡터안에서 포인터를 쓰거나 할때도 내부로 하나하나 메모리 할당을 해제 해 주지 않아도 되니 엄청 편해진다!!
+
+###### [unique_ptr](#unique_ptr)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# make_unique
+
+  - 유니크 포인터의 문제점과 C++14이후의 해결책(make_unique)
+  - 복사나 대입이 안된다고 했지만, 따로 포인터를 만들어서 그 포인터를 각각의 유니크 포인터에 공유하는것은 가능하다
+  - 둘 이상의 unique_ptr가 원시 포인터를 공유하지 못하게 하기 위해서 새로운 문법을 개발 하였음
+  - make_unique가 등장함
+
+    - [make_unique선언하기](#make_unique선언하기)
+    - [make_unique는 복사와, 대입이 불가능](#make_unique는-복사와-대입이-불가능)
+    - [reset](#reset)
+    - [get](#get)
+    - [release](#release)
+    - [move](#move)
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age, int L)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	Animal* myanimal = new Animal(10, 10);
+	std::unique_ptr<Animal> A(myanimal); // 컴파일 ok
+	std::unique_ptr<Animal> B(myanimal); // 컴파일 ok
+
+	B = nullptr; // B객체에 null을 대입했지만 그것을 공유하고 있는 A객체도 null이 된다
+
+// 큰 문제는, 추후에 A객체는 자기 포인터를 또 지우게 된다.(어떤 일이 벌어 질지 모른다?!)
+
+	// 기능 코드
+}
+~~~
+
+###### [make_unique](#make_unique)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# make_unique선언하기
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myanimal = std::make_unique<Animal>(10);
+}
+~~~
+
+###### [make_unique](#make_unique)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# make_unique는 복사와, 대입이 불가능
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	Animal* myanimal = new Animal(10);
+	std::unique_ptr<Animal> A = std::make_unique(myanimal);  // 컴파일 에러
+	std::unique_ptr<Animal> B = std::make_unique<Animal>(myanimal);  // 컴파일 에러
+	std::unique_ptr<Animal> C = std::make_unique<Animal*>;  // 컴파일 에러
+}
+~~~
+
+###### [make_unique](#make_unique)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# make_unique배열만들기
+
+//나중에 공부해서 작성하기
+
+###### [make_unique](#make_unique)
+
+<br/>
+<br/>
+
+# reset
+
+  - 원시포인터 소유권을 박탈하고, 다른 포인터를 가질 수 있게함
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myanimals = std::make_unique<Animal>(10);
+	myanimals.reset(new Animal(20)); // 새로운 포인터로 교체
+	myanimals.reset(); // nullptr로 교체
+}
+~~~
+
+###### [make_unique](#make_unique)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# get
+
+  - 원시 포인터 반환
+  - 이때는 포인터를 지우지 않는다는 규정하에 사용해야 한다!!
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myanimals = std::make_unique<Animal>(10);
+	Animal* A = myanimals.get();
+	A->m_age = 20;
+
+	std::cout << myanimals->m_age; // 출력값 20
+}
+~~~
+
+###### [make_unique](#make_unique)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# release
+
+  - 원시 포인터 소유권 이전
+  - release를 하게 되면 아예 포인터를 옮겨주는 것으로 이해하면 된다. 따라서 release후에 해당 변수를 get하게 되면 아무것도 남지 않았으니 nullptr이 출력된다
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myanimals = std::make_unique<Animal>(10);
+	Animal* A = myanimals.release();
+	myanimals.get(); // nullptr
+}
+~~~
+
+###### [make_unique](#make_unique)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# move
+
+  - 포인터 소유권 옮기기
+  - 이 함수 한번으로 쉽게 다른 유니크 포인터에서 유니크 포인터로 소유권을 옮길 수 있게 된다
+  - const 유니크포인터에는 사용 할 수 없다!
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal> myanimals = std::make_unique<Animal>(10);
+	std::unique_ptr<Animal> myanimals1(std::move(myanimals));
+}
+~~~
+
+###### [make_unique](#make_unique)
 ###### [Top](#top)
