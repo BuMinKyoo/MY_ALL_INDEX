@@ -53,6 +53,16 @@
   - [벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿](#벡터vector-맵map-셋set-stl컨테이너-템플릿)
 
 <br/>
+  - c++11 / 14/ 17 / … 이후의 추된 부분들
+  - [auto](#auto)
+  - [static_assert](#static_assert)
+  - [default](#default)
+  - [delete](#delete)
+  - [final](#final)
+  - [override](#override)
+  - [nullptr](#nullptr)
+
+<br/>
 <br/>
 
 ***
@@ -2222,4 +2232,420 @@ int main()
     - 어떤 자료형이든 필요할때 컴파일러가 대신 만들어줌. 그러한 틀을 가질 수 있게 해주는것
 
 ###### [벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿](#벡터vector-맵map-셋set-stl컨테이너-템플릿)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# auto
+
+  - 자료형을 추론해줌
+  - 실제 자료형은 컴파일하는 동안 결정됨
+  - auto변수는 반드시 초기화 해줘야함
+
+~~~c++
+auto x; // 에러
+auto x = "qwe"
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - auto를 사용하여 포인터를 받을 때 : auto 또는 auto*
+  - 컴파일러가 포인터인지 아닌지 확인해서 알아서 받기 때문에 사실은 가독성이 좋지 않음 그래서 포인터 자료형이라면 auto*를 임의로 사용해서 가독성을 높이는 것이 좋음
+
+~~~c++
+auto a = 3;
+auto b = ptr;  // ptr이 포인터라면 auto는 그 포인터를 받음
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - auto를 사용하여 참조 받을 때 : auto&
+  - 컴파일로는 참조형을 구분하지 못하기 때문에! 단지 대입을 한다고 해서 참조형을 받을 수 없다 이때는 그냥 복사하는 식으로 받아가게 된다
+
+~~~c++
+auto& a = b // b는 참조자료형
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - auto를 사용하여 const 받을 때 : auto&, const auto&
+  - const자료형을 그대로 이어 받게 된다
+  - 가독성이 좋지 않음 ㅠ 가능하면 const auto&를 사용하자!
+
+~~~c++
+const int b = 10;
+auto& a = b
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - auto를 사용하는 좋은 곳
+  - 벡터나, 맵 반복자 처럼 긴 타입을 사용할때 아주 간편해 진다!
+
+~~~c++
+for (std::vector<int>::const_iterator it = v.begin( ); it != v.end( ); ++it)
+{
+
+}
+
+// 위에 것을 아래와 같이 바꿀 수 있음
+
+for (auto it = v.begin( ); it != v.end( ); ++it)
+{
+
+}
+~~~
+
+###### [auto](#auto)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# static_assert
+
+  - 일반적인 assert는 컴파일 후 실행중에 문제가 있는지 잡아 주는데 비해서 static_assert는 컴파일 중에 잡아주기 때문에 실행전에 문제를 잡을 수 있게 해줌
+  - 컴파일중에 잡을 수 있는것은 이걸로 다 잡자!
+  - ex) 특정한 구조체의 크기가 50인 것으로 기준을 다 잡아 놨는데, 이 부분안에 다른 사람이 더 추가 하게 되면 크기가 커지니 그런것들을 방지 할 수 있음
+
+###### [static_assert](#static_assert)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# default
+
+  - 컴파일러가 특정한 생성자, 연산자 및 소멸자를 만들어 낼 수 있음
+  - 그래서, 비어 있는 생성자나 소멸자를 구체화할 필요가 없음
+  - 컴파일러가 기본적으로 만들어주는 것들을 사용해도 큰 문제가 없다는 것을 명시적으로 표시해 주는 용도로 사용!!!(컴파일러는 다른것이 없고 사람이 볼때가 달라진다)
+
+~~~c++
+#include <iostream>
+
+class NumberClass
+{
+public:
+	int num1 = 5;
+	int num2 = 10;
+
+	NumberClass() = default;
+	NumberClass(int n, int n2)
+		: num1(n)
+		, num2(n2)
+	{
+
+	}
+
+};
+
+int main()
+{
+	NumberClass numberclass(10, 20); // d
+	NumberClass numberclass2;
+
+}
+~~~
+
+###### [default](#default)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# delete
+
+  - 컴파일러가 자동으로 생성자를 만들어 주길 원치 않는다면 사용 할 수 있음
+  - 원래는 private접근자를 이용해서 컴파일러가 생성자나 복사자를 만드는 것을 방지 했지만 delete키워드를 사용하면됨
+
+~~~c++
+#include <iostream>
+
+class NumberClass
+{
+public:
+	int num1 = 5;
+	int num2 = 10;
+
+	NumberClass(NumberClass& n) = delete;
+	NumberClass(int n, int n2)
+		: num1(n)
+		, num2(n2)
+	{
+
+	}
+
+};
+
+int main()
+{
+	NumberClass numberclass(10, 20); // d
+	NumberClass numberclass2(numberclass); // 지워진 함수 이므로 컴파일이 되지 않음
+
+}
+~~~
+
+###### [delete](#delete)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# final
+
+  - 상속되지 않도록 막는것(내 밑으로는 물려주지 않을꺼야 라는 뜻)
+
+~~~c++
+#include <iostream>
+
+class Animal final
+{
+public:
+	int m__age;
+
+	Animal(int age)
+		: m__age(age)
+	{
+
+	}
+
+};
+
+class Cat : public Animal // final키워드를 사용함으로써 상속 에러가 발생
+{
+public:
+	int m_age;
+	void bark()
+	{
+		std::cout << "야옹~" << std::endl;
+	}
+};
+
+int main()
+{
+
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 보통은 한번 상속받은 자식 클래스에서 final을쓰는 것이 일반적인 상황이다
+
+~~~c++
+#include <iostream>
+
+class Animal
+{
+public:
+	int m__age;
+
+	Animal(int age)
+		: m__age(age)
+	{
+
+	}
+
+};
+
+
+class Cat final : public Animal
+{
+public:
+	int m_age;
+	void bark()
+	{
+		std::cout << "야옹~" << std::endl;
+	}
+};
+
+int main()
+{
+
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - final키워드를 사용해서 함수 override를 막을 수 있다
+
+~~~c++
+#include <iostream>
+
+class Animal
+{
+public:
+	virtual void bark() final
+	{
+		std::cout << "나는 동물 클래스" << std::endl;
+	}
+
+};
+
+
+class Cat : public Animal
+{
+public:
+	virtual void bark() override // 컴파일 에러 : 부모클래스에 있는 함수의 override를 막는다
+	{
+		std::cout << "야옹~" << std::endl;
+	}
+};
+
+int main()
+{
+	Animal* animal = new Cat();
+}
+~~~
+
+###### [final](#final)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# override
+
+  - 부모가 가지고 있는 함수를 오버라이드를 한다는 뜻
+  - 프로그래머가 실수로 부모의 함수를 오버라이드 하려고 했지만 실수로 인해 인자 자료형을 잘못 입력했을때, 그것은 컴파일러가 오버라이드가 아니라 부모함수 따로 자식 함수 따로로 생각하게 된다
+
+~~~c++
+#include <iostream>
+
+class Animal
+{
+public:
+	virtual void sum(int a)
+	{
+
+	}
+
+};
+
+
+class Cat : public Animal
+{
+public:
+	virtual void sum(float a) // 부모와 인자의 자료형이 다르기 때문에 오버라이드가 아니라 각각 다른 함수로 인식 된다
+	{
+
+	}
+};
+
+int main()
+{
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 이럴때 override를 사용하게 되면 그것을 방지 할 수 있다
+
+~~~c++
+#include <iostream>
+
+class Animal
+{
+public:
+	virtual void sum(int a)
+	{
+
+	}
+
+};
+
+
+class Cat : public Animal
+{
+public:
+	virtual void sum(float a) override // 컴파일 에러 : 부모의 함수를 오버라이드 한것이 아니기 때문에
+	{
+
+	}
+};
+
+int main()
+{
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - override를 사용함으로써 실수를 방지 할 수 있는 부분2
+
+~~~c++
+#include <iostream>
+
+class Animal
+{
+public:
+	void sum(int a)
+	{
+
+	}
+
+};
+
+
+class Cat : public Animal
+{
+public:
+	void sum(float a) override // 컴파일 에러 : 오버라이드는 가상 함수만 가능하기 때문에, 부모가 가지고 있는 함수가 가상 함수 인지 아닌지도 실수를 방지 할 수 있다
+	{
+
+	}
+};
+
+int main()
+{
+}
+~~~
+
+###### [override](#override)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# nullptr
+
+  - null은 상수 0 이고, nullptr은 null포인터 상수라고 보면 된다
+  - 포인터 에서는 언제나 nullptr을 사용하자!!!
+
+~~~c++
+int num = nullptr // 컴파일 에러
+int* num2 = nullptr // 컴파일 성공
+~~~
+
+###### [nullptr](#nullptr)
 ###### [Top](#top)
