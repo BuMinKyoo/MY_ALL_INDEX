@@ -79,6 +79,11 @@
     - [get](#get)
     - [release](#release)
     - [move](#move)
+  - [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+    - [선언하기](#선언하기)
+    - [공유 포인터 공유하기](#공유-포인터-공유하기)
+    - [포인터 재설정 하기](#포인터-재설정-하기)
+  - [weak_ptr 포인터(약한 포인터)](#weak_ptr-포인터약한-포인터)
 
 <br/>
 <br/>
@@ -3513,4 +3518,132 @@ int main()
 ~~~
 
 ###### [make_unique](#make_unique)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# shared 포인터(공유 포인터)
+
+  - 두개의 포인터를 소유하고있음
+    - 데이터 포인터
+    - 제어블록 포인터(몇번 참조했는지 세야하기 때문)
+    - 참조 카운팅기반
+      - 어떤 곳에도 참조되지 않으면 지워줌
+
+    - [선언하기](#선언하기)
+    - [공유 포인터 공유하기](#공유-포인터-공유하기)
+    - [포인터 재설정 하기](#포인터-재설정-하기)
+
+###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 선언하기
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::shared_ptr<Animal> myanimals = std::make_shared<Animal>();
+}
+~~~
+
+###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 공유 포인터 공유하기
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::shared_ptr<Animal> myanimals = std::make_shared<Animal>();
+	std::shared_ptr<Animal> myanimals2 = myanimals;
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/200856083-37a20fa2-0558-4cc7-9465-f1b4b680faca.png)
+
+###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 포인터 재설정 하기
+
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::shared_ptr<Animal> myanimals = std::make_shared<Animal>();
+	std::shared_ptr<Animal> myanimals2 = myanimals;
+	myanimals.reset(); //myanimals = nullptr;
+
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/200856294-190ba46a-b3ea-4e40-b950-d525e718d557.png)
+
+###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# weak_ptr 포인터(약한 포인터)
+
+  - 약한 참조 카운트는 약한 참조의 수를 저장하는데 사용됨
+  - 약한 참조로 참조되는 개체는 강한 참조 카운트가 0이 될때 소멸됨
+  - 순한참조의 해결책
+  - weak_ptr는 혼자 만들어질 수 없고, 공유 포인터가 있을때 만들어 낼 수 있다
+  - 나중에 따로 다시 공부하자
+
+###### [weak_ptr 포인터(약한 포인터)](#weak_ptr-포인터약한-포인터)
 ###### [Top](#top)
