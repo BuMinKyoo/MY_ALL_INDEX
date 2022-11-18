@@ -83,6 +83,7 @@
     - [문자 크기 바꾸기 (LOGFONT)](#문자-크기-바꾸기-logfont)
     - [DrawText (텍스트를 도형 안에 출력하기)](#drawtext-텍스트를-도형-안에-출력하기)
     - [TextOut (텍스트를 원하는 위치에 출력)](#textout-텍스트를-원하는-위치에-출력)
+    - [출력시 폰트 컬러변경하기](#출력시-폰트-컬러변경하기)
       
   </div>
   </details>
@@ -180,6 +181,7 @@
   
   - [기능별 정리](#기능별-정리)
     - [캡쳐하기](#캡쳐하기)
+    - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
       
   </div>
   </details>
@@ -2275,6 +2277,7 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
     - [문자 크기 바꾸기 (LOGFONT)](#문자-크기-바꾸기-logfont)
     - [DrawText (텍스트를 도형 안에 출력하기)](#drawtext-텍스트를-도형-안에-출력하기)
     - [TextOut (텍스트를 원하는 위치에 출력)](#textout-텍스트를-원하는-위치에-출력)
+    - [출력시 폰트 컬러변경하기](#출력시-폰트-컬러변경하기)
 
 ###### [문자 다루기](#문자-다루기)
 ###### [Top](#top)
@@ -2325,7 +2328,7 @@ lf.lfHeight = 20;
 lf.lfWeight = FontStyleRegular;
 lstrcpy(lf.lfFaceName, _T("KoPub돋움체 Medium"));
 m_fnstatic_num.CreateFontIndirect(&lf);
-		GetDlgItem(IDC_STATIC_NUM)->SetFont(&m_fnstatic_num);
+GetDlgItem(IDC_STATIC_NUM)->SetFont(&m_fnstatic_num);
 
 // 다른곳에 위에 선언한 LOGFONT 를 똑같이 적용 시키는 것은 CFont 변수를 만들어서 연결 시켜 주기만 하면 된다..! 
 ~~~
@@ -2400,6 +2403,32 @@ void CMFCApplication2Dlg::OnPaint()
 <br/>
 
 ![20220820_222516](https://user-images.githubusercontent.com/39178978/185748206-a9fd8e37-4645-41fa-aff5-e51913f8a9fc.png)
+
+###### [문자 다루기](#문자-다루기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 출력시 폰트 컬러변경하기
+  - 텍스트의 컬러 변경은, dc에 컬러를 바꿔서 출력하는 방법이 있다
+
+#AppDlg.cpp
+~~~C++
+void CMFCApplication1Dlg::OnPaint()
+{
+	dc.SetTextColor(RGB(255, 0, 0)); // 텍스트를 빨간색으로 변경
+	dc.TextOut(100, 100, _T("qwe")); // 텍스트 출력
+}
+
+~~~
+
+<br/>
+
+  - 위의 예제와 같은 방법으로,
+    - SetTextColor : 텍스트 컬러 변경
+    - SetBkColor : 텍스트 백그라운드 컬러 변경
+    - SetBkMode : 텍스트 백그라운드 모드 설정(모드에서 설정하게 되면, SetBkColor는 먹히지 않게 된다)
 
 ###### [문자 다루기](#문자-다루기)
 ###### [Top](#top)
@@ -4610,6 +4639,7 @@ void CClientDlg::OnBnClickedSenddata()
   - 기능별로 정리해 놓은 목록
 
     - [캡쳐하기](#캡쳐하기)
+    - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
 
 ###### [기능별 정리](#기능별-정리)
 ###### [Top](#top)
@@ -4665,6 +4695,50 @@ void CMFCApplication5Dlg::OnBnClickedButton1()
 ~~~
 
 ![20220923_235233](https://user-images.githubusercontent.com/39178978/191989588-11f3ee5c-6a05-4c1f-8868-06608c3606e1.png)
+
+###### [기능별 정리](#기능별-정리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 동적으로 폰트 크기 맞추기
+  - Width, Height중에 짧은 길이를 기준으로 폰트크기가 커졌다 작아졌다함
+  - CFont 구조체
+  - 사용할 폰트
+  - 적용시킬 컨트롤
+  - 적용시킬 폰트 크기(움수도 가능)
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+void MakeFont(CFont* cfont_text, CString font, CWnd* pCtl, int size)
+{
+	LOGFONT lf = {0,};
+
+	CRect r;
+	int addSize = 0;
+
+	pCtl->GetWindowRect(&r);
+	pCtl->ScreenToClient(&r);
+
+	if (r.Width() < r.Height())
+	{
+		addSize = r.Width() / 5;
+	}
+	else
+	{
+		addSize = r.Height() / 5;
+	}
+
+	lf.lfHeight = size + addSize;
+
+	lstrcpy(lf.lfFaceName, font);
+	cfont_text->CreateFontIndirect(&lf);
+	pCtl->SetFont(cfont_text);
+}
+~~~
 
 ###### [기능별 정리](#기능별-정리)
 ###### [Top](#top)
