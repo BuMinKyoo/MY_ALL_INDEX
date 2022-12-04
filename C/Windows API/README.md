@@ -36,6 +36,7 @@
 - [마우스](#마우스)
 - [메뉴](#메뉴)
 - [커서](#커서)
+- [엑셀러레이터](#엑셀러레이터)
 
 - <details markdown="1">
   <summary>여러 API함수</summary>
@@ -760,4 +761,165 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 ~~~
 
 ###### [DC](#dc)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 마우스
+
+  - 마우스에 관련된 이벤트들
+    - WM_LBUTTONDOWN : 왼쪽 누름
+    - WM_RBUTTONDOWN : 오른쪽 누름
+    - WM_MBUTTONDOWN : 가운데 누름
+    - WM_LBUTTONUP : 왼쪽 놓음
+    - WM_RBUTTONUP : 오른쪽 놓음
+    - WM_MBUTTONUP : 가운데 놓음
+  - IParam : 상위 워드에 마우스 y좌표, 하위 워드에 x좌표값을 가지고 있다
+
+![image](https://user-images.githubusercontent.com/39178978/205497972-4806c224-0131-4cb5-9184-004892dd81e8.png)
+
+  - wParam : 마우스 버튼 상태와 키보드 조합 키의 상태를 전달
+    - MK_CONTROL : Ctrl키가 눌러져 있음
+    - MK_LBUTTON : 마우스 왼쪽 버튼이 눌러져 있음
+    - MK_RBUTTON : 마우스 오른쪽 버튼이 눌러져 있음
+    - MK_MBUTTON : 마우스 중간 버튼이 눌러져 있음
+    - MK_SHIFT : Shift 키가 눌러져 있음
+
+<br/>
+
+  - WM_MOUSEMOVE : 마우스가 움직이면 메시지 호출
+
+###### [마우스](#마우스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 메뉴
+
+  - 메뉴는 리소스 탭에서 쉽게 만들 수 있고, 스트링 적듯이 만들 수 있다. 각각의 항목에 ID값이 부여 되며, 메뉴 항목을 선택할 경우 WM_COMMAND 메시지를 전달한다, 이때 어떤 메뉴가 선택 되었는지는, 그 아이디 값이 wParam의 하위 워드로 전달 되므로 LOWORD(wParam) 으로 읽어서 판단하게 된다
+
+![image](https://user-images.githubusercontent.com/39178978/205498093-068e384d-d493-474d-af7e-2b0e4bc42b9f.png)
+
+  - A메뉴를 선택하면 “A메뉴 선택”메시지 박스가 뜨고, B메뉴를 선택하면 “B메뉴 선택”메시지 박스가 뜨게 된다
+
+~~~c++
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_COMMAND:
+        {
+            int wmId = LOWORD(wParam);
+            // 메뉴 선택을 구문 분석합니다:
+            switch (wmId)
+            {
+            case ID_A:
+                {
+                    MessageBox(hWnd, _T("A메뉴 선택"), _T("메뉴"), MB_OK);
+                    break;
+                }
+            case ID_B:
+                {
+                    MessageBox(hWnd, _T("B메뉴 선택"), _T("메뉴"), MB_OK);
+                    break;
+                }
+            }
+        }
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+  - 메뉴에 단축키를 지정하기 위해서는, 캡션 항목에 & 를 써줘야 한다
+  - 기본적으로 파일 메뉴를 열기 위해서는 F단축키가 지정되 있으므로 ALT + F를 누른후 그림과 같이 D를 누르면 작동될것이다
+
+![image](https://user-images.githubusercontent.com/39178978/205498236-ffdd141e-2ad4-4ec5-94d9-90b07a356fc6.png)
+
+
+###### [메뉴](#메뉴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 커서
+
+  - 커서를 바꾸는 것은 리소스편집기에서 추가한후, 그려주면 되고, 윈도우를 정의할때 그려놓은 ID값으로 정의 하면 된다
+
+![image](https://user-images.githubusercontent.com/39178978/205498302-ce0a3900-6181-4a06-9e76-2cd71c22b67e.png)
+
+~~~c++
+ATOM MyRegisterClass(HINSTANCE hInstance)
+{
+    WNDCLASSEXW wcex;
+
+    wcex.cbSize = sizeof(WNDCLASSEX);
+
+    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc    = WndProc;
+    wcex.cbClsExtra     = 0;
+    wcex.cbWndExtra     = 0;
+    wcex.hInstance      = hInstance;
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWSPROJECT1));
+    wcex.hCursor        = LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR1));
+    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WINDOWSPROJECT1);
+    wcex.lpszClassName  = szWindowClass;
+    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+
+    return RegisterClassExW(&wcex);
+}
+~~~
+
+###### [커서](#커서)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 엑셀러레이터
+
+  - 엑셀러레이터는, 메뉴를 선택하는 단축키와 다르게, 프로그램 안에서 전역으로 사용될 수 있다.
+
+![image](https://user-images.githubusercontent.com/39178978/205498348-235ebc89-a225-4745-80e4-994d596bde04.png)
+
+  - TranslateAccelerator : 엑셀러레이터 테이블 안에 있는 KEY를 받게 되면 여기서 TRUE를 리턴하게 되므로,  TranslateMessage함수가 KETDOWN을 처리하지 못하게 되고(따라서 WM_CHAR메시지가 발생되지 않음), TranslateAccelerator는 해당되는 핸들값을 가진 다이얼로그로 WM_COMMAND메시지를 보내게 된다
+
+~~~c++
+HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MY_ACCELERATOR)); // 엑셀러레이터에 맞는 ID를 넣어주면, 그 엑셀러레이터의 테이블을 가져온다
+
+MSG msg;
+
+// 기본 메시지 루프입니다:
+while (GetMessage(&msg, nullptr, 0, 0))
+{
+    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) // 엑셀러레이터 테이블 안에 있는 KEY를 받게 되면 여기서 TRUE를 리턴
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+}
+~~~
+
+###### [엑셀러레이터](#엑셀러레이터)
 ###### [Top](#top)
