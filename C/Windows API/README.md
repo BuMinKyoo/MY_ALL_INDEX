@@ -923,3 +923,202 @@ while (GetMessage(&msg, nullptr, 0, 0))
 
 ###### [엑셀러레이터](#엑셀러레이터)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 여러 API함수
+
+  - [텍스트 출력 함수](#텍스트-출력-함수)
+  - [그래픽 출력 함수](#그래픽-출력-함수)
+  - [메시지 박스 출력](#메시지-박스-출력)
+  - [비프음 출력하기](#비프음-출력하기)
+  - [화면 다시 그리기](#화면-다시-그리기)
+  - [타이머 함수](#타이머-함수)
+  - [SendMessage,PostMessage](#sendmessagepostmessage)
+  - [wsprintf](#wsprintf)
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 텍스트 출력 함수
+
+  - BOOL TextOut(HDC    hdc, int    x, int    y, LPCSTR lpString, int    c)
+  - int DrawText(HDC hdc, LPCTSTR lpchText, int cchText, LPRECT  lprc, UINT format)
+    - TextOut함수보다 다양한 기능이 있다
+  - BOOL SetWindowTextA(HWND   hWnd, LPCSTR lpString)
+    - 윈도우 타이틀에 글자 출력(주로 디버깅에 사용하기도 함)
+
+~~~c++
+// TextOut예시
+case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        // 100,100위치에 4바이트를 출력한다
+        TextOut(hdc, 100, 100, _T("qwer"), 4);
+        EndPaint(hWnd, &ps);
+    }
+~~~
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 그래픽 출력 함수
+
+  - COLORREF SetPixel(HDC hdc, int x, int y, COLORREF color) : 점출력
+  - BOOL MoveToEx(HDC hdc, int x, int y, LPPOINT lppt) : 선의 시작 지점
+  - BOOL LineTo(HDC hdc, int x, int y) : 선의 끝지점
+  - BOOL Rectangle(HDC hdc, int left, int top, int right, int bottom) : 사각형출력
+  - BOOL Ellipse(HDC hdc, int left, int top, int right, int bottom) : 원출력
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 메시지 박스 출력
+
+  - int MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
+    - HWND hWnd : 오너 윈도우
+    - LPCTSTR lpText : 메시지 박스에 출력할 문자열
+    - LPCTSTR lpCaption : 박스의 타이틀 바에 나타날 제목
+    - UINT uType : 어떤 종류의 버튼이 나타날 것인지
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 비프음 출력하기
+
+  - BOOL MessageBeep(UINT uType)
+    - 비프음을 들리게함, 주로 어떤 흐름에 두고, 그 흐름을 지나가는지 확인하는 용도로 많이 쓰이기도 함
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 화면 다시 그리기
+
+  - BOOL InvalidateRect(HWND hWnd, const RECT *lpRect, BOOL bErase)
+    - 무효화된 화면이 있다면 WM_PAINT 메시지를 보내서 화면을 업데이트 한다
+      - HWND hWnd : 화면을 업데이트할 핸들
+      - const RECT *lpRect : 업데이트할 영역(NULL이면 전체 화면을 업데이트 한다)
+    - BOOL bErase : 업데이트 할때 배경을 지울지 여부
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 타이머 함수
+
+  - SetTimer(HWND hWnd, UINT_PTR  nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc)
+    - HWND hWnd :  타미어를 발생시킬 윈도우
+    - UINT_PTR  nIDEvent : 타이머의 번호, 타이머끼리 번호가 겹치지 않아야 한다
+    - UINT uElapse : 타이머의 주기, 1/1000초 단위
+      - 타이머는 1초에 100회 이상 발생하지는 않는다
+    - TIMERPROC lpTimerFunc : 타이머가 발생할 때마다 호출될 함수, 만약 NULL로 한다면 WM_TIMER메시지가 발생된다
+  - WM_TIMER메시지 에서는 wParam으로 타미어 ID를 발생시키고, lParam으로 타이머 메시지 발생시 호출될 함수의 번지가 전달 된다
+  - 같은 타이머의 번호를 가진, 타이머를 생성하면 타이머는 교체가 된다.
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+# 타이머 함수로 콜백 함수 부르기
+
+  - VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+    - 타이머 함수를 사용할때 마지막 인수인 TIMERPROC lpTimerFunc을 호출할 함수 이름으로 한다면 그 함수를 호출하게 되고, 형식은 위와 같은 함수 형식으로 만들어야 한다
+    - HWND hwnd : 타이머를 소유한 윈도우의 핸들
+    - UINT uMsg : WM_TIMER
+    - UINT idEvent : 타이머 ID
+    - DWORD dwTime : 윈도우즈가 실행된 후의 경과시간
+
+~~~c++
+void CALLBACK aaaaa(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+{
+    HDC hdc = GetDC(hWnd);
+    TextOut(hdc, 100, 100, _T("출력!!"), 4);
+    ReleaseDC(hWnd, hdc);
+}
+
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_CREATE:
+        {
+            SetTimer(hWnd, 1, 100, (TIMERPROC)aaaaa);
+        }
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+~~~
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# SendMessage,PostMessage
+
+  - SendMessage(HWND   hWnd, UINT   Msg, WPARAM wParam, LPARAM lParam)
+    - 윈도우 프로시저를 직접 호출하여, 프로시저가 메시지를 처리할때 까지 반환하지 않습니다
+  - PostMessage(HWND   hWnd, UINT   Msg, WPARAM wParam, LPARAM lParam)
+    - 호출된 메시지가 메시지 큐에 들어가게 되며, 그곳에서 메시지를 윈도우  프로시저에게 전달해 메시지를 처리한다.
+    - DispatchMessage()에 의해 윈도우 프로시저로 전달 된다는 뜻
+
+<br/>
+
+  - PostMessage(hWnd, WM_TIMER, 0, 0);
+    - 이렇게 하면 hWnd윈도우에 WM_TIMER메시지를 보내고, 여분의 데이터는 0, 0을 보내겠다는 뜻이 된다.
+  - 키보드 작업의 경우, SendMessage로 하게 되면 작업이 진행 되지 않고 PostMessage하여야 작업이 진행된다. 키보드를 누른다는것이 하나의 메시지로 작업되는 것이 아니라 다양한 메시지의 조합으로 이루어지기 때문에 하나하나 작업하는 SendMessage같은 경우로는 작동 되지 않는다
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# wsprintf
+
+  - 실수를 서식화 할수 없지만 정수는 서식화 하여 출력 할 수 있다
+
+~~~c++
+case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        int num = 10;
+        TCHAR str[128];
+        wsprintf(str, _T("나는 사과를 %d개 먹었다"), num);
+        TextOut(hdc, 100, 100, str, lstrlen(str));
+        EndPaint(hWnd, &ps);
+    }
+~~~
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
