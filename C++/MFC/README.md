@@ -196,6 +196,7 @@
 - [dll 만들어 사용하기](#dll-만들어-사용하기)
 - [사용자정의 윈도우 만들기](#사용자정의-윈도우-만들기)
 - [Windows Media Player ActiveX컨트롤 사용하기](#windows-media-player-activex컨트롤-사용하기)
+- [음악 재생하기](#음악-재생하기)
 
 
 <br/>
@@ -2033,6 +2034,9 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
     - 두번째 인자에 “open”을 사용하고, 세번째 인자에 어떤 브라우저를 사용할지 명시하고, 네번째에 url주소를 입력하면 된다
   - 2. 응용프로그램 실행
     - 두번째 인자에 “open”을 사용하고 세번째 인자에 실행할 응용 프로그램의 경로를 명시하면 된다
+  - 2-1. cmd명령어 치기
+    - cmd로 명령어를 칠때는 /C를 꼭 해줘야 한다
+    - cmd로 바로 치는 것과 같기 때문에 bat파일은 스페이스 뒤에 문자열을 넣으면 인자를 전달하는 것과 같은 명령이 된다
   - 3. 특정 프로그램으로 원하는 파일 열기
     - 두번째 인자에 “open”을 사용하고, 세번째 인자에 프로그램 이름을 명시하고, 네번째 인자에 파일 경로를 명시한다
 
@@ -2067,6 +2071,23 @@ BOOL CMFCApplication5Dlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	::ShellExecute(NULL, _T("OPEN"),_T("C:\\Users\\Astems\\Desktop\\test.txt"),NULL, NULL, SW_SHOW);
+
+	return TRUE;
+}
+~~~
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 2-1. ShellExecute로 cmd명령어 치기
+BOOL CMFCApplication5Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	::ShellExecute(NULL, _T("OPEN"),_T("cmd"),_T("/C C:\\Users\\Astems\\Desktop\\test1.bat"), NULL, SW_SHOW);
 
 	return TRUE;
 }
@@ -5296,3 +5317,32 @@ BOOL CMFCApplication3App::InitInstance()
 
 ###### [Windows Media Player ActiveX컨트롤 사용하기](#windows-media-player-activex컨트롤-사용하기)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 음악 재생하기
+
+#AppDlg.cpp
+~~~c++
+#pragma comment (lib, "winmm.lib")    //음악
+#include <mmsystem.h>;                //음악
+#include <Digitalv.h>;                //음악
+
+MCI_OPEN_PARMS openBgm;
+MCI_PLAY_PARMS playBgm;
+
+// 파일 열기
+openBgm.lpstrDeviceType = _T("mpegvideo"); // 타입을 다른것을 넣으면 mp3파일도 재생 가능
+openBgm.lpstrElementName = _T("C:\\Users\\Astems\\Desktop\\qqq.mp3");
+mciSendCommand(0, MCI_OPEN, MCI_OPEN_ELEMENT | MCI_OPEN_TYPE, (DWORD)(LPVOID)&openBgm);
+
+int dwID = openBgm.wDeviceID;
+mciSendCommand(dwID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&openBgm);    //반복재생 플레그를 넣으면 반복 재생 할 수 있음
+~~~
+
+###### [음악 재생하기](#음악-재생하기)
+###### [Top](#top)
+
