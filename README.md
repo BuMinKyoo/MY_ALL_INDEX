@@ -10,31 +10,23 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ### [.NET](https://github.com/BuMinKyoo/TIL/tree/main/.NET)
 ### [BAT](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/BAT)
 
-
 <br/>
 
 ***
 
-### C
-  - [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D,%EB%AC%B8%EB%B2%95)
-  - [Windows API](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/C/Windows%20API)
-
-<br/>
-
-***
-
-### C++
-  - [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%2B%2B/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
+### 윈도우 응용프로그램
+  - [Win32](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/C/Windows%20API)
   - [MFC](https://github.com/BuMinKyoo/TIL/tree/main/C%2B%2B/MFC)
-    - Windows API에 해당하는 것도 전부 사용 가능
-
+  - [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/C%23/WPF)
+  
 <br/>
 
 ***
 
-### C#
-- [기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
-- [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/C%23/WPF)
+### 문법
+  - [C언어 기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D,%EB%AC%B8%EB%B2%95)
+  - [C++언어 기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%2B%2B/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
+  - [C#언어 기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
 
 <br/>
 
