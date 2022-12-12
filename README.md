@@ -15,18 +15,18 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ***
 
 ### 윈도우 응용프로그램
-  - [Win32](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/C/Windows%20API)
-  - [MFC](https://github.com/BuMinKyoo/TIL/tree/main/C%2B%2B/MFC)
-  - [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/C%23/WPF)
+  - [Win32](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%9C%88%EB%8F%84%EC%9A%B0%20%EC%9D%91%EC%9A%A9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8/Win32)
+  - [MFC](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%9C%88%EB%8F%84%EC%9A%B0%20%EC%9D%91%EC%9A%A9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8/MFC)
+  - [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%9C%88%EB%8F%84%EC%9A%B0%20%EC%9D%91%EC%9A%A9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8/WPF)
   
 <br/>
 
 ***
 
 ### 언어문법
-  - [C언어 기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D,%EB%AC%B8%EB%B2%95)
-  - [C++언어 기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%2B%2B/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
-  - [C#언어 기본지식,문법](https://github.com/BuMinKyoo/TIL/tree/main/C%23/%EA%B8%B0%EB%B3%B8%EC%A7%80%EC%8B%9D%2C%EB%AC%B8%EB%B2%95)
+  - [C언어 기본지식,문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C)
+  - [C++언어 기본지식,문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%2B%2B)
+  - [C#언어 기본지식,문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%23)
 
 <br/>
 
