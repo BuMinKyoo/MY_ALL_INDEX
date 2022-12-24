@@ -32,7 +32,8 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 
 ***
 
-### [Network](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Network)
+### Network
+  - [Network기초](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Network/Network%EA%B8%B0%EC%B4%88)
 
 <br/>
 
