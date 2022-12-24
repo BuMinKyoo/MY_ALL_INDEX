@@ -19,6 +19,7 @@
 
 - [윈도우가 생성되는 과정 정리](#윈도우가-생성되는-과정-정리)
 - [세가지 동적 라이브러리](#세가지-동적-라이브러리)
+- [왜 ID와 핸들 2가지를 사용할까?](#왜-id와-핸들-2가지를-사용할까)
 
 - <details markdown="1">
   <summary>DC</summary>
@@ -41,6 +42,7 @@
 - [그리기모드](#그리기모드)
 - [컨트롤생성(CreateWindow)](#컨트롤생성createwindow)
 - [다이얼로그 생성](#다이얼로그-생성)
+- [대화상자 기반 프로그램이란?](#대화상자-기반-프로그램이란)
 
 - <details markdown="1">
   <summary>여러 API함수</summary>
@@ -55,6 +57,7 @@
     - [타이머 함수](#타이머-함수)
     - [SendMessage,PostMessage](#sendmessagepostmessage)
     - [wsprintf](#wsprintf)
+    - [SendDlgItemMessage](#senddlgitemmessage)
 
   </div>
   </details>
@@ -399,6 +402,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
  윈도우 API함수의 대부분은 이 세가지 DLL에 의해 제공되고 있다
 
 ###### [세가지 동적 라이브러리](#세가지-동적-라이브러리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 왜 ID와 핸들 2가지를 사용할까?
+
+  - 컨트롤을 만들때마다 중복되지 않은 ID값을 한개씩 발급 받게 된다. 또한 각각은 다른 윈도우 핸들로 관리받게 되는데, 양쪽다 32비트로 용량과 속도 차이가 없는데 따로 관리하는 이유는?
+    - 핸들은, 운영체제가 일방적으로 발급하는 것이기 때문에 번호의 연속성이 없어서 반복적인 처리를 할 수 가 없게 된다. 따라서 ID값으로 연속성 있게 지정해 주면 for문 같은 것으로 연속성 있게 처리를 할 수 있게 된다.
+
+<br/>
+
+ 윈도우 API함수의 대부분은 이 세가지 DLL에 의해 제공되고 있다
+
+###### [왜 ID와 핸들 2가지를 사용할까?](#왜-id와-핸들-2가지를-사용할까)
 ###### [Top](#top)
 
 <br/>
@@ -1189,6 +1209,75 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 ***
 
+# 대화상자 기반 프로그램이란?
+  - 대화 상자 기반 프로그램은, 메인 윈도우 없이 대화상자만을 띄우는 것으로 시작한다
+  - 메인 윈도우가 필요 없으니, 메인 윈도우 등록이나, 메시지 루프 등이 필요가 없다
+
+<br/>
+
+~~~c++
+// WindowsProject1.cpp : 애플리케이션에 대한 진입점을 정의합니다.
+//
+
+#include "framework.h"
+#include "WindowsProject1.h"
+
+// 전역 변수:
+HINSTANCE hInst;                                // 현재 인스턴스입니다.
+
+// 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
+BOOL CALLBACK MyDialogProc(HWND hDlg, UINT iMessage, WPARAM wParam, LPARAM lParam);
+
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+                     _In_opt_ HINSTANCE hPrevInstance,
+                     _In_ LPWSTR    lpCmdLine,
+                     _In_ int       nCmdShow)
+{
+    hInst = hInstance;
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_MYDIALOG), HWND_DESKTOP, (DLGPROC)MyDialogProc);
+    // HWND_DESKTOP : 부모윈도우 핸들
+    return 0;
+}
+
+
+BOOL CALLBACK MyDialogProc(HWND hDlg, UINT iMessage, WPARAM wParam, LPARAM lParam)
+{
+    switch (iMessage)
+    {
+    case WM_INITDIALOG:
+    {
+        return TRUE;
+    }
+    case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // 메뉴 선택을 구문 분석합니다:
+        switch (wmId)
+        {
+
+            case IDOK:
+                MessageBox(hDlg, _T("다이얼로그 OK버튼 클릭"), _T("알림창"), MB_OK);
+                return TRUE;
+            case IDCANCEL:
+                EndDialog(hDlg, 0);
+                return TRUE;
+        }
+        break;
+    }
+    }
+
+    return FALSE;
+}
+~~~
+
+###### [대화상자 기반 프로그램이란?](#대화상자-기반-프로그램이란)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # 여러 API함수
 
   - [텍스트 출력 함수](#텍스트-출력-함수)
@@ -1199,6 +1288,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   - [타이머 함수](#타이머-함수)
   - [SendMessage,PostMessage](#sendmessagepostmessage)
   - [wsprintf](#wsprintf)
+  - [SendDlgItemMessage](#senddlgitemmessage)
 
 ###### [여러 API함수](#여러-api함수)
 ###### [Top](#top)
@@ -1378,6 +1468,20 @@ case WM_PAINT:
         TextOut(hdc, 100, 100, str, lstrlen(str));
         EndPaint(hWnd, &ps);
     }
+~~~
+
+###### [여러 API함수](#여러-api함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# SendDlgItemMessage
+
+~~~c++
+LRESULT SendDlgItemMessageA(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
+//대화상자의 어떤 ID컨트롤에게 Msg를 보낼때 사용
+//부모 대화상자의 핸들과 컨트롤의 ID값으로 편하게 메시지를 보낼 수 있다
 ~~~
 
 ###### [여러 API함수](#여러-api함수)
