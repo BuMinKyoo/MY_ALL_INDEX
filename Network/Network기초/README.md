@@ -700,32 +700,90 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
 ***
 
 # 네트워크 보안 종류
-  - 내부망 안에 있는 Server는 내부에서만 접근이 가능한데, 외부에서 접근하기 위해 VPN을 사용하여 ‘터널링’한다.
-  - 라우터나, 보안장치가 전부 VPN을 지원해야 한다(SG = SecureGate를 지원해야 한다)
-  - VPN프로그램을 설치 해야 한다
-  - 내부망 IP주소를 외부로 하나 할당하게 된다
-  - 순서
-    - 1 - VPN 프로그램을 깔면, Virtual NIC Driver가 생김
-    - 2 - 그곳에 내부망 IP를 할당한다
-    - 3 - Virtual 로 만들어진 IP를 탄후, 본래의 IP를 타고 가게 된다
-      - IP, TCP 헤더가 2개씩 붙게 된다
-      - 헤더가 하나더 붙기 때문에 MTU 1500을 초과하게 되어 단편화가 발생되니, Payload를 기본적으로 1460보다 더 작게 만들어 헤더가 하나더 붙었을때 초과 되지 않게 만든다
-    - 4 - 공유기가 그 IP를 받게 되고, 그것을 디캡슐화 시킨다
+   - 1 - L1~L3 : NAC(Network Access Control) + Probe + IP관리 시스템
+      - IP주소(Packet), MAC주소(Frame) 을 봄
+      - 네트워크에 아무나 접근 못하게 하는것
+        - 1 - L2 Port(Interface)를 다운시켜서 통신을 못하게함
+        - 2 - HTTP 통신을 리다이렉트(Redirect)시킨다
+        - 3 - DHCP통제(주소를 자동으로 할당 받지 못하게 만들어서 인터넷 못하게함)
+        - 4 - ARP Spoofing
+          - 네트워크의 장애원인중의 하나게 될 수 있으니 유의하기
+   - 2 - L1~L2(무선에서만) : WIPS
+      - MAC주소(Frame) 을 봄
+      - 몰래 무선 네트워크를 쓰지 못하도록 차단
 
-![image](https://user-images.githubusercontent.com/39178978/209433861-7cd9c8ee-d239-4185-a296-03a020ae46a0.png)
-
-<br/>
-
-![image](https://user-images.githubusercontent.com/39178978/209433865-3919c937-5db1-4d58-9f22-d5d5c92a1ca7.png)
+![image](https://user-images.githubusercontent.com/39178978/209434051-1a383ac2-0db2-47fd-8e27-f0393f6a82ea.png)
 
 <br/>
 
-![image](https://user-images.githubusercontent.com/39178978/209433873-d3215dfa-4e57-4c0a-a48a-071dfc2aa89a.png)
+  - 3 - L3~L4 : FW(Packet filter), Screening Router
+    - Port주소(Segment), IP주소(Packet) 을 봄
+    - F/W의 동작 방식 : Stateful Inspection
+      - TCP에서 연결을 할때, 연결을 전이하는 과정중에서 순서가 정상적인지, 정상적이지 않은지 확인한다.
+  - 4 - L5~ : WAF(웹 어플리케이션 방화벽 -> Proxy형태로 되어 있음)
 
-###### [VPN작동원리(L3, IPSec)](#vpn작동원리l3-ipsec)
+  - 5 - L3~L4 : VPN(IPSec)
+    - 망 수준에서의 보안을 제공함 -> Gage to Gage, Gage to End Point
+      - 터널링을 통해서 망 접속을 제공해줌
+  - 6 - L5~ : SSL VPN(Proxy형태로 되어 있음)
+
+  - 7 - 망분리, 망연계
+
+  - 3번, 4번을 합쳐서 Hybrid FW이라고함
+  - 3번, 4번, 5을 합쳐서 UTM(Unified Threat Management, 통합 위협 관리) 라고 한다
+    - 하나에 기능이 다 들어가 있기 때문에 성능이 떨어 질 수 밖에 없으면, 기본적으로 중,소 기업에서 사용하게 된다
+
+  - 1~7번까지는 네트워크 보안 인프라에 해당함
+    - 수동적인 성향이 있음
+    - 보안 ‘정책’이 중요함
+      - 설치, 설정
+
+![image](https://user-images.githubusercontent.com/39178978/209434145-42647182-e038-4c4d-b47a-154e1de91685.png)
+
+<br/>
+
+  - 수동적인 보안의 한계로, 능동적인 보안 솔루션이 등장
+    - ‘Rule’이 중요함
+
+  - 1 - L3~ : IDS, IPS (네트워크 침입 탐지 시스템)
+    - IDS, IPS 하는 일은 같지만 설치 구조가 다름(DPI를 함)
+    - NIDS : Out of path구조
+    - IPS  : Inline구조
+
+  - 2 - Sandbox
+    - 악성코드를 집어 넣어서, 어떤 반응을 일으키는지 확인한다
+
+  - 3 - MPS(8번, 9번을 합친 솔루션)
+
+  - 8번, 9번, 10번 같은 솔루션은 클라우드와 연계되어 ‘평판 시스템’을 갖는다
+
+  - 4 - 많은 데이터로 인해, 통합으로 관리해야할 필요가 생김
+    - 엔터프라이즈 서비스 관리(ESM)가 생김
+
+  - 5 - 수많은 로그가 쌓임에 따라 그것을 분석하고 대처할 SIME(보안 정보 및 이벤트 관리)도 생기게됨
+    - 분석을 AI(인공지능)으로 진행하는 경우가 많아짐
+
+![image](https://user-images.githubusercontent.com/39178978/209434191-098a4286-e83b-4ced-879d-8780a973788d.png)
+
+###### [네트워크 보안 종류](#네트워크-보안-종류)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
 ***
+
+# wireshark(패킷 분석 프로그램)
+  - Outbound : 데이터가 나가는것
+  - Inbound : 데이터가 들어오는것
+  - Filter는 Bypass(, Drop을 시킬 수 있으며, Sensor(항상 Bypass)는 그러한 것은 없고 감시(수집)만 한다
+ 
+  - 인터넷에서 데이터가 들어올때, kernel단계인 IP의 단계 전에, 필터 및 센서 프로그램을 설치 할 수 있어서, Inbound , Outbound  된 패킷을 확인 할 수 있다.
+
+  - wireshark
+    - 설치하면 Sensor가 설치가 된다(Npcap)
+
+![image](https://user-images.githubusercontent.com/39178978/209434291-a00a78ca-1240-4934-bc2e-d60d0e15ea1b.png)
+
+###### [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
+###### [Top](#top)
