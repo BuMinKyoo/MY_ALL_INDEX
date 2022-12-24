@@ -21,18 +21,18 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
   - 네트워크의 계층적 구분
     - OSI 7 LAYER 와 DoD Four-Layer Model 의 2가지가 있다
       - OSI 7 LAYER 에서의 구분
-        - 7. 응용
-        - 6. 표현
-        - 5. 세션
-        - 4. 전송
-        - 3. 네트워크
-        - 2. 데이터링크
-        - 1. 물리계층
+        - 7 응용
+        - 6 표현
+        - 5 세션
+        - 4 전송
+        - 3 네트워크
+        - 2 데이터링크
+        - 1 물리계층
       - DoD Four-Layer Model 에서의 구분
-        - 4. Application
-        - 3. Transport
-        - 2. Network
-        - 1. Access
+        - 4 Application
+        - 3 Transport
+        - 2 Network
+        - 1 Access
 
   - DoD Four-Layer Model 으로 설명하는 것이 조금더 간단하고, 아래 그림을 설명해 보면
     - Access 계층에 ‘네트워크 인터페이스 카드(Network Interface Card)’ 인 ‘NIC’이 있고 그 ‘NIC’인 하드웨어를 움직일 수 있는 Device Driver가 있으며, 그 위에 IP, TCP가 존재하고 맨 위에 Application인 Process가 있다.
