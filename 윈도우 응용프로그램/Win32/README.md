@@ -28,6 +28,7 @@
     - [GetStockObject](#getstockobject)
     - [CreatePen](#createpen)
     - [CreateSolidBrush](#createsolidbrush)
+    - [CreateFont](#createfont)
     - [DeleteObject](#deleteobject)
 
   </div>
@@ -37,6 +38,9 @@
 - [메뉴](#메뉴)
 - [커서](#커서)
 - [엑셀러레이터](#엑셀러레이터)
+- [그리기모드](#그리기모드)
+- [컨트롤생성(CreateWindow)](#컨트롤생성createwindow)
+- [다이얼로그 생성](#다이얼로그-생성)
 
 - <details markdown="1">
   <summary>여러 API함수</summary>
@@ -580,6 +584,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   - [GetStockObject](#getstockobject)
   - [CreatePen](#createpen)
   - [CreateSolidBrush](#createsolidbrush)
+  - [CreateFont](#createfont)
   - [DeleteObject](#deleteobject)
 
 ###### [DC](#dc)
@@ -716,6 +721,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 ~~~
+
+###### [DC](#dc)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# CreateFont
+
+  - 폰트 생성하는것, 인자가 정말 많으니 인자는 참고해서 사용하자
+
+<br/>
+
+~~~C++
+HFONT CreateFont(
+  [in] int    cHeight,
+  [in] int    cWidth,
+  [in] int    cEscapement,
+  [in] int    cOrientation,
+  [in] int    cWeight,
+  [in] DWORD  bItalic,
+  [in] DWORD  bUnderline,
+  [in] DWORD  bStrikeOut,
+  [in] DWORD  iCharSet,
+  [in] DWORD  iOutPrecision,
+  [in] DWORD  iClipPrecision,
+  [in] DWORD  iQuality,
+  [in] DWORD  iPitchAndFamily,
+  [in] LPCSTR pszFaceName
+);
+~~~
+
+<br/>
+
+~~~C++
+case WM_PAINT:
+    {
+        HFONT new_font, old_font;
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+
+        new_font = CreateFont(50, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, 0, 0);
+        old_font = (HFONT)SelectObject(hdc, new_font);
+        TextOut(hdc, 100, 100, _T("출력~~"), 4);
+
+        EndPaint(hWnd, &ps);
+    }
+    break;
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/209419875-35ca71e8-29d3-40b4-b85b-59e0d6668643.png)
 
 ###### [DC](#dc)
 ###### [Top](#top)
@@ -922,6 +978,210 @@ while (GetMessage(&msg, nullptr, 0, 0))
 ~~~
 
 ###### [엑셀러레이터](#엑셀러레이터)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 그리기모드
+
+  - 윈도우즈에서 디폴트 그리기 모드는 ‘R2_COPYPEN’모드이다
+  - R2_COPYPEN : 원래의 그림을 덮어버리고 새 그림을 그린다
+
+~~~c++
+int SetROP2(HDC hdc, int rop2);
+//HDC hdc : 그리기 모드를 변경하고자 하는 DC
+//int rop2 : 어떤 모드를 사용할지
+~~~
+
+<br/>
+
+  - 원래는 항상 흰색으로 그려져야 하지만 R2_BLACK모드를 사용함으로써 그리는 것들을 전부 검정색으로 그리게 한다(아래 예제)
+
+~~~c++
+case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        SetROP2(hdc, R2_BLACK);
+        Rectangle(hdc, 100, 100, 200, 200);
+        EndPaint(hWnd, &ps);
+    }
+    break;
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/209419813-15e3cc32-fb96-4483-abcd-7e7f8e8837cf.png)
+
+###### [그리기모드](#그리기모드)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 컨트롤생성(CreateWindow)
+  - 컨트롤을 생성한다
+
+~~~c++
+void CreateWindow(
+  [in, optional]  lpClassName, // 윈도우 클래스
+  [in, optional]  lpWindowName, // 캡션이름
+  [in]            dwStyle, // 스타일
+  [in]            x,
+  [in]            y,
+  [in]            nWidth,
+  [in]            nHeight,
+  [in, optional]  hWndParent, // 부모윈도우
+  [in, optional]  hMenu, //메뉴의 핸들, 컨트롤 지정 ID
+  [in, optional]  hInstance, // 이 컨트롤을 만드는 인스턴스의 핸들
+  [in, optional]  lpParam // 사용자 지정 테이터(우선 NULL)
+)
+~~~
+
+<br/>
+
+  - CreateWindow 로 컨트롤을 생성한다. 다양한 컨트롤이 존재하는데, 버튼을 컨트롤을 클릭했을때, 에디트는 문자열을 입력했을때 등, 다양한 형태로 부모 윈도우에게 통지 메시지를 보내게 되는데 이는 WM_COMMAND메시지로 전달되게 된다. 이때 컨트롤을 만들었던 ID로 구분하여 처리 할 수 있다.
+  - HIWORD(wParam) : 통지코드
+  - LOWORD(wParam) : 컨트롤의 ID
+  - lParam : 메시지를 보낸 차일드 윈도우의 윈도우 핸들
+
+~~~c++
+static HINSTANCE g_hInstance;
+
+
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+                     _In_opt_ HINSTANCE hPrevInstance,
+                     _In_ LPWSTR    lpCmdLine,
+                     _In_ int       nCmdShow)
+{
+    g_hInstance = hInstance;
+
+    . . .
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_CREATE:
+        {
+            CreateWindow(_T("button"), _T("난 버튼"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 100, 100, 200, 200, hWnd, (HMENU)10, g_hInstance, NULL);
+        }
+    case WM_COMMAND:
+        {
+            int wmId = LOWORD(wParam);
+            // 메뉴 선택을 구문 분석합니다:
+            switch (wmId)
+            {
+            case 10:
+                MessageBox(hWnd, _T("버튼클릭"), _T("알림창"), MB_OK);
+                break;
+            }
+        }
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/209419957-43ac9ff8-2217-4455-a4d7-f319462e1ba1.png)
+
+###### [컨트롤생성(CreateWindow)](#컨트롤생성createwindow)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 다이얼로그 생성
+  - 자식 다이얼로그를 생성해보자
+    - 1.리소스뷰 생성하기
+    - 2.대화상자 프로시저 만들기
+    - 3.WndProc에서 DialogBox 함수로 다이얼로그 호출하기
+
+<br/>
+
+  - 1. 리소스뷰 생성하기
+    - 리소스 뷰로 들어가서, 리소스 추가 누르기
+    
+![image](https://user-images.githubusercontent.com/39178978/209420060-253595f8-0b1b-4931-b01c-9cd68b631496.png)
+
+![image](https://user-images.githubusercontent.com/39178978/209420069-8a4e9b3e-381d-423b-b5db-bfa027e341cd.png)
+
+<br/>
+
+  - 2.대화상자 프로시저 만들기
+    - WndProc에서 이 함수를 참조해서 사용해야 함으로 WinMain과 WndProc사이에 작성해야 한다
+    - 윈도우 프로시저와 다른 점은, 윈도우 프로시저는 LRESULT을 리턴하지만 대화상자 프로시저는 BOOL을 리턴 한다
+      - 윈도우 프로시저는 DefWindowProc(hWnd, message, wParam, lParam)로 나머지 메시지를 처리하지만 대화상자 프로시저는 그냥 return FALSE 를 주게 된다
+    - 윈도우 프로시저는 시작에 WM_CREATE메시지를 보내지만 대화상자 프로시저는 WM_INITDIALOG을 보낸다.
+    - 윈도우 프로시저는 PostQuitMessage를 사용해서 메인 윈도우인 자신을 종료 하지만 대화상자 프로시저는 EndDialog를 사용해서 자신을 종료 한다. 종료할때 인자 값을 보내게 된다
+
+~~~c++
+BOOL CALLBACK MyDialogProc(HWND hDlg, UINT iMessage, WPARAM wParam, LPARAM lParam)
+{
+    switch (iMessage)
+    {
+    case WM_INITDIALOG:
+    {
+        return TRUE;
+    }
+    case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // 메뉴 선택을 구문 분석합니다:
+        switch (wmId)
+        {
+
+            case IDOK:
+                MessageBox(hDlg, _T("다이얼로그 OK버튼 클릭"), _T("알림창"), MB_OK);
+                return TRUE;
+            case IDCANCEL:
+                EndDialog(hDlg, 0);
+                return TRUE;
+        }
+        break;
+    }
+    }
+
+    return FALSE;
+}
+~~~
+
+<br/>
+
+  - 3.WndProc에서 DialogBox 함수로 다이얼로그 호출하기
+
+~~~c++
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_LBUTTONDOWN:
+    {
+        DialogBox(hInst, MAKEINTRESOURCE(IDD_MYDIALOG), hWnd, (DLGPROC)MyDialogProc);
+    }
+    break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+~~~
+
+###### [다이얼로그 생성](#다이얼로그-생성)
 ###### [Top](#top)
 
 <br/>
