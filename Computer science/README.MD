@@ -483,13 +483,17 @@ a : 8, b : 3
     - 전 세계의 모든 문자 및 이모지까지 '일관되게'표현할 수 있는 규격
     - 2021년09월14일에 Unicode 14.0이 나왔고 144,697문자를 표현한다, 지금도 계속 늘려 가고 있음
     - UTF-8(1바이트), UTF-16(2바이트), UTF32(4바이트) : 한글자를 저장할때 몇바이트를 쓸건지 명시하는것
-    - 영문이든, 한글이든, 어떤 언어든 같은 byte로 처리함
     - 한글은 초기에 조합형, 완성형에 대한 고민이 있었지만, 완성형으로 결정됨(아래 사이트에서 확인 가능)
-      - unicode.org 
+      - unicode.org
+        - 여기에 나와 있는 것은 기본적으로 UTF-16 인코딩되어 표기되어 있기때문에, 영문과 한글 모두 2byte로 표기됨
  
- ![image](https://user-images.githubusercontent.com/39178978/209461102-1413d2db-b1db-45c6-8a48-e02749055ac4.png)
+![image](https://user-images.githubusercontent.com/39178978/209461102-1413d2db-b1db-45c6-8a48-e02749055ac4.png)
 
 ![image](https://user-images.githubusercontent.com/39178978/209461105-ce2030cd-b642-4e4d-9a7c-ad7216581a1b.png)
+ 
+![image](https://user-images.githubusercontent.com/39178978/209461958-03535740-02e4-4a8f-8a35-216bc93a8664.png)
+
+![image](https://user-images.githubusercontent.com/39178978/209462079-55778768-5ec4-4392-a429-fc1fe8d282b8.png)
  
  <br/>
  
@@ -500,8 +504,11 @@ a : 8, b : 3
     - CJK(중국,일본,한국)를 제외한 거의 모든 문자에 1바이트 또는 2바이트를 사용
       - 한국어는 대부분 3바이트가 필요함 => UTF-16을 쓰면 대부분 2바이트로 표현 가능
     - UTF-8은 1바이트, 즉 8비트 이다, 유니코드상 표기가 높은 수쪽에 있는 한국어의 경우 UTF-8로 인코딩 했을시 2바이트 또는 3바이트가 필요하기 때문에, '비트 패턴을 넣어서 이 글자가 몇 바이트로 인코딩 되고 있는지'를 알려 주어야 한다. => 따라서 몇개의 비트수를 낭비하지만 4바이트까지 총 21개 비트를 표현 할 수 있다.(2,097,152개 표현)
+    - 글자가 영어인지, 한글인지 등 확인후, 범위에 따라서 바이트 수가 달라지게 표현됨
 
 <img src="https://user-images.githubusercontent.com/39178978/156084310-07986758-02a3-48a4-bab5-dbda2e15edd3.png"> 
+
+![image](https://user-images.githubusercontent.com/39178978/209461779-2f28861c-3224-4e49-9aa9-6381cc8ee944.png)
 
   - UCS-2
     - 고정 2바이트 인코딩
@@ -510,6 +517,11 @@ a : 8, b : 3
     - 인코딩/디코딩 규칙이 복잡
     - 엔디언 문제 ex)리틀 엔디언으로 저장했는데 빅 엔디언으로 읽으면 잘못된 결과 나옴
     - 아스키와 호환 안됨
+    - 메모장을 다른이름 으로 저장시 UTF-16 LE : 리틀 엔디언, UTF-16 BE : 빅 엔디언 
+
+![image](https://user-images.githubusercontent.com/39178978/209461833-f9b0ae99-a62c-4b15-ae69-9dc3d0e7b838.png)
+
+![image](https://user-images.githubusercontent.com/39178978/209462086-a47b784e-f0cf-47e6-b482-b278d53a4f96.png)
 
   - UTF-32
     - 유니코드 code point와 1:1대응
