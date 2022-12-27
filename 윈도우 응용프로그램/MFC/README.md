@@ -187,8 +187,18 @@
   </details>
 
 
-- [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
-- [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
+- <details markdown="1">
+  <summary>화면출력</summary>
+  <div markdown="1">
+  
+  - [화면출력](#화면출력)
+    - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+    - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
+    - [GDI,GDI+,Direct2D](#gdigdi+direct2d)
+      
+  </div>
+  </details>
+
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 - [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
@@ -4770,6 +4780,17 @@ void MakeFont(CFont* cfont_text, CString font, CWnd* pCtl, int size)
 
 ***
 
+# 화면출력
+    - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+    - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
+    - [GDI,GDI+,Direct2D](#gdigdi+direct2d)
+
+###### [화면출력](#화면출력)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 # CDC, CPaintDC, CClientDC, CWindowDC (화면출력)
   - CDC : CPaintDC, CClientDC, CWindowDC 클래스의 공통 부모 클래스
     - 특정 상황에 맞춰서 생성하는 용도가 아닌 다형성을 사용하기 위해서 사용 하는 클래스, 직접 생성시에는 생성자에 인자가 없는 기본 생성자가 제공
@@ -4845,13 +4866,11 @@ void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 }
 ~~~
 
-###### [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+###### [화면출력](#화면출력)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # 장치 DC, 메모리 DC (깜박임 없애기)
   - 보통은 장치 DC에 바로 연결해서 도형이나 그림을 출력하게 되지만, 많은 것들을 출력하려고 할때 작은 하나하나를 전부 장치 DC로 출력하려고 할때, 너무 많이 장치 DC가 출력되어 깜박임이 발생하게 된다. 이것을 발생하지 않게 하기위해서는 메모리 DC에 전부 출력한후, 마지막에 보여줄 1장을 장치 DC에 출력하게 되면, 장치 DC의 사용을 현저하게 줄일 수 있게 되기 때문에 깜박임이 발생하지 않게 된다.
@@ -4885,7 +4904,7 @@ mem_dc.SelectObject(&mem_bmp); // 메모리dc가 만들어진 비트맵을 바�
 dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 바꿔치기 해서 출력하기
 ~~~
 
-###### [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
+###### [화면출력](#화면출력)
 ###### [Top](#top)
 
 <br/>
