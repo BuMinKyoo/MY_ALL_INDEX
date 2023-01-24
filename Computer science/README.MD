@@ -105,6 +105,25 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
   </details>
 
 
+- <details markdown="1">
+  <summary>운영체제</summary>
+  <div markdown="1">
+  
+  - [운영체제](#운영체제)
+    - [32비트와 64비트](#32비트와-64비트)
+    - [기억 장치의 종류](#기억 장치의 종류)
+    - [HDD의 논리적 구조와 SSD](#HDD의 논리적 구조와 SSD)
+    - [API, Kernel, System Call, Interrupt](#api-kernel-system-call-interrupt)
+    - [DMA(Direct Memory Access)](#dmadirect-memory-access)
+    - [CPU와GPU](#cpu와gpu)
+    - [Virtual Memory](#virtual-memory)
+    - [Process와 Thread](#process와-thread)
+    - [Process간 통신 IPC](#process간-통신-ipc)
+    - [메모리관리](#메모리관리)
+    
+  </div>
+  </details>
+
 <br/>
 <br/>
 
@@ -1600,4 +1619,110 @@ a : 8, b : 3
 ![image](https://user-images.githubusercontent.com/39178978/209434291-a00a78ca-1240-4934-bc2e-d60d0e15ea1b.png)
 
 ###### [Network기초](#network기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 운영체제
+  - [32비트와 64비트](#32비트와-64비트)
+  - [기억 장치의 종류](#기억 장치의 종류)
+  - [HDD의 논리적 구조와 SSD](#HDD의 논리적 구조와 SSD)
+  - [API, Kernel, System Call, Interrupt](#api-kernel-system-call-interrupt)
+  - [DMA(Direct Memory Access)](#dmadirect-memory-access)
+  - [CPU와GPU](#cpu와gpu)
+  - [Virtual Memory](#virtual-memory)
+  - [Process와 Thread](#process와-thread)
+  - [Process간 통신 IPC](#process간-통신-ipc)
+  - [메모리관리](#메모리관리)
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 32비트와 64비트
+  - CPU가 처리하는 데이터의 최소 단위인 레지스터의 크기가 몇 바이트 인지 나타내는것
+  - 데이터를 처리할때 CPU에서 처리하게 되는데, 매번 데이터를 가져오면 시간이 걸리니 저장하게 된다
+  - 레지스터의 용량이 클 수록 메모리에서 더 많은 데이터를 가져와 저장하기 때문에 속도가 빨라진다
+  - 32비트 = 2의 32승 = 4,294,967,296개의 숫자를 표현 가능하며, 4,294,967,296개의 메모리 주소를 저장할 수 있다(메모리 주소는 1바이트 단위 이므로 4,294,967,296바이트 메모리 주소를 저장 가능)(4,294,967,296바이트 = 4GB)
+
+  8bit = 1Byte
+
+  1024Byte = 1MB
+
+  1024MB = 1KB
+
+  1025KB = 1GB
+
+  - 32비트 레지스터는 램에서 한번에 표현할 수 있는 메모리가 4GB가 된다(하지만 실제 레지스터는 작동중에, 일부가 메모리 주소 외에 다른 임시 값을 저장하는데 사용되기 때문에 실제 한계는 더 적어진다)
+  - 64비트 레지스터는 32비트 레지스터보다 엄청나게 더 많은 메모리 주소를 저장 가능하지만, 현재는 64비트 전체를 다 쓰지는 않는 다고 한다.
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 기억 장치의 종류
+
+![image](https://user-images.githubusercontent.com/39178978/214212250-33440444-d5f1-4cf2-8c14-ea3581ca4a36.png)
+
+  - 출처 : https://www.youtube.com/watch?v=LMwVUzJQSdU&list=PLXvgR_grOs1BQCziQ_MpM877BdBxwbMzA&index=8 
+
+<br/>
+
+  - Cache memory : CPU에서 연산을 하기 위해서 데이터들을 Register까지 불러와야 하는데, Register와 RAM간의 속도 차이 때문에 중간에 있는 Cache memory가 그 간극을 메꿔주게 된다.
+
+  - 기억공간의 관리
+    - 레지스터 : 개별 기억공간마다 고유 이름을 붙인다
+    - 주 기억장치(RAM) : 일련번호를 붙인다
+    - 보조기억장치 : 트랙과 섹터 번호를 붙여 관리한다
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# HDD의 논리적 구조와 SSD
+
+![image](https://user-images.githubusercontent.com/39178978/214212383-6363c427-92e5-4c0b-bc83-8c934572a939.png)
+
+  - 포맷 : HDD는 데이터를 트랙과 섹터로 나누어 관리하고 있는데, 그러한 트랙과 섹터를 집어 넣는 작업을 포맷이라고 하며, 그렇기 때문에 저장되어진 정보는 전부 지워지게 된다
+  - 조각모음 : HDD에 데이터가 저장될때, 연속적으로 저장되어지지 않았을때, 그러한 정보들을 연속적으로 배치하기 위한 작업(연속적으로 되어 있지 않다면 데이터를 사용하는 데 있어서 시간이 더 걸린다)
+  - 파일복구 : 파일을 완전히 지웠다고 해도, HDD상에서는, 덮어 쓸 수 있는 상태의 위치가 될뿐, 아직 그곳에 데이터를 덮어 쓰지 않았다면 그것을 찾아가서 파일을 복구 하는것
+  - HDD와 SSD의 차이
+    - 하드디스크는 내부에 있는 디스크가 돌면서 원시적으로 읽어내기 때문에, 물리적인 속도의 한계가 있지만 SSD는 플래시 메모리를 이용하여 논리적인 구조로 이루어져 있기 때문에 속도가 굉장히 빠르다
+    - SSD가 충격에 훨씬 안전하다
+    - SSD가 훨씬 가볍다
+    - SSD는 배드블록이 발생한다(수명이 존재 하며, 하나의 블록에 쓰고, 지웠다를 반복하면 그 블록을 쓸 수 없게 된다)
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# API, Kernel, System Call, Interrupt
+  - 컴퓨터는 3가지의 구조로 나눌 수 있다
+    - 피지컬
+      - H/W(하드웨어 영역)
+    - 로지컬(= Virtual)
+      - Kernel(운영체제 영역)
+      - User(유저 영역)
+  - 운영체제는 커널 영역에서 유저 레벨을 도와주고, 하드웨어 영역을 관리한다
+  - 메모리나, 장치에 접근하기 위해서는 User모드가 아닌 Kernel모드가 되었을때 접근이 가능하며, Kernel모드로 모드변경을 하기 위해서는 OS의 System Call을 호출하여 변경해야 한다
+  - Interrupt
+    - 컴퓨터는 다른 주변기기와 통신(입출력)을 할때 Interrupt가 발생한다
+      - 컴퓨터 기기들은 저마다의 고유한  Interrupt를 가지고 있어서 컴퓨터가 처리해주어야 할 일이 자신에게 발생했을때 운영체제에게 IRQ(Interrupt Request)를 보내어 컴퓨터를 사용하게 된다. 
+      - blocking IO
+        - Interrupt가 발생하면 프로세스가 잠시 멈췄다가, Interrupt가 끝나면 다시 진행한다
+      - non-blocking IO
+        - Interrupt가 발생해도 프로세스가 멈추지 않는다.
+
+###### [운영체제](#운영체제)
 ###### [Top](#top)
