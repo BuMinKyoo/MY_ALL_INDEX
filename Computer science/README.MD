@@ -111,8 +111,8 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
   
   - [운영체제](#운영체제)
     - [32비트와 64비트](#32비트와-64비트)
-    - [기억 장치의 종류](#기억 장치의 종류)
-    - [HDD의 논리적 구조와 SSD](#HDD의 논리적 구조와 SSD)
+    - [기억 장치의 종류](#기억-장치의-종류)
+    - [HDD의 논리적 구조와 SSD](#hdd의-논리적-구조와-ssd)
     - [API, Kernel, System Call, Interrupt](#api-kernel-system-call-interrupt)
     - [DMA(Direct Memory Access)](#dmadirect-memory-access)
     - [CPU와GPU](#cpu와gpu)
@@ -1628,8 +1628,8 @@ a : 8, b : 3
 
 # 운영체제
   - [32비트와 64비트](#32비트와-64비트)
-  - [기억 장치의 종류](#기억 장치의 종류)
-  - [HDD의 논리적 구조와 SSD](#HDD의 논리적 구조와 SSD)
+  - [기억 장치의 종류](#기억-장치의-종류)
+  - [HDD의 논리적 구조와 SSD](#hdd의-논리적-구조와-ssd)
   - [API, Kernel, System Call, Interrupt](#api-kernel-system-call-interrupt)
   - [DMA(Direct Memory Access)](#dmadirect-memory-access)
   - [CPU와GPU](#cpu와gpu)
@@ -1723,6 +1723,146 @@ a : 8, b : 3
         - Interrupt가 발생하면 프로세스가 잠시 멈췄다가, Interrupt가 끝나면 다시 진행한다
       - non-blocking IO
         - Interrupt가 발생해도 프로세스가 멈추지 않는다.
+    - I/O과정은 기본적으로 이렇게 되기 때문에, 커널모드에 함수가 실행되는 것과,  인터럽트 발생 때문에 속도가 잘 나오지 않는다.
+      - 1. 유저모드에서 함수 실행
+      - 2. 커널모드에서 함수 실행
+      - 3. RAM 메모리에 올라감
+      - 4. 비디오 하드웨어 에게 전송(인터럽트)
+      - 5. 모니터에게 전송(인터럽트)
+    - 주변기기를 고성능을 사면, 비동기가 되기 때문에 속도가 빨라진다
+    - DirectX : 유저 레벨에서 커널 쪽 단계를 스킵하고, 유저 레벨에서 비디오 드라이버에 바로 액세스할 수 있도록 한 기술. 이를 통해 고성능 게임을 구동하는 것
+
+<br/>
+
+![image](https://user-images.githubusercontent.com/39178978/214212779-5289a666-8670-46e4-bb7c-6c8708db52ea.png)
+
+<br/>
+
+  - System Call / Library Call 
+    - System Call은 결국, 어디선가가, 하드웨어와 메모리에 접근하기 위해서 커널 함수를 실행한다고 생각하면 되지 않을까?
+    - stdio.h와 같은 헤더 안에 System Call과 Library Call이 있으며, System Call은 OS의 Kernel에 서비스를 요청할 때에 호출하는 함수를 말한다.
+    - Library Call도 결국은 System Call을 wrapping한 것이기 때문에, 결국 System Call을 호출하게 된다.
+    - System Call을 너무많이 호출하면 시스템 성능에 영향을 주기 때문에, Library Call은 System Call을 적게 호출하면서, 개발을 쉽게 할 수 있도록 기능을 효과적으로 제공해준다
+  - System Call 호출 과정
+    - ex) stdio.h 헤더 안에 있는 printf를 사용했을시, 내부적으로 System Call을 출력할 수 있는 부분이 있으며, 그로 인해 어떤 System Call을 출력할지 컴파일러가 number을 세팅하게 됨 -> printf는 내부적으로 write을 사용하게 되고 이것은 sys_write System Call을 사용함 -> write가 call number 7번이다 라고 컴파일러가 결정하는것
+    - 커널과 컴파일러와 서로 합의된 규칙하에 적용이 된다. 즉, 사용할 커널 함수 number는 컴파일러를 쓰는 회사가 결정하는 것이며, 그 컴파일러를 쓰는 회사와 커널과의 호환이 되어야 한다
+  - API
+    - stdio.h
+      - C언어에서 사용하는 표준 입출력 API함수
+      - 내부적으로 OS의 System Call을 이용하여 Kernel의 도움을 받아서 장치를 사용하게 된다(ex. printf는 내부적으로 System Call을 호출하여 terminal에 출력한다)
+    - Win32API
+      - 윈도우 운영체제에서 사용하는 C언어 기반의 API(C++에서도 사용 가능). 윈도우에서 실행되는 모든 종류의 어플리케이션은 내부적으로 WinAPI함수를 호출 하는 형태가 된다
+      - windows.h인클루드 하여 사용
+        - 다양한 함수와, 모든 데이터 타입, 윈도우 API의 함수들을 사용하기 위한 정의 들이 들어 있다(C 및 C++헤더 파일)
+        - win32프로그램에는 인클루드가 되어 있음
+        - mfc에는 내부적으로 다른 방법으로 인클루드가 되어 있음
+      - 윈도우 운영체제를 설치 할때, 안에 내장되어 있는 함수들이라고 보면 되고, 그 함수들이 있기에, 장치 독립적으로 같은 함수를 호출함으로써 같은 기능을 쓸 수 있게 된다.
+      - WinAPI가 없던 때에는, 장치를 사용할때, 각각의 장치에 대한 제어 코드를 하나하나 만지면서, 장치마다 설명서를 보고 해야 했지만, 지금은 제어 코드를 디바이스 드라이버가 가져가게 되었고, 윈도우가 제공해 주는 api함수를 사용함으로써 쉽게 장치 기능을 쓸 수 있게 됐다.
+      - 정적 라이브러리 형태가 아닌 DLL(동적 라이브러리)형태로 제공되기 때문에, 윈도우 버전이 올라가면서, 윈도우 DLL이 개선되면, 프로그램 기능도 개선되기도 하지만, 호환성에 문제가 생기기도 한다
+      - 윈도우에서 System Call 라이브러리는 ntdll.dll이고, Win32API도 내부적으로 ntdll.dll함수를 호출한다
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DMA(Direct Memory Access)
+  - CPU와 Device장치의 통신
+    - 1. CPU에서 RAM메모리의 일정 부분을 할당에 데이터 복사
+    - 2. RAM내부에서 RAM내부로 데이터 복사
+    - 3. RAM에서 Device로 데이터를 보낼때 Device RAM으로 데이터 복사
+    - Process 가 데이터를 송신할 때
+      - 1. File (Socket) 에 send (write)
+      - 2. 소켓에 딸려있는 I/O Buffer에 차곡차곡 복사됨
+      - 3. 커널 영역의 TCP/IP 레이어에 내려오면서 Segmentation 발생
+      - 4. 커널의 버퍼들에 데이터가 복사됨
+      - 5. 커널의 드라이버를 통해 NIC에 전달
+        - 5-1 만약 NIC에도 RAM이 있다면 이곳에 한번더 들어가 복사되어 이동된다
+      - 6. 외부로 이동
+      - 그런데 프로세스 영역의 메모리와, 소켓의 메모리와, 커널의 메모리와는 모두 RAM 의 어딘가 이기 때문에 비효율적이다.
+    - 이러한 과정이 굉장히 비효율적이기 때문에 DMA가 등장
+  - DMA : CPU 에서 일정 유저 RAM영역을 OS가 Lock을 걸고  다이렉트로 Device RAM 영역에 데이터를 복사시키거나, 데이터를 Device RAM 으로 부터 받는다
+    - 윈도우의 IOCP가 이러한 원리를 활용한 것이다
+  - 가상환경(VM) : 기존 유저 영역을 유저/커널 영역으로 간주하고, 커널 영역을 H/W 로 간주하는 Guest OS 를 만드는 것
+    - 두 VM이 데이터를 주고받을 때 (실제론 커널 영역에 있는) NIC 두 개를 통해서 양쪽 유저 영역이 데이터를 주고 받는게 아니라, "했다 치고" 실제론 메모리 영역에 데이터를 copy 해버린다. 이렇게 해서 성능을 끌어올릴 수 있다
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# CPU와GPU
+  - CPU의 코어는 그렇게 많지 않지만, 복잡한 고차원적인 연산이 가능하다
+  - GPU의 코어는 몇천개 단위로 많고, 단순한 반복작업을 하는데에 최적화되어 있다
+    - 그래픽의 벡터 연산 : 3D그래픽은 많은 폴리곤으로 이루어져 있으며, 폴리곤이 세밀할수록 표면을 보다 매끄럽게 표현할 수 있으며, 폴리곤이 세밀할수록 연산해야 되는 좌표가 많아진다 그렇기 때문에 그래픽 작업은 기본적으로 단순한 ‘좌표 계산’이라고 표현된다
+    - 딥러닝, 머신러닝, 빅데이터 : 수천만 개의 학습 데이터를 이용해 연산을 수없이 반복하여 데이터로부터 특징을 추출, 즉 매우 반복적인 알고리즘 계산
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Virtual Memory
+  - 1차 메모리(RAM), 2차 메모리(HDD의 Swap영역)를 합쳐서 하나의 연속된 메모리로 추상화 한것
+    - OS는 Virtual Memory를 Process에게 할당한다
+    - User어플리케이션은 그냥 RAM을 쓴다고 하지만 그것은 가상 메모리가 될것이고, 그것은 1차,2차 메모리를 합쳐서 연속된 메모리를 추상화한것을 사용하게 된다
+  - 32bit기준 으로 설명하는 Virtual Memory
+    - 한 Process의 Virtual Memory안에서 User, kernel에서 사용하는 메모리로 나누어서 쓰게 된다. User에서 앞부분은 OS가 차지 하게 되기 때문에 그 영역은 사용하지 못하게 된다
+  - 관리
+    - User모드에서 Process의 Virtual Memory를 관리하는 단위는 Page가 된다
+    - H/W에서 물리 Memory를 관리하는 단위는 Segment가 된다
+    - 매핑 테이블을 통해 각 Process가 사용하고 있는 Page나 Segment의 위치를 매핑 하고 있다.
+      - 보통, 가상 주의의 단위인 Page와 물리 주소의 단위인 Segment의 길이를 똑같이 맞추고, 테이블을 통해서 매핑 하여 관리하게 된다
+      - Process가 오작동 해서, 종료가 됐을 때 매핑 테이블을 확인해서 그 메모리를 사용하지 않고 있다고만해서 메모리를 깔끔하게 다 수거할 수 있다.
+      - 관리적인 의미로 아주 뛰어나게 된다.
+      - OS가 접근 권한(rwx)을 확인 할때 테이블을 확인하고, 그것이 읽기만 되는지 쓰기만 되는지, 실행만 되는지 확인해서 작업을 하게 된다
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Process와 Thread
+  - Process에 속한 모든 Thread는 Process의 Virtual Memory로 메모리 공간이 제약 된다
+
+  - PCB(Process Control Block), TCB(Thread Control Block)
+    - PCB
+      - OS의 스케줄러가 스케줄링 해줌
+      - OS의 스케줄러에 의해 Context Switching되는 프로세스의 정보 단위
+      - CPU의 Core몇개로 몇천개가 되는 Process를 돌리는데, 그것을 시분할 사용하고 있지만, 너무 빠르게 하고 있기 때문에 사람의 눈에는 동시 실행 되는 것처럼 보인다
+      - 어떤 Process가 타임 아웃이 되었을때 그 상태를 PCB에 저장해 두었다가 디스패치가 되면 이어서 작업하게 된다
+    - TCB
+      - 프로세스에 있는 Thread라이브러리에 의해 스케줄링 됨
+      - Thread라이브러리에의해 Context Switching되는 Thread의 정보 단위
+  - Thread 는 Queue구조에서 무언가를 퍼와서 작업하게 된다!!
+
+개발 툴 추천 : MS사의 프로세스 탐색기
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Process간 통신 IPC
+  - Process별로 할당된 Virtual Memory는 OS가 보장해 주고 있으며, 서로간에 메모리를 침범할 수 없다. 따라서, IPC방법을 통해서, 어떤 Process에 공유 메모리를 할당해서 그것을 어떤 Process도 접근할 수 있도록 한다
+  - Process가 사용하는 자원
+    - RAM(=고정길이) + File(2차 메모리)(=Stream, 길이 제한 없음)
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 메모리관리
+  - 많은 프로세스가 RAM을 사용하려고 하지만, RAM은 제한적 이기 때문에, CPU가 판단하여 연산이 많이 필요 없는 Process를 Page단위로 하여 2차 메모리로 보내거나 하는 식으로 관리하게 된다
+    - Swap In : HDD -> RAM
+    - Swap Out : RAM -> HDD
 
 ###### [운영체제](#운영체제)
 ###### [Top](#top)
