@@ -182,6 +182,7 @@
   - [기능별 정리](#기능별-정리)
     - [캡쳐하기](#캡쳐하기)
     - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
+    - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
       
   </div>
   </details>
@@ -4673,6 +4674,7 @@ void CClientDlg::OnBnClickedSenddata()
 
     - [캡쳐하기](#캡쳐하기)
     - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
+    - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
 
 ###### [기능별 정리](#기능별-정리)
 ###### [Top](#top)
@@ -4771,6 +4773,56 @@ void MakeFont(CFont* cfont_text, CString font, CWnd* pCtl, int size)
 	cfont_text->CreateFontIndirect(&lf);
 	pCtl->SetFont(cfont_text);
 }
+~~~
+
+###### [기능별 정리](#기능별-정리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 멀티바이트 CString자료형에 한글확인 코드 와 짜르기
+
+  - 멀티바이트 환경에서는 한글은 2바이트로 표현되기 때문에, 1바이트인 글자와 구별해 내는 것이 복잡한데, 1바이트씩 확인하면서 그것이 한글에 해당하는 바이트 인지 아닌지 알 수 있는 코드이다
+
+#AppDlg.cpp
+~~~c++
+CString cs = _T("가가4사사");
+
+int cnt = 0;
+for (cnt = 0; cnt < cs.GetLength(); cnt++)
+{
+	if ((cs.GetAt(cnt) & 0x80) == 0x80) // 한글인지 아닌지 확인함, 이것을 1바이트씩 돌면서 확인하게 됨
+	{
+		
+	}
+}
+~~~
+
+  - 위와 같은 환경에서, CString 자료형안에 있는 스트링을 쉽게 잘라 낼수 있는 함수이다
+
+#AppDlg.cpp
+~~~c++
+//cstring의 left함수처럼 왼쪽부터 세서, 한글과 다른 언어를 분리해서 짤라주는 함수
+char* CKioskOrderHisryDetail::CstringLeft(char* sz, int len)
+{
+	int i = 0;
+
+	if ( strlen(sz) <= len ) return sz;
+
+	for (i=0; i<len; i++)
+	{
+		if ( IsHangle(sz[i]) )    
+		{
+			if ( len-1 < i+1 ) break;
+			else  i++;
+		}
+	}
+
+	sz[i] = 0;
+
+	return sz;
+};
 ~~~
 
 ###### [기능별 정리](#기능별-정리)
