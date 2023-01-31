@@ -351,6 +351,7 @@ void CMFCApplication3Dlg::OnSetNumber(UINT a_ctrl_id)
   - WM_CTLCOLOR은 각종 컨트롤에 배경과 글꼴색을 바꿀 수 있다.
   - Dialog ID가 “IDC_STATIC2”일때
   - Owner Draw가 없는 컨트롤을 변경할 때 사용. 컬러를 바꿀 때 사용(그래서 버튼 같은 컨트롤은 WM_DRAWITEM 메시지로 해야함)
+  - Invalidate()함수를 호출하게 되면, WM_CTLCOLOR메시지도 다시 호출되기 때문에 WM_CTLCOLOR안에 있는 컨트롤들의 컬러를 변수로 설정해 놓았다면, 변수의 컬러 변경과 Invalidate()호출로 컨트롤들의 컬러를 변경 할 수 있다.
 
 #AppDlg.cpp
 ~~~c++
