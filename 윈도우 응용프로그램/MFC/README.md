@@ -69,6 +69,7 @@
     - [AnimateWindow](#animatewindow)
     - [FindWindow, FindWindowEx](#findwindow-findwindowex)
     - [AfxExtractSubString](#afxextractsubstring)
+    - [GetLastError](#getlasterror)
 
   </div>
   </details>
@@ -1355,6 +1356,7 @@ CD1::CD1(int Dialog, CWnd* pParent /*=NULL*/)
     - [AnimateWindow](#animatewindow)
     - [FindWindow, FindWindowEx](#findwindow-findwindowex)
     - [AfxExtractSubString](#afxextractsubstring)
+    - [GetLastError](#getlasterror)
 
 ###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
@@ -2294,6 +2296,23 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 ~~~
+
+###### [다양한 함수](#다양한-함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# GetLastError
+  - 마지막에 발생한 시스템 오류 코드를 확인 할 수 있다.
+
+<br/>
+<br/>
+
+  - 어떤 오류인지 확인하는 방법
+
+![image](https://user-images.githubusercontent.com/39178978/215752044-2360b3b9-81cd-45f4-af50-5932f9401cd1.png)
+
 
 ###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
