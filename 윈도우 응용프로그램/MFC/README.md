@@ -190,16 +190,29 @@
 
 
 - <details markdown="1">
-  <summary>화면출력</summary>
+  <summary>GDI</summary>
   <div markdown="1">
   
-  - [화면출력](#화면출력)
+  - [GDI](#gdi)
     - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
     - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
-    - [GDI,GDI+,Direct2D](#gdigdi+direct2d)
+    - [GDI,GDI+,Direct2D](#gdigdidirect2d)
       
   </div>
   </details>
+
+
+- <details markdown="1">
+  <summary>GDI+</summary>
+  <div markdown="1">
+  
+  - [GDI Plus(+)](#gdi-plus)
+    - [GDI Plus(+) 초기화하기](#gdi-plus-초기화기)
+    - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
+      
+  </div>
+  </details>
+
 
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
@@ -4852,12 +4865,12 @@ char* CKioskOrderHisryDetail::CstringLeft(char* sz, int len)
 
 ***
 
-# 화면출력
-    - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
-    - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
-    - [GDI,GDI+,Direct2D](#gdigdi+direct2d)
+# GDI
+  - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+  - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
+  - [GDI,GDI+,Direct2D](#gdigdidirect2d)
 
-###### [화면출력](#화면출력)
+###### [GDI](#gdi)
 ###### [Top](#top)
 
 <br/>
@@ -4938,7 +4951,7 @@ void CMFCApplication2Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 }
 ~~~
 
-###### [화면출력](#화면출력)
+###### [GDI](#gdi)
 ###### [Top](#top)
 
 <br/>
@@ -4976,8 +4989,226 @@ mem_dc.SelectObject(&mem_bmp); // 메모리dc가 만들어진 비트맵을 바�
 dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 바꿔치기 해서 출력하기
 ~~~
 
-###### [화면출력](#화면출력)
+###### [GDI](#gdi)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# GDI,GDI+,Direct2D
+  - GDI/GDI+
+    - CPU렌더링을 한다, 따라서, 좋은 그래픽 카드를 가지고 있어도 출력이 같다
+    - 안좋은 그래픽 카드를 가지고 있어도 그래픽 작업이 가능하다
+    - CPU가 렌더링하고 그것을 RAM이 비트맵을기억한다
+    - GDI+ 는 그래픽 장치에 접근 하진 않지만, 그래픽 장치의 드라이버와 연동해서 그래픽 장치가 제공하는 좀 더 향상된 그리기 기능을 수행한다
+    - GDI+ 는 GDI보다 품질이 뛰어나지만 그래픽 장치의 가속 효과나 다양한 기능을 사용하기는 어렵다
+    - GDI+ 를 사용해서 만든 응용 프로그램의 경우 원격 접속을 하여 해당 프로그램을 사용 할때 일부 기능이 GDI와 동일하게 출력 될 수 있다.
+  - DirectX시리즈(Windows7 과 같이 공개됨)
+    - Direct2D : 그래픽 카드가 많이 좋아지면서 그래픽 카드의 성능을 이용하기 위해 나온 그래픽 엔진
+    - CPU대신 GPU를 사용하여 렌더링한다. RAM대신  VRAM을 사용하여 기억한다
+    - Windows7 이상에서만 돌아감
+    - DirectX로 렌더링 되는 프로그램은 GDI비트맵을 복사해 올 수 없다, VRAM공간에 GDI가 접근할 수 없기 때문에.
+
+###### [GDI](#gdi)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# GDI Plus(+)
+  - [GDI Plus(+) 초기화하기](#gdi-plus-초기화기)
+  - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
+
+###### [GDI Plus(+)](#gdi-plus)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# GDI Plus(+) 초기화하기
+  - 가장 먼저 초기화 작업을 진행해 줘야 한다. 가장 편한 사용법은 최상단 메인 윈도우에서 초기화 작업을 해주는 것이다
+  - 각 클래스 내에서 사용하기 위해서는 초기화 작업을 각 클래스 별로 진행 하면 된다(중요한것은 클래스 별로 토큰의 이름이 같으면 안된다!)
+  - 컴파일 속도 향상을 위해 stdafx.h 파일을 사용하는 경우에는 stdafx.h 파일에 아래와 같은  전처리기 코드가 있는데 이 코드를 주석 처리해야지 오류가 발생하지 않는다
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+# stdafx.h
+~~~C++
+// #define WIN32_LEAN_AND_MEAN
+~~~
+
+<br/>
+
+#App.h
+~~~C++
+public:
+	ULONG_PTR m_gpToken;
+	GdiplusStartupInput m_gpsi; // GDI+의 처리 방식에 추가적인 옵션을 설정하는 변수
+~~~
+
+<br/>
+
+#App.cpp
+~~~C++
+BOOL CMFCApplication7App::InitInstance()
+{
+	CWinApp::InitInstance();
+
+	if (GdiplusStartup(&m_gpToken, &m_gpsi, NULL) != Ok)
+	{
+		AfxMessageBox(_T("GDI+ 사용 실패"));
+	}
+}
+
+. . . 
+
+int CMFCApplication7App::ExitInstance()
+{
+	::GdiplusShutdown(m_gpToken);
+
+	return CWinApp::ExitInstance();
+}
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~C++
+void CMFCApplication7Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	{
+	   . . .
+	}
+	else
+	{
+		Graphics p_graphic(dc.GetSafeHdc());
+		p_graphic.SetSmoothingMode(SmoothingModeAntiAlias);
+		Pen p_pen(Color(255, 255, 0, 0), 3);
+		p_graphic.DrawLine(&p_pen, 50, 100, 200, 157);
+	}
+}
+~~~
+
+<br/>
+
+![image](https://user-images.githubusercontent.com/39178978/223144227-66d15f27-35ad-47ff-99d5-2048a2c0d5d9.png)
+
+###### [GDI Plus(+)](#gdi-plus)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# GDI Plus(+) 더블 버퍼링(With GDI)
+  - GDI+와 GDI를 혼용해서 사용하는것이 괜찮은건지 정확하게는 알지 못하지만, 아래 코드는 혼용해서 쓸 경우에 코드를 작성해 봤다
+  - GDI+로만 더블 버퍼링을 하는 과정은 다른 분들이 작성해 놓은것을 참고하
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.h
+~~~C++
+#include <gdiplus.h> // GDI+를 사용하기 위한 헤더 파일
+#pragma comment(lib, "gdiplus") // GDI+를 사용하기 위한 라이브러리 파일
+using namespace Gdiplus; // GDI+는 클래스 개념과 네임스페이스 개념을 사용하기 때문에, 편하게 쓰기 위함
+
+
+public:
+	ULONG_PTR m_gpToken;
+	GdiplusStartupInput m_gpsi; // GDI+의 처리 방식에 추가적인 옵션을 설정하는 변수
+	Graphics* p_graphic;
+	CDC mem_dc; // 장치 dc와 바꿔 채기할 dc
+	CBitmap mem_bmp; // 메모리dc의 비트맵을 바꿔채기할 비트맵
+	CRect m_rClientrect;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~C++
+BOOL CMFCApplication7Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	if (GdiplusStartup(&m_gpToken, &m_gpsi, NULL) != Ok)
+	{
+		AfxMessageBox(_T("GDI+ 사용 실패"));
+	}
+
+
+	CClientDC dc(this); // 메모리dc와 비트맵에게 정보를 줄 장치dc
+	mem_dc.CreateCompatibleDC(&dc); // 장치 dc의 기본적인 정보를 가져가기
+	
+	GetClientRect(&m_rClientrect);
+	mem_bmp.CreateCompatibleBitmap(&dc, m_rClientrect.Width(), m_rClientrect.Height()); // 장치 dc의 기본적인 정보를 가져가기, w,h로 장치 dc와 같은 크기 지정하기
+	mem_dc.SelectObject(&mem_bmp); // 메모리dc가 만들어진 비트맵을 바꿔치기 하기
+
+	mem_dc.FillSolidRect(0, 0, m_rClientrect.Width(), m_rClientrect.Height(), RGB(255,255,255));
+
+	Graphics p_graphic(mem_dc);
+	p_graphic.SetSmoothingMode(SmoothingModeAntiAlias);
+	Pen p_pen(Color(255, 255, 0, 0), 3);
+	
+	p_graphic.DrawEllipse(&p_pen, 10,
+		10, 200, 200);
+
+	return TRUE; 
+}
+
+. . .
+
+void CMFCApplication7Dlg::OnPaint()
+{
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+
+	if (IsIconic())
+	{
+
+	}
+	else
+	{
+		dc.BitBlt(0, 0, m_rClientrect.Width(), m_rClientrect.Height(), &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 바꿔치기 해서 출력하기
+	}
+}
+
+. . .
+
+void CMFCApplication7Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	::GdiplusShutdown(m_gpToken);
+}
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/223145274-006e0877-e1ab-4b84-9189-5cb9678ec501.png)
+
+###### [GDI Plus(+)](#gdi-plus)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <br/>
 <br/>
