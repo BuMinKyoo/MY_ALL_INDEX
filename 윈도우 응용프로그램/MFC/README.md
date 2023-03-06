@@ -209,6 +209,8 @@
   - [GDI Plus(+)](#gdi-plus)
     - [GDI Plus(+) 초기화하기](#gdi-plus-초기화기)
     - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
+    - [여러가지 그리기](#여러가지-그리기)
+    - [이미지 원하는 모양으로 출력하기](#이미지-원하는-모양으로-출력하기)
       
   </div>
   </details>
@@ -5020,6 +5022,8 @@ dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 �
 # GDI Plus(+)
   - [GDI Plus(+) 초기화하기](#gdi-plus-초기화기)
   - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
+  - [여러가지 그리기](#여러가지-그리기)
+  - [이미지 원하는 모양으로 출력하기](#이미지-원하는-모양으로-출력하기)
 
 ###### [GDI Plus(+)](#gdi-plus)
 ###### [Top](#top)
@@ -5194,21 +5198,102 @@ void CMFCApplication7Dlg::OnDestroy()
 ###### [GDI Plus(+)](#gdi-plus)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+# 여러가지 그리기
+  - g.DrawImage
+  - g.FillRectangle
+  - g.FillEllipse
+  - SolidBrush solidBrushWhite(Color(255, 255, 255));
+  - SolidBrush solidBrushWhite(Color(255, 255, 255, 255));
+
+###### [GDI Plus(+)](#gdi-plus)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 이미지 원하는 모양으로 출력하기
+  - 이미지를 원하는 모양으로 출력하기 위해서 SetClip() 함수를 사용했다. SetClip()은 출력하기 전에, '내가 어느 정도 범위에 어떤 무엇이든지 출력 범위를 제한 할때' 사용하게 된다.
+  - 라운드 사각형을 SetClip()하여, 그 위에 이미지를 출력하면 라운드 된 모양으로 이미지가 출력되게 된다. 한가지 해결하지 못한 것은, 사진이 라운드가 될때 안티에일리어싱이 되지 않는 다는 점이다..
+
+#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+<br/>
+
+#AppDlg.cpp
+~~~C++
+// m_rCImageRect[inBtnCnt].left, m_rCImageRect[inBtnCnt].top, m_rCImageRect[inBtnCnt].Width(), m_rCImageRect[inBtnCnt].Height() 특정한 크기의 사각형을 만듬
+RectF PaintRect(m_rCImageRect[inBtnCnt].left, m_rCImageRect[inBtnCnt].top, m_rCImageRect[inBtnCnt].Width(), m_rCImageRect[inBtnCnt].Height());
+
+GraphicsPath RoundPath;
+GetRoundedRect(&RoundPath, PaintRect, 10); // 만든 사각형을 라운드하기
+
+m_graphics->SetClip(&RoundPath, CombineModeReplace); // 라운드한 사각형으로 다음 출력시 출력을 제한 하기
 
 
+// 여기서 이미지를 출력한다
 
 
+/// round rect 만들기
+void GetRoundedRect(GraphicsPath* pPath, RectF baseRect, float radius)
+{
+	if( radius<=0.0F ){ 
+		pPath->AddRectangle(baseRect); 
+		pPath->CloseFigure(); 
+		return;
+	}
+	if( radius>=(min(baseRect.Width, baseRect.Height))/2.0){
+		GetCapsule(pPath, baseRect); 
+		return;
+	}
+	float diameter = radius * 2.0F; 
+	RectF arc ( baseRect.X, baseRect.Y, diameter, diameter); 
+	pPath->AddArc( arc, 180, 90 ); 
+	arc.X = baseRect.GetRight() -diameter; 
+	pPath->AddArc( arc, 270, 90 ); 
+	arc.Y = baseRect.GetBottom() -diameter; 
+	pPath->AddArc( arc, 0, 90 ); 
+	arc.X = baseRect.GetLeft();
+	pPath->AddArc( arc, 90, 90 ); 
+	pPath->CloseFigure(); 
+}
 
+. . .
 
+/// round rect 만들기
+void GetCapsule(GraphicsPath* pPath, RectF baseRect)
+{ 
+	float diameter; 
 
+	TRY{ 
+		if( baseRect.Width > baseRect.Height){ 
+			diameter = baseRect.Height; 
+			RectF arc( baseRect.X, baseRect.Y, diameter, diameter); 
+			pPath->AddArc( arc, 90, 180); 
+			arc.X = baseRect.GetRight()-diameter; 
+			pPath->AddArc( arc, 270, 180); 
+		}else if( baseRect.Width < baseRect.Height ){ 
+			diameter = baseRect.Width;
 
+			RectF arc( baseRect.X, baseRect.Y, diameter, diameter ); 
+			pPath->AddArc( arc, 180, 180 ); 
+			arc.Y = baseRect.GetBottom() -diameter; 
+			pPath->AddArc( arc, 0, 180 ); 
+		}else{ 
+			pPath->AddEllipse( baseRect ); 
+		}
+	}CATCH(CException, ex){
+		pPath->AddEllipse( baseRect ); 
+	}
+	END_CATCH
+		pPath->CloseFigure(); 
+}
+~~~
 
-
-
-
-
-
-
+###### [GDI Plus(+)](#gdi-plus)
+###### [Top](#top)
 
 <br/>
 <br/>
