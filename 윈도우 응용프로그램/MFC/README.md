@@ -229,6 +229,19 @@
   </details>
 
 
+- <details markdown="1">
+  <summary>Direct2D</summary>
+  <div markdown="1">
+  
+  - [Direct2D](#direct2d)
+    - [Direct2D 초기화 및 기본출력](#direct2d-초기화-및-기본출력)
+    - [Direct2D 초기화 및 이미지출력](#direct2d-초기화-및-이미지출력)
+    - [Direct2D 초기화 및 이미지 라운드 출력](#direct2d-초기화-및-이미지-라운드-출력)
+ 
+  </div>
+  </details>
+
+
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
 - [서브 클래싱(SubclassDlgItem)이용하여 기능변경](#서브-클래싱subclassdlgitem이용하여-기능변경)
@@ -5545,6 +5558,432 @@ void GetCapsule(GraphicsPath* pPath, RectF baseRect)
 ~~~
 
 ###### [GDI Plus(+)](#gdi-plus)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Direct2D
+  - d2d1.h 파일은 C/C++에서 Direct2D API를 사용하기 위해서 참조해야 하는 헤더파일
+  - Windows 8 또는 그 이후 버전에서는 Direct2D에 여러 가지 추가 기능과 변화가 생겼기 때문에 이 기능들을 사용하려면 각 헤더파일의 이름을 약간 변경해서 참조해야 합니다. (이 기능들을 사용하면 Windows 7 응용 프로그램과의 호환성을 잃을수도 있다)
+  - D2D1.lib 파일은 C/C++ 에서 Direct2D API를 사용하기 위해서 참조해야 하는 라이브러리 파일
+  - Direct2D 를 구성하는 객체들은 ID2D1Resource 인터페이스로부터 상속받아서 구현되고, ID2D1Factory 객체는 ID2D1Resource 를 상속받아 만들어진 객체를 생성하고 사용할 수 있도록 해준다
+
+    - [Direct2D 초기화 및 기본출력](#direct2d-초기화-및-기본출력)
+    - [Direct2D 초기화 및 이미지출력](#direct2d-초기화-및-이미지출력)
+    - [Direct2D 초기화 및 이미지 라운드 출력](#direct2d-초기화-및-이미지-라운드-출력)
+
+###### [Direct2D](#direct2d)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Direct2D 초기화 및 기본출력
+
+#AppDlg.h
+~~~c++
+#include <d2d1_1.h>
+#pragma comment(lib, "D2D1.lib")
+using namespace D2D1;
+
+. . .
+
+public:
+	ID2D1Factory *m_p_factory;
+	ID2D1HwndRenderTarget *m_p_render_target;
+~~~
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication17Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	m_p_factory = NULL;
+	m_p_render_target = NULL;
+
+	D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_p_factory);
+
+	if (S_OK == D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_p_factory)){
+		MessageBox(_T("Factory 생성에 성공했습니다!"), _T("D2D1CreateFactory"), MB_OK);
+		// 성공했으면 m_p_factory에 사용 가능한 Factory 객체의 주소가 저장되어 있다.
+	} else {
+		MessageBox(_T("Factory 생성에 실패했습니다!"), _T("D2D1CreateFactory"), MB_ICONERROR);
+	}
+
+	CRect r;
+	GetClientRect(&r);
+
+
+	if (S_OK == m_p_factory->CreateHwndRenderTarget(RenderTargetProperties(),
+		HwndRenderTargetProperties(m_hWnd, SizeU(r.right, r.bottom)), &m_p_render_target))
+	{
+		MessageBox(_T("m_p_render_target 생성에 성공했습니다!"), _T("D2D1CreateFactory"), MB_OK);
+		//  성공했으면 m_p_render_target 에 사용 가능한 RenderTarget 객체의 주소가 저장되어 있다.
+	} else {
+		MessageBox(_T("m_p_render_target 생성에 실패했습니다!"), _T("D2D1CreateFactory"), MB_ICONERROR);
+	}
+
+	return TRUE;
+}
+
+. . . 
+
+void CMFCApplication17Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	m_p_render_target->BeginDraw();
+	m_p_render_target->Clear(ColorF(0.0f, 0.8f, 1.0f));
+
+	D2D1_ELLIPSE my_region;
+	my_region.point.x = 100;
+	my_region.point.y = 100;
+	my_region.radiusX = 50.0f;
+	my_region.radiusY = 50.0f;
+
+	ID2D1SolidColorBrush *p_yellow_brush = NULL;
+
+	m_p_render_target->CreateSolidColorBrush(ColorF(1.0f, 1.0f, 0.0f), &p_yellow_brush);
+
+	m_p_render_target->FillEllipse(my_region, p_yellow_brush);
+
+	p_yellow_brush->Release();
+	p_yellow_brush = NULL;
+
+	m_p_render_target->EndDraw();
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+. . .
+
+void CMFCApplication17Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	m_p_factory->Release();
+
+	if (m_p_render_target != NULL)
+	{
+		m_p_render_target->Release();
+		m_p_render_target = NULL;
+	}
+}
+~~~
+
+###### [Direct2D](#direct2d)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Direct2D 초기화 및 이미지출력
+
+#AppDlg.h
+~~~c++
+#include <d2d1.h>
+#pragma comment(lib, "D2D1.lib")
+#include <Wincodec.h>     // IWICImagingFactory를 사용하기 위해서 추가 
+using namespace D2D1;
+
+. . .
+public:
+	ID2D1Factory *m_p_factory;
+	ID2D1HwndRenderTarget *m_p_render_target;
+	ID2D1Bitmap *m_p_bitmap;
+	void WIC();
+~~~
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication22Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+
+	m_p_factory = NULL;
+	m_p_render_target = NULL;
+
+	D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_p_factory);
+
+	if (S_OK == D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_p_factory)){
+		MessageBox(_T("Factory 생성에 성공했습니다!"), _T("D2D1CreateFactory"), MB_OK);
+		// 성공했으면 m_p_factory에 사용 가능한 Factory 객체의 주소가 저장되어 있다.
+	} else {
+		MessageBox(_T("Factory 생성에 실패했습니다!"), _T("D2D1CreateFactory"), MB_ICONERROR);
+	}
+
+	CRect r;
+	GetClientRect(&r);
+
+
+	if (S_OK == m_p_factory->CreateHwndRenderTarget(RenderTargetProperties(),
+		HwndRenderTargetProperties(m_hWnd, SizeU(r.right, r.bottom)), &m_p_render_target))
+	{
+		MessageBox(_T("m_p_render_target 생성에 성공했습니다!"), _T("D2D1CreateFactory"), MB_OK);
+		//  성공했으면 m_p_render_target 에 사용 가능한 RenderTarget 객체의 주소가 저장되어 있다.
+	} else {
+		MessageBox(_T("m_p_render_target 생성에 실패했습니다!"), _T("D2D1CreateFactory"), MB_ICONERROR);
+	}
+
+	WIC();
+
+
+	return TRUE; 
+}
+
+
+. . .
+
+void CMFCApplication22Dlg::WIC()
+{
+	// WIC(Windows Imaging Component)관련 객체를 생성하기 위한 Factory 객체 선언 
+	IWICImagingFactory *p_wic_factory; 
+	// WIC 객체를 생성하기 위한 Factory 객체를 생성한다. 
+	CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&p_wic_factory)); 
+
+
+	// 압축된 이미지를 해제할 객체 
+	IWICBitmapDecoder *p_decoder; 
+	// WIC용 Factory 객체를 사용하여 이미지 압축 해제를 위한 객체를 생성 
+	p_wic_factory->CreateDecoderFromFilename(_T("1.jpg"), NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &p_decoder);
+
+
+	// 특정 그림을 선택한 객체 
+	IWICBitmapFrameDecode *p_frame; 
+	// 파일을 구성하는 이미지 중에서 첫번째 이미지를 선택한다. 
+	p_decoder->GetFrame(0, &p_frame);
+
+
+
+	// 이미지 변환 객체 
+	IWICFormatConverter *p_converter; 
+	// WIC Factory 객체를 사용하여 이미지형식 변환 객체를 생성한다.
+	p_wic_factory->CreateFormatConverter(&p_converter); 
+	// 선택된 그림을 어떤 형식의 비트맵으로 변환할 것인지 설정한다. 
+	p_converter->Initialize(p_frame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom); 
+
+
+
+	// 변환된 이미지 형식을 사용하여 Direct2D용 비트맵을 생성합니다.
+	m_p_render_target->CreateBitmapFromWicBitmap(p_converter, NULL, &m_p_bitmap); 
+
+	p_wic_factory->Release();
+}
+
+
+. . .
+
+void CMFCApplication22Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// RenderTarget 에 출력이 시작됨을 설정한다.
+	m_p_render_target->BeginDraw();
+	// RenderTarget 의 전체 영역에 파란색(R0, G203, B255)을 칠한다.
+	m_p_render_target->Clear(ColorF(0, 0.8f, 1));
+
+	// 이미지가 정상적으로 구성된 경우에만 출력한다.
+	if (m_p_bitmap != NULL){
+		// 구성된 비트맵 이미지의 크기를 얻는다.
+		D2D1_SIZE_F image_size = m_p_bitmap->GetSize();
+		// 완전 불투명 상태로 지정된 좌표에 비트맵을 출력한다.
+		m_p_render_target->DrawBitmap(m_p_bitmap, RectF(0, 0, image_size.width, image_size.height));
+	}
+
+	// 출력을 끝낸다
+	m_p_render_target->EndDraw();
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+. . .
+
+void CMFCApplication22Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	m_p_factory->Release();
+
+	if (m_p_render_target != NULL)
+	{
+		m_p_render_target->Release();
+		m_p_render_target = NULL;
+	}
+}
+~~~
+
+###### [Direct2D](#direct2d)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Direct2D 초기화 및 이미지 라운드 출력
+
+#AppDlg.h
+~~~c++
+#include <d2d1.h>
+#pragma comment(lib, "D2D1.lib")
+#include <Wincodec.h>     // IWICImagingFactory를 사용하기 위해서 추가 
+using namespace D2D1;
+
+. . .
+
+public:
+	ID2D1Factory *m_p_factory;
+	ID2D1HwndRenderTarget *m_p_render_target;
+	ID2D1Bitmap *m_p_bitmap[2];
+	void WIC();
+~~~
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication22Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+
+	m_p_factory = NULL;
+	m_p_render_target = NULL;
+
+	D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_p_factory);
+
+	if (S_OK == D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_p_factory)){
+		MessageBox(_T("Factory 생성에 성공했습니다!"), _T("D2D1CreateFactory"), MB_OK);
+		// 성공했으면 m_p_factory에 사용 가능한 Factory 객체의 주소가 저장되어 있다.
+	} else {
+		MessageBox(_T("Factory 생성에 실패했습니다!"), _T("D2D1CreateFactory"), MB_ICONERROR);
+	}
+
+	CRect r;
+	GetClientRect(&r);
+
+
+	if (S_OK == m_p_factory->CreateHwndRenderTarget(RenderTargetProperties(),
+		HwndRenderTargetProperties(m_hWnd, SizeU(r.right, r.bottom)), &m_p_render_target))
+	{
+		MessageBox(_T("m_p_render_target 생성에 성공했습니다!"), _T("D2D1CreateFactory"), MB_OK);
+		//  성공했으면 m_p_render_target 에 사용 가능한 RenderTarget 객체의 주소가 저장되어 있다.
+	} else {
+		MessageBox(_T("m_p_render_target 생성에 실패했습니다!"), _T("D2D1CreateFactory"), MB_ICONERROR);
+	}
+
+	WIC();
+
+
+	return TRUE; 
+}
+
+. . .
+
+void CMFCApplication22Dlg::WIC()
+{
+	for(int i = 0; i < 2; i++)
+	{
+		// WIC(Windows Imaging Component)관련 객체를 생성하기 위한 Factory 객체 선언 
+		IWICImagingFactory *p_wic_factory; 
+		// WIC 객체를 생성하기 위한 Factory 객체를 생성한다. 
+		CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&p_wic_factory)); 
+
+
+		// 압축된 이미지를 해제할 객체 
+		IWICBitmapDecoder *p_decoder; 
+
+		if (i == 0)
+		{
+			// WIC용 Factory 객체를 사용하여 이미지 압축 해제를 위한 객체를 생성 
+			p_wic_factory->CreateDecoderFromFilename(_T("D:\\POS\\Astems_2.0\\Img\\Kiosk\\Goods\\C374_NC1932_01_07.jpg"), NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &p_decoder);
+		}
+		else
+		{
+			// WIC용 Factory 객체를 사용하여 이미지 압축 해제를 위한 객체를 생성 
+			p_wic_factory->CreateDecoderFromFilename(_T("D:\\POS\\Astems_2.0\\Img\\Kiosk\\Goods\\C374_NC1932_01_20.jpg"), NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &p_decoder);
+		}
+		
+
+
+		// 특정 그림을 선택한 객체 
+		IWICBitmapFrameDecode *p_frame; 
+		// 파일을 구성하는 이미지 중에서 첫번째 이미지를 선택한다. 
+		p_decoder->GetFrame(0, &p_frame);
+
+
+
+		// 이미지 변환 객체 
+		IWICFormatConverter *p_converter; 
+		// WIC Factory 객체를 사용하여 이미지형식 변환 객체를 생성한다.
+		p_wic_factory->CreateFormatConverter(&p_converter); 
+		// 선택된 그림을 어떤 형식의 비트맵으로 변환할 것인지 설정한다. 
+		p_converter->Initialize(p_frame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom); 
+
+
+
+		// 변환된 이미지 형식을 사용하여 Direct2D용 비트맵을 생성합니다.
+		m_p_render_target->CreateBitmapFromWicBitmap(p_converter, NULL, &m_p_bitmap[i]); 
+
+		p_wic_factory->Release();
+	}
+}
+
+. . .
+
+void CMFCApplication22Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	ID2D1RoundedRectangleGeometry* geometry;
+	m_p_factory->CreateRoundedRectangleGeometry(RoundedRect(RectF(0.0f, 0.0f, 200.0f, 150.0f), 10.0f, 10.0f), &geometry);
+
+
+	// RenderTarget 에 출력이 시작됨을 설정한다.
+	m_p_render_target->BeginDraw();
+	// RenderTarget 의 전체 영역에 파란색(R0, G203, B255)을 칠한다.
+	m_p_render_target->Clear(ColorF(0, 0.8f, 1));
+
+	ID2D1Layer *pLayer = NULL;
+	m_p_render_target->CreateLayer(NULL, &pLayer);
+	m_p_render_target->PushLayer(LayerParameters(InfiniteRect(), geometry),pLayer);
+
+	for (int i = 0; i < 2; i++)
+	{
+		// 이미지가 정상적으로 구성된 경우에만 출력한다.
+		if (m_p_bitmap[i] != NULL){
+			// 구성된 비트맵 이미지의 크기를 얻는다.
+			D2D1_SIZE_F image_size = m_p_bitmap[i]->GetSize();
+			// 완전 불투명 상태로 지정된 좌표에 비트맵을 출력한다.
+
+			D2D1_ROUNDED_RECT roundedRect = RoundedRect(RectF(i*50, i*50, image_size.width, image_size.height), 10.f, 10.f);
+
+			D2D1_RECT_F dRect = RectF(i*50, i*50, image_size.width, image_size.height);
+
+			m_p_render_target->DrawBitmap(m_p_bitmap[i], dRect);
+		}
+	}
+	
+	m_p_render_target->PopLayer();
+
+	// 출력을 끝낸다
+	m_p_render_target->EndDraw();
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+. . .
+
+void CMFCApplication22Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	m_p_factory->Release();
+
+	if (m_p_render_target != NULL)
+	{
+		m_p_render_target->Release();
+		m_p_render_target = NULL;
+	}
+}
+~~~
+
+###### [Direct2D](#direct2d)
 ###### [Top](#top)
 
 <br/>
