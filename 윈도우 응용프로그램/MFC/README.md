@@ -162,6 +162,19 @@
 
 
 - <details markdown="1">
+  <summary>http,https통신</summary>
+  <div markdown="1">
+  
+  - [http,https통신](#httphttps통신)
+    - [http,https Get통신](#httphttps-get통신)
+    - [http,https Post통신](#httphttps-post통신)
+    - [https Put통신](#https-put통신)
+      
+  </div>
+  </details>
+
+
+- <details markdown="1">
   <summary>소켓통신</summary>
   <div markdown="1">
   
@@ -4071,13 +4084,252 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 
 ***
 
+# http,https통신
+  - [http,https Get통신](#httphttps-get통신)
+  - [http,https Post통신](#httphttps-post통신)
+  - [https Put통신](#https-put통신)
+
+###### [http,https통신](#httphttps통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# http,https Get통신
+
+#AppDlg.cpp
+~~~c++
+#include <wininet.h>
+#include <string>
+#include <vector>
+#include <fstream>
+
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// http get통신
+	// 1. 인터넷 연결
+
+	// 만약 postman으로 보낼 주소가 (www.aaaaaa.com:8070/kkk/k11S.php3?No=kc100&Date=20221210)이라면,
+	// http get통신
+	HINTERNET hSession = InternetOpen(L"Test", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	HINTERNET hConnect = InternetConnect(hSession, L"www.aaaaaa.com", 8070, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+	HINTERNET hRequest = HttpOpenRequest(hConnect, L"GET", L"/kkk/k11S.php3?No=kc100&Date=20221210", NULL, NULL, NULL, INTERNET_FLAG_RELOAD, 0);
+
+	// https get통신
+	/*HINTERNET hRequest = HttpOpenRequest(hConnect, L"GET", L"/kkk/k11S.php3?No=kc100&Date=20221210", NULL, NULL, NULL, INTERNET_FLAG_RELOAD | INTERNET_FLAG_SECURE, 0);*/
+
+
+	// 2. 요청
+	BOOL bRequest = HttpSendRequest(hRequest, NULL, 0, NULL, 0);
+
+	// 3. 응답
+	std::vector<char> response;
+	char szBuffer[1024] = { 0 };
+	DWORD dwRead = 0;
+	while (InternetReadFile(hRequest, szBuffer, sizeof(szBuffer), &dwRead) && dwRead > 0) {
+		response.insert(response.end(), szBuffer, szBuffer + dwRead);
+	}
+
+	// Save response to file
+	std::ofstream file("response.dat");
+	file.write(response.data(), response.size());
+	file.close();
+
+	// Convert from UTF-8 to UTF-16 using MultiByteToWideChar
+	/*MFC에서 '유니코드 문자 집합’을 사용하고 있고 인코딩 문제가 발생한다면, 서버에서 전송되는 데이터의
+	인코딩이 UTF-8이 아닐 수 있습니다. 이 경우 MultiByteToWideChar 함수의 첫 번째 매개변수를 서버
+	서 전송되는 데이터의 인코딩에 해당하는 코드 페이지로 변경해야 합니다.
+	예를 들어 서버에서 전송되는 데이터가 EUC - KR 인코딩을 사용한다면 MultiByteToWideChar 함수의 첫
+	번째 매개변수를 CP_UTF8에서 51949로 변경해야 합니다.*/
+	int wchars_num = MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), NULL, 0);
+	std::wstring wide(wchars_num, 0);
+	MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), &wide[0], wchars_num);
+
+	// 4. 종료
+	InternetCloseHandle(hRequest);
+	InternetCloseHandle(hConnect);
+	InternetCloseHandle(hSession);
+
+	// 5. 출력
+	MessageBox(wide.c_str());
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+###### [http,https통신](#httphttps통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# http,https Post통신
+
+#AppDlg.cpp
+~~~c++
+#include <wininet.h>
+#include <string>
+#include <vector>
+#include <fstream>
+
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// http post통신
+	// 1. 인터넷 연결
+
+	// 만약 postman으로 보낼 주소가 (www.aaaaaa.com:8070/kkk/k11S.php3)이라면,
+	// 바디가 
+	//  <?xml version="1.0" encoding="euc-kr"?>
+	//  <ASP><TELEX-HD Id="P71R" MsgCd="0000"/><HEADER Hq="NC1932" MsNo="NC1933" CustTelNo="01019900101"/></ASP>
+	// 이거라면,
+
+	// http POST통신
+	HINTERNET hSession = InternetOpen(L"Test", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	HINTERNET hConnect = InternetConnect(hSession, L"www.aaaaaa.com", 8070, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+	HINTERNET hRequest = HttpOpenRequest(hConnect, L"POST", L"/kkk/k11S.php3", NULL, NULL, NULL, INTERNET_FLAG_RELOAD, 0);
+
+	// https POST통신 : INTERNET_FLAG_SECURE 플레그를 하나 추가하면 된다
+	/*HINTERNET hRequest = HttpOpenRequest(hConnect, L"POST", L"/kkk/k11S.php3", NULL, NULL, NULL, INTERNET_FLAG_RELOAD | INTERNET_FLAG_SECURE, 0);*/
+
+	CString strXML = _T("<?xml version=\"1.0\" encoding=\"euc - kr\"?>\n<ASP><TELEX-HD Id=\"P71R\" MsgCd=\"0000\"/><HEADER Hq=\"NC1932\" MsNo=\"NC1933\" CustTelNo=\"01019900101\"/></ASP>");
+
+
+	CT2A asciiXML(strXML);
+
+	// 2. 요청
+	BOOL bRequest = HttpSendRequest(hRequest, NULL, 0, (LPVOID)(LPCSTR)asciiXML, strXML.GetLength());
+
+	// 3. 응답
+	std::vector<char> response;
+	char szBuffer[1024] = { 0 };
+	DWORD dwRead = 0;
+	while (InternetReadFile(hRequest, szBuffer, sizeof(szBuffer), &dwRead) && dwRead > 0) {
+		response.insert(response.end(), szBuffer, szBuffer + dwRead);
+	}
+
+	// Save response to file
+	std::ofstream file("response.dat");
+	file.write(response.data(), response.size());
+	file.close();
+
+	// Convert from UTF-8 to UTF-16 using MultiByteToWideChar
+	/*MFC에서 '유니코드 문자 집합’을 사용하고 있고 인코딩 문제가 발생한다면, 서버에서 전송되는 데이터의
+	인코딩이 UTF-8이 아닐 수 있습니다. 이 경우 MultiByteToWideChar 함수의 첫 번째 매개변수를 서버
+	서 전송되는 데이터의 인코딩에 해당하는 코드 페이지로 변경해야 합니다.
+	예를 들어 서버에서 전송되는 데이터가 EUC - KR 인코딩을 사용한다면 MultiByteToWideChar 함수의 첫
+	번째 매개변수를 CP_UTF8에서 51949로 변경해야 합니다.*/
+	int wchars_num = MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), NULL, 0);
+	std::wstring wide(wchars_num, 0);
+	MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), &wide[0], wchars_num);
+
+	// 4. 종료
+	InternetCloseHandle(hRequest);
+	InternetCloseHandle(hConnect);
+	InternetCloseHandle(hSession);
+
+	// 5. 출력
+	MessageBox(wide.c_str());
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+###### [http,https통신](#httphttps통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# https Put통신
+
+#AppDlg.cpp
+~~~c++
+#include <wininet.h>
+#include <string>
+#include <vector>
+#include <fstream>
+
+BOOL CMFCApplication3Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// https put통신
+	// 1. 인터넷 연결
+
+	// 만약 postman으로 보낼 주소가 (www.aaaaaa.com:8070/kkk/k11S.php3)이라면,
+	// 바디가,
+	// {
+	//    "WEB_POS_NO" : "60",
+	//    "POS_BILL_NO" : "3"
+	// }
+	// 이거라면,
+
+	HINTERNET hSession = InternetOpen(L"Test", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	HINTERNET hConnect = InternetConnect(hSession, L"www.aaaaaa.com", 8370, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+	HINTERNET hRequest = HttpOpenRequest(hConnect, L"PUT", L"/kkk/k11S.php3", NULL, NULL, NULL, INTERNET_FLAG_RELOAD | INTERNET_FLAG_SECURE, 0);
+
+	CString strJSON;
+	strJSON.Format(_T("{\n\t\"WEB_POS_NO\": \"%s\",\n\t\"POS_BILL_NO\": \"%s\"\n}"), _T("60"), _T("3"));
+
+	CT2A asciiJSON(strJSON);
+
+	/*HttpSendRequest 함수를 사용하여 PUT 요청을 보낼 때 Content - Type 헤더를 지정해야 할 수 있습
+	다.Content - Type 헤더는 서버에게 요청 본문의 형식을 알려주는 역할을 합니다.JSON 데이터를 전송하
+	경우 Content - Type 헤더의 값으로 "application/json"을 지정해야 합니다.*/
+	LPCTSTR szHeaders = _T("Content-Type: application/json");
+	HttpAddRequestHeaders(hRequest, szHeaders, -1L, HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE);
+
+	// 2. 요청
+	BOOL bRequest = HttpSendRequest(hRequest, NULL, 0, (LPVOID)(LPCSTR)asciiJSON, strJSON.GetLength());
+
+	// 3. 응답
+	std::vector<char> response;
+	char szBuffer[1024] = { 0 };
+	DWORD dwRead = 0;
+	while (InternetReadFile(hRequest, szBuffer, sizeof(szBuffer), &dwRead) && dwRead > 0) {
+		response.insert(response.end(), szBuffer, szBuffer + dwRead);
+	}
+
+	// Save response to file
+	std::ofstream file("response.dat");
+	file.write(response.data(), response.size());
+	file.close();
+
+	// Convert from UTF-8 to UTF-16 using MultiByteToWideChar
+	int wchars_num = MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), NULL, 0);
+	std::wstring wide(wchars_num, 0);
+	MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), &wide[0], wchars_num);
+
+	// 4. 종료
+	InternetCloseHandle(hRequest);
+	InternetCloseHandle(hConnect);
+	InternetCloseHandle(hSession);
+
+	// 5. 출력
+	MessageBox(wide.c_str());
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+###### [http,https통신](#httphttps통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # 소켓통신
--
-    - [소켓통신 사용 준비](#소켓통신-사용-준비)
-    - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
-    - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
-    - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
-    - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
+  - [소켓통신 사용 준비](#소켓통신-사용-준비)
+  - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
+  - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
+  - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
+  - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
 
 ###### [소켓통신](#소켓통신)
 ###### [Top](#top)
