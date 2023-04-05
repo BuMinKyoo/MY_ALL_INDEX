@@ -20,6 +20,7 @@
   </div>
   </details>
 
+- [Garbage Collection(GC), Automatic Reference Counting(ARC)](#garbage-collectiongc-automatic-reference-countingarc)
 - [스택, 힙, 코드, 데이터영역](#스택-힙-코드-데이터영역)
 - [프레임워크, 라이브러리](#프레임워크-라이브러리)
 - [디버그(debug)빌드, 릴리즈(release)빌드](#디버그debug빌드-릴리즈release빌드)
@@ -252,6 +253,31 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
     - 복잡한 프로그램의 구조를 잡기 쉽다, 재사용성 증가, 변형가능성을 높일 수 있음
 
 ###### [언어분류](#언어분류)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Garbage Collection(GC), Automatic Reference Counting(ARC)
+  - Heap 영역에서 동적으로 할당했던 메모리 중 필요 없게 된 메모리 객체(garbage)를 모아 주기적으로 제거하는 프로세스
+<br/>
+
+  - Garbage Collection(GC)
+    - 메모리가 언제 해제되는지 정확하게 알 수 없어 제어하기 힘들다
+    - 가비지 컬렉션(GC)이 동작하는 동안에는 다른 동작을 멈추기 때문에 오버헤드가 발생
+    - Stack메모리를 전부 확인하면서, 어떤 데이터가 힙메모리를 참조하고 있는지 전부 확인한 후에, 참조되고 있지 않은 힙메모리를 전부 제거한다
+    - 순환참조까지 전부 해결할 수 있다
+    
+<br/>
+
+  - Automatic Reference Counting(ARC)
+    - 언제 메모리에서 해제되는지 컴파일과 동시에 결정할 수 있다
+    - ARC 는 클래스 인스턴스가 참조될 때(강한 참조 시) 레퍼런스 카운트를 증가시킨다, 그 이후 레퍼런스가 0이 되는 구간에 메모리 해제 코드를 컴파일러가 집어 넣는다. 즉, 컴파일시에 결정이 된다.
+    - 두 객체가 서로를 참조하여, 참조순환이 발생되면 메모리가 해제 되지 않는다는 단점이 있다
+
+###### [Garbage Collection(GC), Automatic Reference Counting(ARC)](#garbage-collectiongc-automatic-reference-countingarc)
 ###### [Top](#top)
 
 <br/>
