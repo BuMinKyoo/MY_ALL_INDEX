@@ -169,6 +169,7 @@
     - [http,https Get통신](#httphttps-get통신)
     - [http,https Post통신](#httphttps-post통신)
     - [https Put통신](#https-put통신)
+    - [파일 다운받기](#파일-다운받기)
       
   </div>
   </details>
@@ -4101,6 +4102,7 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
   - [http,https Get통신](#httphttps-get통신)
   - [http,https Post통신](#httphttps-post통신)
   - [https Put통신](#https-put통신)
+  - [파일 다운받기](#파일-다운받기)
 
 ###### [http,https통신](#httphttps통신)
 ###### [Top](#top)
@@ -4313,6 +4315,78 @@ BOOL CMFCApplication3Dlg::OnInitDialog()
 	file.close();
 
 	// Convert from UTF-8 to UTF-16 using MultiByteToWideChar
+	int wchars_num = MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), NULL, 0);
+	std::wstring wide(wchars_num, 0);
+	MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), &wide[0], wchars_num);
+
+	// 4. 종료
+	InternetCloseHandle(hRequest);
+	InternetCloseHandle(hConnect);
+	InternetCloseHandle(hSession);
+
+	// 5. 출력
+	MessageBox(wide.c_str());
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+~~~
+
+###### [http,https통신](#httphttps통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 파일 다운받기
+  - zip 파일과 같은 이진 파일을 다운로드할 때 파일이 바이트 순서로 다운로드되므로 인코딩이 문제가 되지 않습니다. 일반적으로 텍스트 데이터를 처리할 때 인코딩 문제가 발생하며, 사용된 인코딩에 따라 문자의 표현이 달라질 수 있습니다.
+  - 출력 파일 스트림을 열 때 다운로드한 파일이 std::ios::binary 플래그를 사용하여 디스크에 이진 파일로 저장됩니다. 이렇게 하면 파일이 인코딩 변환 없이 서버에서 받은 대로 디스크에 정확히 기록됩니다.
+
+#AppDlg.cpp
+~~~c++
+#include <wininet.h>
+#include <string>
+#include <vector>
+#include <fstream>
+
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// http get통신
+	// 1. 인터넷 연결
+
+	// 만약 postman으로 보낼 주소가 (www.aaaaaa.com:8070/kkk/k11S.php3?No=kc100&Date=20221210)이라면,
+	// http get통신
+	HINTERNET hSession = InternetOpen(L"Test", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	HINTERNET hConnect = InternetConnect(hSession, L"www.aaaaaa.com", 8070, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+	HINTERNET hRequest = HttpOpenRequest(hConnect, L"GET", L"/kkk/k11S.php3?No=kc100&Date=20221210", NULL, NULL, NULL, INTERNET_FLAG_RELOAD, 0);
+
+	// https get통신
+	/*HINTERNET hRequest = HttpOpenRequest(hConnect, L"GET", L"/kkk/k11S.php3?No=kc100&Date=20221210", NULL, NULL, NULL, INTERNET_FLAG_RELOAD | INTERNET_FLAG_SECURE, 0);*/
+
+
+	// 2. 요청
+	BOOL bRequest = HttpSendRequest(hRequest, NULL, 0, NULL, 0);
+
+	// 3. 응답
+	std::vector<char> response;
+	char szBuffer[1024] = { 0 };
+	DWORD dwRead = 0;
+	while (InternetReadFile(hRequest, szBuffer, sizeof(szBuffer), &dwRead) && dwRead > 0) {
+		response.insert(response.end(), szBuffer, szBuffer + dwRead);
+	}
+
+	// Save response to file
+	std::ofstream file("file.zip", std::ios::binary);
+	file.write(response.data(), response.size());
+	file.close();
+
+	// Convert from UTF-8 to UTF-16 using MultiByteToWideChar
+	/*MFC에서 '유니코드 문자 집합’을 사용하고 있고 인코딩 문제가 발생한다면, 서버에서 전송되는 데이터의
+	인코딩이 UTF-8이 아닐 수 있습니다. 이 경우 MultiByteToWideChar 함수의 첫 번째 매개변수를 서버
+	서 전송되는 데이터의 인코딩에 해당하는 코드 페이지로 변경해야 합니다.
+	예를 들어 서버에서 전송되는 데이터가 EUC - KR 인코딩을 사용한다면 MultiByteToWideChar 함수의 첫
+	번째 매개변수를 CP_UTF8에서 51949로 변경해야 합니다.*/
 	int wchars_num = MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), NULL, 0);
 	std::wstring wide(wchars_num, 0);
 	MultiByteToWideChar(CP_UTF8, 0, response.data(), response.size(), &wide[0], wchars_num);
