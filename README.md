@@ -25,10 +25,10 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ***
 
 ### 언어문법
-  - [C언어 기본지식,문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C)
-  - [C++언어 기본지식,문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%2B%2B)
-  - [C#언어 기본지식,문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%23)
-
+  - [C 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C)
+  - [C++ 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%2B%2B)
+  - [C# 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%23)
+  - [JavaScript 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/JavaScript)
 <br/>
 
 ***
