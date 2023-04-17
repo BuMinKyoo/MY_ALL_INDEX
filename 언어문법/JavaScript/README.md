@@ -5,7 +5,7 @@
 ###### Top
 
   - [기초문법~객체생성문법](#기초문법객체생성문법)
-
+  - [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
 
 <br/>
 
@@ -303,14 +303,102 @@ object.bark()
   - 외부 자바스크립트 파일 읽어 오기
     - <script src=”b.js”></script> 와 같이 src키워드를 써서 파일을 불러 올 수 있다
 
-
-
-
 ###### [기초문법~객체생성문법](#기초문법객체생성문법)
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
 
+## 자바스크립트로 문서조작하기
+  - 자바스크립트로 문서를 조작하기 위해서는 태그들을 잡아서 불러와야 하는데, 일반적으로 title밑에 자바스크립트 조작 구문을 사용하게 되고, body태그는 아직 만들어지기 전이기 때문에, 문서가 모두 만들어지고 자바스크립트 구문이 실행되기 위해서 addEventListener 함수가 사용된다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 문서 객제 조작
+        })
+    </script>
+</head>
+<body>
+    <h1>ㅎㅇ~</h1>
+    <script>
+        // 문서 객체 조작
+    </script>
+</body>
+</html>
+~~~
+
 <br/>
+
+  - querySelector 는 한개만 잡아 오고, querySelectorAll은 여러개를 잡아 오게 된다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 태그 선택자
+            const h1 = document.querySelector('h1').style.color = 'blue'
+            //h1.style.color = 'red'
+
+
+            // 아이디 선택자
+            const h2 = document.querySelector('#hhh').style.backgroundColor = 'red'
+
+
+            // 클래스 선택자, 여러개 클래스를 지정할 경우는 띄어쓰기를 하지 않고 .으로 이어 붙인다
+            const h3 = document.querySelector('.myFirstClass.mySecondClass').style.textAlign = 'center'
+
+
+            // 속성 선택자
+            const h4 = document.querySelector('[type=text]').style.borderRadius = '20px'
+           
+            // 후선 선택자, 띄어쓰기로 구분해서 잡아 오기
+            const h5 = document.querySelector('body input').style.backgroundColor = 'blue'
+
+
+            // 여러개를 잡아 온다
+            const h6 = document.querySelectorAll('input')
+            for (const i of h6) {
+                i.style.background = 'orange'
+            }
+        })
+    </script>
+</head>
+<body>
+    <!-- 여러개의 클래스를 지정할 경우는 띄어쓰기를 구분한다 -->
+    <h1 id = "hhh" class="myFirstClass mySecondClass">ㅎㅇ~</h1>
+    <input type="text">
+    <input type="text1">
+    <input type="text2">
+    <script>
+        // 문서 객체 조작
+    </script>
+</body>
+</html>
+~~~
+
+<br/>
+
+  - 문자열 조작하기
+
+~~~JavaScript
+
+~~~
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
