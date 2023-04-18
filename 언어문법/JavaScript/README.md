@@ -1,12 +1,13 @@
-<br/>
+정리중...!!
 
-  - 하나하나 세세하기 정리하기 보다 이미 알고 있는 다른 언어의 문법등을 배제하며, 검색해서 쉽게 확인할 수 있다는 것들또한 배제하여 간결하게 정리 하였음
+
+<br/>
 
 ###### Top
 
-  - [자바스크립트 코드사용](#자바스크립트-코드사용)
-  - [자바스크립트 코드 실행](#자바스크립트-코드-실행)
-  - [자바스크립트 코드 실행에러 확인](#자바스크립트-코드-실행에러-확인)
+  - [JavaScript 사용(Script태크)](#JavaScript-사용script태크)
+  - [JavaScript 코드실행 3가지](#자바스크립트-코드실행-3가지)
+  - [JavaScript 코드실행에러 확인](#자바스크립트-코드실행에러-확인)
   - [자료형](#자료형)
   - [비교연산자](#비교연산자)
   - [템플릿 문자열](#템플릿-문자열)
@@ -14,16 +15,14 @@
   - [||기호 사용시 주의](#기호-사용시-주의)
   - [함수](#함수)
   - [나머지 매개변수](#나머지-매개변수)
-  - [forEach 함수](#foreach-함수)
-  - [forin,forof](#forinforof)
-  - [filer함수](#filer함수)
-  - [map함수](#map함수)
-  - [화살표 문법](#화살표-문법)
+  - [forEach,forin,forof](#forEach,forin,forof)
+  - [filer,map함수](#filermap함수)
+  - [함수'=>'문법](#함수'=>'문법)
   - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
   - [즉시호출 함수](#즉시호출-함수)
-  - [엄격 모드](#엄격-모드)
   - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
-  - [객체 생성](#객체-생성)
+  - [엄격모드](#엄격모드)
+  - [객체생성](#객체생성)
   - [객체내 this](#객체내-this)
   - [prototype문법](#prototype문법)
   - [외부 자바스크립트 파일 읽어 오기](#외부-자바스크립트-파일-읽어-오기)
@@ -34,12 +33,12 @@
 
 ***
 
-# 자바스크립트 코드사용
-  - html형식 안에  <script></script> 라는 태그 안쪽에 쓰면 그것이 자바스크립트 코드를 쓰는 것이 된다
+# JavaScript 사용(Script태크)
+  - 자바스크립트 코드는 html형식 안에 <script></script> 태그 안쪽에 작성한다. main이라는 시작점을 
 
 ![image](https://user-images.githubusercontent.com/39178978/232321880-87371d43-f9cb-4638-8300-e0e702134fb9.png)
   
-###### [자바스크립트 코드사용](#자바스크립트-코드사용)
+###### [JavaScript 사용(Script태크)](#JavaScript-사용script태크)
 ###### [Top](#top)
 
 <br/>
