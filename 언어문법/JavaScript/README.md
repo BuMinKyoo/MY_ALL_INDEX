@@ -177,7 +177,14 @@
 ***
 
 # 함수
-  - const f = function (매개변수, 매개변수…) { return 리턴값 }
+
+~~~JavaScript
+const f = function (매개변수, 매개변수…) { return 리턴값 }
+
+function square(number) {
+  return number * number;
+}
+~~~
 
 ###### [함수](#함수)
 ###### [Top](#top)
