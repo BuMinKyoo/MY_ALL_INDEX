@@ -1,6 +1,3 @@
-정리중...!!
-
-
 <br/>
 
 ###### Top
@@ -11,16 +8,16 @@
   - [자료형,변수](#자료형변수)
   - [비교연산자](#비교연산자)
   - [템플릿 문자열](#템플릿-문자열)
-  - [상수,변수,prompt,confirm,자료형변환](#상수변수promptconfirm자료형변환)
-  - [||기호 사용시 주의](#기호-사용시-주의)
+  - [prompt,confirm,자료형변환](#promptconfirm자료형변환)
+  - [논리 연산자 "||" 기호 사용시 주의](#논리-연산자-||-기호-사용시-주의)
   - [함수](#함수)
-  - [나머지 매개변수](#나머지-매개변수)
-  - [forEach,forin,forof](#forEach,forin,forof)
-  - [filer,map함수](#filermap함수)
-  - [함수'=>'문법](#함수'=>'문법)
-  - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
-  - [즉시호출 함수](#즉시호출-함수)
-  - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
+    - [나머지 매개변수](#나머지-매개변수)
+    - [forEach,forin,forof](#forEach,forin,forof)
+    - [filer,map함수](#filermap함수)
+    - [함수'=>'문법](#함수'=>'문법)
+    - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
+    - [즉시호출 함수](#즉시호출-함수)
+    - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
   - [엄격모드](#엄격모드)
   - [객체생성](#객체생성)
   - [객체내 this](#객체내-this)
@@ -140,7 +137,12 @@
 ***
 
 # 템플릿 문자열
-  - "안녕하세요" + 1 + "ㄴㄴㄴ"(result : “안녕하세요1ㄴㄴㄴ”) 이렇게 써주어야 했던 것을 템플릿 문자열을 이용해서 `안녕하세요 ${1} ${"aaa"} 용용`(result : “'안녕하세요 1 aaa 용용')”이렇게 쓸수 있게 해준다
+  - JavaScritp는 유연한 언어이기 때문에, 문자열 + 숫자를 해도 숫자가 자동으로 문자열되어 합쳐진다.
+  - 탬플릿 문자열을 사용하면 조금더 코드를 확인하기 좋아지고, 간편하게 문자열을 작성할 수 있다
+  - 탬플릿 문자열을 사용하지 않을경우 : "안녕하세요" + 1 + "ㄴㄴㄴ" -> “안녕하세요1ㄴㄴㄴ”
+  - 탬플릿 문자열을 사용할 경우 :  \`안녕하세요 ${1} ${"aaa"} 용용\` : “안녕하세요1aaa용용”이렇게 쓸수 있게 해준다
+    - 템플릿 문자열을 만들때 양쪽 끝에 \` 기호를 사용한다(키보드에 ~표시 키보드)
+    - 탬플릿 문자열 안쪽에 변수를 사용 할때는 "${}"로 감싸서 사용하게 된
 
 ###### [템플릿 문자열](#템플릿-문자열)
 ###### [Top](#top)
@@ -150,16 +152,17 @@
 
 ***
 
-# 상수,변수,prompt,confirm,자료형변환
- - 상수 : const 식별자 = ‘자료’
-   - 자료를 바꿀수 없음
- - 변수 : let 식별자 = ‘자료’
-   - 자료를 바 꿀수 있음, 일반적으로 상수보다 변수가 내부적으로 더 느리기 때문에 가능하면 상수를 사용하고, 바꿔야 한다면 변수를 쓰자
+# prompt,confirm,자료형변환
  - prompt
-   - 값받기
-   - 무조건 문자열로 입력받음
+   - 문자열을 입력할 때 사용
+   - 숫자를 입력 받아야 하는 경우는 문자열로 입력 받은 뒤 변환
+   - 첫번째 매개변수는 입력 창에서 띄워줄 메시지
+   - 두번째 매개변수는 입력 부분의 기본 값
+   - 무조건 문자열로 입력받게 
  - confirm
-   - 확인, 취소 받기
+   - 불린 값을 입력 받을 때 사용
+   - 확인을 누르면 true를 리턴
+   - 취소를 누르면 false를 리턴
  - 자료형 변환
    - Number(변환할 값)
    - String(변환할 값)
@@ -172,12 +175,11 @@
         let b = prompt('두 번째 숫자를 입력해주세요')
         b = Number(b)
 
-
         alert(`${a} + ${b} + ${a + b}`)
  </script>
 ~~~
 
-###### [상수,변수,prompt,confirm,자료형변환](#상수변수promptconfirm자료형변환)
+###### [prompt,confirm,자료형변환](#promptconfirm자료형변환)
 ###### [Top](#top)
 
 <br/>
@@ -185,7 +187,7 @@
 
 ***
 
-# ||기호 사용시 주의
+# 논리 연산자 "||" 기호 사용시 주의
   - || 이 기호를 사용하여 앞에 부분이 true가 되어 실행되면 뒤에는 볼것도 없기 때문에 뒤에는 실행 되지 않음
 
 ~~~JavaScript
@@ -200,7 +202,7 @@
 // 시작, 트루2 만 출력됨
 ~~~
 
-###### [||기호 사용시 주의](#||기호-사용시-주의)
+###### [논리 연산자 "||" 기호 사용시 주의](#논리-연산자-||-기호-사용시-주의)
 ###### [Top](#top)
 
 <br/>
@@ -209,13 +211,63 @@
 ***
 
 # 함수
+  - JavaScritp함수의 가장 기본적인 형태
 
 ~~~JavaScript
-const f = function (매개변수, 매개변수…) { return 리턴값 }
-
-function square(number) {
-  return number * number;
+const f = function(매개변수, 매개변수...){
+    return 리턴값
 }
+~~~
+
+<br/>
+
+  - [나머지 매개변수](#나머지-매개변수)
+  - [forEach,forin,forof](#forEach,forin,forof)
+  - [filer,map함수](#filermap함수)
+  - [함수'=>'문법](#함수'=>'문법)
+  - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
+  - [즉시호출 함수](#즉시호출-함수)
+  - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 나머지 매개변수
+  - JavaScritp에서 함수의 넘겨주는 인수의 갯수는 제한이 없다
+  - 함수를 만들때 매개 변수의 마지막 변수앞에 ‘…’을 달게 되면 나머지 매개 변수가 된다
+  - 나머지 매개 변수는 맨 마지막에 인수로만 쓸 수 있다.
+  - 나머지 매개 변수를 사용하면, 전달된 인수들의 목록을 배열로 압축할때 사용되어 진다
+
+<br/>
+
+  - JavaScritp는 유연하기 때문에, 함수에 인수 목록을 1개만 적고, 함수를 실행할때 인수를 2개 넣어도 에러가 나지 않고, 1개만 출력 된다
+
+~~~JavaScript
+const f = function(매개변수){
+    console.log(매개변수)
+}
+
+f("ㅁ", "ㄷ")
+
+// ㅁ
+~~~
+
+<br/>
+
+  - 나머지 매개 변수를 사용하게 되면, 뒤에 몇개의 매개변수를 넣어 함수를 실행하든 매개변수의 목록을 배열로 압축하여 전달 한다
+
+~~~JavaScript
+const f = function(...매개변수){
+    console.log(...매개변수)
+}
+
+f("ㅁ", "ㄷ")
+
+// ㅁ
+// 
 ~~~
 
 ###### [함수](#함수)
@@ -224,83 +276,68 @@ function square(number) {
 <br/>
 <br/>
 
-***
+# forEach,forin,forof
+  - for문과 같이 배열을 순회하는 방버들이다
+  - forin,forof는 함수는 아니지만 forEach를 설명하면서 같이 설명진행한다
 
-# 나머지 매개변수
-  - 함수를 만들때, 매개 변수쪽에, ‘…’을 달게 되면 그것이 나머지 매개 변수가 된다. 나머지 매개 변수는 맨 마지막에 인수로만 쓸 수 있다. 나머지 매개 변수를 배열을 만든다
-    
 <br/>
 
+  - forin
 ~~~JavaScript
-const min1 = function(arr) {
-    let output = arr[0]
-    for (const value of arr) {
-        if (output > value){
-            output = value
-        }
-    }
-    return output
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+for (const key in arr) {
+  console.log(key, typeof key, arr[key])
 }
 
-console.log(`min1 : ${min1([50, 19, 200, 1, 20])}`)
-
-const min2 = function(...arr) {
-    let output = arr[0]
-    for (const value of arr) {
-        if (output > value){
-            output = value
-        }
-    }
-    return output
-}
-
-const ar = [50, 19, 200, 1, 20]
-console.log(`min2 : ${min2(...ar)}`)
+// 0 "string" a
+// 1 "string" b
+// 2 "string" c
+// 3 "string" prop prop
 ~~~
 
-###### [나머지 매개변수](#나머지-매개변수)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-***
-
-# forEach 함수
-  - forin, forof함수를 포함하고 있다
+  - forEach
 ~~~JavaScript
-const ar = [11,53,27,115]
-ar.forEach(function (value, index, array) {
-    console.log(value, index, array)
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+arr.forEach((e, index) => {
+  console.log(e, index)
 })
 
-// 11 0 (4) [11, 53, 27, 115]
-// 3 53 1 (4) [11, 53, 27, 115]
-// 3 27 2 (4) [11, 53, 27, 115]
-// 3 115 3 (4) [11, 53, 27, 115]
+// a 0
+// b 1
+// c 2
 ~~~
 
-###### [forEach 함수](#forEach-함수)
+<br/>
+
+  - forof
+~~~JavaScript
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+for (const e of arr) {
+  console.log(e)
+}
+
+// a
+// b
+// c
+~~~
+
+###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-***
-
-# forin,forof
-  - forin은 index를 출력, forof는 value를 출력
-
-###### [forin,forof](#forinforof)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# filer함수
-  - 조건을 확인하여 true인것만 출력해줌
+# filer,map함수
+  - filter : 조건을 확인하여 true인것만 출력해줌
+  - map : 뒤에 추가적으로 뭔가 붙일때 사용
 
 ~~~JavaScript
 const ar = [10,40,20,70,1]
@@ -313,17 +350,8 @@ console.log(ar2)
 // [40, 20]
 ~~~
 
-###### [filer함수](#filer함수)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-***
-
-# map함수
-  - 뒤에 추가적으로 뭔가 붙일때 사용
-  
 ~~~JavaScript
 const ar = [10,40,20,70,1]
 const ar2 = ar.map(function(value, index){
@@ -335,48 +363,42 @@ console.log(ar2)
 // ['10안뇽', '40안뇽', '20안뇽', '70안뇽', '1안뇽']
 ~~~
 
-###### [map함수](#map함수)
+###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-***
-
-# 화살표 문법
-  - forEach, filer, map함수 처럼 function키워드를 사용하는 함수는 화살표 문법을 이용해 줄일 수 있다. 조건식이 한줄이라면, return키워드 조차 줄일 수 있다
-
-~~~JavaScript
-const ar = [11,53,27,115]
-ar.forEach((value, index, array) => console.log(value, index, array))
-~~~
+# 함수'=>'문법
+  - forEach, filer, map함수 처럼 function키워드를 사용하는 함수는 화살표 문법을 이용할 수 있다
+  - 함수가 한줄이라면 function과 {}와 return까지 모두 줄일 수 있게 된다
+  - "=>" 문법을 사용하여 나타내는것이 속도 측면에서 더 빠름. function에는 this를 사용 할 수 있는 것들이 포함 되어 있기 때문에 더 무겁고 느림
 
 ~~~JavaScript
-const ar = [10,40,20,70,1]
-const ar2 = ar.filter((value, index) => value === 40 || value === 20)
+const f = function(매개변수){
+    console.log(매개변수)
+}
 
-console.log(ar2)
+// 위와 같은 함수를 아래와 같이 바꿀 수 있다
+
+const f = (매개변수) => console.log(매개변수)
 ~~~
 
-###### [화살표 문법](#화살표-문법)
+###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # setTimeout,setInterval,clearTimeout,clearInterval함수
-  - setTimeout 해당 초 뒤에 실행
-  - setInterval  해당 초 마다 실행
+  - setTimeout : 주어진 시간이 되면 한번 호출 한다
+  - setInterval : 인터벌 시간마다 반복 호출 한
 
-###### [setTimeout,setInterval,clearTimeout,clearInterval함수](#setTimeout,setInterval,clearTimeout,clearInterval함수)
+###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # 즉시호출 함수
   - html내의 각각의 scritp태그 안은 함께 공유한다고 생각할 수 있으니, 같은 이름의 변수는 하나만 선언 할수 있게 됨. 이때 즉시호출 함수를 써서, 변수를 내부에 위치 시키면 같은 변수이름이라도 사용 할 수 있게 됨
@@ -388,24 +410,11 @@ console.log(ar2)
 })()
 ~~~
 
-###### [즉시호출 함수](#즉시호출-함수)
+###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
-
-# 엄격 모드
-  - script태그 안쪽에, ‘use strict’를 쓰면 엄격 모드가 된다. 자바스크립트는 너무 유연한 언어이기 때문에 저런 것들로 나중에 있을 위험들을 예방할 수 있다
-
-###### [엄격 모드](#엄격-모드)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
 
 # 선언적 함수, 익명 함수
   - 선언적 함수 : 전체 코드를 실행하기 전에 만들어짐
@@ -428,7 +437,18 @@ function 함수() {
 // 나중에 만들어지는 익명 함수가 선언적 함수를 덮어 버리기 때문에 익명 함수가 실행
 ~~~
 
-###### [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 엄격 모드
+  - script태그 안쪽에, ‘use strict’를 쓰면 엄격 모드가 된다. 자바스크립트는 너무 유연한 언어이기 때문에 저런 것들로 나중에 있을 위험들을 예방할 수 있다
+
+###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
@@ -437,7 +457,8 @@ function 함수() {
 ***
 
 # 객체 생성
-
+  - JavaScript객체 만드는 기본적인 형태
+ 
 ~~~JavaScript
 const object = {
     name : '철수',
@@ -451,6 +472,57 @@ console.log(object.name)
 // 철수
 ~~~
 
+<br/>
+
+  - new키워드를 이용한 객체 생성
+    - 같은 객체를 더 쉽게 만들어 낼 수 있다
+
+~~~JavaScript
+function User(name) {
+    this.name = name;
+    this.isAdmin = false;
+  }
+ 
+  let user = new User("보라");
+ 
+  alert(user.name); // 보라
+  alert(user.isAdmin); // false
+~~~
+
+new User(...)가 실행되면 암시적으로 일어나는 일
+
+~~~JavaScript
+function User(name) {
+    // this = {};  (빈 객체가 암시적으로 만들어짐)
+ 
+    // 새로운 프로퍼티를 this에 추가함
+    this.name = name;
+    this.isAdmin = false;
+ 
+    // return this;  (this가 암시적으로 반환됨)
+  }
+~~~
+
+let user = new User("보라")는 아래와 같다고 볼 수 있다
+
+~~~JavaScript
+ let user = {
+    name: "보라",
+    isAdmin: false
+  };
+
+~~~
+
+<br/>
+
+  - JavaScritp에서는 함수또한 객체를 만들어 낼 수가 있다
+
+~~~JavaScript
+function Person(){}
+var joon = new Person();
+var jisoo = new Person();
+~~~
+
 ###### [객체 생성](#객체-생성)
 ###### [Top](#top)
 
@@ -460,7 +532,8 @@ console.log(object.name)
 ***
 
 # 객체내 this
-  - 이렇게 객체 내에 다른 것들을 출력, 잡아(?)오기 위해서는 무조건 this를 사용해야 한다. 여기서 this는 자기 자신을 나타내게 된다. 하지만 주의할 것은 함수를 만들때 ‘=>’ 문법을 사용하게 되면 this는 자기 자신을 나타내는 것이 아니기 때문에 ‘=>’ 문법 안에서는 사용이 불가능 하게 된다
+  - 이렇게 객체 내에 다른 것들을 출력, 잡아(?)오기 위해서는 무조건 this를 사용해야 한다. 여기서 this는 자기 자신을 나타내게 된다
+  - 주의할 것은 함수를 만들때 ‘=>’ 문법을 사용하게 되면 this는 자기 자신을 나타내는 것이 아니기 때문에(보통 윈도우 os라면 윈도우 객체를 가리키게 된다고 한다) ‘=>’ 문법 안에서는 사용이 불가능 하게 된다
 
 ~~~JavaScript
 const object = {
@@ -483,8 +556,14 @@ object.bark()
 ***
 
 # prototype문법
-  - 없는 함수를 임시로 만들어서 사용할 수 있게 해줌
-    
+  - class문법이 있기 때문에 많이 사용하지 않는 문법
+  - 어떤 객체 안에 없는 함수를 임시로 만들어서 사용할 수 있게 해줌
+
+~~~JavaScript
+String.prototype.aaa = 10
+console.log("aaa".aaa)
+~~~
+
 ###### [prototype문법](#prototype문법)
 ###### [Top](#top)
  
