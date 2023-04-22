@@ -1453,3 +1453,603 @@ console.log("aaa".aaa)
 
 <br/>
 <br/>
+
+***
+
+# localStorage
+  - 간단하게 만들때는 여기에 데이터를 보관 할 수 있기 때문에 유용 하게 쓸 수 있다
+  - localStorage객체를 사용하게 되며, 4가지 함수를 제공한다
+
+~~~JavaScript
+localStorage.getItem('키') // 특정 키로 값을 꺼낼때
+localStorage.getItem('키', '값') // 특정 키로 특정한 값을 저장할때
+localStorage.removeItem('키') // 특정 키로 어떤 아이템을 제거 할때
+localStorage.clear() // 전체 제거
+~~~
+
+<br/>
+
+  - 로컬 저장소에 간단하게 데이터를 넣는 코드
+  - 원래 웹은 새로고침을 하면 데이터가 날라가지만, 로컬 저장소에 저장해 놓았다면 사라지지 않는다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const p = document.querySelector('p')
+            const button = document.querySelector('button')
+            const input = document.querySelector('input')
+
+
+            button.addEventListener('click', () => {
+                localStorage.clear()
+            })
+
+
+            input.addEventListener('keyup', () => {
+                localStorage.setItem('키', input.value)
+            })
+        })
+    </script>
+</head>
+<body>
+<p></p>
+<button>지우기</button>
+<input type="text" name="" id="">
+</body>
+</html>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233764647-0265ea48-92d2-4bd8-a146-7d3f0849b595.png)
+
+![image](https://user-images.githubusercontent.com/39178978/233764655-a5582287-441f-43fe-950e-2a521b4017a5.png)
+
+<br/>
+
+  - 새로고침후 마지막 로컬 저장소에 넣었던 데이터를 가져오는 코드
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const p = document.querySelector('p')
+            const button = document.querySelector('button')
+            const input = document.querySelector('input')
+
+
+            const key = localStorage.getItem('키')
+            p.textContent = `이전 값 : ${key}`
+
+
+            button.addEventListener('click', () => {
+                localStorage.clear()
+            })
+
+
+            input.addEventListener('keyup', () => {
+                localStorage.setItem('키', input.value)
+            })
+        })
+    </script>
+</head>
+<body>
+<p></p>
+<button>지우기</button>
+<input type="text" name="" id="">
+</body>
+</html>
+~~~
+
+###### [localStorage](#localstorage)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# json
+  - JSON.stringify() : 자바스크립트 객체 -> JSON문자열로 변경
+  - JSON.parse() : JSON문자열 -> 자바스크립트 객체
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const obj = {
+                color : "blue",
+                name : "minkyoo"
+            }
+            const string_json = JSON.stringify(obj) // {"color":"blue","name":"minkyoo"}
+           
+            const string_obj = JSON.parse(string_json)
+            console.log(string_obj.color) // blue
+            console.log(string_obj.name) // minkyoo
+
+
+
+
+        })
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
+~~~
+
+###### [json](#json)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 객체 매개변수
+
+~~~JavaScript
+<script>
+
+
+    //#1
+    function mailSend(obj){
+        console.log(obj.i)
+        console.log(obj.j)
+        console.log(obj.k)
+    }
+   
+    mailSend({
+        i : "아이1",
+        j : "제이1",
+        k : "케이1"
+    })
+
+
+    //#2
+    function mailSend2({i, j, k}){
+        console.log(i)
+        console.log(j)
+        console.log(k)
+    }
+
+
+    mailSend2({
+        i : "아이2",
+        j : "제이2",
+        k : "케이2"
+    })
+</script>
+~~~
+
+###### [객체 매개변수](#객체-매개변수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 클래스
+  - JavaScritp도 다른 언어와 같이 class라는 개념이 만들어 졌다
+
+<br/>
+
+  - [선언하기,생성자](#선언하기생성자)
+  - [private속성](#private속성)
+  - [get,set문법](#getset문법)
+  - [static](#static)
+  - [상속](#상속)
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 선언하기,생성자
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            constructor (이름, 국어, 영어, 수학, 과학) {
+                this.이름 = 이름
+                this.국어 = 국어
+                this.영어 = 영어
+                this.수학 = 수학
+                this.과학 = 과학
+            }
+
+
+            // 메서드
+            getSum() {
+                return this.국어 + this.영어 + this.수학 + this.과학
+            }
+
+
+        }
+
+
+        // 객체 생성
+        const students = [
+            new Student('ㄱ', 11,22,33,44),
+            new Student('ㄴ', 12,23,34,45),
+            new Student('ㄷ', 13,24,35,46),
+            new Student('ㄹ', 14,25,36,47)
+        ]
+
+
+        let output = `이름\t총점`
+        for (const student of students) {
+            console.log(`${student.이름}\t${student.getSum()}`)
+        }
+
+
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
+
+// ㄱ 110
+// ㄴ 114
+// ㄷ 118
+// ㄹ 122
+~~~
+
+<br/>
+
+  - 객체를 이렇게 만들어 넣을 수도 있음
+
+~~~JavaScript
+// 객체 생성
+const students = new Student()
+students.add(new Student('ㄱ', 11,22,33,44))    
+students.add(new Student('ㄴ', 12,23,34,45))    
+students.add(new Student('ㄷ', 13,24,35,46))    
+students.add(new Student('ㄹ', 14,25,36,47))   
+~~~
+
+<br/>
+
+  - 객체 매개변수를 활용하여 나타내기도함
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            constructor ({이름, 국어, 영어, 수학, 과학}) {
+                this.이름 = 이름
+                this.국어 = 국어
+                this.영어 = 영어
+                this.수학 = 수학
+                this.과학 = 과학
+            }
+
+
+            // 메서드
+            getSum() {
+                return this.국어 + this.영어 + this.수학 + this.과학
+            }
+        }
+
+        // 객체 매개변수 활용
+        const student = new Student({
+            이름: "ㄱ",
+            국어: 11,
+            영어: 22,
+            수학: 33,
+            과학: 44
+        })
+
+        let output = `이름\t총점`
+        console.log(`${student.이름}\t${student.getSum()}`)
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# private속성
+  - class내에 #을 이용해서 private를 설정 할 수 있으며, 직접적으로 접근 할 수 없고 class안에 있는 함수나 다른 변수를 통해서 간접적으로 접근 할 수 있게 된다
+  - 변수뿐만 아니라 매서드도 앞에 #을 붙여서 private 메서드를 만들 수 있다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            #이름
+
+            constructor ({이름, 국어, 영어, 수학, 과학}) {
+                this.#이름 = 이름
+                this.국어 = 국어
+                this.영어 = 영어
+                this.수학 = 수학
+                this.과학 = 과학
+            }
+
+            // 메서드
+            getSum() {
+                return this.국어 + this.영어 + this.수학 + this.과학
+            }
+
+            getName() {
+                return this.#이름
+            }
+        }
+
+        // 객체 매개변수 활용
+        const student = new Student({
+            이름: "ㄱ",
+            국어: 11,
+            영어: 22,
+            수학: 33,
+            과학: 44
+        })
+
+        console.log(`국어 : ${student.국어}`)
+        console.log(`국어 : ${student.이름}`) // 이름이 private이기 때문에 결과가 undefinde로 나오게됨
+        console.log(`국어 : ${student.getName()}`) // 내부의 함수를 호출하여 얻은 값
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
+
+
+// 국어 : 11
+// 국어 : undefined
+// 국어 : ㄱㄱ
+
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# get,set문법
+  - get, set문법을 사용하면, 대입할때 set을 사용하고 값을 호출할때 get문법을 자동으로 사용하게 되어 편리하다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            #이름
+
+            constructor (이름) {
+                this.#이름 = 이름
+            }
+
+            // get메서드
+            get Name() {
+                return this.#이름
+            }
+
+            // set메서드
+            set Name(이름1) {
+                this.#이름 = 이름1
+            }
+        }
+
+        // 객체 매개변수 활용
+        const student = new Student('ㄱ')
+        console.log(`이름 : ${student.Name}`)
+
+        student.Name = 'ㄴ'
+        console.log(`이름 : ${student.Name}`)
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
+
+// 이름 : ㄱ
+// 이름 : ㄴ
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# static
+  - 첫번째 코드처럼 class에 어떤 변수를 지정하거나, 함수를 추가로 지정해서 사용할 수도 있음, 하지만 위와 같은 문법보다 좀 더 직관적으로 편하게 static을 사용하는 문법이 제공 되었음
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+       
+        class MySum {
+            constructor(){
+                MySum.count += 1
+            }
+        }
+        MySum.count = 0
+        MySum.test = function(){
+            return MySum.count
+        }
+
+        console.log(MySum.count) // 0
+        console.log(MySum.test()) // 0
+        new MySum()
+        new MySum()
+        new MySum()
+        console.log(MySum.count) // 3
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+<br/>
+
+  - static을 사용하는 문법
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+       
+        class MySum {
+            static count = 0
+            static test () { }
+
+
+            constructor(){
+                MySum.count += 1
+            }
+        }
+
+        console.log(MySum.count) // 0
+        console.log(MySum.test()) // 0
+        new MySum()
+        new MySum()
+        new MySum()
+        console.log(MySum.count) // 3
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 상속
+  - extends키워드를 사용하여 상속을 할 수 있다
+  - 부모것을 자식단에서 바꾸기 위해서는 똑같은 이름의 매서드와 속성을 지정해주면 덮어 쓰게 된다
+  - 생성자 내에서 super()을 쓰면 이것은 부모의 생성자 라는 의미가 된다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+    class Person{
+    constructor(name, first, second){
+        this.name = name;
+        this.first = first;
+        this.second = second;
+        }
+        sum(){
+            return this.first+this.second;
+        }
+
+
+        bark(){
+            console.log("asfasdf")
+        }
+    }
+    class PersonPlus extends Person{
+    constructor(name, first, second, third){
+        super(name, first, second);
+        this.third = third;
+        }
+        sum(){
+            return super.sum()+this.third;
+        }
+        avg(){
+            return (this.first+this.second+this.third)/3;
+        }
+    }
+ 
+    let kim = new PersonPlus('kim', 10, 20, 30);
+    console.log("kim.sum()", kim.sum());
+    console.log("kim.avg()", kim.avg());        
+    kim.bark();        
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
