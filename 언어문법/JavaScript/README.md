@@ -39,7 +39,7 @@
     - [textContent,value차이](#textcontentvalue차이)
   - [localStorage](#localstorage)
   - [json](#json)
-  - [객체 매개변수](#객체 매개변수)
+  - [객체 매개변수](#객체-매개변수)
   - [클래스](#클래스)
     - [선언하기,생성자](#선언하기생성자)
     - [private속성](#private속성)
@@ -633,6 +633,27 @@ console.log("aaa".aaa)
 
 <br/>
 
+  - [querySelector,querySelectorAll](#queryselectorqueryselectorall)
+  - [문자열조작하기](#문자열조작하기)
+  - [태그 값 넣기,가져오기](#태그-값-넣기가져오기)
+  - [스타일조작하기](#스타일조작하기)
+  - [문서객체 생성,제거,이동](#문서객체-생성제거이동)
+  - [이벤트연결](#이벤트연결)
+  - [버튼만들기(button)](#버튼만들기button)
+  - [버튼만들기(submit이벤트)](#버튼만들기submit이벤트)
+  - [글자입력 상자만들기(text)](#글자입력-상자만들기text)
+  - [선택박스 만들기(드롭다운)](#선택박스-만들기드롭다운)
+  - [다중선택 상자 만들기](#다중선택-상자-만들기)
+  - [체크박스,라디오 버튼](#체크박스라디오-버튼)
+  - [textContent,value차이](#textcontentvalue차이)
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# querySelector,querySelectorAll
   - querySelector 는 한개만 잡아 오고, querySelectorAll은 여러개를 잡아 오게 된다
 
 ~~~JavaScript
@@ -686,13 +707,749 @@ console.log("aaa".aaa)
 </html>
 ~~~
 
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
 <br/>
 
-  - 문자열 조작하기
+# 문자열조작하기
+  - id="textContent"
+    - 안쪽에 태그가 있을시 그것을 그냥 텍스트로 반영
+  - id="innerHTML"
+    - 안쪽에 태그가 있을시 그것을 태그로 반영
+    - 보안적으로 문제가 있을 수 있으므로 많이 쓰지는 않는다
 
 ~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header1 = document.querySelector('#textContent')
+            const header2 = document.querySelector('#innerHTML')
 
+
+            //값을 추출한다
+            console.log(header1.textContent)
+            console.log(header2.innerHTML)
+
+
+            //값을 넣는다
+            header1.textContent = '문자 수정1'
+            header2.innerHTML = '문자 수정2'
+        })
+    </script>
+</head>
+<body>
+    <h1 id="textContent">문자열1</h1>
+    <h1 id="innerHTML">문자열2</h1>
+</body>
+</html>
 ~~~
 
 ###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# 태그 값 넣기,가져오기
+  - setAttribute, getAttribute
+  - 조작하려는 태그가 표준일 경우에는 두번째 예시와 같이 . 을 이용해 더 쉽게 조작 할 수 있음
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+           
+            // 태그 잡기
+            const img = document.querySelector('img')
+
+
+            // 값 넣기
+            img.setAttribute('src', 'https://img.freepik.com/free-photo/closeup-shot-of-a-cute-ginger-kitten-staring-at-the-camera-isolated-on-a-white-wall_181624-45452.jpg')
+
+
+            // 값 추출
+            console.log(img.getAttribute('src'))
+
+
+        })
+    </script>
+</head>
+<body>
+    <img src="" alt="">
+</body>
+</html>
+~~~
+
+<br/>
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+           
+            // 태그 잡기
+            const img = document.querySelector('img')
+
+
+            // 값 넣기
+            img.src = 'https://img.freepik.com/free-photo/closeup-shot-of-a-cute-ginger-kitten-staring-at-the-camera-isolated-on-a-white-wall_181624-45452.jpg'
+
+
+            // 값 추출
+            console.log(img.src)
+
+
+        })
+    </script>
+</head>
+<body>
+    <img src="" alt="">
+</body>
+</html>
+~~~
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 스타일조작하기
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const divs = document.querySelectorAll('div')
+            for (let i = 0; i < divs.length; i++) {
+                divs[i].style.backgroundColor = 'rgb(0, 0, 0)'
+                divs[i].style.height = '10px'
+
+
+                // 값 추출
+                console.log(divs[i].style.height)
+            }
+        })
+    </script>
+</head>
+<body>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+</body>
+</html>
+~~~
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 문서객체 생성,제거,이동
+  - 생성(createElement, appendChild)
+  - 제거
+  - 이동
+    - 이동할때는 appendChild를 해주기만 하면 이동이 된다
+
+<br/>
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.createElement('h1')
+            header.style.color = 'rgb(255, 0, 0)'
+            header.style.background = 'rgb(0, 0, 0)'
+            header.textContent = '만들어진 h1태그 문자열'
+
+
+            const body = document.querySelector('body')
+            body.appendChild(header)
+        })
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+<br/>
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.createElement('h1')
+            header.style.color = 'rgb(255, 0, 0)'
+            header.style.background = 'rgb(0, 0, 0)'
+            header.textContent = '만들어진 h1태그 문자열'
+
+
+            const body = document.querySelector('body')
+
+
+            // 자식 으로 생성
+            body.appendChild(header)
+
+
+            // 제거
+            //body.removeChild(header)
+            setTimeout(function()
+            {
+                header.parentNode.removeChild(header)
+            }, 2000)
+
+
+
+
+        })
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+<br/>
+
+  - 연습예제
+    - 나는야! 추가 라는 글자가 위로 갔다가 아래로 갔다가 반복 하게 된다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const text = document.createElement('h2')
+            text.textContent = '나는야! 추가'
+
+
+            const array = [
+                document.querySelector('.first'),
+                document.querySelector('.second')
+            ]
+
+
+            let count = 0
+            const f = () => {
+                array[count % 2].appendChild(text)
+                count++
+            }
+
+
+            setInterval(f, 1000)
+        })
+    </script>
+</head>
+<body>
+    <div class="first">
+        <h1>첫 번째 해더</h1>
+    </div>
+    <hr>
+    <div class="second">
+        <h1>두 번째 해더</h1>
+    </div>
+</body>
+</html>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233763980-a74ac27b-a4b1-4bc4-ae27-a556a21024dd.png)
+
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 이벤트연결
+  - addEventListener을 이용해서 문서 객체에 이벤트를 연결 할 수 있다, 첫번째 매개 변수에 ‘이벤트 이름’ 을 이벤트가 발생되었을 때 실행할 함수를 입력
+  - 문서 객체에 On으로 시작하는 것들이 이벤트이다..
+    - ex) document.on……..
+
+<br/>
+
+  - 버튼을 클릭하면 숫자가 오르는 예제
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.createElement('h1')
+            document.querySelector('body').appendChild(header)
+
+
+            let count = 0
+            header.innerText = `클릭한 횟수 : ${count}`
+            header.style.userSelect = 'none'
+
+
+            header.addEventListener('click', () => {
+                header.innerText = `클릭한 횟수 : ${count}`
+                count++
+            })
+        })
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233764074-e0d76e4f-0425-4f05-b622-de78cafd5bfc.png)
+
+
+<br/>
+
+  - 키다운 이벤트
+    - keydown 을 사용하면 된다
+    - addEventListener을 사용시 두번째 인자에는 항상 해당하는 이벤트의 데이터가 들어가게 된다
+    - 만약 이벤트를 막으려면, event.preventDefault()와 같이 쓰면 이벤트가 막아 지게 된다
+
+<br/>
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('keydown', (event) => {
+                document.body.innerText = `키 다운 : ${event.code}`
+            })
+
+
+            document.addEventListener('keyup', (event) => {
+                document.body.innerText = `키 업 : ${event.code}`
+            })
+        })
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233764066-34b27058-0183-4cd3-90e8-829d6a9c7023.png)
+
+<br/>
+
+  - 이벤트를 사용했을때 이벤트 객채(?)를 잡아오는 3가지
+
+~~~JavaScript
+    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('keydown', (event) => {
+        document.body.innerText = `키 다운 : ${event.code}`
+    })
+
+    document.addEventListener('keydown', (event) => {
+        document.body.innerText = `키 다운 : ${event.currentTarget}`
+    })
+
+    document.addEventListener('keydown', function(event) {
+        document.body.innerText = `키 다운 : ${this.code}`
+    })
+})
+~~~
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 버튼만들기(button)
+  - 버튼 생성 및 버튼 이벤트 생성
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () =>
+        {
+            const buttonA = document.querySelector('button')
+            const buttonB = document.querySelector('input[type=button]')
+
+
+            buttonA.addEventListener('click', (event) => {
+                event.currentTarget.textContent += '글자'
+            })
+
+
+            buttonB.addEventListener('click', (event) => {
+                event.currentTarget.value += '글자'
+            })
+        })
+    </script>
+</head>
+<body>
+    <!-- click 이벤트-->
+    <button>글자</button>
+    <input type="button" value="글자">
+
+
+    <!-- submit 이벤트! (click이벤트도 가능하지만...잘 안씀)-->
+    <!-- 서버 쪽으로 데이터를 넘길때 사용한다-->
+    <form action="">
+        <input type="button" value="글자">
+    </form>
+</body>
+</html>
+~~~
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 버튼만들기(submit이벤트)
+  - 여기서도 click이벤트를 만들 수 있지만, 대부분 여기서 만들지는 않음, 서버쪽으로 데이터를 전달할 때 사용하게 된다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form')
+            form.addEventListener('submit', (event) => {
+                const text = document.querySelector('input[type=text]')
+                if (text.value.indexOf('@') >= 0) {
+                    alert('정상적으로 제출')
+                } else {
+                    alert('이메일 형식을 입력해주세요!')
+                    event.preventDefault()
+                }
+            })
+        })
+    </script>
+</head>
+<body>
+    <form action="">
+        이메일 형식을 입력해주세요!<br>
+        <input type="text" name="test" id="">
+        <input type="submit" value="글자">
+    </form>
+</body>
+</html>
+~~~
+
+<br/>
+
+  - 주의사항
+    - form 태그 밑에 버튼을 만들면 submit이벤트가 동작 되기 때문에 form 태그 밑에서 일반 버튼을 만들기 위해서 type을 button으로 지정한다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+
+        })
+    </script>
+</head>
+<body>
+    <form action="">
+        이메일 형식을 입력해주세요!<br>
+        <input type="text" name="test" id="">
+        <input type="button" value="글자">
+    </form>
+</body>
+</html>
+~~~
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 글자입력 상자만들기(text)
+  - 글자 입력 상자 3가지
+    - input-type-text : 한줄 입력
+    - textarea : 여러줄 입력
+    - p-contenteditable : 클릭하면 글자 변경 가능
+
+~~~JavaScript
+<input type="text" name="" id="">
+<textarea name="" id="" cols="30" rows="10"></textarea>
+<p contenteditable="true">123123</p>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233764188-9040bad8-a1e4-4878-9f0b-1b47ddc90158.png)
+
+<br/>
+
+  - 연습예제
+    - keyup이벤트를 이용해서 버튼을 누르지 않아도 자동계산 되게 한다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const button = document.querySelector('button')
+            const input = document.querySelector('input')
+            const p = document.querySelector('p')
+
+            button.addEventListener('click', (event) => {
+            p.textContent = Number(input.value) * 2.54
+
+            })
+        })
+    </script>
+</head>
+<body>
+    <input type="text" name="" id="">inch<br>
+    <button>계산</button>
+    <p></p>
+</body>
+</html>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233764243-40c27255-68f3-4ee5-90d1-c3cf97176e16.png)
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 선택박스 만들기(드롭다운)
+  - select-option 을 통해서 만들고
+  - options.selectedIndex를 통해 현재 몇번째 option을 선택했는지 알아 온다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const select = document.querySelector('select')
+            const p = document.querySelector('p')
+
+
+            select.addEventListener('change', (event) => {
+                const options = event.currentTarget.options
+                const index = options.selectedIndex
+                p.textContent = `선택 : ${options[index].textContent}`
+            })
+        })
+    </script>
+</head>
+<body>
+    <select name="" id="">
+        <option value="">1</option>
+        <option value="">2</option>
+        <option value="">3</option>
+        <option value="">4</option>
+        <option value="">5</option>
+    </select>
+    <p>선택 : 1</p>
+</body>
+</html>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233764254-e8c4c628-2a9b-4226-b62c-eb58b3af4308.png)
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 다중선택 상자 만들기
+  - 선택박스 에서 multiple을 추가한다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const select = document.querySelector('select')
+            const p = document.querySelector('p')
+
+
+            select.addEventListener('change', (event) => {
+                const options = event.currentTarget.options
+                const index = options.selectedIndex
+                p.textContent = `선택 : ${options[index].textContent}`
+            })
+        })
+    </script>
+</head>
+<body>
+    <select name="" id="" multiple>
+        <option value="">1</option>
+        <option value="">2</option>
+        <option value="">3</option>
+        <option value="">4</option>
+        <option value="">5</option>
+    </select>
+    <p>선택 : 1</p>
+</body>
+</html>
+~~~
+
+![image](https://user-images.githubusercontent.com/39178978/233764282-3a797a14-9904-4885-9473-2752412b182c.png)
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 체크박스,라디오 버튼
+  - input-checkbox
+  - input-radio
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkbox = document.querySelector('input[type=checkbox]')
+            const h1_checkbox = document.querySelector('h1#checkbox')
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    h1_checkbox.textContent = '체크'
+                } else {
+                    h1_checkbox.textContent = '해제'
+                }
+            })
+
+
+            const radios = document.querySelectorAll('input[type=radio]')
+            const h2_radiobox = document.querySelector('h1#radiobutton')
+            radios.forEach((radio) => {
+                radio.addEventListener('change', (event) => {
+                    h2_radiobox.textContent = event.currentTarget.value
+                })
+            })
+        })
+    </script>
+</head>
+<body>
+    <!-- false 또는 true하나씩 선택 가능-->
+    <input type="checkbox" name="" id=""><br>
+    <h1 id="checkbox"></h1>
+    <!-- 여러 대상 중에서 하나만 선택 가능-->
+    <input type="radio" name="gender" id="" value="1">1<br>
+    <input type="radio" name="gender" id="" value="2">2<br>
+    <input type="radio" name="gender" id="" value="3">3<br>
+    <h1 id="radiobutton"></h1>
+</body>
+</html>
+~~~
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# textContent,value차이
+  - https://miracleground.tistory.com/entry/dom-%EA%B0%9C%EB%85%90-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EC%9D%B4%EB%B2%A4%ED%8A%B8%EB%AC%B8%EB%B2%95-valuetextContent%EC%B0%A8%EC%9D%B4-dom%EC%9D%B4%EB%B2%A4%ED%8A%B8 
+
+###### [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
+###### [Top](#top)
+
+<br/>
+<br/>
