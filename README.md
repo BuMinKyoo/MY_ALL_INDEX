@@ -15,16 +15,10 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 
 ***
 
-### 윈도우 응용프로그램
+### 프레임워크, 개발환경
   - [Win32](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%9C%88%EB%8F%84%EC%9A%B0%20%EC%9D%91%EC%9A%A9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8/Win32)
     - [MFC](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%9C%88%EB%8F%84%EC%9A%B0%20%EC%9D%91%EC%9A%A9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8/MFC)
   - [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%9C%88%EB%8F%84%EC%9A%B0%20%EC%9D%91%EC%9A%A9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8/WPF)
-  
-<br/>
-
-***
-
-### Web
   - [NodeJs](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Web/NodeJs)
 <br/>
 
