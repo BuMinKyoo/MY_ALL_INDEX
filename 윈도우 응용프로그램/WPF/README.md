@@ -41,13 +41,13 @@
   <div markdown="1">
 
     - [다양한 참조법](#다양한-참조법)
-    - [xaml.cs에 있는 Class를 xaml안에 객체로 불러오기](#xamlcs에-있는-class를-xaml안에-객체로-불러오기)
-    - [같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기](#같은-프로젝트-cs에-있는-class를-xaml안에-객체로-불러오기)
-    - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
-    - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-    - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
-    - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
-    - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
+      - [xaml.cs에 있는 Class를 xaml안에 객체로 불러오기](#xamlcs에-있는-class를-xaml안에-객체로-불러오기)
+      - [같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기](#같은-프로젝트-cs에-있는-class를-xaml안에-객체로-불러오기)
+      - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
+      - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
+      - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
+      - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
+      - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
     
   </div>
   </details>
@@ -1143,12 +1143,6 @@ public class Car
 
 ***
 
-# Decorator
-  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
-
-###### [FrameworkElement](#frameworkelement)
-###### [Top](#top)
-
 # Border
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Decorator
   - 모서리를 동그랗게 만들어줌
@@ -1168,14 +1162,13 @@ public class Car
 
 <img src="https://user-images.githubusercontent.com/39178978/151305860-78bd39a9-da06-4e70-8daf-318e54a4640f.png">
 
-###### [Decorator](#decorator)
+###### [Border](#border)
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # TextBlock
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
@@ -1194,14 +1187,13 @@ public class Car
 
 <img src="https://user-images.githubusercontent.com/39178978/151999032-9aa3f1e3-a989-4739-b5a4-fa33f103aedb.png">
 
-
-###### [FrameworkElement](#frameworkelement)
+###### [TextBlock](#textblock)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-
-## Run
+# Run
   - Text내용을 자체 텍스트 컨트롤로 취급할 수 있게 해준다.
 
 #MainWindow.xaml
@@ -1225,10 +1217,9 @@ public class Car
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # Popup
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
@@ -1244,12 +1235,13 @@ public class Car
   - AllowsTransparency : 팝업창의 배경을 투명으로 할 수 있음
   - IsOpen : 팝업을 띄워주고 닫아줌 
 
-###### [FrameworkElement](#frameworkelement)
+###### [Popup](#popup)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen
+# Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen
 
 #MainWindow.xaml
 ~~~c#
@@ -1298,7 +1290,7 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## AllowsTransparency(False일때)
+# AllowsTransparency(False일때)
   - False 일때, Ellipse주변에 검정색 Background가 남아 있다
 
 #MainWindow.xaml
@@ -1323,7 +1315,7 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## AllowsTransparency(True일때)
+# AllowsTransparency(True일때)
   - True 일때, Ellipse주변에 검정색 Background가 없어 진다
 
 #MainWindow.xaml
@@ -1346,10 +1338,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # Panel
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
@@ -1364,22 +1355,14 @@ public partial class MainWindow : Window
   - [Viewbox](#viewbox)
   - [UniformGrid](#uniformgrid)
 
-###### [FrameworkElement](#frameworkelement)
+###### [Panel](#panel)
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # Grid
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
-
-<br/>
-
-  - [다양한 요소안에 Grid를 만들기](#다양한-요소안에-grid를-만들기)
-  - [IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기](#issharedsizescope속성을-이용해-grid의-폭과-넓이-맟주기)
 
 <br/>
 
@@ -1420,7 +1403,7 @@ public partial class MainWindow : Window
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-## 다양한 요소안에 Grid를 만들기
+  - 다양한 요소안에 Grid를 만들기
 
 #MainWindow.xaml
 ~~~c#
@@ -1443,7 +1426,7 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
+  - IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
 
 #MainWindow.xaml
 ~~~c#
@@ -1505,9 +1488,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # Canvas
@@ -1533,10 +1513,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # DockPanel
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
@@ -1566,10 +1545,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # StackPanel
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
