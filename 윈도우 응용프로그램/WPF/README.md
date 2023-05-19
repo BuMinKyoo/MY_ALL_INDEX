@@ -217,11 +217,10 @@
   </div>
   </details>
 
-
-***
-***
-
 <br/>
+<br/>
+
+***
 
 # WPF의 시작...
 
@@ -307,8 +306,16 @@ public static void Main() {
 <br/>
 
 # Application
+  - [ShutdownMode](#shutdownmode)
+  - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
 
-## ShutdownMode
+###### [Application](#application)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ShutdownMode
   - ShutdownMode="OnExplicitShutdown" : 종료를 아예 말해야함
   - ShutdownMode="OnLastWindowClose" : 위도우창을 전부 종료해야함
   - ShutdownMode="OnMainWindowClose" : 메인 윈도우 창을 종료하면 됨
@@ -435,7 +442,7 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## Event(Startup, Activated, Deactivated, Exit)
+# Event(Startup, Activated, Deactivated, Exit)
   - Startup : Application이 시작하면서 이벤트 발생, 보통 UI진입전에 로그인을 해야 하는 경유에 적합 하다고 함
   - Activated : Application이 가지고 있는 어떤 Window라도 포커스 될 경우에 발생
   - Deactivated : Application이 가지고 있는 어떤 Window라도 포커스 잃으면 발생
@@ -510,8 +517,18 @@ Exit
 <br/>
 
 # Window
+  - [xmlns](#xmlns)
+  - [ResizeMode](#resizemode)
+  - [SizeToContent](#sizetocontent)
+  - [Window이벤트(Activated, Deactivated, Closing)](#window이벤트activated-deactivated-closing)
 
-## xmlns
+###### [Window](#window)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# xmlns
 ##### - 내부적인 부분에 대한 상세한 설명은 아직 공부가 더 필요한듯하다..단순하게만 적고 넘어가자.
   - xmlns는 xml namespace의 줄임말이고, URI로 네임스페이스 이름을 정의한 형태이다.
 
@@ -527,7 +544,7 @@ XAML의 네임 스페이스이고, 다양한 XAML유틸리티 기능을 포함�
 <br/>
 <br/>
 
-## ResizeMode
+# ResizeMode
 ##### - ResizeMode="NoResize"를 사용하면 Window창의 가로,세로 길이를 임의로 조절할 수 없게 만든다.
 
 #MainWindow.XAML
@@ -541,7 +558,7 @@ Title="MainWindow" ResizeMode="NoResize"
 <br/>
 <br/>
 
-## SizeToContent
+# SizeToContent
 ##### - SizeToContent="WidthAndHeight"를 사용하면 윈도우창을 컨텐트 내용대로 자동으로 조절해 준다.
 
 #MainWindow.XAML
@@ -561,7 +578,7 @@ Title="MainWindow" SizeToContent="WidthAndHeight"
 <br/>
 <br/>
 
-## Window이벤트(Activated, Deactivated, Closing)
+# Window이벤트(Activated, Deactivated, Closing)
   - Activated : 메인 윈도우가 포커스 되었을때 발생
   - Deactivated : 메인 윈도우가 포커스 되지 않았을 때 발생
   - Closing : 메인 윈도우를 닫을때 이벤트 발생
@@ -633,7 +650,21 @@ public partial class MainWindow : Window
 # 다양한 참조법
   - Class를 참조할 경우 일반적으로 클래스 라이브 러리의 .NET Standard 프레임 워크를 이용하여 참조한다(이유 : .NET Framework, .NET Core, Xamarin 전부 호환 되기 때문에)
 
-## xaml.cs에 있는 Class를 xaml안에 객체로 불러오기
+  - [xaml.cs에 있는 Class를 xaml안에 객체로 불러오기](#xamlcs에-있는-class를-xaml안에-객체로-불러오기)
+  - [같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기](#같은-프로젝트-cs에-있는-class를-xaml안에-객체로-불러오기)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
+  - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
+  - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
+  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
+
+###### [다양한 참조법](#다양한-참조법)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# xaml.cs에 있는 Class를 xaml안에 객체로 불러오기
   - xmlns:(접두사)="clr-namespace:(namespace명)"를 사용하여 매핑하기
 
 #MainWindow.xaml
@@ -678,7 +709,7 @@ public class Car
 <br/>
 <br/>
 
-## 같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기
+# 같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기
   - xmlns:(접두사)="clr-namespace:(namespace명)"를 사용하여 매핑하기
 
 #MainWindow.xaml
@@ -718,7 +749,7 @@ public class Car
 <br/>
 <br/>
 
-## 같은 프로젝트에서 '리소스 사전' 불러오기
+# 같은 프로젝트에서 '리소스 사전' 불러오기
 
 ~~~c#
 <ResourceDictionary>
@@ -776,7 +807,7 @@ public class Car
 <br/>
 <br/>
 
-## 같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우
+# 같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우
   - 위에 것으로 부터 이어 참고해서 보면, "Dictionary1.xaml" => "NewFolder/Dictionary1.xaml"이렇게 참조 했음을 알 수 있다.
 
 #MainWindow.xaml
@@ -805,7 +836,7 @@ public class Car
 <br/>
 <br/>
 
-## 같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기
+# 같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기
 
 <br/>
 
@@ -848,7 +879,7 @@ public class Car
 <br/>
 <br/>
 
-## 다른 프로젝트의 네임스페이스 참조하기
+# 다른 프로젝트의 네임스페이스 참조하기
   - CLR네임 스페이스 참조
   - XML네임 스페이스 참조
  
@@ -921,7 +952,7 @@ public class Car
 <br/>
 <br/>
 
-## 다른 프로젝트에서 '리소스사전' 참조하기
+# 다른 프로젝트에서 '리소스사전' 참조하기
  
 <br/>
 
@@ -979,24 +1010,34 @@ public class Car
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # Style
   - 상속 : Object - DispatcherObject - Style
   - Style : 컨트롤 요소들을 미리 정의해 놓고, 사용하는 방법
 
-##### - Style적용 방식
-  - 정적바인딩 : StaticResource이용 : 코드를 통해서 리소스가 변경되었을 때 참조 항목에 실시간 반영되지 않음(성능면에서는 뛰어남)
-  - 동적바인딩 : DynamicResource이용 : 코드를 통해서 리소스가 변경되었을 때 참조 항목에 실시간 반영됨(성능떨어짐)
+  - Style적용 방식
+    - 정적바인딩 : StaticResource이용 : 코드를 통해서 리소스가 변경되었을 때 참조 항목에 실시간 반영되지 않음(성능면에서는 뛰어남)
+    - 동적바인딩 : DynamicResource이용 : 코드를 통해서 리소스가 변경되었을 때 참조 항목에 실시간 반영됨(성능떨어짐)
 
+<br/>
+
+  - [Style의 key값으로 각각의 컨트롤에 Style을 적용](#style의-key값으로-각각의-컨트롤에-style을-적용)
+    - Style x:Key="(사용할 name)" TargetType="(적용시킬 컨트롤)"
+  - [TargetType속성으로 적용시킬 컨트롤 지정](#targettype속성으로-적용시킬-컨트롤-지정)
+    - Style TargetType="{x:Type 적용시킬 컨트롤}"
+  - [각각의 자식 컨트롤에 Style 적용하기](#각각의-자식-컨트롤에-style-적용하기)
+  - [BasedOn을 이용한 Style상속](#basedon을-이용한-style상속)
+
+###### [Style](#style)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
- ## Style의 key값으로 각각의 컨트롤에 Style을 적용
+ # Style의 key값으로 각각의 컨트롤에 Style을 적용
   - Style x:Key="(사용할 name)" TargetType="(적용시킬 컨트롤)" : Style의 key값으로 각각의 컨트롤에 Style을 적용 시킨다. Style에서 지정한 '적용시킬 컨트롤'요소에 맞게 넣지 않는다면 예외가 발생한다
 
 <br/>
@@ -1021,7 +1062,7 @@ public class Car
 ###### [Style](#style)
 ###### [Top](#top)
 
-## TargetType속성으로 적용시킬 컨트롤 지정
+# TargetType속성으로 적용시킬 컨트롤 지정
   - Style TargetType="{x:Type 적용시킬 컨트롤}" : Style에서 지정한 '적용시킬 컨트롤'에 합당한 컨트롤이 자동으로 Style이 지정된다.
 
 #MainWindow.xaml
@@ -1044,7 +1085,7 @@ public class Car
 ###### [Style](#style)
 ###### [Top](#top)
 
-## 각각의 자식 컨트롤에 Style 적용하기
+# 각각의 자식 컨트롤에 Style 적용하기
   - 각각의 컨트롤 안쪽에만 적용하기 위해서는, 적용시킬 컨트롤을 포함하고 있는 상위 컨트롤에 Resources로 적용시키면됨
 
 #MainWindow.xaml
@@ -1072,7 +1113,7 @@ public class Car
 ###### [Style](#style)
 ###### [Top](#top)
 
-## BasedOn을 이용한 Style상속
+# BasedOn을 이용한 Style상속
 
 #MainWindow.xaml
 ~~~c#
@@ -1100,15 +1141,7 @@ public class Car
 <br/>
 <br/>
 
-# FrameworkElement
-
-###### [Top](#top)
-
-<br/>
-
 ***
-
-<br/>
 
 # Decorator
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
