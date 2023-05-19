@@ -1515,8 +1515,6 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-***
-
 # DockPanel
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
   - 자식요소를 기준으로 가로 또는 세로로 정렬 할 수 있는 영역을 정의
@@ -1547,23 +1545,17 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-***
-
 # StackPanel
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
   - 자식 요소들을 행이나 열로 나열
-
-<br/>
-
-  - [Orientation="Horizontal"](#orientationhorizontal)
 
 ###### [Panel](#panel)
 ###### [Top](#top)
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-## Orientation="Horizontal"
- - 정렬 방향을 수평으로 바꿀 수 있음
+  - Orientation="Horizontal"
+    - 정렬 방향을 수평으로 바꿀 수 있음
 
 #MainWindow.xaml
 ~~~c#
@@ -1591,9 +1583,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # WrapPanel
@@ -1602,8 +1591,6 @@ public partial class MainWindow : Window
   - WrapPanel은 stackpanel과는 다르게 창을 줄였을 경우 요소들이 공간을 초과하면 밑으로 내려간다
 
 <br/>
-
-  - [Orientation="Vertical"](#orientationvertical)
 
 #MainWindow.xaml
 ~~~c#
@@ -1631,8 +1618,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## Orientation="Vertical"
-  - 수직으로 배치가능하게 함
+  - Orientation="Vertical"
+    - 수직으로 배치가능하게 함
  
 #MainWindow.xaml
 ~~~c#
@@ -1658,9 +1645,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # Viewbox
@@ -1668,6 +1652,8 @@ public partial class MainWindow : Window
   - 화면의 크기를 늘리고 줄였을때 그 안에 요소들을 일정한 비율로 늘리고 줄일 수 있음
 
 <br/>
+
+여기까지 정리 했음!!!
 
   - [Stretch](#stretch)
   - [StretchDirection](#stretchdirection)
