@@ -2,11 +2,7 @@
 
 - [WPF class hierarchy](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/C%23/WPF/WPF%20class%20hierarchy.png)
 
-
-
 - [WPF로의시작...](#wpf의-시작)
-
-
 
 - <details>
   <summary>Application</summary>  
@@ -18,8 +14,6 @@
 
   </div>
   </details>
-
-
 
 - <details>
   <summary>Window</summary>
@@ -33,8 +27,6 @@
   
   </div>
   </details>
-
-
 
 - <details>
   <summary>다양한 참조법</summary>
@@ -52,9 +44,6 @@
   </div>
   </details>
 
-***
-***
-
 - <details>
   <summary>Object - DispatcherObject</summary>
   <div markdown="1">
@@ -69,7 +58,6 @@
 
   </div>
   </details>
-  
   
 - <details>
   <summary>Object - DispatcherObject - DependencyObject - Visual - UIElement</summary>
@@ -86,22 +74,22 @@
         - [AllowsTransparency(True일때)](#allowstransparencytrue일때)
       - [Panel](#panel)
         - [Grid](#grid)
-          - [다양한 요소안에 Grid를 만들기](#다양한-요소안에-grid를-만들기)
-          - [IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기](#issharedsizescope속성을-이용해-grid의-폭과-넓이-맟주기)
+          - 다양한 요소안에 Grid를 만들기
+          - IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
         - [Canvas](#canvas)
         - [DockPanel](#dockpanel)
         - [StackPanel](#stackpanel)
-          - [Orientation="Horizontal"](#orientationhorizontal)
+          - Orientation="Horizontal"
         - [WrapPanel](#wrappanel)
-          - [Orientation="Vertical"](#orientationvertical)
+          - Orientation="Vertical"
         - [Viewbox](#viewbox)
-          - [Stretch](#stretch)
-          - [StretchDirection](#stretchdirection)
+          - Stretch
+          - StretchDirection
         - [UniformGrid](#uniformgrid)
-          - [Columns,Rows지정](#columnsrows지정)
-          - [ClipToBounds](#cliptobounds)
-          - [FirstColumn](#firstcolumn)
-          - [FlowDirection](#flowdirection)
+          - Columns,Rows지정
+          - ClipToBounds
+          - FirstColumn
+          - FlowDirection
       - [Control](#control)
         - [Separator](#separator)
         - [PasswordBox](#passwordbox)
@@ -155,11 +143,8 @@
                 - [ListView헤더 크기를 비율로 조절하기(Binding활용)](#listview헤더-크기를-비율로-조절하기binding활용)
                 - [DisplayMemberBinding](#displaymemberbinding)
 
-    
   </div>
   </details>
-  
-  
   
 - <details>
   <summary>자주 활용하는 Class, Interface</summary>
@@ -170,8 +155,6 @@
     
   </div>
   </details>
-
-
 
 - <details>
   <summary>Binding</summary>
@@ -184,7 +167,6 @@
     
   </div>
   </details>
-
 
 - [JsonParsing](#jsonparsing)
   - [JsonParsing하기](#jsonparsing하기)
@@ -1653,22 +1635,17 @@ public partial class MainWindow : Window
 
 <br/>
 
-여기까지 정리 했음!!!
-
-  - [Stretch](#stretch)
-  - [StretchDirection](#stretchdirection)
-
 ###### [Panel](#panel)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## Stretch
-
-- None : 자식 컨트롤의 크기가 변경되지 않음.(ViewBox크기에 따라 여백이 생기거나 클리핑)
-- Fill : 자식 컨트롤이 ViewBox를 완전히 채우도록 크기가 조절된다.(절대 클리핑되지 않는다) 종횡비율(가로,세로 크기의 비율)이 다를 수 있으므로 ViewBox의 내용이 변형될 수 있다.
-- Uniform : ViewBox의 기본 옵션. 자식컨트롤이 가로, 세로 크기에 맞게 균일하게 크기조절
-- UniformToFill : ViewBox의 크기를 모두 채우는데,  자식 컨트롤의 가로와 세로의 비율을 동일한 비율로 조정한다.왜곡 현상이 없도록 하기 위해서 자식 컨트롤이 잘리는 현상이 일어날 수 있다.
+  -  Stretch
+    - None : 자식 컨트롤의 크기가 변경되지 않음.(ViewBox크기에 따라 여백이 생기거나 클리핑)
+    - Fill : 자식 컨트롤이 ViewBox를 완전히 채우도록 크기가 조절된다.(절대 클리핑되지 않는다) 종횡비율(가로,세로 크기의 비율)이 다를 수 있으므로 ViewBox의 내용이 변형될 수 있다.
+    - Uniform : ViewBox의 기본 옵션. 자식컨트롤이 가로, 세로 크기에 맞게 균일하게 크기조절
+    - UniformToFill : ViewBox의 크기를 모두 채우는데,  자식 컨트롤의 가로와 세로의 비율을 동일한 비율로 조정한다.왜곡 현상이 없도록 하기 위해서 자식 컨트롤이 잘리는 현상이 일어날 수 있다.
 
 #MainWindow.xaml
 ~~~c#
@@ -1692,19 +1669,15 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## StretchDirection
-
-- Both(기본값) : 콘텐츠의 기본 크기에 비례하여 위아래로 크기 조정
-- UpOnly : 기본 크기보다 큰 크기에서만 크기조정을 허용
-- DownOnly : 기본 크기보다 작은 크기에서만 조절이 가능
+- StretchDirection
+  - Both(기본값) : 콘텐츠의 기본 크기에 비례하여 위아래로 크기 조정
+  - UpOnly : 기본 크기보다 큰 크기에서만 크기조정을 허용
+  - DownOnly : 기본 크기보다 작은 크기에서만 조절이 가능
 
 ###### [Viewbox](#viewbox)
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # UniformGrid
@@ -1712,11 +1685,6 @@ public partial class MainWindow : Window
   - 모든 열,행을 자동으로 똑같이 맞춰줌, 크기를 조절 불가능함
 
 <br/>
-
-  - [Columns,Rows지정](#columnsrows지정)
-  - [ClipToBounds](#cliptobounds)
-  - [FirstColumn](#firstcolumn)
-  - [FlowDirection](#flowdirection)
 
 #MainWindow.xaml
 ~~~c#
@@ -1738,10 +1706,11 @@ public partial class MainWindow : Window
 ###### [Panel](#panel)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## Columns,Rows지정
-  - 지정한 열,행을 넘어가면 프로그램을 실행했을때 화면에 표현되지 않고 무시하게 됨
+  - Columns,Rows지정
+    - 지정한 열,행을 넘어가면 프로그램을 실행했을때 화면에 표현되지 않고 무시하게 됨
 
 #MainWindow.xaml
 ~~~c#
@@ -1774,8 +1743,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## ClipToBounds
-  - 내 크기를 벗어난 요소들을 사라지게 할 수 있음
+  - ClipToBounds
+    - 내 크기를 벗어난 요소들을 사라지게 할 수 있음
 
 #MainWindow.xaml
 ~~~c#
@@ -1800,8 +1769,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## FirstColumn
-  - 그 순서 부터 시작할 수 있음
+  - FirstColumn
+    - 그 순서 부터 시작할 수 있음
 
 #MainWindow.xaml
 ~~~c#
@@ -1823,8 +1792,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## FlowDirection
-  - 방향을 반대로 바꿀 수 있음
+  - FlowDirection
+    - 방향을 반대로 바꿀 수 있음
 
 #MainWindow.xaml
 ~~~c#
@@ -1844,10 +1813,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # Control
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
@@ -1868,9 +1836,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # Separator
@@ -1896,10 +1861,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # PasswordBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -1920,10 +1884,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # Thumb
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -1934,8 +1897,15 @@ public partial class MainWindow : Window
     - IsDragging 속성 : 사용자가 드래그를 하는 동안에는 true, 드래그가 중지되면 false를 리턴한다.
     - CancelDrag 메소드 : 이 메소드를 호출하면 드래그 작업이 즉시 중지된다.
 
+<br/>
+
+  - [GridSplitter](#gridsplitter)
+
 ###### [Control](#control)
 ###### [Top](#top)
+
+<br/>
+<br/>
 
 # GridSplitter
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - Thumb
@@ -1943,8 +1913,6 @@ public partial class MainWindow : Window
   - ShowsPreview : 마우스로 끌어서 옮길때 미리보기를 할지 안할지 설정
 
 <br/>
-
-  - [DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag](#dragstarted-dragcompleted-dragdelta-isdragging-canceldrag)
 
 #MainWindow.xaml
 ~~~c#
@@ -1968,10 +1936,11 @@ public partial class MainWindow : Window
 ###### [Thumb](#thumb)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
-  - Thumb클래스에서 상속받아 사용
+  - DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
+    - Thumb클래스에서 상속받아 사용
 
 #MainWindow.xaml
 ~~~c#
@@ -2017,10 +1986,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # RangeBase
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -2031,9 +1999,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # ProgressBar
@@ -2043,8 +2008,6 @@ public partial class MainWindow : Window
   - Maximum : ProgressBar의 최대값 설정
 
 <br/>
-
-  - [IsIndeterminate](#isindeterminate)
 
 #MainWindow.xaml
 ~~~c#
@@ -2059,10 +2022,11 @@ public partial class MainWindow : Window
 ###### [RangeBase](#rangebase)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## IsIndeterminate
-  - true일 경우
+  - IsIndeterminate
+    - true일 경우
 
 #MainWindow.xaml
 ~~~c#
@@ -2099,7 +2063,8 @@ public partial class MainWindow : Window
 ###### [RangeBase](#rangebase)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
 ## ValueChanged이벤트로 R,G,B값 표현하기
   - 슬라이더의 Value값의 변경을 감지하면 발생하는 이벤트
