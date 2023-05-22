@@ -95,32 +95,32 @@
         - [PasswordBox](#passwordbox)
         - [Thumb](#thumb)
           - [GridSplitter](#gridsplitter)
-            - [DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag](#dragstarted-dragcompleted-dragdelta-isdragging-canceldrag)
+            - DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
         - [RangeBase](#rangebase)
           - [ProgressBar](#progressbar)
-            - [IsIndeterminate](#isindeterminate)
+            - IsIndeterminate
           - [Slider](#slider)
-            - [ValueChanged이벤트로 R,G,B값 표현하기](#valuechanged이벤트로-rgb값-표현하기)
-            - [ValueChanged이벤트로 R,G,B,A값 표현하기](#valuechanged이벤트로-rgba값-표현하기)
-            - [Orientation속성](#orientation속성)
-            - [TickPlacement속성(눈금표시)](#tickplacement속성눈금표시)
+            - ValueChanged이벤트로 R,G,B값 표현하기
+            - ValueChanged이벤트로 R,G,B,A값 표현하기
+            - Orientation속성
+            - TickPlacement속성(눈금표시)
         - [TextBoxBase](#textboxbase)
           - [TextBox](#textbox)
-            - [AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing](#acceptsreturn-acceptstab-verticalscrollbarvisibility-maxlength-charactercasing)
-            - [TextChanged이벤트, SelectionChanged이벤트](#textchanged이벤트-selectionchanged이벤트)
-            - [SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()](#selectedtext-caretindex-selectionstart-selectionlength-select14-selectallall)
+            - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
+            - TextChanged이벤트, SelectionChanged이벤트
+            - SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
         - [ContentControl](#contentcontrol)
           - [ScrollViewer](#scrollviewer)
-            - [FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기](#frameworkelement를-이용해-scrollviewer의-시스템-whith사이즈를-불러오기)
-            - [HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)](#horizontalscrollbarvisibility-verticalscrollbarvisibilityvisible-hidden-auto-disabled)
+            - HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
+            - FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
           - [ToolTip](#tooltip)
-          - [ButtonBase](#buttonbase)
+          - ButtonBase
             - [RepeatButton](#repeatbutton)
           - [HeaderedContentControl](#headeredcontentcontrol)
             - [Expander](#expander)
-              - [Header를 따로 빼서 지정가능](#header를-따로-빼서-지정가능)
+              - Header를 따로 빼서 지정가능
             - [GroupBox](#groupbox)
-              - [FontFamily](#fontfamily)
+              - FontFamily
         - [ItemsControl](#itemscontrol)
           - [MenuBase](#menubase)
             - [Menu](#menu)
@@ -2042,9 +2042,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # Slider
@@ -2053,21 +2050,14 @@ public partial class MainWindow : Window
   - Maximum 속성 : 최대 큰 수 지정
   - IsDirectionReversed : 슬라이더의 최대, 최소값의 위치가 바뀜(true이면 최대 최소의 방향이 바뀐다)
 
-<br/>
-
-  - [ValueChanged이벤트로 R,G,B값 표현하기](#valuechanged이벤트로-rgb값-표현하기)
-  - [ValueChanged이벤트로 R,G,B,A값 표현하기](#valuechanged이벤트로-rgba값-표현하기)
-  - [Orientation속성](#orientation속성)
-  - [TickPlacement속성(눈금표시)](#tickplacement속성눈금표시)
-
 ###### [RangeBase](#rangebase)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-## ValueChanged이벤트로 R,G,B값 표현하기
-  - 슬라이더의 Value값의 변경을 감지하면 발생하는 이벤트
+  - ValueChanged이벤트로 R,G,B값 표현하기
+    - 슬라이더의 Value값의 변경을 감지하면 발생하는 이벤트
 
 #MainWindow.xaml
 ~~~c#
@@ -2111,8 +2101,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## ValueChanged이벤트로 R,G,B,A값 표현하기
-  - 슬라이더의 Value값의 변경을 감지하면 발생하는 이벤트
+  - ValueChanged이벤트로 R,G,B,A값 표현하기
+    - 슬라이더의 Value값의 변경을 감지하면 발생하는 이벤트
 
 #MainWindow.xaml
 ~~~c#
@@ -2159,8 +2149,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## Orientation속성
-  - 가로 및 세로 방향을 지정 가능
+  - Orientation속성
+    - 가로 및 세로 방향을 지정 가능
 
 #MainWindow.xaml
 ~~~c#
@@ -2181,12 +2171,12 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## TickPlacement속성(눈금표시)
-  - None : 슬라이더의 기본값으로 눈금이 숨겨져 있는 상태
-  - TopLeft : 가로슬라이더는 위쪽에 표시 또는 세로슬라이더는 왼쪽에 표시
-  - BottomRight : 가로 슬라이더는 아래쪽에 표시 또는 세로 슬라이더는 오른쪽에 표시
-  - Both : 가로 슬라이더는 위아래 표시 또는 세로 슬라이더는 좌우에 표시
-  - TickFrequency : 눈금의 갯수를 조절
+  - TickPlacement속성(눈금표시)
+    - None : 슬라이더의 기본값으로 눈금이 숨겨져 있는 상태
+    - TopLeft : 가로슬라이더는 위쪽에 표시 또는 세로슬라이더는 왼쪽에 표시
+    - BottomRight : 가로 슬라이더는 아래쪽에 표시 또는 세로 슬라이더는 오른쪽에 표시
+    - Both : 가로 슬라이더는 위아래 표시 또는 세로 슬라이더는 좌우에 표시
+    - TickFrequency : 눈금의 갯수를 조절
 
 #MainWindow.xaml
 ~~~c#
@@ -2205,10 +2195,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # TextBoxBase
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -2219,9 +2208,6 @@ public partial class MainWindow : Window
 # TextBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - TextBoxBase
   - 사용자가 Box내부에 string을 적을 수 있는 컨텐트
-  - [AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing](#acceptsreturn-acceptstab-verticalscrollbarvisibility-maxlength-charactercasing)
-  - [TextChanged이벤트, SelectionChanged이벤트](#textchanged이벤트-selectionchanged이벤트)
-  - [SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()](#selectedtext-caretindex-selectionstart-selectionlength-select14-selectallall)
 
 <br/>
 
@@ -2230,12 +2216,12 @@ public partial class MainWindow : Window
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-## AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
-  - AcceptsReturn="True" 속성 : 엔터키를 사용 할 수 있게함
-  - AcceptsTab="True" 속성 : 텝키를 사용 할 수 있게함
-  - VerticalScrollBarVisibility="Auto" 속성 : TextBox안의 공간보다 길이 길어지면 자동으로 wrap해줌
-  - MaxLength 속성 : 글자수를 제한해줌
-  - CharacterCasing 속성 : 자동으로 대문자 소문자로 입력되게 함
+  - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
+    - AcceptsReturn="True" 속성 : 엔터키를 사용 할 수 있게함
+    - AcceptsTab="True" 속성 : 텝키를 사용 할 수 있게함
+    - VerticalScrollBarVisibility="Auto" 속성 : TextBox안의 공간보다 길이 길어지면 자동으로 wrap해줌
+    - MaxLength 속성 : 글자수를 제한해줌
+    - CharacterCasing 속성 : 자동으로 대문자 소문자로 입력되게 함
 
 ###### [TextBox](#textbox)
 ###### [Top](#top)
@@ -2243,9 +2229,9 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## TextChanged이벤트, SelectionChanged이벤트
-  - TextChanged 이벤트 : 글자가 바뀔 때마다 이벤트를 실행하게함(TextBox안에 글자가 지정되어 있으면 예외가 발생하여 실행이 안됨)
-  - SelectionChanged 이벤트 : 선택한 텍스트를 변경하거나 캐럿을 이동할 때 발생하는 이벤트, 마우스나 키보드 등의 입력장치를 사용해서 선택을 조정할 때마다 발생하는 이벤트
+  - TextChanged이벤트, SelectionChanged이벤트
+    - TextChanged 이벤트 : 글자가 바뀔 때마다 이벤트를 실행하게함(TextBox안에 글자가 지정되어 있으면 예외가 발생하여 실행이 안됨)
+    - SelectionChanged 이벤트 : 선택한 텍스트를 변경하거나 캐럿을 이동할 때 발생하는 이벤트, 마우스나 키보드 등의 입력장치를 사용해서 선택을 조정할 때마다 발생하는 이벤트
 
 ###### [TextBox](#textbox)
 ###### [Top](#top)
@@ -2253,22 +2239,21 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
-  - SelectedText : 마우스 드래그로 선택한 텍스트를 가져옴
-  - CaretIndex : 캐럿의 위치를 설정
-  - SelectionStart : 선택한 텍스트가 시작되는 위치값(CaretIndex와 같은 값을 리턴)
-  - SelectionLength : 선택된 문자 수를 반환, 선택 문자가 없으면 0을 리턴
-  - Select(1,4) : 마우스로 드래그 하는 것과 같다, ex)현재 예시는 1이상 4미만의 인덱스를 표시함
-  - SelectAllAll() : 마우스로 드래그 하는 것과 같다, 전체 선택
+  - SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
+    - SelectedText : 마우스 드래그로 선택한 텍스트를 가져옴
+    - CaretIndex : 캐럿의 위치를 설정
+    - SelectionStart : 선택한 텍스트가 시작되는 위치값(CaretIndex와 같은 값을 리턴)
+    - SelectionLength : 선택된 문자 수를 반환, 선택 문자가 없으면 0을 리턴
+    - Select(1,4) : 마우스로 드래그 하는 것과 같다, ex)현재 예시는 1이상 4미만의 인덱스를 표시함
+    - SelectAllAll() : 마우스로 드래그 하는 것과 같다, 전체 선택
 
 ###### [TextBox](#textbox)
 ###### [Top](#top)
 
+<br/>
 <br/>
 
 ***
-
-<br/>
 
 # ContentControl
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -2281,30 +2266,26 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # ScrollViewer
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
   - ScrollViewer내부에 있는 객체들을 스크롤로 나타내줌
   - 기본적으로, VerticalScrollBarVisibility="Visible"로 되어 있기 때문에 VerticalScrollBarVisibility="Hidden"을 해줘야 수직 스크롤 막대가 없어짐
-  - [FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기](#frameworkelement를-이용해-scrollviewer의-시스템-whith사이즈를-불러오기)
-  - [HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)](#horizontalscrollbarvisibility-verticalscrollbarvisibilityvisible-hidden-auto-disabled)
 
 ###### [ContentControl](#contentcontrol)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
-  - HorizontalScrollBarVisibility : 수평 스크롤 막대 속성
-  - VerticalScrollBarVisibility : 수직 스크롤 막대 속성
-    - visible : 스크롤바 막대를 항상 표시, ScrollViewer 크기가 자식 내용보다 작을 경우에는 활성화 상태, 반대로 ScrollViewer크기가 자식 내용보다 클 경우에는 비활성화 상태가 된다.
-    - Hidden : 스크롤 막대가 숨겨져 있도록 하는 속성, 자식 내용이 ScrollViewer보다 클 경우에는 내용이 잘리게 된다. 스크롤휠을 내려서 확인 가능하다
-    - Auto : 스크롤이 필요 없을 만큼 창크기를 늘려주면 스크롤이 없어짐(필요한 경우에만 표시됨)
-    - Disabled : 스크롤이 아예 없어짐, 창 크기를 밑으로 내려야지만 내용이 보임
+  - HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
+    - HorizontalScrollBarVisibility : 수평 스크롤 막대 속성
+    - VerticalScrollBarVisibility : 수직 스크롤 막대 속성
+      - visible : 스크롤바 막대를 항상 표시, ScrollViewer 크기가 자식 내용보다 작을 경우에는 활성화 상태, 반대로 ScrollViewer크기가 자식 내용보다 클 경우에는 비활성화 상태가 된다.
+      - Hidden : 스크롤 막대가 숨겨져 있도록 하는 속성, 자식 내용이 ScrollViewer보다 클 경우에는 내용이 잘리게 된다. 스크롤휠을 내려서 확인 가능하다
+      - Auto : 스크롤이 필요 없을 만큼 창크기를 늘려주면 스크롤이 없어짐(필요한 경우에만 표시됨)
+      - Disabled : 스크롤이 아예 없어짐, 창 크기를 밑으로 내려야지만 내용이 보임
 
 #Mainwindow.xaml
 ~~~c#
@@ -2329,8 +2310,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
-  - FrameworkElement : 아무것도 없는 공간이라고 생각하면 됨
+  - FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
+    - FrameworkElement : 아무것도 없는 공간이라고 생각하면 됨
 
 #Mainwindow.xaml
 ~~~c#
@@ -2375,10 +2356,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # tooltip
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
@@ -2401,16 +2381,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
-# ButtonBase
-  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
-
-###### [ContentControl](#contentcontrol)
-###### [Top](#top)
+***
 
 # RepeatButton
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - ButtonBase
@@ -2436,10 +2409,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # HeaderedContentControl
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
@@ -2449,13 +2421,14 @@ public partial class MainWindow : Window
 ###### [ContentControl](#contentcontrol)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
 # Expander
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - HeaderedContentControl
   - 눌렀을때 하위의 객체들이 튀어 나옴
 
 <br/>
-
-  - [Header를 따로 빼서 지정가능](#header를-따로-빼서-지정가능)
 
 #MainWindow.xaml
 ~~~c#
@@ -2477,9 +2450,10 @@ public partial class MainWindow : Window
 ###### [HeaderedContentControl](#headeredcontentcontrol)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## Header를 따로 빼서 지정가능
+  - Header를 따로 빼서 지정가능
 
 #MainWindow.xaml
 ~~~c#
@@ -2507,9 +2481,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # GroupBox
@@ -2518,15 +2489,14 @@ public partial class MainWindow : Window
 
 <br/>
 
-  - [FontFamily](#fontfamily)
-
 ###### [HeaderedContentControl](#headeredcontentcontrol)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## FontFamily
-  - 문자를 다양한 기호로 렌더링하는 일련의 딩뱃 글꼴
+  - FontFamily
+    - 문자를 다양한 기호로 렌더링하는 일련의 딩뱃 글꼴
 
 #MainWindow.xaml
 ~~~c#
@@ -2552,10 +2522,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # ItemsControl
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -2566,9 +2535,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # MenuBase
@@ -2580,9 +2546,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # Menu
@@ -2597,7 +2560,8 @@ public partial class MainWindow : Window
 ###### [MenuBase](#menubase)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
 ## MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
   - MenuItem : Menu안에 요소 생성
