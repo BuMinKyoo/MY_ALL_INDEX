@@ -791,7 +791,57 @@ export const load = async (serverLoadEvent) => {
 ***
 
 # fetch로 api호출하고 데이터 뿌려주기(Params)
-  - 
+
+Dir : routes/products/[productId]/ +page.svelte
+~~~
+<script>
+    export let data;
+    const products = data.product;
+</script>
+
+<h1>제품 상세페이지</h1>
+<div>
+    <h2>{products.title}</h2>
+    <h3>가격: {products.price}원</h3>
+    <p>설명 : {products.description}</p>
+</div>
+~~~
+
+Dir : routes/products/[productId]/ +page.server.js
+~~~
+export const load = async (serverLoadEvent) => {
+
+    const {fetch, params} = serverLoadEvent;
+    const {productId} = params;
+    const response = await fetch(`http://localhost:4000/products/${productId}`);
+    const product = await response.json();
+
+    return {
+        product
+    };
+}
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/19fa842c-abd6-4378-b9c7-5ddde964f291)
+
+  - serverLoadEvent에서 제공해주는 데이터 확인해보기
+    - fetch, params, url, route
+~~~
+export const load = async (serverLoadEvent) => {
+    const {fetch, params, url, route} = serverLoadEvent;
+    console.log({fetch, params, url, route});
+   
+    const {productId} = params;
+    const response = await fetch(`http://localhost:4000/products/${productId}`);
+    const product = await response.json();
+
+    return {
+        product
+    };
+}
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/3695f5d3-ed27-48b6-a356-c448a5084775)
 
 ###### [fetch로 api호출하고 데이터 뿌려주기(Params)](#fetch로-api호출하고-데이터-뿌려주기params)
 ###### [Top](#top)
@@ -802,13 +852,58 @@ export const load = async (serverLoadEvent) => {
 ***
 
 # error&redirect
-  - 
+  - “+error.svelte”라는 파일 문법을 사용한다
+
+Dir : routes/products/[productId]/ +page.server.js
+~~~
+import {error} from '@sveltejs/kit'; // sveltekit이 제공
+
+export const load = async (serverLoadEvent) => {
+    const {fetch, params} = serverLoadEvent;
+    const {productId} = params;
+
+    if(productId > 3){
+        throw error(404,'Product not found');
+    }
+
+    const response = await fetch(`http://localhost:4000/products/${productId}`);
+    const product = await response.json();
+
+    return {
+        product
+    };
+}
+~~~
+
+Dir : routes/products/[productId]/ +error.svelte
+~~~
+<h1>상품이 존재하지 않습니다.</h1>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/907ae92b-b999-46fc-87a8-9b2249f077a1)
+
+  - redirect
+
+Dir : routes/products/[productId]/ +page.server.js
+~~~
+import {redirect} from '@sveltejs/kit'; // sveltekit이 제공
+
+export const load = async (serverLoadEvent) => {
+    const {fetch, params} = serverLoadEvent;
+    const {productId} = params;
+
+    if(productId > 3){
+        throw redirect(307,'/products');
+    }
+
+    const response = await fetch(`http://localhost:4000/products/${productId}`);
+    const product = await response.json();
+
+    return {
+        product
+    };
+}
+~~~
 
 ###### [error&redirect](#errorredirect)
 ###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
