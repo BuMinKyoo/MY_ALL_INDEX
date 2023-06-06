@@ -17,7 +17,6 @@
   - 3. 원하는 폴더에 가서 "git init" 명령어를 실행한다
     - .git파일이 만들어진다(버전관리에 관한 정보들 담김)
 
-  
 ###### [Git설치](#git시작)
 ###### [Top](#top)
 
@@ -27,14 +26,30 @@
 ***
 
 # Git명령어
-  - git init
-    - 버전관리할 폴더를 만듬, .git파일이 생성됨(버전관리에 관한 정보들 담김)
   - git config --global user.name 이름
     - git에서 커밋 할 때 사용할 이름(최조 1번)
   - git config --global user.email 이메일
     - git에서 커밋 할 때 사용할 이메일(최조 1번)
+  - git init
+    - 버전관리할 폴더를 만듬, .git파일이 생성됨(버전관리에 관한 정보들 담김)
+  - git add 파일명
+    - commit할 파일들을 결정(git add . : 전체 파일 add하기)
+  - git commit -m '남길메시지'
   - git status
     - 현재 git상태 확인
+  - git log
+    - commit한 log보기
+  - git branch
+    - 현재 branch보기
+  - git branch 브랜치명
+    - branch 만들기
+  - git checkout 변경할브랜치
+    - 브랜치 이동하기
+  - git merge 병합할브랜치
+    - brnach병합하기
+    - branch를 merge하는 일은 '현재 branch에서 다른 branch를 가져와서 병합하는 것'만 가능하다
+  - git branch -d 삭제할브랜치
+    - branch삭제
 
   
 ###### [Git명령어](#git명령어)
