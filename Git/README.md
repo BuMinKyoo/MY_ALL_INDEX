@@ -45,6 +45,8 @@
     - branch 만들기
   - git checkout 변경할브랜치
     - 브랜치 이동하기
+  - git checkout -r
+    - 원격 브랜치 목록 조회
   - git merge 병합할브랜치
     - brnach병합하기
     - branch를 merge하는 일은 '현재 branch에서 다른 branch를 가져와서 병합하는 것'만 가능하다
