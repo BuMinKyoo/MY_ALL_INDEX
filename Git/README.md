@@ -39,6 +39,9 @@
     - 현재 git상태 확인
   - git log
     - commit한 log보기
+
+<br/>
+
   - git branch
     - 현재 branch보기
   - git branch 브랜치명
@@ -47,13 +50,23 @@
     - 브랜치 이동하기
   - git checkout -r
     - 원격 브랜치 목록 조회
-  - git merge 병합할브랜치
-    - brnach병합하기
-    - branch를 merge하는 일은 '현재 branch에서 다른 branch를 가져와서 병합하는 것'만 가능하다
   - git branch -d 삭제할브랜치
     - branch삭제
+  - git pull origin 브랜치
+    - git에서 다른 브랜치에서 pull하는 방법
+  - git merge 병합할브랜치
+    - branch병합하기
+    - branch를 merge하는 일은 '현재 branch에서 다른 branch를 가져와서 병합하는 것'만 가능하다
 
-  
+<br/>
+
+  - git reset --hard ORIG_HEAD
+    - 방금 pull해온것 취소하기
+  - git reset --hard 커밋로그
+    - HEAD로 가리키고 있는것이 아닌 commit을 제거할때
+  - git reset --hard HEAD^
+    - HEAD로 가리키고 있는 commit을 제거할때
+
 ###### [Git명령어](#git명령어)
 ###### [Top](#top)
 
