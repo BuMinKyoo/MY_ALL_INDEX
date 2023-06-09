@@ -4,7 +4,6 @@
 
   - [Git설치](#git시작)
   - [Git명령어](#git명령어)
-    - git init
 
 <br/>
 <br/>
