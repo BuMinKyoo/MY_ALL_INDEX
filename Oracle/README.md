@@ -52,9 +52,10 @@
     - 다중 행 서브 쿼리(WHERE절)
     - 인라인 뷰(Inline View)(FROM절)
     - SELECT절 서브 쿼리
-  - [INSERT문](#insert문)
+  - [INSERT](#insert)
   - [UPDATE](#update)
   - [DELETE](#delete)
+  - [데이터 무결성과 제약 조건](#데이터-무결성과-제약-조건)
   - [테이블 생성, 수정, 삭제](#테이블-생성-수정-삭제)
   - [기타](#기타)
     - DUAL테이블
@@ -701,12 +702,28 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# 집계 및 그룹 함수
+  - 여러 행에 대해서 하나의 결과를 출력하는 그룹 함수를 이용하여 여러가지 집계 연산을 수행
+  - 집계 함수 종류
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/455aaa2c-3337-4f1c-81d3-a855c95b6ca8)
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+  - COUNT( ) 함수는 일반적으로 null값을 세어 주지 않는다
+  - COUNT(*) 함수를 사용하여 null값을 포함한 전체 행의 갯수를 알 수 있다.
+
+<br/>
+
+
+~~~
+// OVER 기준을 활용한 출력
+// SUM(salary) 은 집계함수로써 한줄만 나와야 하지만 아래와 같이 기준을 잡아 주면 누적합을 볼 수 있다
+SELECT first_name, salary,
+       SUM(salary) OVER (ORDER BY first_name)
+FROM employees;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/3b00ec87-f34b-45d5-abf5-f693cbd9f0e1)
+
+###### [집계 및 그룹 함수](#집계-및-그룹-함수)
 ###### [Top](#top)
 
 <br/>
@@ -714,12 +731,68 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# GROUP BY
+  - 지정한 열의 데이터 값을 기준으로 그룹화하여 집계 함수 적용
+  - GROUP BY 동작 순서
+    - 테이블에서 WHERE 조건식에 맞는 데이터 값만 구분
+    - 지정한 열 기준으로 같은 데이터 값으로 그룹화
+    - 지정한 열들의 그룹화된 집계 결과 출력
+  - GROUP BY 절 특징
+    - WHERE 절은 그룹화 되기 전에 조건식 적용
+    - GROUP BY 절 사용시 SELECT 절에 지정된 기준 열을 지정
+    - SELECT 절에 그룹 함수 없이도 GROUP BY 절 사용 가능
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+<br/>
+
+~~~
+// job_id가 같은것들이 그룹되어 지고, SUM, AVG함수에 따라 작성된다
+SELECT job_id, SUM(salary), AVG(salary)
+FROM employees
+GROUP BY job_id;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1cdc7f6a-f78d-4146-b403-4054f0eb6209)
+
+<br/>
+
+~~~
+// 위의 데이터에서 where절을 추가한것
+SELECT job_id, SUM(salary), AVG(salary)
+FROM employees
+WHERE job_id LIKE 'AD%'
+GROUP BY job_id;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c9820345-1e09-4c16-92d8-4dbdb06d1387)
+
+<br/>
+
+~~~
+// 위의 데이터에서 ORDER BY절을 추가한것
+SELECT job_id, SUM(salary), AVG(salary)
+FROM employees
+WHERE job_id LIKE 'AD%'
+GROUP BY job_id
+ORDER BY SUM(salary) DESC;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c90c416c-ec3b-41c7-bf1a-687e93624704)
+
+<br/>
+
+~~~
+// 다중 GROUP BY절
+SELECT job_id, department_id,
+       SUM(salary), AVG(salary)
+FROM employees
+WHERE department_id BETWEEN 50 AND 100
+GROUP BY job_id, department_id
+ORDER BY job_id;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/68d04c89-80a0-452a-b96a-e6ddd88fc80b)
+
+###### [GROUP BY](#group-by)
 ###### [Top](#top)
 
 <br/>
@@ -727,12 +800,32 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# HAVING
+  - WHERE 절에서는 그룹 함수를 사용할 수 없음
+  - 그룹화면 집계 결과에 조건식을 적용할 때 HAVING절 사용
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+~~~
+// GROUP화된 것에 조건식을 HAVING으로 달 수 있다
+SELECT job_id, SUM(salary), AVG(salary)
+FROM employees
+GROUP BY job_id
+HAVING AVG(salary) > 10000;
+~~~
+
+<br/>
+
+~~~
+// 문법을 순서대로 작성하면 차례대로 이렇게 적용 시킬 수가 있다
+SELECT manager_id, department_id, job_id,
+       SUM(salary), MIN(salary), MAX(salary)
+FROM employees
+WHERE manager_id IN(100, 101)
+GROUP BY manager_id, department_id, job_id
+HAVING SUM(salary) BETWEEN 10000 AND 40000
+ORDER BY manager_id, department_id;
+~~~
+
+###### [HAVING](#having)
 ###### [Top](#top)
 
 <br/>
@@ -740,12 +833,103 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# JOIN
+  - 두 개 이상의 테이블을 서로 연결하는데 사용되는 기법
+  - 테이블들은 특정 규칙에 따라 서로 상호 관계를 가짐
+  - 조인 종류
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/ad136714-56b7-41a7-8ce5-55b6201854d2)
+
+<br/>
+
+  - 카티션 곱(Cartesian Product)
+    - 공통되는 칼럼 없이 조인 조건이 없어서 모든 데이터가 조회
+
+~~~
+// employees첫째 행부터 마지막행이 departments의 첫째행에 대응되어 나오고, 다시 employees첫째 행부터 마지막행이 두번째행에 대응되어 나오는 식으로 수량은 둘의 곱셈으로 늘어난다
+SELECT *
+FROM employees, departments;
+~~~
+
+<br/>
+
+  - 동등 조인(Equi Join)
+    - 조인하는 테이블에서 조인 조건이 일치하는 것만 조회
+    - 내부 조인이라고도 부름
+
+~~~
+// jobs 의 job_id와 job_history의 job_id가 일치하는 것만 join 해달라는 뜻
+SELECT *
+FROM jobs, job_history
+WHERE jobs.job_id = job_history.job_id;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1f048004-04a6-48bf-bd9c-89a30b3d3f2f)
+
+<br/>
+
+~~~
+// 결과는 위와 동일, 테이블의 표현만 바뀐것
+SELECT *
+FROM jobs A, job_history B
+WHERE A.job_id = B.job_id;
+~~~
+
+<br/>
+
+  - 비동등 조인(Non Equi Join)
+    - 테이블의 동일한 컬럼 없이 다른 조건으로 조인하는 방법
+
+~~~
+SELECT *
+FROM employees E, jobs J
+WHERE E.salary BETWEEN J.min_salary AND J.min_salary;
+~~~
+
+<br/>
+
+~~~
+SELECT E.first_name, E.hire_date, H.start_date, H.end_date
+FROM employees E, job_history H
+WHERE E.hire_date BETWEEN H.start_date AND H.end_date;
+~~~
+
+<br/>
+
+  - 외부 조인(Outer Join)
+    - 조인하는 테이블에서 조인 조건을 만족하지 않는 행도 출력
+    - 동등 조인 조건을 만족하지 못하고 누락된 행을 출력할 때 사용
+
+~~~
+// jobs 테이블과 job_history  테이블에서 공통되지 않아 가져오지 못했던 jobs 테이블 데이터를 가져온다 
+SELECT *
+FROM jobs J, job_history H
+WHERE J.job_id = H.job_id(+);
+~~~
+
+<br/>
+
+~~~
+// jobs 테이블과 job_history  테이블에서 공통되지 않아 가져오지 못했던 job_history 테이블 데이터를 가져온다 
+SELECT *
+FROM jobs J, job_history H
+WHERE J.job_id(+) = H.job_id;
+~~~
+
+<br/>
+
+  - 자체 조인(Self Join)
+    - 자기 자신의 테이블과 조인하는 방법
+
+~~~
+SELECT E.first_name, E.last_name, M.first_name, M.last_name
+FROM employees E, employees M
+WHERE E.manager_id = M.employee_id;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/eaba672c-f652-4404-b7e1-b27b74ea50e9)
+
+###### [JOIN](#join)
 ###### [Top](#top)
 
 <br/>
@@ -753,12 +937,162 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# 서브 쿼리
+  - SELECT 문 안에 다시 SELECT 문이 기술된 쿼리
+  - 상위 SELECT 문 안에 하위 SELECT 문이 포함된 형태라 중첩된 쿼리라고도 부름
+  - 단일 SELECT 문 사용만으로는 복잡한 조건식을 만들 때 사용
+  - 다른 테이블에서 데이터 값을 조회한 후 조건으로 사용할 때 사용
+  - 서브쿼리 종류
+    - 단일 행 서브 쿼리 : 하나의 행을 검색하는 서브 질의
+    - 다중 행 서브 쿼리 : 하나 이상의 행을 검색하는 서브 질의
+    - 다중 열 서브 쿼리 : 하나 이상의 열을 검색하는 서브 질의
+  - 서브 쿼리 규칙
+    - 서브 쿼리는 괄호를 묶어서 사용
+    - 단일 행 연산자 또는 다중 행 연산자로 서브 쿼리 연결
+    - 서브 쿼리 실행 후 메인 쿼리 실행
+    - 여러 서브 쿼리를 중첩해서 사용 가능
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fe6ba153-5615-4209-8fb4-0f67e14d58e2)
+
+<br/>
+
+  - 단일 행 서브 쿼리
+    - 서브쿼리 SELECT 문에서 단일 행 결과를 메인 쿼리에 전달
+    - WHERE에 사용되는 열의 개수와 데이터 타입 일치 필요
+    - 단일 행 연산자 사용 : =, >, >=, <, <=, <>, !=
+
+<br/>
+
+~~~
+// 단일 행 서브 쿼리 임으로, 서브 쿼리에서는 단 한줄만 결과가 나와야 한다
+SELECT *
+FROM employees
+WHERE phone_number = ( SELECT phone_number
+                       	FROM employees
+                      	WHERE employee_id = 100 );
+~~~
+
+<br/>
+
+~~~
+// employee_id 가 200보다 큰것들만 나올 수 있도록 WHERE절을 만듬
+SELECT *
+FROM employees
+WHERE employee_id > ( SELECT employee_id
+                      FROM employees
+                      WHERE employee_id = 200)
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/ce75a347-37eb-4566-899d-474c55ac5533)
+
+<br/>
+
+  - 다중 행 서브 쿼리
+    - 서브쿼리 SELECT 문에서 다중 행 결과를 메인 쿼리에 전달
+    - 단일 행 연산자는 사용할 수 없고, 다중 행 연산자만 사용 가능
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/ba816453-ec67-470c-98dd-171176d9f66b)
+
+<br/>
+
+~~~
+SELECT *
+FROM employees
+WHERE salary IN ( SELECT MAX(salary)
+                  FROM employees
+                  GROUP BY department_id );
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1bb081f8-1202-4c25-ba96-6bc915ba1613)
+
+<br/>
+
+~~~
+// 서브쿼리에 하나라도 데이터가 맞는게 있다면 EXISTS 는 true가 되서 쿼리문이 작동 된다
+SELECT *
+FROM employees
+WHERE EXISTS ( SELECT *
+               FROM employees
+               WHERE employee_id = 100 );
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0ae1bd27-84df-4e4a-b783-e1bcb8812bfa)
+
+<br/>
+
+~~~
+// ANY는 조건을 하나라도 
+SELECT *
+FROM employees
+WHERE salary = ANY(6000, 10000, 12000);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fd32a895-e947-4669-9073-795de9e43aab)
+
+<br/>
+
+~~~
+// ANY는 하나라도 만족하면 나오기 때문에 밑의 예제 에서는 6000보다 크기만 하면 전부 다 나오게 된다
+SELECT *
+FROM employees
+WHERE salary > ANY(6000, 10000, 12000);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/bf4be913-3684-4b2f-b14f-e981d7654efc)
+
+<br/>
+
+~~~
+// ALL은 모두 만족시켜야 되기 때문에 6000보다 작거나 같은 것만 나오게 된다
+SELECT *
+FROM employees
+WHERE salary <= ALL(6000, 10000, 12000);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d2d73f7e-762b-4e7d-98f6-37d74dcd850a)
+
+<br/>
+
+  - 인라인 뷰(Inline View)
+    - FROM 절에 있는 서브쿼리가 인라인 뷰를 생성
+    - FROM 절에 직접 기술하여 효율적인 검색 가능
+    - FROM 절에 있는 서브쿼리에는 자주 별칭을 사용
+
+<br/>
+
+~~~
+// FROM절에 사용함으로써 서브 쿼리에서 나온 질의를 하나의 테이블로 사용할 수 있다
+SELECT *
+FROM employees E, ( SELECT department_id
+                    FROM departments
+                    WHERE department_name = 'IT') D
+WHERE E.department_id = D.department_id                    
+~~~
+
+<br/>
+
+~~~
+// 현재 D테이블에는 avg_sal라는 컬럼이 없지만, 아래와 같이 컬럼을 지정해서 뽑아 올 수도 있다
+SELECT E.last_name, E.salary, D.avg_sal
+FROM employees E, ( SELECT department_id, AVG(salary) avg_sal
+                    FROM employees
+                    GROUP BY department_id ) D
+WHERE E.department_id = D.department_id
+AND E.salary > D.avg_sal;
+~~~
+
+<br/>
+
+~~~
+SELECT department_name, ( SELECT AVG(salary)
+                          FROM employees
+                          GROUP BY department_name )
+FROM departments;                          
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d2acf422-2030-4e64-8987-2a4da43233ee)
+
+###### [서브 쿼리](#서브-쿼리)
 ###### [Top](#top)
 
 <br/>
@@ -766,12 +1100,30 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# INSERT
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/2db33e54-2507-4ae3-9d2a-7647cef2414b)
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+~~~
+// 어떤 테이블에 전체 컬럼을 1행 집어 넣을때는, 넣고자 하는 컬럼을 따로 지정해 주지 않아도 된다
+INSERT INTO countries
+VALUES ('KR', 'South Korea', 3);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c58ed959-249a-47f8-abcb-01bd1f10de28)
+
+<br/>
+
+~~~
+// 특정한 컬럼에 값을 집어 넣을때는, 컬럼을 지정해준다
+INSERT INTO countries(country_id)
+VALUES ('KP');
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/878834cd-07ac-4e8b-a3f8-fb65a31d9470)
+
+
+
+###### [INSERT](#insert)
 ###### [Top](#top)
 
 <br/>
@@ -779,12 +1131,29 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# UPDATE
+  - 테이블에 기존 값을 새로운 값으로 변경
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/11d049f5-e809-44d9-9ff4-15b169af6f1a)
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+<br/>
+
+~~~
+// 한개의 컬럼만 UPDATE할 때
+UPDATE countries
+SET country_name = 'aa'
+WHERE country_id = 'KR';
+~~~
+
+<br/>
+
+~~~
+// 여러개 컬럼을 UPDATE할 때
+UPDATE jobs
+SET job_id = 'IT QA', job_title = 'Quality Assurance'
+WHERE job_id = 'IT DS';
+~~~
+
+###### [UPDATE](#update)
 ###### [Top](#top)
 
 <br/>
@@ -792,12 +1161,21 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# DELETE
+  - 테이블의 데이터를 삭제
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8f9a08bc-a9ef-4874-a7fb-55e76d1ed288)
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+<br/>
+
+~~~
+// 해당되는 줄이 삭제 된다
+DELETE
+FROM countries
+WHERE country_id = 'KR';
+~~~
+
+
+###### [DELETE](#delete)
 ###### [Top](#top)
 
 <br/>
@@ -805,12 +1183,67 @@ FROM employees;
 
 ***
 
-# 데이터베이스의 개념
-  - 방대한 데이터를 효율적으로 관리하기 위해 컴퓨터에 통합,저장한 것
-  - 특정 조직의 여러 사용하자 공유하여 사용 할 수 있음
-  - 데이터베이스 관리 시스템(DBMS)이라는 프로그램을 이용하여 관리
+# 데이터 무결성과 제약 조건
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6912bd5d-c160-4831-bc8e-402d23b29ad1)
 
-###### [데이터베이스의 개념](#데이터베이스의-개념)
+###### [데이터 무결성과 제약 조건](#데이터-무결성과-제약-조건)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 테이블 생성, 수정, 삭제
+  - 데이터베이스 객체
+  - 테이블
+  - 뷰
+  - 인덱스
+  - 시퀀스
+  - 시노님
+  - …등등
+
+<br/>
+
+  - CREATE : 데이터 베이스 객체 생성
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/243a6b37-0050-4cdd-a27e-3387cbc69b43)
+
+~~~
+CREATE TABLE customers
+(   customer_id  number       NOT NULL PRIMARY KEY,
+    first_name   varchar2(10) NOT NULL,
+    last_name    varchar2(10) NOT NULL,
+    email        varchar2(10),
+    phone_number varchar2(20),
+    regist_date  date
+);
+~~~
+
+<br/>
+
+  - ALTER : 데이터 베이스 객체 수정
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/edc8f900-37a8-4b6b-884a-66a91fb36d30)
+
+~~~
+ALTER TABLE customers
+ADD ( gender varchar2(10) );
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/5eb6e4dc-810b-45e7-8619-567846a7cc43)
+
+<br/>
+
+  - 열을 추가할때 제약 조건을 추가할 수 있다
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/dc05e050-dada-43d0-8784-79ba9b2ec35e)
+
+<br/>
+
+  - DROP : 데이터 베이스 객체 삭제
+  - TRUNCATE : 테이블의 전체 데이터 삭제
+
+###### [테이블 생성, 수정, 삭제](#테이블-생성-수정-삭제)
 ###### [Top](#top)
 
 <br/>
@@ -828,6 +1261,21 @@ FROM dual;
 ~~~
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/768f3420-004c-4664-9576-5294b9c67682)
+
+<br/>
+
+  - DML 명령어를 최종적으로 반영하기 위한 방법
+~~~
+COMMIT;
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/2856b2cb-bae6-41fe-9dd0-38ed1155a3d3)
+
+<br/>
+
+오라클 툴에 커밋과 롤백이 존재한다
+커밋후에는 롤백이 불가능하다..!
+
 
 ###### [기타](#기타)
 ###### [Top](#top)
