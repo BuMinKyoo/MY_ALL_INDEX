@@ -211,6 +211,7 @@ FROM departments;
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/dea421e8-3e2a-4b74-a207-0b9dd9f78f31)
 
 - 산술 연산자
+
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/2cbfb49e-4de3-4b55-8416-008ec903ca01)
 
 <br/>
