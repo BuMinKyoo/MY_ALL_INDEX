@@ -251,9 +251,11 @@ FROM employees;
 <br/>
 
   - 연산자 우선순위
+
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d49001e1-4c26-41ce-8fb6-7a72017ba770)
 
   - 비교연산자
+
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8e9d5bf3-e7ea-4064-96b5-1615b78266c5)
 
 <br/>
@@ -320,6 +322,7 @@ WHERE last_name LIKE '___';
 <br/>
 
   - 논리연산자
+
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/e7d320bd-4e81-4ef3-96e3-e8430362da41)
 
 ~~~
@@ -483,6 +486,7 @@ WHERE employee_id >= 140;
   - 문자 함수
     - 문자 함수는 주로 데이터 조작에 사용되며 문자와 문자열은 작은 따옴표(‘)로 묶어서 표현
     - 문자 함수 종류
+
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/e787a109-5aaa-42e3-94a0-8bbd86fab7cc)
 
 ~~~
@@ -706,6 +710,7 @@ FROM employees;
 # 집계 및 그룹 함수
   - 여러 행에 대해서 하나의 결과를 출력하는 그룹 함수를 이용하여 여러가지 집계 연산을 수행
   - 집계 함수 종류
+
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/455aaa2c-3337-4f1c-81d3-a855c95b6ca8)
 
   - COUNT( ) 함수는 일반적으로 null값을 세어 주지 않는다
@@ -1164,6 +1169,7 @@ WHERE job_id = 'IT DS';
 
 # DELETE
   - 테이블의 데이터를 삭제
+
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8f9a08bc-a9ef-4874-a7fb-55e76d1ed288)
 
 <br/>
