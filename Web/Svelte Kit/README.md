@@ -19,6 +19,11 @@
 - [Universal VS Server(Data Load Function)](#universal-vs-serverdata-load-function)
 - [fetch로 api호출하고 데이터 뿌려주기(Params)](#fetch로-api호출하고-데이터-뿌려주기params)
 - [error&redirect](#errorredirect)
+- [TailWind사용하기](#tailwind사용하기)
+- [export와 export default의 차이](#export와-export-default의-차이)
+- [oracledb연결하기](#oracledb연결하기)
+- [front에서 데이터 보내기](#front에서-데이터-보내기)
+- [DB데이터 가져오기](#db데이터-가져오기)
 
 <br/>
 <br/>
@@ -906,4 +911,324 @@ export const load = async (serverLoadEvent) => {
 ~~~
 
 ###### [error&redirect](#errorredirect)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# TailWind사용하기
+  - 1. npm install -D tailwindcss postcss autoprefixer
+  - 2. npx tailwindcss init -p
+    - tailwind.config.js, postcss.config.js이 생성됨
+  - 3. svelte.config.js파일 수정
+    - import { vitePreprocess } from '@sveltejs/kit/vite';
+    - preprocess: vitePreprocess()
+
+Dir : svelte.config.js
+~~~
+import adapter from '@sveltejs/adapter-auto';
+import { vitePreprocess } from '@sveltejs/kit/vite';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+    kit: {
+        // adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
+        // If your environment is not supported or you settled on a specific environment, switch out the adapter.
+        // See https://kit.svelte.dev/docs/adapters for more information about adapters.
+        adapter: adapter()
+    },
+    preprocess: vitePreprocess()
+};
+
+export default config;
+~~~
+
+  - 4. tailwind.config.js 파일 수정
+    - content: ['./src/**/*.{html,js,svelte,ts}']
+
+Dir : tailwind.config.js
+~~~
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./src/**/*.{html,js,svelte,ts}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+~~~
+
+  - 5. css파일 생성
+    - 아래는 app.css란 파일로 생성 하였음(이름은 달라져도 됨)
+    - src바로 하위에 생성하여야함
+
+Dir : src/ app.css
+~~~
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+~~~
+
+  - 6. layout.svelte파일 생성
+
+Dir : src/routes/ +layout.svelte
+~~~
+<script>
+    import "../app.css";
+  </script>
+ 
+  <slot />
+~~~
+
+  - 7. 완료!
+  - 8. 추가 확장 설치
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9c72182a-3dfa-4ae3-aa22-93408cbbbadc)
+
+###### [TailWind사용하기](#tailwind사용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# export와 export default의 차이
+  - https://ko.javascript.info/import-export#ref-4122 
+  - 파일 하나엔 대개 export default가 하나만있으며, default를 붙여서 모듈을 내보내면 중괄호 {} 없이 모듈을 가져올 수 있습니다.
+
+###### [export와 export default의 차이](#export와-export-default의-차이)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# oracledb연결하기
+  - nodejs에서 오라클 db를 사용하기 위해서는 oracle client를 설치하고, 위치를 설정해 줘야 한다
+  - npm i oracledb 명령어로 설치
+  - 커넥션 풀
+    - 데이터베이스와 연결된 커넥션을 미리 만들어서 풀(pool) 속에 저장해 두고 있다가 필요할 때 커넥션을 풀에서 쓰고 다시 풀에 반환하는 기법
+    - 커넥션 풀을 사용하면 커넥션을 생성하고 닫는 시간이 소모되지 않기 때문에 애플리케이션의 실행 속도가 빨라지며, 또한 한 번에 생성될 수 있는 커넥션 수를 제어하기 때문에 동시 접속자 수가 몰려도 웹 애플리케이션이 쉽게 다운되지 않는다
+    - 생성(초기화)하는 과정이 오래 걸리고 부하가 심한 것들을 미리 만들어두고 바구니에 담아두고 계속 재활용하는것이 목적이다
+  - db객체 정의하기
+
+~~~
+const dbConfig = {
+    user:  1111,
+    password:  2222,
+    connectString: 143.243.535”80,
+    externalAuth: false,
+    poolMin: 1,
+    poolMax: 20,
+    poolTimeout: 300,
+}
+~~~
+
+  - “externalAuth”
+    - externalAuth는 외부 인증(External Authentication)을 사용할지 여부를 나타내는 옵션입니다.
+    - 외부 인증은 Oracle 데이터베이스의 사용자 인증을 외부에서 처리하는 방식을 말합니다.
+    - 이 옵션을 true로 설정하면, user 및 password 옵션을 제공하지 않아도 됩니다. 대신 운영 체제나 다른 인증 서비스에서 인증 정보를 제공합니다.
+    - 외부 인증을 사용하는 경우, user 및 password를 설정하지 않아도 데이터베이스에 연결할 수 있습니다.
+  - “poolTimeout”
+    - poolTimeout을 설정하면 커넥션 풀에 대기 중인 커넥션의 최대 대기 시간을 지정할 수 있습니다. 대기 시간이 지정된 시간을 초과하는 경우, 커넥션은 풀에서 제거됩니다. 이렇게 함으로써 오랫동안 유휴 상태로 남아있는 커넥션들을 제거하여 풀의 리소스를 절약하고 성능을 향상시킬 수 있습니다.
+    - 밀리초 단위로 지정된다
+
+<br/>
+
+  - 오라클db연결
+~~~
+import oracledb from 'oracledb';
+
+/** @type {import('@sveltejs/kit').Config} */
+const dbConfig = {
+    user:  ,
+    password:  ,
+    connectString: ,
+    externalAuth: false,
+    poolMin: 1,
+    poolMax: 20,
+    poolTimeout: 300,
+}
+
+let pool;
+export const createPool = async () => {
+    pool = await oracledb.createPool(dbConfig)
+}
+
+/* 오라클 클라이언트를 환경변수에 적용했다면 필요 없음 */
+let init;
+const initOracleClient = async () => {
+    try {
+        await oracledb.initOracleClient({ libDir: './src/lib/oracle/instantclient_21_7' })
+        init = true
+    } catch (error) {
+       //logger.error('%o', error)
+    }
+}
+
+// 데이터베이스 연결 가져오기
+export const getConnection = async () => {
+    if (!init) await initOracleClient()
+    if (!pool) await createPool()
+
+
+    return await pool.getConnection()
+}
+~~~
+
+###### [oracledb연결하기](#oracledb연결하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# front에서 데이터 보내기
+  - axios라이브러리 사용하기
+
+~~~
+<script>
+    import axios from 'axios'
+   
+    const getServerData = async() =>{
+        const postData = {
+            msNo:'C00441'
+        }
+        const response = await axios.post('/tailwind_page',postData)
+        const serverData = response.data[0]
+        console.log(serverData)
+    }
+</script>
+
+<button class=' text-white bg-blue-700' on:click={getServerData}>
+    데이터 내놔
+</button>
+~~~
+
+###### [front에서 데이터 보내기](#front에서-데이터-보내기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# DB데이터 가져오기
+  - DB데이터 가져오기 GET통신
+
+Dir : 
+~~~
+/** @type {import('./$types').RequestHandler} */
+export async function GET({ params }) {    
+
+
+   
+    const customerQuery = {
+        query:`
+            SELECT AS_GROP_CD, AS_GROP_NM FROM GWGROPTB
+            WHERE MA_FG IN ('0001','0002','0003')
+            ORDER BY AS_GROP_NM
+        `,
+        binds:{
+            //MS_NO:{ val: req.msNo  }
+        }
+    }
+
+
+    const connection = await getConnection()
+    const customer_result = await connection.execute(customerQuery.query,{}, options)
+    const returnData = customer_result.rows // 고객사
+    connection.release()
+
+
+    console.log(returnData)
+    return json(returnData)
+}
+~~~
+
+<br/>
+
+  - DB데이터 가져오기 POST통신
+
+Dir : 
+~~~
+/** @type {import('./$types').RequestHandler} */
+export async function POST({ params, request }) {
+    const req = await request.clone().json();
+
+    // 분류 쿼리
+    const nativeQuery = {
+        query:`
+        SELECT HPL_CD, HPL_NM,
+        HPM_CD, HPM_NM,
+        HPS_CD, HPS_NM,
+        A_SORT_NO,
+        B_SORT_NO
+    FROM (SELECT A.HPL_CD, A.HPL_NM,
+                B.HPM_CD, B.HPM_NM,
+                C.HPS_CD, C.HPS_NM,
+                A.SORT_NO A_SORT_NO,
+                B.SORT_NO B_SORT_NO
+        FROM PROLMSTB A, PROMMSTB B, PROSMSTB C
+        WHERE A.HPL_CD = B.HPL_CD
+            AND A.HPL_CD = C.HPL_CD
+            AND B.HPL_CD = C.HPL_CD
+            AND B.HPM_CD = C.HPM_CD  
+            AND C.HPL_CD = '0001'
+            AND C.CREATE_DATE > TO_CHAR(TO_DATE(SYSDATE-730),'YYYYMMDD')
+        UNION  
+        SELECT A.HPL_CD, A.HPL_NM,
+                B.HPM_CD, B.HPM_NM,
+                C.HPS_CD, C.HPS_NM,
+                A.SORT_NO A_SORT_NO,
+                B.SORT_NO B_SORT_NO
+        FROM PROLMSTB A, PROMMSTB B, PROSMSTB C
+        WHERE A.HPL_CD = B.HPL_CD
+            AND A.HPL_CD = C.HPL_CD
+            AND B.HPL_CD = C.HPL_CD
+            AND B.HPM_CD = C.HPM_CD
+            AND C.HPL_CD IN ('0002','0003'))
+        ORDER BY A_SORT_NO, B_SORT_NO, HPS_CD              
+        `,
+        binds:{
+            HPL_CD:{ val: req.hpl_cd  } // HPL_CD가 0001일 경우 개발 업무
+        }
+    }
+
+    const connection = await getConnection()
+    const result = await connection.execute(nativeQuery.query, nativeQuery.binds, options)
+    const returnData = result.rows // 분류
+    connection.release()
+
+    console.log(returnData)
+    return json(returnData)
+}
+~~~
+
+<br/>
+
+  - binding사용하기
+
+Dir : 
+~~~
+// 고객사 쿼리
+const customerQuery = {
+    query : `
+        SELECT AS_GROP_CD, AS_GROP_NM FROM GWGROPTB
+        WHERE MA_FG IN ('0001', '0002', '0003')
+        MS_NO = :MS_NO
+        ORDER BY AS_GROP_NM
+    `,
+    binds:{
+        MS_NO : { val: req.msNo }
+    }
+}
+~~~
+
+###### [DB데이터 가져오기](#db데이터-가져오기)
 ###### [Top](#top)
