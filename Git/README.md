@@ -61,6 +61,8 @@
 
   - git reset --hard ORIG_HEAD
     - 방금 pull해온것 취소하기
+  - git reset --merge ORIG_HEAD
+    - merge되돌리기
   - git reset --hard 커밋로그
     - HEAD로 가리키고 있는것이 아닌 commit을 제거할때
   - git reset --hard HEAD^
