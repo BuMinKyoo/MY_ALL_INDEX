@@ -64,9 +64,15 @@
   - git reset --merge ORIG_HEAD
     - merge되돌리기
   - git reset --hard 커밋로그
-    - HEAD로 가리키고 있는것이 아닌 commit을 제거할때
-  - git reset --hard HEAD^
-    - HEAD로 가리키고 있는 commit을 제거할때
+    - HEAD로 가리키고 있는것이 아닌 commit을 제거할때(작업했던것 없어짐!!)
+  - git reset --hard HEAD~1
+    - commit을 제거할때(작업했던것 없어짐!!)
+  - git reset --soft 커밋로그
+    - HEAD로 가리키고 있는것이 아닌 commit을 제거할때(작업했던것 없어지지 않음!!)
+  - git reset --soft HEAD~1
+    - commit을 제거할때(작업했던것 없어지지 않음!!)
+  - git status
+    - git add 했던것 전체 취소하기
 
 ###### [Git명령어](#git명령어)
 ###### [Top](#top)
