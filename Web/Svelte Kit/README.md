@@ -22,8 +22,7 @@
 - [TailWind사용하기](#tailwind사용하기)
 - [export와 export default의 차이](#export와-export-default의-차이)
 - [oracledb연결하기](#oracledb연결하기)
-- [front에서 데이터 보내기](#front에서-데이터-보내기)
-- [back단에서 DB데이터 가져오기(server.js)](#back단에서-db데이터-가져오기serverjs)
+- [back단에서 DB데이터 가져오기(+server.js)](#back단에서-db데이터-가져오기serverjs)
 
 <br/>
 <br/>
@@ -1081,36 +1080,6 @@ export const getConnection = async () => {
 ~~~
 
 ###### [oracledb연결하기](#oracledb연결하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# front에서 데이터 보내기
-  - axios라이브러리 사용하기
-
-~~~
-<script>
-    import axios from 'axios'
-   
-    const getServerData = async() =>{
-        const postData = {
-            msNo:'C00441'
-        }
-        const response = await axios.post('/tailwind_page',postData)
-        const serverData = response.data[0]
-        console.log(serverData)
-    }
-</script>
-
-<button class=' text-white bg-blue-700' on:click={getServerData}>
-    데이터 내놔
-</button>
-~~~
-
-###### [front에서 데이터 보내기](#front에서-데이터-보내기)
 ###### [Top](#top)
 
 <br/>
