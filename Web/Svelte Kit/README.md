@@ -23,7 +23,7 @@
 - [export와 export default의 차이](#export와-export-default의-차이)
 - [oracledb연결하기](#oracledb연결하기)
 - [front에서 데이터 보내기](#front에서-데이터-보내기)
-- [DB데이터 가져오기](#db데이터-가져오기)
+- [back단에서 DB데이터 가져오기(server.js)](#back단에서-db데이터-가져오기serverjs)
 
 <br/>
 <br/>
@@ -1118,35 +1118,38 @@ export const getConnection = async () => {
 
 ***
 
-# DB데이터 가져오기
+# back단에서 DB데이터 가져오기(server.js)
   - DB데이터 가져오기 GET통신
 
-Dir : 
+Dir : +server.js
 ~~~
+import { json } from '@sveltejs/kit'; // 모듈 불러오기
+import oracledb from 'oracledb'; // 모듈 불러오기
+import {getConnection} from "../../../../libraries/oracle/oracleConfig" // db연결을 위한 모듈 불러오기
+
+const options = { outFormat: oracledb.OUT_FORMAT_OBJECT, autoCommit: false, batchErrors: true }  
+
+// 고객사 데이터 가져오는 함수
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ params }) {    
 
-
-   
+    //고객사 쿼리
     const customerQuery = {
         query:`
-            SELECT AS_GROP_CD, AS_GROP_NM FROM GWGROPTB
-            WHERE MA_FG IN ('0001','0002','0003')
+            SELECT AS_GROP_CD, AS_GROP_NM FROM GWGROPTB 
+            WHERE MA_FG IN ('0001','0002','0003') 
             ORDER BY AS_GROP_NM
         `,
         binds:{
             //MS_NO:{ val: req.msNo  }
         }
-    }
-
+    } 
 
     const connection = await getConnection()
     const customer_result = await connection.execute(customerQuery.query,{}, options)
     const returnData = customer_result.rows // 고객사
     connection.release()
 
-
-    console.log(returnData)
     return json(returnData)
 }
 ~~~
@@ -1155,80 +1158,41 @@ export async function GET({ params }) {
 
   - DB데이터 가져오기 POST통신
 
-Dir : 
+Dir : +server.js
 ~~~
+import { json } from '@sveltejs/kit';
+import oracledb from 'oracledb';
+import {getConnection} from "../../../../../libraries/oracle/oracleConfig"
+
+const options = { outFormat: oracledb.OUT_FORMAT_OBJECT, autoCommit: false, batchErrors: true }  
+
+
+// 기본 데이터 가져오는 함수
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ params, request }) {
     const req = await request.clone().json();
 
+    
+
     // 분류 쿼리
     const nativeQuery = {
         query:`
-        SELECT HPL_CD, HPL_NM,
-        HPM_CD, HPM_NM,
-        HPS_CD, HPS_NM,
-        A_SORT_NO,
-        B_SORT_NO
-    FROM (SELECT A.HPL_CD, A.HPL_NM,
-                B.HPM_CD, B.HPM_NM,
-                C.HPS_CD, C.HPS_NM,
-                A.SORT_NO A_SORT_NO,
-                B.SORT_NO B_SORT_NO
-        FROM PROLMSTB A, PROMMSTB B, PROSMSTB C
-        WHERE A.HPL_CD = B.HPL_CD
-            AND A.HPL_CD = C.HPL_CD
-            AND B.HPL_CD = C.HPL_CD
-            AND B.HPM_CD = C.HPM_CD  
-            AND C.HPL_CD = '0001'
-            AND C.CREATE_DATE > TO_CHAR(TO_DATE(SYSDATE-730),'YYYYMMDD')
-        UNION  
-        SELECT A.HPL_CD, A.HPL_NM,
-                B.HPM_CD, B.HPM_NM,
-                C.HPS_CD, C.HPS_NM,
-                A.SORT_NO A_SORT_NO,
-                B.SORT_NO B_SORT_NO
-        FROM PROLMSTB A, PROMMSTB B, PROSMSTB C
-        WHERE A.HPL_CD = B.HPL_CD
-            AND A.HPL_CD = C.HPL_CD
-            AND B.HPL_CD = C.HPL_CD
-            AND B.HPM_CD = C.HPM_CD
-            AND C.HPL_CD IN ('0002','0003'))
-        ORDER BY A_SORT_NO, B_SORT_NO, HPS_CD              
+        select HPL_CD, HPM_CD, HPM_NM from PROMMSTB where HPL_CD = :HPL_CD              
         `,
+        
         binds:{
-            HPL_CD:{ val: req.hpl_cd  } // HPL_CD가 0001일 경우 개발 업무
+             HPL_CD:{ val: req.hpl_cd  }
         }
-    }
+    } 
 
     const connection = await getConnection()
     const result = await connection.execute(nativeQuery.query, nativeQuery.binds, options)
-    const returnData = result.rows // 분류
+    const returnData = result.rows
     connection.release()
 
-    console.log(returnData)
     return json(returnData)
 }
 ~~~
 
-<br/>
-
-  - binding사용하기
-
-Dir : 
-~~~
-// 고객사 쿼리
-const customerQuery = {
-    query : `
-        SELECT AS_GROP_CD, AS_GROP_NM FROM GWGROPTB
-        WHERE MA_FG IN ('0001', '0002', '0003')
-        MS_NO = :MS_NO
-        ORDER BY AS_GROP_NM
-    `,
-    binds:{
-        MS_NO : { val: req.msNo }
-    }
-}
-~~~
-
-###### [DB데이터 가져오기](#db데이터-가져오기)
+###### [back단에서 DB데이터 가져오기(server.js)](#back단에서-db데이터-가져오기serverjs)
 ###### [Top](#top)
