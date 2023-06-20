@@ -2,19 +2,19 @@
 
 ###### Top
 
-  - [JavaScript 사용(Script태크)](#JavaScript-사용script태크)
-  - [JavaScript 코드실행 3가지](#자바스크립트-코드실행-3가지)
-  - [JavaScript 코드실행에러 확인](#자바스크립트-코드실행에러-확인)
+  - [JavaScript 사용(Script태크)](#javascript-사용script태크)
+  - [JavaScript 코드실행 3가지](#javascript-코드실행-3가지)
+  - [JavaScript 코드실행에러 확인](#javascript-코드실행에러-확인)
   - [자료형,변수](#자료형변수)
   - [비교연산자](#비교연산자)
   - [템플릿 문자열](#템플릿-문자열)
   - [prompt,confirm,자료형변환](#promptconfirm자료형변환)
-  - [논리 연산자 "||" 기호 사용시 주의](#논리-연산자-||-기호-사용시-주의)
+  - [논리 연산자 "||" 기호 사용시 주의](#논리-연산자--기호-사용시-주의)
   - [함수](#함수)
     - [나머지 매개변수](#나머지-매개변수)
-    - [forEach,forin,forof](#forEach,forin,forof)
+    - [forEach,forin,forof](#foreachforinforof)
     - [filer,map함수](#filermap함수)
-    - [함수'=>'문법](#함수'=>'문법)
+    - [함수'=>'문법](#함수문법)
     - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
     - [즉시호출 함수](#즉시호출-함수)
     - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
@@ -46,7 +46,13 @@
     - [get,set문법](#getset문법)
     - [static](#static)
     - [상속](#상속)
-
+  - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+  - [map함수](#map함수)
+  - [new Set](#new-set)
+  - [Object.keys, Object.values](#objectkeys-objectvalues)
+  - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
+  - [setInterval](#setinterval)
+   
 <br/>
 <br/>
 
