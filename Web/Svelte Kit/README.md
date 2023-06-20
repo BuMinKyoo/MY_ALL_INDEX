@@ -1,4 +1,4 @@
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9063c38b-f64b-443b-ab2e-5d1c643ceb6a)###### Top
+###### Top
 
 - [SveltKit시작](#sveltkit시작)
 - [라우트하기](#라우트하기)
