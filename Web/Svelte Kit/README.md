@@ -1,4 +1,4 @@
-###### Top
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9063c38b-f64b-443b-ab2e-5d1c643ceb6a)###### Top
 
 - [SveltKit시작](#sveltkit시작)
 - [라우트하기](#라우트하기)
@@ -22,6 +22,40 @@
 - [TailWind사용하기](#tailwind사용하기)
 - [export와 export default의 차이](#export와-export-default의-차이)
 - [oracledb연결하기](#oracledb연결하기)
+
+<br/>
+
+sveltKit에서 사용하는 front문법은 대부분 svelte를 따르고 있으며, svelte의 tutorial을 하면서 기억할 부분을 남긴다
+
+indroduction
+- [Style속성은 현재 svelte파일에만 적용](#style속성은-현재-svelte파일에만-적용)
+- [string안에 태그 데이터 넣기](#string안에-태그-데이터-넣기)
+
+Reactivity
+- [$문법](#$문법)
+
+Logic
+- [if문 사용하기](#if문-사용하기)
+- [each문 사용하기](#each문-사용하기)
+- [await, then문](#await-then문)
+
+Events
+- [on click](#on-click)
+- [Mousemove](#mousemove)
+
+Bindings
+- [text input](#text-input)
+
+LifeCyle
+- [onMount](#onmount)
+- [tick](#tick)
+
+Stores
+- [Writable stores](#writable-stores)
+- [Derived stores](#derived-stores)
+
+Component composition
+- [Slots](#slots)
 
 <br/>
 <br/>
@@ -1079,6 +1113,962 @@ export const getConnection = async () => {
 ~~~
 
 ###### [oracledb연결하기](#oracledb연결하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+***
+
+# Style속성은 현재 svelte파일에만 적용
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    import Nested from "./Nested.svelte";
+</script>
+
+<p>This is a paragraph.</p>
+
+<div>
+    <Nested/>
+</div>
+
+<style>
+    p {
+        color: purple;
+        font-family: 'Comic Sans MS', cursive;
+        font-size: 2em;
+    }
+</style>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f325c391-c705-408a-8e91-afb6ee9db04b)
+
+###### [Style속성은 현재 svelte파일에만 적용](#style속성은-현재-svelte파일에만-적용)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# string안에 태그 데이터 넣기
+  - @html 을사용함으로써 태그를 집어 넣을 수 있다
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    let string = '<strong>this is string</strong>'
+</script>
+
+<div>{@html string}</div>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f33411bb-1102-4d19-9e2c-434c1780aac0)
+
+###### [string안에 태그 데이터 넣기](#string안에-태그-데이터-넣기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# $문법
+  - 아래는 count가 바뀌었을때 자동으로 doubled도 최신화 된다
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    let count = 0;
+    $: doubled = count * 2;
+   
+    function handleClick() {
+        count += 1;
+    }
+</script>
+
+<button on:click={handleClick}>
+    Clicked {count} {count === 1 ? 'time' : 'times'}
+</button>
+
+<p>{count} doubled is {doubled}</p>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/beed8886-1eb0-4021-9a10-510d44067fd9)
+
+<br/>
+
+  - 아래와 같이 console.log를 찍을 수도 있다
+
+~~~JavaScript
+<script>
+    let count = 0;
+    let count1 = 0;
+    $: console.log(`${count}${count1}`)
+   
+    function handleClick1() {
+        count += 1;
+    }
+
+    function handleClick2() {
+        count1 += 1;
+    }
+</script>
+
+<button on:click={handleClick1}>
+    버튼1
+</button>
+
+<button on:click={handleClick2}>
+    버튼2
+</button>
+~~~
+
+<br/>
+
+  - 다른 예시
+
+~~~JavaScript
+$: {
+    console.log('the count is ' + count);
+    alert('I SAID THE COUNT IS ' + count);
+}
+~~~
+
+<br/>
+
+~~~JavaScript
+$: if (count >= 10) {
+    alert('count is dangerously high!');
+    count = 9;
+}
+~~~
+
+###### [$문법](#$문법)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+
+# if문 사용하기
+
+Dir : +page.svelte
+
+~~~JavaScript
+{#if x > 10}
+    <p>{x} is greater than 10</p>
+{:else if 5 > x}
+    <p>{x} is less than 5</p>
+{:else}
+    <p>{x} is between 5 and 10</p>
+{/if}
+~~~
+
+###### [if문 사용하기](#if문-사용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+
+# each문 사용하기
+  - array를 돌릴 수 있다
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    let cats = [
+        { id: 'J---aiyznGQ', name: 'Keyboard Cat' },
+        { id: 'z_AbfPXTKms', name: 'Maru' },
+        { id: 'OUtn3pvWmpg', name: 'Henri The Existential Cat' }
+    ];
+</script>
+
+<h1>The Famous Cats of YouTube</h1>
+
+<ul>
+    {#each cats as cat}
+        <li><a target="_blank" href="https://www.youtube.com/watch?v={cat.id}" rel="noreferrer">
+            {cat.name}
+        </a></li>
+    {/each}
+</ul>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fe55da1e-6bb8-45e2-bc69-3ac27d2e6226)
+
+<br/>
+
+  - 두번째 인자로 인덱스를 0부터 줄 수 있다
+
+~~~JavaScript
+<script>
+    let cats = [
+        { id: 'J---aiyznGQ', name: 'Keyboard Cat' },
+        { id: 'z_AbfPXTKms', name: 'Maru' },
+        { id: 'OUtn3pvWmpg', name: 'Henri The Existential Cat' }
+    ];
+</script>
+
+<h1>The Famous Cats of YouTube</h1>
+
+<ul>
+    {#each cats as cat, i}
+        <li><a target="_blank" href="https://www.youtube.com/watch?v={cat.id}" rel="noreferrer">
+            {i} : {cat.name}
+        </a></li>
+    {/each}
+</ul>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/29e2adbd-0e5d-4ae4-a078-8c448e833d73)
+
+<br/>
+
+  - as받는 부분을 처음부터 인자로 받을 수도 있음
+
+~~~JavaScript
+<script>
+    let cats = [
+        { id: 'J---aiyznGQ', name: 'Keyboard Cat' },
+        { id: 'z_AbfPXTKms', name: 'Maru' },
+        { id: 'OUtn3pvWmpg', name: 'Henri The Existential Cat' }
+    ];
+</script>
+
+<h1>The Famous Cats of YouTube</h1>
+
+<ul>
+    {#each cats as {id, name}, i}
+        <li><a target="_blank" href="https://www.youtube.com/watch?v={id}" rel="noreferrer">
+            {i} : {name}
+        </a></li>
+    {/each}
+</ul>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9a1b7363-f3a8-4c98-a5f1-b8004b40bcbb)
+
+###### [each문 사용하기](#each문-사용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+
+# await, then문
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+
+
+// 어떤 함수 클릭에 의한 실행
+//{
+    indexMdata = indexM(HPL_CD)
+//}
+
+</script>
+
+<!-- 아래와 같이 하면 indexMdata 데이터가 출력된 후에 그 다음문을 실행하게 된다-->
+{#await indexMdata}
+{:then number}
+{#if number == undefined}
+{:else}
+    {number}
+{/if}
+{/await}
+~~~
+
+<br/>
+
+  - 아래와 같이 awite와 then을 한줄로 사용할 수 있다
+
+~~~JavaScript
+{#await indexMdata then number}
+{#if number == undefined}
+{:else}
+{number}
+{/if}
+{/await}
+~~~
+
+###### [await, then문](#await-then문)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# on click
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    let count = 0;
+
+    function incrementCount() {
+        count += 1;
+    }
+</script>
+
+<button on:click={incrementCount}>
+    Clicked {count} {count === 1 ? 'time' : 'times'}
+</button>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/79207a50-21e0-4f21-a839-5e8ac35d7b11)
+
+<br/>
+
+~~~JavaScript
+<script>
+
+    function handleClick() {
+            alert('clicked')
+        }
+</script>
+
+<button on:click|once={handleClick}>
+    Click me
+</button>
+~~~
+
+  - once : 핸들러가 한번 실행된 후 제거된다
+  - stopPropagation : 이벤트가 상위 엘리먼트에 전달되지 않게 막아 준다
+  - 그 외에도 여러가지 속성이 있음
+  - https://svelte.dev/tutorial/event-modifiers
+  - 참고
+
+###### [on click](#on-click)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Mousemove
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    let m = { x: 0, y: 0 };
+
+
+    function handleMousemove(event) {
+        m.x = event.clientX;
+        m.y = event.clientY;
+    }
+</script>
+
+<div on:mousemove={handleMousemove}>
+    The mouse position is {m.x} x {m.y}
+</div>
+
+<style>
+    div { width: 100%; height: 100%; }
+</style>
+~~~
+
+###### [Mousemove](#mousemove)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# text input
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    let name = 'world';
+</script>
+
+<input value={name}>
+
+<h1>Hello {name}!</h1>
+~~~
+
+<br/>
+
+  - input박스에 있는 데이터를 바꿨을때 바로 html에 데이터가 바껴지지 않는다 이럴때는 bind를 통해서 실시간으로 바꿀 수 있게 해야 한다
+
+~~~JavaScript
+<script>
+    let name = 'world';
+</script>
+
+<input bind:value={name}>
+
+<h1>Hello {name}!</h1>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/5a33a464-63e4-4138-aa31-bbd8fe6687ea)
+
+<br/>
+
+  - 타입 number로 지정할 수도 있음
+
+~~~JavaScript
+<script>
+    let a = 1;
+    let b = 2;
+</script>
+
+<label>
+    <input type=number bind:value={a} min=0 max=10>
+    <input type=range bind:value={a} min=0 max=10>
+</label>
+
+<label>
+    <input type=number bind:value={b} min=0 max=10>
+    <input type=range bind:value={b} min=0 max=10>
+</label>
+
+<p>{a} + {b} = {a + b}</p>
+
+<style>
+    label { display: flex }
+    input, p { margin: 6px }
+</style>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0b43f4cf-b15f-41c1-b7ce-1c2a0c6d815c)
+
+<br/>
+
+  - div의 innerHTML속성 값 바인딩 할 수도 있음
+
+~~~JavaScript
+<script>
+    let html = '<p>Write some text!</p>';
+</script>
+
+<div contenteditable="true" bind:innerHTML={html}></div>
+
+<pre>{html}</pre>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/575839b3-9656-4c6f-b857-639b5e012964)
+
+<br/>
+
+  - 글자 사이즈 실시간 변경하기
+
+~~~JavaScript
+<script>
+    let w;
+    let h;
+    let size = 42;
+    let text = 'edit me';
+</script>
+
+<input type=range bind:value={size}>
+<input bind:value={text}>
+
+<p>size: {w}px x {h}px</p>
+
+<div bind:clientWidth={w} bind:clientHeight={h}>
+    <span style="font-size: {size}px">{text}</span>
+</div>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9c5956c6-6504-46f2-9ad8-e83c296ddba7)
+
+###### [text input](#text-input)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+
+# onMount
+  - 컴퍼넌트가 처음 만들어지고 실행되는 함수
+  - onMount() 함수의 return문은 컴포넌트 또는 DOM 요소가 DOM에서 제거될 때, 실행되어야 하는 함수를 작성한다. 즉, onMount() 함수의 return문과
+  - onDestroy() 함수는 동일한 역할을 수행한다
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    import { onMount } from 'svelte';
+
+    let photos = [];
+
+    onMount(async () => {
+        const res = await fetch(`/tutorial/api/album`);
+        photos = await res.json();
+    });
+</script>
+~~~
+
+###### [onMount](#onmount)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# tick
+  - 아래와 같이 tick을 사용하지 않으면 console.log에 찍히는 것은 물음표가 나오지 않는다.
+
+Dir : +page.svelte
+
+~~~JavaScript
+<script>
+    import { tick } from 'svelte';
+
+    let name = 'man';
+
+    async function handler(){
+        name = 'man ?';
+
+        await tick();
+
+        const h1 = document.querySelector('h1');
+        console.log(h1.innerText);
+    }
+</script>
+
+<h1 on:click={handler}>Are You {name}</h1>
+~~~
+
+###### [tick](#tick)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Writable stores
+  - js파일에서 export해온 변수는 상수 취급이 되기 때문에  svelte에서 값을 바꿀 수가 없다
+  - 버튼을 누르면 타입 에러가 발생한다
+
+Dir : aaa.js
+
+~~~JavaScript
+export let count = 5;
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import { count } from './aaa'
+
+    function add(){
+        count = count + 1;
+        console.log(count);
+    }
+</script>
+
+<div >{count}</div>
+<button on:click={add}>
+    더하기
+</button>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b0000a98-6a07-4163-9ac9-3c2bf9901b94)
+
+<br/>
+
+  - 방법1 : 다른변수에 담는다
+
+Dir : aaa.js
+~~~JavaScript
+export let count = 5;
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import { count } from './aaa'
+
+    let count1 = count
+
+    function add(){
+        count1 = count1 + 1;
+        console.log(count1);
+    }
+</script>
+
+<div>{count1}</div>
+<button on:click={add}>
+    더하기
+</button>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8b49a42e-dd5e-40bc-9eeb-689df846acab)
+
+<br/>
+
+  - 밥법2 : Writable을 사용해야 한다
+    - update : 데이터 바꾸기
+    - set : 데이터 초기화 하기
+    - 클라이언트 부분에 렌더링 할때는 $을 앞에 붙여 준다
+
+Dir : aaa.js
+~~~JavaScript
+import { writable } from 'svelte/store'
+export const count = writable(5);
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import { count } from './aaa'
+
+    function add(){
+        count.update(n => n + 1)
+    }
+</script>
+
+<div >{$count}</div>
+<button on:click={add}>
+    더하기
+</button>
+~~~
+
+<br/>
+
+ - set
+   - 데이터 초기화
+
+~~~JavaScript
+count.set(0);
+~~~
+
+###### [Writable stores](#writable-stores)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Derived stores
+  - 파생 store변수 만들기
+  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+
+Dir : aaa.js
+~~~JavaScript
+import { writable, derived } from 'svelte/store';
+
+export const name = writable('kkkk')
+
+export const greeting = derived(
+    name,
+    $name => `qqqq ${$name}`
+)
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import { name, greeting } from './aaa.js';
+</script>
+
+<h1>{$greeting}</h1>
+<input bind:value={$name}>
+~~~
+
+###### [Derived stores](#derived-stores)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Slots
+  - 자식 svelte파일에 <slot></slot>을 넣게 되면, 부모가 자식 class안쪽에 넣은 데이터가 들어가게 된다
+
+Dir : Input.svelte
+~~~JavaScript
+<div class="box">
+    <slot></slot>
+</div>
+
+<div>
+    aaaaaaaa
+</div>
+
+<style>
+    .box {
+        width: 300px;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        padding: 1em;
+        margin: 0 0 1em 0;
+    }
+</style>
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import Box from './input.svelte';
+</script>
+
+<Box>
+    <h2>Hello!</h2>
+    <p>This is a box. It can contain anything.</p>
+</Box>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/607cda57-7c1f-4f5a-90be-ed38f3ad8c4f)
+
+<br/>
+
+  - 아무것도 적지 않았을때 기본 값을 설정 할 수 있다
+
+Dir : Input.svelte
+~~~JavaScript
+<div class="box">
+    <slot>
+        dsfsdsdsdfsdf
+    </slot>
+</div>
+
+<style>
+    .box {
+        width: 300px;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        padding: 1em;
+        margin: 0 0 1em 0;
+    }
+</style>
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import Box from './input.svelte';
+</script>
+
+<Box>
+    <h2>Hello!</h2>
+    <p>This is a box. It can contain anything.</p>
+</Box>
+
+<Box/>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9d8a6a92-a535-4602-9d1c-10f0130b54ef)
+
+<br/>
+
+  - Slots여러군데 사용시에 사용법
+    - name을 달아서 사용할 수 있다
+
+Dir : input.svelte
+~~~JavaScript
+<article class="contact-card">
+    <h2>
+        <slot name="name">
+            <span class="missing">Unknown name</span>
+        </slot>
+    </h2>
+
+    <div class="address">
+        <slot name="address">
+            <span class="missing">Unknown address</span>
+        </slot>
+    </div>
+
+    <div class="email">
+        <slot name="email">
+            <span class="missing">Unknown email</span>
+        </slot>
+    </div>
+</article>
+
+<style>
+    .contact-card {
+        width: 300px;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        padding: 1em;
+    }
+
+    h2 {
+        padding: 0 0 0.2em 0;
+        margin: 0 0 1em 0;
+        border-bottom: 1px solid #ff3e00
+    }
+
+    .address, .email {
+        padding: 0 0 0 1.5em;
+        background:  0 0 no-repeat;
+        background-size: 20px 20px;
+        margin: 0 0 0.5em 0;
+        line-height: 1.2;
+    }
+
+    .address {
+        background-image: url(/tutorial/icons/map-marker.svg);
+    }
+    .email {
+        background-image: url(/tutorial/icons/email.svg);
+    }
+    .missing {
+        color: #999;
+    }
+</style>
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import Box from './input.svelte';
+</script>
+
+<Box>
+    <span slot="name">
+        P. Sherman
+    </span>
+
+    <span slot="address">
+        42 Wallaby Way<br>
+        Sydney
+    </span>
+</Box>
+~~~
+
+<br/>
+
+  - Slots가 사용되었는지 확인 가능
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import Box from './input.svelte';
+</script>
+
+<Box>
+    <span slot="name">
+        P. Sherman
+    </span>
+
+    <span slot="address">
+        42 Wallaby Way<br>
+        Sydney
+    </span>
+</Box>
+~~~
+
+<br/>
+
+  - Dir : input.svelte
+
+~~~JavaScript
+<article class="contact-card">
+    <h2>
+        <slot name="name">
+            <span class="missing">Unknown name</span>
+        </slot>
+    </h2>
+
+    <div class="address">
+        <slot name="address">
+            <span class="missing">Unknown address</span>
+        </slot>
+    </div>
+
+    <div class="email">
+        <slot name="email">
+            <span class="missing">Unknown email</span>
+        </slot>
+    </div>
+</article>
+
+<dir>{$$slots.name}</dir>
+<dir>{$$slots.address}</dir>
+<dir>{$$slots.email}</dir>
+
+<style>
+    .contact-card {
+        width: 300px;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        padding: 1em;
+    }
+
+    h2 {
+        padding: 0 0 0.2em 0;
+        margin: 0 0 1em 0;
+        border-bottom: 1px solid #ff3e00
+    }
+
+    .address, .email {
+        padding: 0 0 0 1.5em;
+        background:  0 0 no-repeat;
+        background-size: 20px 20px;
+        margin: 0 0 0.5em 0;
+        line-height: 1.2;
+    }
+
+    .address {
+        background-image: url(/tutorial/icons/map-marker.svg);
+    }
+    .email {
+        background-image: url(/tutorial/icons/email.svg);
+    }
+    .missing {
+        color: #999;
+    }
+</style>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/aaac9bb6-ac56-4f93-b59a-0c4d0c9f0e4c)
+
+###### slots
 ###### [Top](#top)
 
 <br/>
