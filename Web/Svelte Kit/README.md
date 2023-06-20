@@ -1028,8 +1028,13 @@ Dir : src/routes/ +layout.svelte
 ***
 
 # export와 export default의 차이
-  - https://ko.javascript.info/import-export#ref-4122 
-  - 파일 하나엔 대개 export default가 하나만있으며, default를 붙여서 모듈을 내보내면 중괄호 {} 없이 모듈을 가져올 수 있습니다.
+
+  - 변수 가져오기
+
+Dir : input.js
+
+
+
 
 ###### [export와 export default의 차이](#export와-export-default의-차이)
 ###### [Top](#top)
@@ -1074,6 +1079,8 @@ const dbConfig = {
   - 오라클db연결
 ~~~
 import oracledb from 'oracledb';
+//import * as OracleDB from "oracledb";
+//import {default as OracleDB} from "oracledb";
 
 /** @type {import('@sveltejs/kit').Config} */
 const dbConfig = {
@@ -1088,7 +1095,7 @@ const dbConfig = {
 
 let pool;
 export const createPool = async () => {
-    pool = await oracledb.createPool(dbConfig)
+    pool = await oracledb.createPool(dbConfig) // 초기비용을 아끼기 위한 방법(new 할당)
 }
 
 /* 오라클 클라이언트를 환경변수에 적용했다면 필요 없음 */
@@ -1114,6 +1121,14 @@ export const getConnection = async () => {
 
 ###### [oracledb연결하기](#oracledb연결하기)
 ###### [Top](#top)
+
+
+
+
+
+
+
+
 
 <br/>
 <br/>
