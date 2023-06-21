@@ -810,7 +810,7 @@ Dir : routes/products/ +page.server.js
 export const load = async (serverLoadEvent) => {
 
     const {fetch} = serverLoadEvent;
-    const response = await fetch("http://localhost:4000/products");
+    const response = await fetch("http://localhost:4000/products"); // +page.server.js파일은 http://localhost:4000이라고 하는 상세 url까지 써주어야 한다
     const products = await response.json();
 
     return {
@@ -1030,11 +1030,58 @@ Dir : src/routes/ +layout.svelte
 # export와 export default의 차이
 
   - 변수 가져오기
+    - export default를 썼기 때문에 아래와 같이 num이라는 변수에 맞춰서 가지고 오지 않아도 된다
 
 Dir : input.js
+~~~JavaScript
+let num  = 10;
+export default num;
+~~~
 
+<br/>
 
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import num from './input'
+    //import * as num from "./input";
+    //import {default as num} from "./input"
 
+    console.log(num)
+</script>
+
+<h1>{num}</h1>
+~~~
+
+<br/>
+
+  - 함수 가져오기
+    - export default를 썼기 때문에 아래와 같이 num이라는 함수명에 맞춰서 가지고 오지 않아도 된다
+
+Dir : input.js
+~~~JavaScript
+function num(){
+    console.log(">>>>");
+}
+
+export default num;
+~~~
+
+<br/>
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import num from './input'
+    //import * as num from "./input";
+    //import {default as num} from "./input"
+
+    num();
+    //console.log(num)
+</script>
+
+<h1>{num}</h1>
+~~~
 
 ###### [export와 export default의 차이](#export와-export-default의-차이)
 ###### [Top](#top)
