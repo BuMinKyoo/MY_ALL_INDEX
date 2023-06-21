@@ -1142,7 +1142,7 @@ const dbConfig = {
 <br/>
 
   - 오라클db연결
-~~~
+~~~JavaScript
 import oracledb from 'oracledb';
 //import * as OracleDB from "oracledb";
 //import {default as OracleDB} from "oracledb";
@@ -1183,6 +1183,30 @@ export const getConnection = async () => {
     return await pool.getConnection()
 }
 ~~~
+
+  - db옵션값
+    - autoCommit: false
+      - 자동으로 데이터 베이스의 커밋을 완료해줌
+      - 기본값은 false임
+      - 오라클 db의 트렌젠셕을 완료해 준다는 의미임
+    - oracledb.OUT_FORMAT_OBJECT
+      - 결과를 JavaScript 객체 형식으로 반환합니다
+    - batchErrors: true
+      - sql문을 실행하고 나서 발생하는 오류를 보여줌
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d10a56fb-3a12-45e1-8689-8c8973824da0)
+
+~~~JavaScript
+const connection = await getConnection()
+const result = await connection.execute(nativeQuery.query, nativeQuery.binds, options)
+//const result = await connection.execute(nativeQuery.query)
+const returnData = result.rows // 분류
+connection.release()
+
+console.log(result.batchErrors) //오류 보여줌
+~~~
+
+
 
 ###### [oracledb연결하기](#oracledb연결하기)
 ###### [Top](#top)
@@ -2177,7 +2201,31 @@ Dir : +page.svelte
 
 Dir : +page.server.js
 ~~~JavaScript
+import axios from "axios";
 
+export async function load(){
+    const response = await axios.post('http://localhost:5173/api/daily_report/index/indexL',{})  
+    const data = response.data
+
+    const client_res = await axios.get('http://localhost:5173/api/daily_report/index',{})  
+    const client_res_data = client_res.data
+   
+    const mapData1 = data.map(e=>e[0])
+    const mapData2 = data.map(e=>e[1])
+    const setData1 = new Set(mapData1)
+
+    const setData2 = new Set(mapData2)
+    const object1 = Object.fromEntries(setData1.entries())  
+    const object2 = Object.fromEntries(setData2.entries())  
+
+    const obj = {
+        data1 :  object1,
+        data2 :  object2,
+        clients : client_res_data
+    }
+
+    return obj    
+}
 ~~~
 
 ###### [서버 load함수](#서버-load함수)
@@ -2187,12 +2235,80 @@ Dir : +page.server.js
 <br/>
 
 # 서버 통신함수
-  - 파생 store변수 만들기
-  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+  - +server.js함수이고 이 파일에서 모든 DB와의 통신이 이어 진다
+  - console.log로 서버에 데이터 찍힘
 
-Dir : 
+Dir : routes/api/daily_report/index/indexL/ +server.js
 ~~~JavaScript
+import { json } from '@sveltejs/kit';
+import oracledb from 'oracledb';
+import {getConnection} from "../../../../../libraries/oracle/oracleConfig"
 
+const options = { outFormat: oracledb.OUT_FORMAT_OBJECT, autoCommit: false, batchErrors: true }  
+
+// 기본 데이터 가져오는 함수
+/** @type {import('./$types').RequestHandler} */
+export async function POST({ params }) {
+    //const req = await request.clone().json();
+
+    // 분류 쿼리
+    const nativeQuery = {
+        query:`
+        select HPL_CD, HPL_NM from PROLMSTB              
+        `,
+       
+        binds:{
+        //     HPL_CD:{ val: req.hpl_cd  } // HPL_CD가 0001일 경우 개발 업무
+        }
+    }
+
+    const connection = await getConnection()
+    //const result = await connection.execute(nativeQuery.query, nativeQuery.binds, options)
+    const result = await connection.execute(nativeQuery.query, {}, options)
+    const returnData = result.rows // 분류
+    connection.release()
+
+    //console.log(returnData)
+    return json(returnData)
+}
+~~~
+
+<br/>
+
+Dir : routes/api/daily_report/index/ +server.js
+~~~JavaScript
+import { json } from '@sveltejs/kit';
+import oracledb from 'oracledb';
+import {getConnection} from "../../../../libraries/oracle/oracleConfig"
+
+const options = { outFormat: oracledb.OUT_FORMAT_OBJECT, autoCommit: false, batchErrors: true }  
+
+// 고객사 데이터 가져오는 함수
+/** @type {import('./$types').RequestHandler} */
+export async function GET({ params }) {    
+
+    //고객사 쿼리
+    const customerQuery = {
+        query:`
+            SELECT AS_GROP_CD, AS_GROP_NM FROM GWGROPTB
+            WHERE MA_FG IN ('0001','0002','0003')
+            ORDER BY AS_GROP_NM
+        `,
+        binds:{
+            //MS_NO:{ val: req.msNo  }
+        }
+    }
+
+    const connection = await getConnection()
+    const customer_result = await connection.execute(customerQuery.query,{}, options)
+    const returnData = customer_result.rows // 고객사
+    connection.release()
+
+    //console.log("aaaaaaaaaaaaa")
+    //console.log(returnData)
+
+    return json(returnData)
+}
 ~~~
 
 ###### [서버 통신함수](#서버-통신함수)
@@ -2202,12 +2318,60 @@ Dir :
 <br/>
 
 # 서버 load함수에 의해 받은 데이터 +page.svelte로 넘기기
-  - 파생 store변수 만들기
-  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+  - export let data에 데이터가 들어가게 된다
+  - svelte에서 다른 svelte파일을 불러와서 그곳에 데이터, 인수를 넘기는 법
+    - 스벨트 파일위치를 불러와서, 그것에 대한 이름을 지정하고(이름은 마음대로 지정할 수 있음), 아래 부분에 넣어서 사용한다
 
-Dir : 
+Dir : routes/daily_report/ +page.svelte
 ~~~JavaScript
+<script>  
+    import Write from "./Write.svelte";
+    import Read from "./Read.svelte";
 
+    export let data    
+    let REQ_CONTENT
+    let WORK_CONTENT
+    let PLAN_CONTENT
+    let MAN_DAY
+    let CTRT_MD
+
+</script>
+<div class="flex flex-nowrap w-full mx-5 justify-center">
+    <!-- svelte-ignore missing-declaration -->
+    <Write
+        {data}
+        {REQ_CONTENT}
+        {WORK_CONTENT}
+        {PLAN_CONTENT}
+        {MAN_DAY}
+        {CTRT_MD}
+    />
+    <Read  
+        bind:REQ_CONTENT
+        bind:WORK_CONTENT
+        bind:PLAN_CONTENT
+        bind:MAN_DAY
+        bind:CTRT_MD
+    />
+</div>
+~~~
+
+<br/>
+
+  - 다른 svelte파일에서 보낸 데이터를 같은 변수로 설정해서 받을 수 있다
+
+Dir : routes/daily_report/ Write.svelte
+~~~JavaScript
+<script>
+    export let data;
+   
+    export let REQ_CONTENT
+    export let WORK_CONTENT
+    export let PLAN_CONTENT
+    export let MAN_DAY
+    export let CTRT_MD
+
+</script>
 ~~~
 
 ###### [서버 load함수에 의해 받은 데이터 +page.svelte로 넘기기](#서버-load함수에-의해-받은-데이터-pagesvelte로-넘기기)
@@ -2217,12 +2381,31 @@ Dir :
 <br/>
 
 # 서버 load함수가 아닌 js
-  - 파생 store변수 만들기
-  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+  - 서버 load함수가 아닌 js파일 안에서 api를 호출하기 위한 것을 만들 수 있음
+  - 함수를 실행 시킴으로 써 리턴 값을 받게 됨
+  - 이것또한 결국 +server.js파일로 가서 데이터를 가져오게 됨
 
-Dir : 
+Dir : routes/daily_report/store.js
 ~~~JavaScript
+import axios from "axios";
 
+export const indexM = async(chplCd) =>{
+
+    const postData = {
+        hpl_cd:chplCd
+    }
+    const response = await axios.post('/api/daily_report/index/indexM',postData)
+    const serverData = response.data
+
+    let serverDataarray = []
+
+    for(let i = 0; i < serverData.length; i++)
+    {
+        serverDataarray.push(Object.values(serverData[i]));  // indexL 데이터
+    }
+
+    return serverDataarray;
+}
 ~~~
 
 ###### [서버 load함수가 아닌 js](#서버-load함수가-아닌-js)
@@ -2232,12 +2415,24 @@ Dir :
 <br/>
 
 # Svelte파일에서 js파일 함수 사용하기
-  - 파생 store변수 만들기
-  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+  - js파일에서 사용할 함수 import(일반 변수도 export 키워드를 사용하였다면 import해올 수 있음)
+  - 함수 사용하고 return받을 때 비동기로 받기
+  - 전역 변수에 저장 하기 위해 변수를 밖으로 빼놓기
 
-Dir : 
+Dir : 익명.svelte
 ~~~JavaScript
+import { indexM } from 'routes/daily_report/store.js'
 
+let indexMdata;
+
+async function dropClickL(item, i) {
+dropclickL = item;
+dropdownOpenL = false;
+indexMdata = await indexM(array1[i]);
+indexMdata_hpL_cd = array1[i];
+
+console.log(indexMdata)
+}
 ~~~
 
 ###### [Svelte파일에서 js파일 함수 사용하기](#svelte파일에서-js파일-함수-사용하기)
