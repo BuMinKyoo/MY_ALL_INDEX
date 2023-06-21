@@ -22,6 +22,7 @@
 - [TailWind사용하기](#tailwind사용하기)
 - [export와 export default의 차이](#export와-export-default의-차이)
 - [oracledb연결하기](#oracledb연결하기)
+- [Query 바인딩](#query-바인딩)
 
 <br/>
 <br/>
@@ -46,6 +47,7 @@ Events
 
 Bindings
 - [text input](#text-input)
+- [svelte간 데이터 전달](#svelte간-데이터-전달)
 
 LifeCyle
 - [onMount](#onmount)
@@ -1206,12 +1208,72 @@ connection.release()
 console.log(result.batchErrors) //오류 보여줌
 ~~~
 
-
-
 ###### [oracledb연결하기](#oracledb연결하기)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
+***
+
+# Query 바인딩
+
+Dir : src/routes/api/daily_report/index/indexM/ +server.js
+
+~~~JavaScript
+    // 분류 쿼리
+    const nativeQuery = {
+        query:`
+        select HPL_CD, HPM_CD, HPM_NM from PROMMSTB where HPL_CD = :HPL_CD              
+        `,
+       
+        binds:{
+             HPL_CD:{ val: req.hpl_cd  } // HPL_CD가 0001일 경우 개발 업무
+        }
+    }
+~~~
+
+  - val을 다른것으로 바꾸면 에러가남
+Error: NJS-044: bind object must contain one of the following attributes: "dir", "type", "maxSize", or "val"  
+
+<br/>
+
+  - 바인드 속성들
+    - dir: 바인드 변수의 방향을 지정. 'IN'은 입력 값을 나타내고, 'OUT'은 출력 값을 나타낸다
+    - type: 바인드 변수의 데이터 유형을 지정. 예를 들어 'STRING', 'NUMBER', 'DATE' 등을 지정할 수 있다
+    - maxSize: 바인드 변수의 최대 크기를 지정. 일반적으로 문자열이나 버퍼와 같은 유형에 사용된다
+
+~~~JavaScript
+    // 분류 쿼리
+    const nativeQuery = {
+        query:`
+        select HPL_CD, HPM_CD, HPM_NM from PROMMSTB where HPL_CD = :HPL_CD              
+        `,
+       
+        binds:{
+             HPL_CD:{ dir: oracledb.BIND_IN, type: oracledb.STRING, maxSize:100, val: req.hpl_cd  } // HPL_CD가 0001일 경우 개발 업무
+        }
+    }
+~~~
+
+<br/>
+
+  - 바인딩 속성들을 정의 하지 않고 그냥 보내도 된다
+~~~JavaScript
+    // 분류 쿼리
+    const nativeQuery = {
+        query:`
+        select HPL_CD, HPM_CD, HPM_NM from PROMMSTB where HPL_CD = :HPL_CD              
+        `,
+       
+        binds:{
+             HPL_CD:req.hpl_cd // HPL_CD가 0001일 경우 개발 업무
+        }
+    }
+~~~
+
+###### [바인딩](#바인딩)
+###### [Top](#top)
 
 
 
@@ -1711,6 +1773,86 @@ Dir : +page.svelte
 
 ***
 
+# svelte간 데이터 전달
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import Input from "./input.svelte";
+    let num;
+
+    function ChangeDataPage(){
+        num = 10;
+
+        console.log(num);
+    }
+
+</script>
+
+<button on:click={ChangeDataPage}>
+    +page의 버튼
+</button>
+
+<Input
+    bind:num1={num}/>
+
+    <h1>나는 +page의 값 : {num}</h1>
+~~~
+
+<br/>
+
+Dir : input.svelte
+
+~~~JavaScript
+<script>
+    import InputChild from "./inputChild.svelte";
+
+    export let num1 = 10;
+
+    function ChangeData(){
+        num1 = 20;
+        console.log(num1);
+    }
+</script>
+
+<button on:click={ChangeData}>
+    input의 버튼
+</button>
+
+<InputChild
+    num2={num1}/>
+
+    <h1>나는 input의 값 : {num1}</h1>
+~~~
+
+<br/>
+
+Dir : inputChild.svelte
+
+~~~JavaScript
+<script>
+    export let num2;
+
+    function ChangeDataChild(){
+        num2 = 30;
+        console.log(num2);
+    }
+</script>
+
+<button on:click={ChangeDataChild}>
+    inputChild의 버튼
+</button>
+
+    <h1>나는 inputChild의 값 : {num2}</h1>
+~~~
+
+###### [svelte간 데이터 전달](#svelte간-데이터-전달)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
 
 # onMount
   - 컴퍼넌트가 처음 만들어지고 실행되는 함수
