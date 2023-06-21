@@ -24,6 +24,7 @@
 - [oracledb연결하기](#oracledb연결하기)
 
 <br/>
+<br/>
 
 sveltKit에서 사용하는 front문법은 대부분 svelte를 따르고 있으며, svelte의 tutorial을 하면서 기억할 부분을 남긴다
 
@@ -56,6 +57,23 @@ Stores
 
 Component composition
 - [Slots](#slots)
+
+<br/>
+<br/>
+
+- <details markdown="1">
+  <summary>실예시 코드</summary>
+  <div markdown="1">
+  
+  - [실예시 코드](#실예시-코드)
+    - [서버 load함수](#서버-load함수)
+    - [서버 통신함수](#서버-통신함수)
+    - [서버 load함수에 의해 받은 데이터 +page.svelte로 넘기기](#서버-load함수에-의해-받은-데이터-pagesvelte로-넘기기)
+    - [서버 load함수가 아닌 js](#서버-load함수가-아닌-js)
+    - [Svelte파일에서 js파일 함수 사용하기](#svelte파일에서-js파일-함수-사용하기)
+
+  </div>
+  </details>
 
 <br/>
 <br/>
@@ -2137,3 +2155,94 @@ Dir : +page.svelte
 <br/>
 
 ***
+
+# 실예시 코드
+  - [서버 load함수](#서버-load함수)
+  - [서버 통신함수](#서버-통신함수)
+  - [서버 load함수에 의해 받은 데이터 +page.svelte로 넘기기](#서버-load함수에-의해-받은-데이터-pagesvelte로-넘기기)
+  - [서버 load함수가 아닌 js](#서버-load함수가-아닌-js)
+  - [Svelte파일에서 js파일 함수 사용하기](#svelte파일에서-js파일-함수-사용하기)
+
+###### [실예시 코드](#실예시-코드)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 서버 load함수
+  - 페이지가 로드 되면서 바로 데이터 불러오기(+page.server.js)
+    - +page.server.js에 라우팅된 사이트를 들어가면 +page.server.js를 바로 실행 시킴
+    - 통신은 +server.js파일 안에 있는 POST 및 GET과 같은 함수로 들어가게 되고, 데이터를 받게됨
+    - console.log로 서버에 데이터 찍힘
+
+Dir : +page.server.js
+~~~JavaScript
+
+~~~
+
+###### [서버 load함수](#서버-load함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 서버 통신함수
+  - 파생 store변수 만들기
+  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+
+Dir : 
+~~~JavaScript
+
+~~~
+
+###### [서버 통신함수](#서버-통신함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 서버 load함수에 의해 받은 데이터 +page.svelte로 넘기기
+  - 파생 store변수 만들기
+  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+
+Dir : 
+~~~JavaScript
+
+~~~
+
+###### [서버 load함수에 의해 받은 데이터 +page.svelte로 넘기기](#서버-load함수에-의해-받은-데이터-pagesvelte로-넘기기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 서버 load함수가 아닌 js
+  - 파생 store변수 만들기
+  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+
+Dir : 
+~~~JavaScript
+
+~~~
+
+###### [서버 load함수가 아닌 js](#서버-load함수가-아닌-js)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Svelte파일에서 js파일 함수 사용하기
+  - 파생 store변수 만들기
+  - writable했던, name이란 변수를 통해서 파생 값을 만든다
+
+Dir : 
+~~~JavaScript
+
+~~~
+
+###### [Svelte파일에서 js파일 함수 사용하기](#svelte파일에서-js파일-함수-사용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
