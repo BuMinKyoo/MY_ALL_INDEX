@@ -18,6 +18,10 @@
   - [템플릿 문자열](#템플릿-문자열)
   - [prompt,confirm,자료형변환](#promptconfirm자료형변환)
   - [논리 연산자 "||" 기호 사용시 주의](#논리-연산자--기호-사용시-주의)
+  - [배열(array)](#배열array)
+    - [filer함수](#filer함수)
+    - [map함수](#map함수)
+    - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
   - [함수](#함수)
     - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
     - [즉시호출 함수](#즉시호출-함수)
@@ -25,10 +29,18 @@
     - [나머지 매개변수](#나머지-매개변수)
     - [객체 매개변수](#객체-매개변수)
     - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
+  - [객체(Object)](#객체object)
+    - [객체 생성](#객체-생성)
+    - [객체내 this](#객체내-this)
+  - [forEach,forin,forof](#forEach,forin,forof)
   - [엄격 모드](#엄격-모드)
-  - [객체 생성](#객체-생성)
-  - [객체내 this](#객체내-this)
   - [prototype문법](#prototype문법)
+  - [클래스](#클래스)
+    - [선언하기,생성자](#선언하기생성자)
+    - [private속성](#private속성)
+    - [get,set문법](#getset문법)
+    - [static](#static)
+    - [상속](#상속)
   - [외부 자바스크립트 파일 읽어 오기](#외부-자바스크립트-파일-읽어-오기)
   - [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
     - [querySelector,querySelectorAll](#queryselectorqueryselectorall)
@@ -46,13 +58,7 @@
     - [textContent,value차이](#textcontentvalue차이)
   - [localStorage](#localstorage)
   - [json](#json)
-  - [클래스](#클래스)
-    - [선언하기,생성자](#선언하기생성자)
-    - [private속성](#private속성)
-    - [get,set문법](#getset문법)
-    - [static](#static)
-    - [상속](#상속)
-  - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+
    
 <br/>
 <br/>
@@ -585,6 +591,114 @@ console.log(arrarr)
 
 ***
 
+# 배열(array)
+    - [filer함수](#filer함수)
+    - [map함수](#map함수)
+    - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+
+~~~JavaScript
+const fruits = ["apple", "banana", "orange"];
+
+console.log(fruits); // ["apple", "banana", "orange"]
+~~~
+
+###### 배열(array)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# filer함수
+  - filter : 조건을 확인하여 true인것만 출력해줌
+  - map : 뒤에 추가적으로 뭔가 붙일때 사용
+
+~~~JavaScript
+const ar = [10,40,20,70,1]
+const ar2 = ar.filter(function(value, index){
+    return value === 40 || value === 20
+})
+
+console.log(ar2)
+
+// [40, 20]
+~~~
+
+###### 배열(array)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# map함수
+  - 배열일 때 하나하나를 특정한 것으로 작업을 해줌
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6]
+const arr2 = arr.map(e=>e*2)
+console.log(arr2)
+
+// [ 2, 4, 6, 8, 10, 12 ]
+~~~
+
+<br/>
+
+~~~JavaScript
+const arr = [ [1,2], [3,4] ,[5,6] ]
+const arr2 = arr.map(e=>e[0])
+console.log(arr2)
+
+// [ 1, 3, 5 ]
+~~~
+
+###### 배열(array)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 배열 얕은 복사와 깊은 복사(스프레드 ...)
+  - 위에는 깊은 복사로서 각각 독립적인 배열이 생성되지만, 아래는 참조 복사로써 독립적인 배열이 아닌 참조 배열이기때문에 하나의 배열이 바뀌면 둘다 바뀌게 된다
+
+~~~JavaScript
+<script>
+    const arr = [1,2,3,4,5]
+    console.log(arr)
+    const chartData = [...arr]
+    console.log(chartData)
+
+
+    const arr1 = [1,2,3,4,5]
+    console.log(arr1)
+    const chartData1 = arr1
+    console.log(chartData1)
+</script>
+~~~
+
+  - 깊은 복사 할때 사용 하는 … 뒤에 다른 데이터를 넣으면, push하는 것과 같은 역할을 하게 된다
+
+~~~JavaScript
+<script>
+    let number = [1,2,3,4,5]
+
+    function f(){
+
+    number = [...number, number.length+1];
+
+    }
+
+</script>
+
+<div>{number}</div>
+<button on:click={f}>
+    버튼
+</button>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fe5f1649-3300-4a56-8ddd-ae67585dcda4)
+
+###### [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+###### [Top](#top)
+
 # 함수
   - JavaScritp함수의 가장 기본적인 형태
 
@@ -783,266 +897,35 @@ f("ㅁ", "ㄷ")
 <br/>
 <br/>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<br/>
-<br/>
-
-# filer함수
-  - filter : 조건을 확인하여 true인것만 출력해줌
-  - map : 뒤에 추가적으로 뭔가 붙일때 사용
-
-~~~JavaScript
-const ar = [10,40,20,70,1]
-const ar2 = ar.filter(function(value, index){
-    return value === 40 || value === 20
-})
-
-console.log(ar2)
-
-// [40, 20]
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# map함수
-  - 배열일 때 하나하나를 특정한 것으로 작업을 해줌
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6]
-const arr2 = arr.map(e=>e*2)
-console.log(arr2)
-
-// [ 2, 4, 6, 8, 10, 12 ]
-~~~
-
-<br/>
-
-~~~JavaScript
-const arr = [ [1,2], [3,4] ,[5,6] ]
-const arr2 = arr.map(e=>e[0])
-console.log(arr2)
-
-// [ 1, 3, 5 ]
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# forEach,forin,forof
-  - for문과 같이 배열을 순회하는 방버들이다
-  - forin,forof는 함수는 아니지만 forEach를 설명하면서 같이 설명진행한다
-
-<br/>
-
-  - forin
-~~~JavaScript
-const arr = ['a', 'b', 'c']
-arr.prop = 'prop'
-
-for (const key in arr) {
-  console.log(key, typeof key, arr[key])
-}
-
-// 0 "string" a
-// 1 "string" b
-// 2 "string" c
-// 3 "string" prop prop
-~~~
-
-<br/>
-
-  - forEach
-~~~JavaScript
-const arr = ['a', 'b', 'c']
-arr.prop = 'prop'
-
-arr.forEach((e, index) => {
-  console.log(e, index)
-})
-
-// a 0
-// b 1
-// c 2
-~~~
-
-<br/>
-
-  - forof
-~~~JavaScript
-const arr = ['a', 'b', 'c']
-arr.prop = 'prop'
-
-for (const e of arr) {
-  console.log(e)
-}
-
-// a
-// b
-// c
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-
-
-# Object.keys, Object.values
-  - 객체의 key와 value만 잡아서 배열로 만듬
-
-~~~JavaScript
-    const arr = {'a': 1,'b': 2,'c': 3,'d': 4,'e': 5}
-    let arrObjKey = Object.keys(arr);
-    let arrObjValues = Object.values(arr);
-    console.log(arrObjKey)
-    console.log(arrObjValues)
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# Object.fromEntries, Object.entries
-  - Object.fromEntries : 키-값 쌍의 배열을 입력받아 객체로 변환한다
-  - Object.entries : 객체를 입력받아 키-값 쌍의 배열로 변환 한다
-
-~~~JavaScript
-// Object.fromEntries
-const arr = [['a', 1], ['b', 2], ['c', 3]];
-let arrObj = Object.fromEntries(arr)
-console.log(arrObj)
-
-// { a: 1, b: 2, c: 3 }
-~~~
-
-<br/>
-
-~~~JavaScript
-// Object.entries
-const arrObj = { a: 1, b: 2, c: 3 };
-let arr = Object.entries(arrObj)
-console.log(arr)
-
-// [ [ 'a', 1 ], [ 'b', 2 ], [ 'c', 3 ] ]
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
 ***
 
+# 객체(Object)
+  - [객체 생성](#객체-생성)
+  - [객체내 this](#객체내-this)
+  - [Object.keys, Object.values](#objectkeys-objectvalues)
+  - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 엄격 모드
-  - 순수 JS로 개발할 때 에는 JS파일의 맨 위에 'use strict' 를 사용하는 것이 좋다
-  - const와 let도 선언하지 않아도... 상관이 없는 js..., 아래에 있는 것이 웹 브라우저에 잘 출력된다..
-
-Dir : main.js
 ~~~JavaScript
-a = 6
+var person = {
+  name: "John Doe",
+  age: 30,
+  occupation: "Software Engineer",
+  address: {
+    street: "123 Main Street",
+    city: "Exampleville",
+    country: "Exampleland"
+  },
+  hobbies: ["reading", "playing guitar", "hiking"]
+};
 
-console.log(a);
+console.log(person);
 ~~~
 
-  - 하지만 맨 위에 'use strict'를 선언하면 에러가 나게 된다
-Dir : main.js
-~~~JavaScript
-'use strict'
-
-a = 6
-
-console.log(a);
-~~~
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/638e03eb-1d81-4868-b6ba-22ce3d0cb4c5)
-
-  - 해결하기 위해서는 아래와 같이 변수를 선언 해야한다
-Dir : main.js
-~~~JavaScript
-'use strict'
-
-let a;
-a = 6
-
-console.log(a);
-~~~
-
-###### [엄격 모드](#엄격-모드)
+###### [객체(Object)](#객체object)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # 객체 생성
   - JavaScript객체 만드는 기본적인 형태
@@ -1111,13 +994,11 @@ var joon = new Person();
 var jisoo = new Person();
 ~~~
 
-###### [객체 생성](#객체-생성)
+###### [객체(Object)](#객체object)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # 객체내 this
   - 이렇게 객체 내에 다른 것들을 출력, 잡아(?)오기 위해서는 무조건 this를 사용해야 한다. 여기서 this는 자기 자신을 나타내게 된다
@@ -1135,7 +1016,155 @@ const object = {
 object.bark()
 ~~~
 
-###### [객체내 this](#객체내-this)
+###### [객체(Object)](#객체object)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Object.keys, Object.values
+  - 객체의 key와 value만 잡아서 배열로 만듬
+
+~~~JavaScript
+    const arr = {'a': 1,'b': 2,'c': 3,'d': 4,'e': 5}
+    let arrObjKey = Object.keys(arr);
+    let arrObjValues = Object.values(arr);
+    console.log(arrObjKey)
+    console.log(arrObjValues)
+~~~
+
+###### [객체(Object)](#객체object)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Object.fromEntries, Object.entries
+  - Object.fromEntries : 키-값 쌍의 배열을 입력받아 객체로 변환한다
+  - Object.entries : 객체를 입력받아 키-값 쌍의 배열로 변환 한다
+
+~~~JavaScript
+// Object.fromEntries
+const arr = [['a', 1], ['b', 2], ['c', 3]];
+let arrObj = Object.fromEntries(arr)
+console.log(arrObj)
+
+// { a: 1, b: 2, c: 3 }
+~~~
+
+<br/>
+
+~~~JavaScript
+// Object.entries
+const arrObj = { a: 1, b: 2, c: 3 };
+let arr = Object.entries(arrObj)
+console.log(arr)
+
+// [ [ 'a', 1 ], [ 'b', 2 ], [ 'c', 3 ] ]
+~~~
+
+###### [객체(Object)](#객체object)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# forEach,forin,forof
+  - for문과 같이 배열을 순회하는 방버들이다
+  - forin,forof는 함수는 아니지만 forEach를 설명하면서 같이 설명진행한다
+
+<br/>
+
+  - forin
+~~~JavaScript
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+for (const key in arr) {
+  console.log(key, typeof key, arr[key])
+}
+
+// 0 "string" a
+// 1 "string" b
+// 2 "string" c
+// 3 "string" prop prop
+~~~
+
+<br/>
+
+  - forEach
+~~~JavaScript
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+arr.forEach((e, index) => {
+  console.log(e, index)
+})
+
+// a 0
+// b 1
+// c 2
+~~~
+
+<br/>
+
+  - forof
+~~~JavaScript
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+for (const e of arr) {
+  console.log(e)
+}
+
+// a
+// b
+// c
+~~~
+
+###### [forEach,forin,forof](#forEach,forin,forof)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 엄격 모드
+  - 순수 JS로 개발할 때 에는 JS파일의 맨 위에 'use strict' 를 사용하는 것이 좋다
+  - const와 let도 선언하지 않아도... 상관이 없는 js..., 아래에 있는 것이 웹 브라우저에 잘 출력된다..
+
+Dir : main.js
+~~~JavaScript
+a = 6
+
+console.log(a);
+~~~
+
+  - 하지만 맨 위에 'use strict'를 선언하면 에러가 나게 된다
+Dir : main.js
+~~~JavaScript
+'use strict'
+
+a = 6
+
+console.log(a);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/638e03eb-1d81-4868-b6ba-22ce3d0cb4c5)
+
+  - 해결하기 위해서는 아래와 같이 변수를 선언 해야한다
+Dir : main.js
+~~~JavaScript
+'use strict'
+
+let a;
+a = 6
+
+console.log(a);
+~~~
+
+###### [엄격 모드](#엄격-모드)
 ###### [Top](#top)
 
 <br/>
@@ -1155,6 +1184,416 @@ console.log("aaa".aaa)
 ###### [prototype문법](#prototype문법)
 ###### [Top](#top)
  
+<br/>
+<br/>
+
+***
+
+# 클래스
+  - JavaScritp도 다른 언어와 같이 class라는 개념이 만들어 졌다
+
+<br/>
+
+  - [선언하기,생성자](#선언하기생성자)
+  - [private속성](#private속성)
+  - [get,set문법](#getset문법)
+  - [static](#static)
+  - [상속](#상속)
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 선언하기,생성자
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            constructor (이름, 국어, 영어, 수학, 과학) {
+                this.이름 = 이름
+                this.국어 = 국어
+                this.영어 = 영어
+                this.수학 = 수학
+                this.과학 = 과학
+            }
+
+
+            // 메서드
+            getSum() {
+                return this.국어 + this.영어 + this.수학 + this.과학
+            }
+
+
+        }
+
+
+        // 객체 생성
+        const students = [
+            new Student('ㄱ', 11,22,33,44),
+            new Student('ㄴ', 12,23,34,45),
+            new Student('ㄷ', 13,24,35,46),
+            new Student('ㄹ', 14,25,36,47)
+        ]
+
+
+        let output = `이름\t총점`
+        for (const student of students) {
+            console.log(`${student.이름}\t${student.getSum()}`)
+        }
+
+
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
+
+// ㄱ 110
+// ㄴ 114
+// ㄷ 118
+// ㄹ 122
+~~~
+
+<br/>
+
+  - 객체를 이렇게 만들어 넣을 수도 있음
+
+~~~JavaScript
+// 객체 생성
+const students = new Student()
+students.add(new Student('ㄱ', 11,22,33,44))    
+students.add(new Student('ㄴ', 12,23,34,45))    
+students.add(new Student('ㄷ', 13,24,35,46))    
+students.add(new Student('ㄹ', 14,25,36,47))   
+~~~
+
+<br/>
+
+  - 객체 매개변수를 활용하여 나타내기도함
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            constructor ({이름, 국어, 영어, 수학, 과학}) {
+                this.이름 = 이름
+                this.국어 = 국어
+                this.영어 = 영어
+                this.수학 = 수학
+                this.과학 = 과학
+            }
+
+
+            // 메서드
+            getSum() {
+                return this.국어 + this.영어 + this.수학 + this.과학
+            }
+        }
+
+        // 객체 매개변수 활용
+        const student = new Student({
+            이름: "ㄱ",
+            국어: 11,
+            영어: 22,
+            수학: 33,
+            과학: 44
+        })
+
+        let output = `이름\t총점`
+        console.log(`${student.이름}\t${student.getSum()}`)
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# private속성
+  - class내에 #을 이용해서 private를 설정 할 수 있으며, 직접적으로 접근 할 수 없고 class안에 있는 함수나 다른 변수를 통해서 간접적으로 접근 할 수 있게 된다
+  - 변수뿐만 아니라 매서드도 앞에 #을 붙여서 private 메서드를 만들 수 있다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            #이름
+
+            constructor ({이름, 국어, 영어, 수학, 과학}) {
+                this.#이름 = 이름
+                this.국어 = 국어
+                this.영어 = 영어
+                this.수학 = 수학
+                this.과학 = 과학
+            }
+
+            // 메서드
+            getSum() {
+                return this.국어 + this.영어 + this.수학 + this.과학
+            }
+
+            getName() {
+                return this.#이름
+            }
+        }
+
+        // 객체 매개변수 활용
+        const student = new Student({
+            이름: "ㄱ",
+            국어: 11,
+            영어: 22,
+            수학: 33,
+            과학: 44
+        })
+
+        console.log(`국어 : ${student.국어}`)
+        console.log(`국어 : ${student.이름}`) // 이름이 private이기 때문에 결과가 undefinde로 나오게됨
+        console.log(`국어 : ${student.getName()}`) // 내부의 함수를 호출하여 얻은 값
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
+
+
+// 국어 : 11
+// 국어 : undefined
+// 국어 : ㄱㄱ
+
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# get,set문법
+  - get, set문법을 사용하면, 대입할때 set을 사용하고 값을 호출할때 get문법을 자동으로 사용하게 되어 편리하다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        class Student {
+            // 생성자
+            #이름
+
+            constructor (이름) {
+                this.#이름 = 이름
+            }
+
+            // get메서드
+            get Name() {
+                return this.#이름
+            }
+
+            // set메서드
+            set Name(이름1) {
+                this.#이름 = 이름1
+            }
+        }
+
+        // 객체 매개변수 활용
+        const student = new Student('ㄱ')
+        console.log(`이름 : ${student.Name}`)
+
+        student.Name = 'ㄴ'
+        console.log(`이름 : ${student.Name}`)
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
+
+// 이름 : ㄱ
+// 이름 : ㄴ
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# static
+  - 첫번째 코드처럼 class에 어떤 변수를 지정하거나, 함수를 추가로 지정해서 사용할 수도 있음, 하지만 위와 같은 문법보다 좀 더 직관적으로 편하게 static을 사용하는 문법이 제공 되었음
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+       
+        class MySum {
+            constructor(){
+                MySum.count += 1
+            }
+        }
+        MySum.count = 0
+        MySum.test = function(){
+            return MySum.count
+        }
+
+        console.log(MySum.count) // 0
+        console.log(MySum.test()) // 0
+        new MySum()
+        new MySum()
+        new MySum()
+        console.log(MySum.count) // 3
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+<br/>
+
+  - static을 사용하는 문법
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+       
+        class MySum {
+            static count = 0
+            static test () { }
+
+
+            constructor(){
+                MySum.count += 1
+            }
+        }
+
+        console.log(MySum.count) // 0
+        console.log(MySum.test()) // 0
+        new MySum()
+        new MySum()
+        new MySum()
+        console.log(MySum.count) // 3
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 상속
+  - extends키워드를 사용하여 상속을 할 수 있다
+  - 부모것을 자식단에서 바꾸기 위해서는 똑같은 이름의 매서드와 속성을 지정해주면 덮어 쓰게 된다
+  - 생성자 내에서 super()을 쓰면 이것은 부모의 생성자 라는 의미가 된다
+
+~~~JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+    class Person{
+    constructor(name, first, second){
+        this.name = name;
+        this.first = first;
+        this.second = second;
+        }
+        sum(){
+            return this.first+this.second;
+        }
+
+
+        bark(){
+            console.log("asfasdf")
+        }
+    }
+    class PersonPlus extends Person{
+    constructor(name, first, second, third){
+        super(name, first, second);
+        this.third = third;
+        }
+        sum(){
+            return super.sum()+this.third;
+        }
+        avg(){
+            return (this.first+this.second+this.third)/3;
+        }
+    }
+ 
+    let kim = new PersonPlus('kim', 10, 20, 30);
+    console.log("kim.sum()", kim.sum());
+    console.log("kim.avg()", kim.avg());        
+    kim.bark();        
+    </script>
+</head>
+<body>
+   
+</body>
+</html>
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
 <br/>
 <br/>
 
@@ -2170,462 +2609,3 @@ localStorage.clear() // 전체 제거
 <br/>
 
 ***
-
-# 클래스
-  - JavaScritp도 다른 언어와 같이 class라는 개념이 만들어 졌다
-
-<br/>
-
-  - [선언하기,생성자](#선언하기생성자)
-  - [private속성](#private속성)
-  - [get,set문법](#getset문법)
-  - [static](#static)
-  - [상속](#상속)
-
-###### [클래스](#클래스)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 선언하기,생성자
-
-~~~JavaScript
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-        class Student {
-            // 생성자
-            constructor (이름, 국어, 영어, 수학, 과학) {
-                this.이름 = 이름
-                this.국어 = 국어
-                this.영어 = 영어
-                this.수학 = 수학
-                this.과학 = 과학
-            }
-
-
-            // 메서드
-            getSum() {
-                return this.국어 + this.영어 + this.수학 + this.과학
-            }
-
-
-        }
-
-
-        // 객체 생성
-        const students = [
-            new Student('ㄱ', 11,22,33,44),
-            new Student('ㄴ', 12,23,34,45),
-            new Student('ㄷ', 13,24,35,46),
-            new Student('ㄹ', 14,25,36,47)
-        ]
-
-
-        let output = `이름\t총점`
-        for (const student of students) {
-            console.log(`${student.이름}\t${student.getSum()}`)
-        }
-
-
-    </script>
-</head>
-<body>
-
-
-</body>
-</html>
-
-// ㄱ 110
-// ㄴ 114
-// ㄷ 118
-// ㄹ 122
-~~~
-
-<br/>
-
-  - 객체를 이렇게 만들어 넣을 수도 있음
-
-~~~JavaScript
-// 객체 생성
-const students = new Student()
-students.add(new Student('ㄱ', 11,22,33,44))    
-students.add(new Student('ㄴ', 12,23,34,45))    
-students.add(new Student('ㄷ', 13,24,35,46))    
-students.add(new Student('ㄹ', 14,25,36,47))   
-~~~
-
-<br/>
-
-  - 객체 매개변수를 활용하여 나타내기도함
-
-~~~JavaScript
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-        class Student {
-            // 생성자
-            constructor ({이름, 국어, 영어, 수학, 과학}) {
-                this.이름 = 이름
-                this.국어 = 국어
-                this.영어 = 영어
-                this.수학 = 수학
-                this.과학 = 과학
-            }
-
-
-            // 메서드
-            getSum() {
-                return this.국어 + this.영어 + this.수학 + this.과학
-            }
-        }
-
-        // 객체 매개변수 활용
-        const student = new Student({
-            이름: "ㄱ",
-            국어: 11,
-            영어: 22,
-            수학: 33,
-            과학: 44
-        })
-
-        let output = `이름\t총점`
-        console.log(`${student.이름}\t${student.getSum()}`)
-
-    </script>
-</head>
-<body>
-
-</body>
-</html>
-~~~
-
-###### [클래스](#클래스)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# private속성
-  - class내에 #을 이용해서 private를 설정 할 수 있으며, 직접적으로 접근 할 수 없고 class안에 있는 함수나 다른 변수를 통해서 간접적으로 접근 할 수 있게 된다
-  - 변수뿐만 아니라 매서드도 앞에 #을 붙여서 private 메서드를 만들 수 있다
-
-~~~JavaScript
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-        class Student {
-            // 생성자
-            #이름
-
-            constructor ({이름, 국어, 영어, 수학, 과학}) {
-                this.#이름 = 이름
-                this.국어 = 국어
-                this.영어 = 영어
-                this.수학 = 수학
-                this.과학 = 과학
-            }
-
-            // 메서드
-            getSum() {
-                return this.국어 + this.영어 + this.수학 + this.과학
-            }
-
-            getName() {
-                return this.#이름
-            }
-        }
-
-        // 객체 매개변수 활용
-        const student = new Student({
-            이름: "ㄱ",
-            국어: 11,
-            영어: 22,
-            수학: 33,
-            과학: 44
-        })
-
-        console.log(`국어 : ${student.국어}`)
-        console.log(`국어 : ${student.이름}`) // 이름이 private이기 때문에 결과가 undefinde로 나오게됨
-        console.log(`국어 : ${student.getName()}`) // 내부의 함수를 호출하여 얻은 값
-
-    </script>
-</head>
-<body>
-
-</body>
-</html>
-
-
-// 국어 : 11
-// 국어 : undefined
-// 국어 : ㄱㄱ
-
-~~~
-
-###### [클래스](#클래스)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# get,set문법
-  - get, set문법을 사용하면, 대입할때 set을 사용하고 값을 호출할때 get문법을 자동으로 사용하게 되어 편리하다
-
-~~~JavaScript
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=chrome">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-        class Student {
-            // 생성자
-            #이름
-
-            constructor (이름) {
-                this.#이름 = 이름
-            }
-
-            // get메서드
-            get Name() {
-                return this.#이름
-            }
-
-            // set메서드
-            set Name(이름1) {
-                this.#이름 = 이름1
-            }
-        }
-
-        // 객체 매개변수 활용
-        const student = new Student('ㄱ')
-        console.log(`이름 : ${student.Name}`)
-
-        student.Name = 'ㄴ'
-        console.log(`이름 : ${student.Name}`)
-
-    </script>
-</head>
-<body>
-
-</body>
-</html>
-
-// 이름 : ㄱ
-// 이름 : ㄴ
-~~~
-
-###### [클래스](#클래스)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# static
-  - 첫번째 코드처럼 class에 어떤 변수를 지정하거나, 함수를 추가로 지정해서 사용할 수도 있음, 하지만 위와 같은 문법보다 좀 더 직관적으로 편하게 static을 사용하는 문법이 제공 되었음
-
-~~~JavaScript
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-       
-        class MySum {
-            constructor(){
-                MySum.count += 1
-            }
-        }
-        MySum.count = 0
-        MySum.test = function(){
-            return MySum.count
-        }
-
-        console.log(MySum.count) // 0
-        console.log(MySum.test()) // 0
-        new MySum()
-        new MySum()
-        new MySum()
-        console.log(MySum.count) // 3
-    </script>
-</head>
-<body>
-   
-</body>
-</html>
-~~~
-
-<br/>
-
-  - static을 사용하는 문법
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-       
-        class MySum {
-            static count = 0
-            static test () { }
-
-
-            constructor(){
-                MySum.count += 1
-            }
-        }
-
-        console.log(MySum.count) // 0
-        console.log(MySum.test()) // 0
-        new MySum()
-        new MySum()
-        new MySum()
-        console.log(MySum.count) // 3
-    </script>
-</head>
-<body>
-   
-</body>
-</html>
-
-###### [클래스](#클래스)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 상속
-  - extends키워드를 사용하여 상속을 할 수 있다
-  - 부모것을 자식단에서 바꾸기 위해서는 똑같은 이름의 매서드와 속성을 지정해주면 덮어 쓰게 된다
-  - 생성자 내에서 super()을 쓰면 이것은 부모의 생성자 라는 의미가 된다
-
-~~~JavaScript
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-    class Person{
-    constructor(name, first, second){
-        this.name = name;
-        this.first = first;
-        this.second = second;
-        }
-        sum(){
-            return this.first+this.second;
-        }
-
-
-        bark(){
-            console.log("asfasdf")
-        }
-    }
-    class PersonPlus extends Person{
-    constructor(name, first, second, third){
-        super(name, first, second);
-        this.third = third;
-        }
-        sum(){
-            return super.sum()+this.third;
-        }
-        avg(){
-            return (this.first+this.second+this.third)/3;
-        }
-    }
- 
-    let kim = new PersonPlus('kim', 10, 20, 30);
-    console.log("kim.sum()", kim.sum());
-    console.log("kim.avg()", kim.avg());        
-    kim.bark();        
-    </script>
-</head>
-<body>
-   
-</body>
-</html>
-~~~
-
-###### [클래스](#클래스)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# 배열 얕은 복사와 깊은 복사(스프레드 ...)
-  - 위에는 깊은 복사로서 각각 독립적인 배열이 생성되지만, 아래는 참조 복사로써 독립적인 배열이 아닌 참조 배열이기때문에 하나의 배열이 바뀌면 둘다 바뀌게 된다
-
-~~~JavaScript
-<script>
-    const arr = [1,2,3,4,5]
-    console.log(arr)
-    const chartData = [...arr]
-    console.log(chartData)
-
-
-    const arr1 = [1,2,3,4,5]
-    console.log(arr1)
-    const chartData1 = arr1
-    console.log(chartData1)
-</script>
-~~~
-
-  - 깊은 복사 할때 사용 하는 … 뒤에 다른 데이터를 넣으면, push하는 것과 같은 역할을 하게 된다
-
-~~~JavaScript
-<script>
-    let number = [1,2,3,4,5]
-
-    function f(){
-
-    number = [...number, number.length+1];
-
-    }
-
-</script>
-
-<div>{number}</div>
-<button on:click={f}>
-    버튼
-</button>
-~~~
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fe5f1649-3300-4a56-8ddd-ae67585dcda4)
-
-###### [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
