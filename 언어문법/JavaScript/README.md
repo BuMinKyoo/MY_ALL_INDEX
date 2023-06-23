@@ -18,6 +18,11 @@
     - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
     - [즉시호출 함수](#즉시호출-함수)
     - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
+    - [map함수](#map함수)
+    - [new Set](#new-set)
+    - [Object.keys, Object.values](#objectkeys-objectvalues)
+    - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
+    - [setInterval](#setinterval)
   - [엄격 모드](#엄격-모드)
   - [객체 생성](#객체-생성)
   - [객체내 this](#객체내-this)
@@ -47,11 +52,6 @@
     - [static](#static)
     - [상속](#상속)
   - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
-  - [map함수](#map함수)
-  - [new Set](#new-set)
-  - [Object.keys, Object.values](#objectkeys-objectvalues)
-  - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
-  - [setInterval](#setinterval)
    
 <br/>
 <br/>
@@ -256,6 +256,11 @@ const f = function(매개변수, 매개변수...){
   - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
   - [즉시호출 함수](#즉시호출-함수)
   - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
+  - [map함수](#map함수)
+  - [new Set](#new-set)
+  - [Object.keys, Object.values](#objectkeys-objectvalues)
+  - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
+  - [setInterval](#setinterval)
 
 ###### [함수](#함수)
 ###### [Top](#top)
@@ -458,6 +463,227 @@ function 함수() {
 <br/>
 <br/>
 
+# map함수
+  - 배열일 때 하나하나를 특정한 것으로 작업을 해줌
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6]
+const arr2 = arr.map(e=>e*2)
+console.log(arr2)
+
+// [ 2, 4, 6, 8, 10, 12 ]
+~~~
+
+<br/>
+
+~~~JavaScript
+const arr = [ [1,2], [3,4] ,[5,6] ]
+const arr2 = arr.map(e=>e[0])
+console.log(arr2)
+
+// [ 1, 3, 5 ]
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# new Set
+  - 중복이 허용되지 않는 객체이다
+  - 객체로 만들어 주면서 중복을 제거해 준다
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6,6]
+const arrObj = new Set(arr)
+console.log(arrObj)
+
+// { 1, 2, 3, 4, 5, 6 }
+~~~
+
+<br/>
+
+~~~JavaScript
+const arr = [[1,2], [3,4], [5,6], [5,6]]
+const arrObj = new Set(arr)
+console.log(arrObj)
+
+// { [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], [ 5, 6 ] }
+~~~
+
+<br/>
+
+~~~JavaScript
+// new set은 반복이 가능한 배열을 보내야 한다
+const arr = { 1: 'a', 2: 'b', 3: 'c'}
+const arrObj = new Set(arr)
+console.log(arr)
+
+// object is not iterable (cannot read property Symbol(Symbol.iterator))
+~~~
+
+<br/>
+
+  - entries사용하기
+    - 객체 내의 각 요소들을 [value, value] 형태의 배열로 가지는 이터레이터가 생성됩니다.
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6,6]
+const arrSet = new Set(arr)
+const arrSetEntries = arrSet.entries()
+console.log(arrSet)
+console.log(arrSetEntries)
+
+// { 1, 2, 3, 4, 5, 6 }
+
+// {
+  [ 1, 1 ],    
+  [ 2, 2 ],    
+  [ 3, 3 ],    
+  [ 4, 4 ],    
+  [ 5, 5 ],    
+  [ 6, 6 ]     
+}
+~~~
+
+<br/>
+
+  - Set객체 foreach로 반복문 돌리기
+    - item에 괄호는 있어도 되고, 없어도 되고
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6,7]
+const arr2 = new Set(arr)
+
+arr2.forEach( (item) => {
+    console.log(item)
+})
+
+// 1 2 3 4 5 6 7
+~~~
+
+<br/>
+
+  - Set객체 배열 만들기(Array.from)
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6,7]
+const arr2 = new Set(arr)
+const arrarr = Array.from(arr2)
+
+console.log(arrarr)
+
+// [1,2,3,4,5,6,7]
+~~~
+
+<br/>
+
+  - Set객체 배열 만들기(전개연산자)
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6,7]
+const arr2 = new Set(arr)
+const arrarr = [...arr2]
+
+console.log(arrarr)
+
+// [1,2,3,4,5,6,7]
+~~~
+
+<br/>
+
+  - Set객체 배열 만들기(forEach)
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6,7]
+const arr2 = new Set(arr)
+const arrarr = []
+
+arr2.forEach(item => {
+    arrarr.push(item)
+})
+
+console.log(arrarr)
+
+// [1,2,3,4,5,6,7]
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Object.keys, Object.values
+  - 객체의 key와 value만 잡아서 배열로 만듬
+
+~~~JavaScript
+    const arr = {'a': 1,'b': 2,'c': 3,'d': 4,'e': 5}
+    let arrObjKey = Object.keys(arr);
+    let arrObjValues = Object.values(arr);
+    console.log(arrObjKey)
+    console.log(arrObjValues)
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Object.fromEntries, Object.entries
+  - Object.fromEntries : 키-값 쌍의 배열을 입력받아 객체로 변환한다
+  - Object.entries : 객체를 입력받아 키-값 쌍의 배열로 변환 한다
+
+~~~JavaScript
+// Object.fromEntries
+const arr = [['a', 1], ['b', 2], ['c', 3]];
+let arrObj = Object.fromEntries(arr)
+console.log(arrObj)
+
+// { a: 1, b: 2, c: 3 }
+~~~
+
+<br/>
+
+~~~JavaScript
+// Object.entries
+const arrObj = { a: 1, b: 2, c: 3 };
+let arr = Object.entries(arrObj)
+console.log(arr)
+
+// [ [ 'a', 1 ], [ 'b', 2 ], [ 'c', 3 ] ]
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# setInterval
+  - setInterval의 두번째 인자는 실행되는 속도를 말한다
+
+~~~JavaScript
+<script>
+    import { onDestroy } from "svelte";
+
+    let seconds = 0;
+    const internal = setInterval(() => seconds += 1, 1000);
+
+    onDestroy(() => clearInterval(internal));
+</script>
+
+<p>{seconds}</p>
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 ***
 
 # 엄격 모드
@@ -494,7 +720,7 @@ a = 6
 console.log(a);
 ~~~
 
-###### [함수](#함수)
+###### [엄격 모드](#엄격-모드)
 ###### [Top](#top)
 
 <br/>
@@ -2124,237 +2350,6 @@ students.add(new Student('ㄹ', 14,25,36,47))
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fe5f1649-3300-4a56-8ddd-ae67585dcda4)
 
 ###### [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# map함수
-  - 배열일 때 하나하나를 특정한 것으로 작업을 해줌
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6]
-const arr2 = arr.map(e=>e*2)
-console.log(arr2)
-
-// [ 2, 4, 6, 8, 10, 12 ]
-~~~
-
-<br/>
-
-~~~JavaScript
-const arr = [ [1,2], [3,4] ,[5,6] ]
-const arr2 = arr.map(e=>e[0])
-console.log(arr2)
-
-// [ 1, 3, 5 ]
-~~~
-
-###### [map함수](#map함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# new Set
-  - 중복이 허용되지 않는 객체이다
-  - 객체로 만들어 주면서 중복을 제거해 준다
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6,6]
-const arrObj = new Set(arr)
-console.log(arrObj)
-
-// { 1, 2, 3, 4, 5, 6 }
-~~~
-
-<br/>
-
-~~~JavaScript
-const arr = [[1,2], [3,4], [5,6], [5,6]]
-const arrObj = new Set(arr)
-console.log(arrObj)
-
-// { [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], [ 5, 6 ] }
-~~~
-
-<br/>
-
-~~~JavaScript
-// new set은 반복이 가능한 배열을 보내야 한다
-const arr = { 1: 'a', 2: 'b', 3: 'c'}
-const arrObj = new Set(arr)
-console.log(arr)
-
-// object is not iterable (cannot read property Symbol(Symbol.iterator))
-~~~
-
-<br/>
-
-  - entries사용하기
-    - 객체 내의 각 요소들을 [value, value] 형태의 배열로 가지는 이터레이터가 생성됩니다.
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6,6]
-const arrSet = new Set(arr)
-const arrSetEntries = arrSet.entries()
-console.log(arrSet)
-console.log(arrSetEntries)
-
-// { 1, 2, 3, 4, 5, 6 }
-
-// {
-  [ 1, 1 ],    
-  [ 2, 2 ],    
-  [ 3, 3 ],    
-  [ 4, 4 ],    
-  [ 5, 5 ],    
-  [ 6, 6 ]     
-}
-~~~
-
-<br/>
-
-  - Set객체 foreach로 반복문 돌리기
-    - item에 괄호는 있어도 되고, 없어도 되고
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6,7]
-const arr2 = new Set(arr)
-
-arr2.forEach( (item) => {
-    console.log(item)
-})
-
-// 1 2 3 4 5 6 7
-~~~
-
-<br/>
-
-  - Set객체 배열 만들기(Array.from)
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6,7]
-const arr2 = new Set(arr)
-const arrarr = Array.from(arr2)
-
-console.log(arrarr)
-
-// [1,2,3,4,5,6,7]
-~~~
-
-<br/>
-
-  - Set객체 배열 만들기(전개연산자)
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6,7]
-const arr2 = new Set(arr)
-const arrarr = [...arr2]
-
-console.log(arrarr)
-
-// [1,2,3,4,5,6,7]
-~~~
-
-<br/>
-
-  - Set객체 배열 만들기(forEach)
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6,7]
-const arr2 = new Set(arr)
-const arrarr = []
-
-arr2.forEach(item => {
-    arrarr.push(item)
-})
-
-console.log(arrarr)
-
-// [1,2,3,4,5,6,7]
-~~~
-
-###### [new Set](#new-set)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Object.keys, Object.values
-  - 객체의 key와 value만 잡아서 배열로 만듬
-
-~~~JavaScript
-    const arr = {'a': 1,'b': 2,'c': 3,'d': 4,'e': 5}
-    let arrObjKey = Object.keys(arr);
-    let arrObjValues = Object.values(arr);
-    console.log(arrObjKey)
-    console.log(arrObjValues)
-~~~
-
-###### [Object.keys, Object.values](#objectkeys-objectvalues)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Object.fromEntries, Object.entries
-  - Object.fromEntries : 키-값 쌍의 배열을 입력받아 객체로 변환한다
-  - Object.entries : 객체를 입력받아 키-값 쌍의 배열로 변환 한다
-
-~~~JavaScript
-// Object.fromEntries
-const arr = [['a', 1], ['b', 2], ['c', 3]];
-let arrObj = Object.fromEntries(arr)
-console.log(arrObj)
-
-// { a: 1, b: 2, c: 3 }
-~~~
-
-<br/>
-
-~~~JavaScript
-// Object.entries
-const arrObj = { a: 1, b: 2, c: 3 };
-let arr = Object.entries(arrObj)
-console.log(arr)
-
-// [ [ 'a', 1 ], [ 'b', 2 ], [ 'c', 3 ] ]
-~~~
-
-###### [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# setInterval
-  - setInterval의 두번째 인자는 실행되는 속도를 말한다
-
-~~~JavaScript
-<script>
-    import { onDestroy } from "svelte";
-
-    let seconds = 0;
-    const internal = setInterval(() => seconds += 1, 1000);
-
-    onDestroy(() => clearInterval(internal));
-</script>
-
-<p>{seconds}</p>
-~~~
-
-###### [setInterval](#setinterval)
 ###### [Top](#top)
 
 <br/>
