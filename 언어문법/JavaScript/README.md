@@ -474,7 +474,38 @@ function 함수() {
 ***
 
 # 엄격 모드
-  - script태그 안쪽에, ‘use strict’를 쓰면 엄격 모드가 된다. 자바스크립트는 너무 유연한 언어이기 때문에 저런 것들로 나중에 있을 위험들을 예방할 수 있다
+  - 순수 JS로 개발할 때 에는 JS파일의 맨 위에 'use strict' 를 사용하는 것이 좋다
+  - const와 let도 선언하지 않아도... 상관이 없는 js..., 아래에 있는 것이 웹 브라우저에 잘 출력된다..
+
+Dir : main.js
+~~~JavaScript
+a = 6
+
+console.log(a);
+~~~
+
+  - 하지만 맨 위에 'use strict'를 선언하면 에러가 나게 된다
+Dir : main.js
+~~~JavaScript
+'use strict'
+
+a = 6
+
+console.log(a);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/638e03eb-1d81-4868-b6ba-22ce3d0cb4c5)
+
+  - 해결하기 위해서는 아래와 같이 변수를 선언 해야한다
+Dir : main.js
+~~~JavaScript
+'use strict'
+
+let a;
+a = 6
+
+console.log(a);
+~~~
 
 ###### [함수](#함수)
 ###### [Top](#top)
