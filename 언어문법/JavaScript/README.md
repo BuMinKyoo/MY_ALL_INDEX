@@ -13,7 +13,7 @@
   - [함수](#함수)
     - [나머지 매개변수](#나머지-매개변수)
     - [forEach,forin,forof](#foreachforinforof)
-    - [filer,map함수](#filermap함수)
+    - [filer함수](#filer함수)
     - [함수'=>'문법](#함수문법)
     - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
     - [즉시호출 함수](#즉시호출-함수)
@@ -251,7 +251,7 @@ const f = function(매개변수, 매개변수...){
 
   - [나머지 매개변수](#나머지-매개변수)
   - [forEach,forin,forof](#forEach,forin,forof)
-  - [filer,map함수](#filermap함수)
+  - [filer함수](#filer함수)
   - [함수'=>'문법](#함수'=>'문법)
   - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
   - [즉시호출 함수](#즉시호출-함수)
@@ -363,7 +363,7 @@ for (const e of arr) {
 <br/>
 <br/>
 
-# filer,map함수
+# filer함수
   - filter : 조건을 확인하여 true인것만 출력해줌
   - map : 뒤에 추가적으로 뭔가 붙일때 사용
 
@@ -376,19 +376,6 @@ const ar2 = ar.filter(function(value, index){
 console.log(ar2)
 
 // [40, 20]
-~~~
-
-<br/>
-
-~~~JavaScript
-const ar = [10,40,20,70,1]
-const ar2 = ar.map(function(value, index){
-    return value + "안뇽"
-})
-
-console.log(ar2)
-
-// ['10안뇽', '40안뇽', '20안뇽', '70안뇽', '1안뇽']
 ~~~
 
 ###### [함수](#함수)
