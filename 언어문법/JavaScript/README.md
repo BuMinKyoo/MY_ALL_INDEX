@@ -6,23 +6,25 @@
   - [JavaScript 코드실행 3가지](#javascript-코드실행-3가지)
   - [JavaScript 코드실행에러 확인](#javascript-코드실행에러-확인)
   - [자료형,변수](#자료형변수)
+    - [let, const, var](#let-const-var)
+    - [Infinity, NaN](#infinity-nan)
+    - [Boolean, Number, String, Null, Undefined](#boolean-number-string-null-undefined)
+    - [bigInt](#bigint)
+    - [Symbol](#symbol)
+    - [배열](#배열)
+    - [객체](#객체)
+    - [Set](#set)
   - [비교연산자](#비교연산자)
   - [템플릿 문자열](#템플릿-문자열)
   - [prompt,confirm,자료형변환](#promptconfirm자료형변환)
   - [논리 연산자 "||" 기호 사용시 주의](#논리-연산자--기호-사용시-주의)
   - [함수](#함수)
-    - [나머지 매개변수](#나머지-매개변수)
-    - [forEach,forin,forof](#foreachforinforof)
-    - [filer함수](#filer함수)
-    - [함수'=>'문법](#함수문법)
-    - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
-    - [즉시호출 함수](#즉시호출-함수)
     - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
-    - [map함수](#map함수)
-    - [new Set](#new-set)
-    - [Object.keys, Object.values](#objectkeys-objectvalues)
-    - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
-    - [setInterval](#setinterval)
+    - [즉시호출 함수](#즉시호출-함수)
+    - [함수'=>'문법](#함수'=>'문법)
+    - [나머지 매개변수](#나머지-매개변수)
+    - [객체 매개변수](#객체-매개변수)
+    - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
   - [엄격 모드](#엄격-모드)
   - [객체 생성](#객체-생성)
   - [객체내 this](#객체내-this)
@@ -44,7 +46,6 @@
     - [textContent,value차이](#textcontentvalue차이)
   - [localStorage](#localstorage)
   - [json](#json)
-  - [객체 매개변수](#객체-매개변수)
   - [클래스](#클래스)
     - [선언하기,생성자](#선언하기생성자)
     - [private속성](#private속성)
@@ -128,17 +129,14 @@
 ***
 
 # 자료형,변수
-  - 동적타입, 정적타입
-    - let : 재할당이 가능한 변수
-    - const : 재할당이 불가능한 변수
-      - 반드시 선언과 초기화를 동시에 진행해야 한다
-      - '재할당'이 불가능 한 것이기 때문에, const로 선언된 배열, 객체 등의 값들은 바꿀수가 있게 된다. 왜냐면.. const로 선언한 배열과 객체와 같은것은 포인터값(즉 메모리값)만 상수이기 때문에 안에 내용은 상수가 아니기 때문..!
-  - Boolean
-  - Number
-  - String
-    - 문자열을 작음 따옴표 or 큰 따옴표로 감싼다(작은 따옴표, 큰 따옴표가 같음..!)
-  - Null
-  - Undefined
+  - [let, const, var](#let-const-var)
+  - [Infinity, NaN](#infinity-nan)
+  - [Boolean, Number, String, Null, Undefined](#boolean-number-string-null-undefined)
+  - [bigInt](#bigint)
+  - [Symbol](#symbol)
+  - [배열](#배열)
+  - [객체](#객체)
+  - [Set](#set)
 
 ###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
@@ -146,352 +144,232 @@
 <br/>
 <br/>
 
-***
-
-# 비교연산자
-  - "===" : (다른 언어와 달리 JavaScritp는 "=="가 아닌 "==="를 사용한다)
-  - "!==" : (이것도 다른 언어와 다르다..!)
-  - ">"
-  - ">="
-  - "<"
-  - "<="
-
-###### [비교연산자](#비교연산자)
-###### [Top](#top)
+# let, const, var
+  - let : 재할당이 가능한 변수(동적타입)
+  - const : 재할당이 불가능한 변수(정적타입)
+    - 반드시 선언과 초기화를 동시에 진행해야 한다
+    - '재할당'이 불가능 한 것이기 때문에, const로 선언된 배열, 객체 등의 값들은 바꿀수가 있게 된다. 왜냐면.. const로 선언한 배열과 객체와 같은것은 포인터값(즉 메모리값)만 상수이기 때문에 안에 내용은 상수가 아니기 때문..!
 
 <br/>
-<br/>
 
-***
+  - 더 이상 var변수를 사용하지 말자
+    - 변수를 선언도 하기 전에 할당하고, 그 이후에 var로 할당할 수 있다..
+    - var hoisting이라고 한다
+    - 어디에 선언했냐에 상관없이, 항상 위로 끌어 올려 준다는것
 
-# 템플릿 문자열
-  - JavaScritp는 유연한 언어이기 때문에, 문자열 + 숫자를 해도 숫자가 자동으로 문자열되어 합쳐진다.
-  - 탬플릿 문자열을 사용하면 조금더 코드를 확인하기 좋아지고, 간편하게 문자열을 작성할 수 있다
-  - 탬플릿 문자열을 사용하지 않을경우 : "안녕하세요" + 1 + "ㄴㄴㄴ" -> “안녕하세요1ㄴㄴㄴ”
-  - 탬플릿 문자열을 사용할 경우 :  \`안녕하세요 ${1} ${"aaa"} 용용\` : “안녕하세요1aaa용용”이렇게 쓸수 있게 해준다
-    - 템플릿 문자열을 만들때 양쪽 끝에 \` 기호를 사용한다(키보드에 ~표시 키보드)
-    - 탬플릿 문자열 안쪽에 변수를 사용 할때는 "${}"로 감싸서 사용하게 된
+~~~JavaScritp
+'use strict'
 
-###### [템플릿 문자열](#템플릿-문자열)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# prompt,confirm,자료형변환
- - prompt
-   - 문자열을 입력할 때 사용
-   - 숫자를 입력 받아야 하는 경우는 문자열로 입력 받은 뒤 변환
-   - 첫번째 매개변수는 입력 창에서 띄워줄 메시지
-   - 두번째 매개변수는 입력 부분의 기본 값
-   - 무조건 문자열로 입력받게 
- - confirm
-   - 불린 값을 입력 받을 때 사용
-   - 확인을 누르면 true를 리턴
-   - 취소를 누르면 false를 리턴
- - 자료형 변환
-   - Number(변환할 값)
-   - String(변환할 값)
-   - Boolean(변환할 값)
-
-~~~JavaScript
- <script>
-        let a = prompt('첫 번째 숫자를 입력해주세요')
-        a = Number(a)
-        let b = prompt('두 번째 숫자를 입력해주세요')
-        b = Number(b)
-
-        alert(`${a} + ${b} + ${a + b}`)
- </script>
+num = 10;
+var num;
+console.log(num); // 10
 ~~~
 
-###### [prompt,confirm,자료형변환](#promptconfirm자료형변환)
+  - block scope가 없다..
+
+~~~JavaScritp
+'use strict'
+
+{
+    num = 10;
+    var num;
+}
+
+console.log(num) // 10
+~~~
+
+###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-***
+# Infinity, NaN
+  - 무한대 일때와, 숫자와 문자를 계산할 경우
 
-# 논리 연산자 "||" 기호 사용시 주의
-  - || 이 기호를 사용하여 앞에 부분이 true가 되어 실행되면 뒤에는 볼것도 없기 때문에 뒤에는 실행 되지 않음
+~~~JavaScritp
+'use strict'
 
-~~~JavaScript
-<script>
-    alert("시작")
-    true || alert("트루1")
-    false || alert("트루2")
+const result1 = 1/0;
+const result2 = -1/0;
+const result3 = 'aaa' / 2;
+
+console.log(`result1 : ${result1}`); // result1 : Infinity
+console.log(`result2 : ${result2}`); // result2 : -Infinity
+console.log(`result3 : ${result3}`); // result3 : NaN
+~~~
+
+###### [자료형,변수](#자료형변수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Boolean, Number, String, Null, Undefined
+
+  - Boolean
+    - 어떤것을 비교 할때 false, true로 나옴
+
+~~~JavaScritp
+const a = 10
+const a1 = 20;
+
+console.log(a === a1); //false
+~~~
     
-    alert(`${a} + ${b} + ${a + b}`)
-</script>
+  - Number
+    - 숫자형식이며, 작음 따옴표나 큰 따옴표를 사용하지 않았을 경우
 
-// 시작, 트루2 만 출력됨
+~~~JavaScritp
+const num = 10;
+
+console.log(`num: ${typeof num}`); // num: number
 ~~~
 
-###### [논리 연산자 "||" 기호 사용시 주의](#논리-연산자-||-기호-사용시-주의)
+  - String
+    - 문자열을 작음 따옴표 or 큰 따옴표로 감싼다(작은 따옴표, 큰 따옴표가 같음..!)
+   
+~~~JavaScritp
+const num = "10";
+
+console.log(`num: ${typeof num}`); // num: string
+~~~
+
+  - Null
+    - null이라는 값을 직접 대입했을 경우, 이 경우 Undefined과 다르다
+
+~~~JavaScritp
+const num = null;
+
+console.log(`num: ${num}`); // num: null
+~~~
+
+  - Undefined
+    - 변수에 값을 할당하지 않았을 경우
+
+~~~JavaScritp
+let num;
+
+console.log(`num: ${num}`); // num: undefined
+~~~
+
+###### [Boolean, Number, String, Null, Undefined](#boolean-number-string-null-undefined)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-***
+# bigInt
+  - 최근에 추가된 자료형, 매우큰 숫자를 담을 수 있다
+  - 숫자 마지막에 n을 붙여주면 된다
+  - 지원되지 않는 브라우저가 있을 수 있으니 참고해서 사용하여야 한다
 
-# 함수
-  - JavaScritp함수의 가장 기본적인 형태
-
-~~~JavaScript
-const f = function(매개변수, 매개변수...){
-    return 리턴값
-}
+~~~JavaScritp
+const bigInt = 9999999999999999999999999999999999999999999999999999999999999n;
+console.log(`${typeof bigInt} : ${bigInt}`);
 ~~~
 
-<br/>
-
-  - [나머지 매개변수](#나머지-매개변수)
-  - [forEach,forin,forof](#forEach,forin,forof)
-  - [filer함수](#filer함수)
-  - [함수'=>'문법](#함수'=>'문법)
-  - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
-  - [즉시호출 함수](#즉시호출-함수)
-  - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
-  - [map함수](#map함수)
-  - [new Set](#new-set)
-  - [Object.keys, Object.values](#objectkeys-objectvalues)
-  - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
-  - [setInterval](#setinterval)
-
-###### [함수](#함수)
+###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 나머지 매개변수
-  - JavaScritp에서 함수의 넘겨주는 인수의 갯수는 제한이 없다
-  - 함수를 만들때 매개 변수의 마지막 변수앞에 ‘…’을 달게 되면 나머지 매개 변수가 된다
-  - 나머지 매개 변수는 맨 마지막에 인수로만 쓸 수 있다.
-  - 나머지 매개 변수를 사용하면, 전달된 인수들의 목록을 배열로 압축할때 사용되어 진다
+# Symbol
+  - 고유한 식별자를 만들때 사용하게 된다
+  - console.log(symbol1.description === symbol2.description) 이렇게 스트링값 자체를 비교하면 true가 나오게 된다
 
-<br/>
+~~~JavaScritp
+const symbol1 = Symbol('aa');
+const symbol2 = Symbol('aa');
 
-  - JavaScritp는 유연하기 때문에, 함수에 인수 목록을 1개만 적고, 함수를 실행할때 인수를 2개 넣어도 에러가 나지 않고, 1개만 출력 된다
-
-~~~JavaScript
-const f = function(매개변수){
-    console.log(매개변수)
-}
-
-f("ㅁ", "ㄷ")
-
-// ㅁ
+console.log(symbol1 === symbol2);  // false
 ~~~
 
 <br/>
 
-  - 나머지 매개 변수를 사용하게 되면, 뒤에 몇개의 매개변수를 넣어 함수를 실행하든 매개변수의 목록을 배열로 압축하여 전달 한다
+  - Symbol.for
+    - 만든 symbol의 고유한 식별자가 같은 것으로 만들기 위해서
 
-~~~JavaScript
-const f = function(...매개변수){
-    console.log(...매개변수)
-}
+~~~JavaScritp
+const symbol1 = Symbol.for('aa');
+const symbol2 = Symbol.for('aa');
 
-f("ㅁ", "ㄷ")
-
-// ㅁ
-// 
+console.log(symbol1 === symbol2);  // false
 ~~~
 
-###### [함수](#함수)
+###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# forEach,forin,forof
-  - for문과 같이 배열을 순회하는 방버들이다
-  - forin,forof는 함수는 아니지만 forEach를 설명하면서 같이 설명진행한다
+# 배열
 
-<br/>
+~~~JavaScritp
+const fruits = ["apple", "banana", "orange"];
 
-  - forin
-~~~JavaScript
-const arr = ['a', 'b', 'c']
-arr.prop = 'prop'
-
-for (const key in arr) {
-  console.log(key, typeof key, arr[key])
-}
-
-// 0 "string" a
-// 1 "string" b
-// 2 "string" c
-// 3 "string" prop prop
+console.log(fruits); // ["apple", "banana", "orange"]
 ~~~
 
-<br/>
-
-  - forEach
-~~~JavaScript
-const arr = ['a', 'b', 'c']
-arr.prop = 'prop'
-
-arr.forEach((e, index) => {
-  console.log(e, index)
-})
-
-// a 0
-// b 1
-// c 2
-~~~
-
-<br/>
-
-  - forof
-~~~JavaScript
-const arr = ['a', 'b', 'c']
-arr.prop = 'prop'
-
-for (const e of arr) {
-  console.log(e)
-}
-
-// a
-// b
-// c
-~~~
-
-###### [함수](#함수)
+###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# filer함수
-  - filter : 조건을 확인하여 true인것만 출력해줌
-  - map : 뒤에 추가적으로 뭔가 붙일때 사용
+# 객체
 
-~~~JavaScript
-const ar = [10,40,20,70,1]
-const ar2 = ar.filter(function(value, index){
-    return value === 40 || value === 20
-})
+~~~JavaScritp
+const person = {
+  name: "John Doe",
+  age: 30,
+  occupation: "Software Engineer",
+  address: {
+    street: "123 Main Street",
+    city: "Exampleville",
+    country: "Exampleland"
+  },
+  hobbies: ["reading", "playing guitar", "hiking"]
+};
 
-console.log(ar2)
-
-// [40, 20]
+console.log(person);
 ~~~
 
-###### [함수](#함수)
+###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 함수'=>'문법
-  - forEach, filer, map함수 처럼 function키워드를 사용하는 함수는 화살표 문법을 이용할 수 있다
-  - 함수가 한줄이라면 function과 {}와 return까지 모두 줄일 수 있게 된다
-  - "=>" 문법을 사용하여 나타내는것이 속도 측면에서 더 빠름. function에는 this를 사용 할 수 있는 것들이 포함 되어 있기 때문에 더 무겁고 느림
+# Set
+  - 고유한 식별자를 만들때 사용하게 된다
+  - console.log(symbol1.description === symbol2.description) 이렇게 스트링값 자체를 비교하면 true가 나오게 된다
 
-~~~JavaScript
-const f = function(매개변수){
-    console.log(매개변수)
-}
+~~~JavaScritp
+const symbol1 = Symbol('aa');
+const symbol2 = Symbol('aa');
 
-// 위와 같은 함수를 아래와 같이 바꿀 수 있다
-
-const f = (매개변수) => console.log(매개변수)
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# setTimeout,setInterval,clearTimeout,clearInterval함수
-  - setTimeout : 주어진 시간이 되면 한번 호출 한다
-  - setInterval : 인터벌 시간마다 반복 호출 한
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 즉시호출 함수
-  - html내의 각각의 scritp태그 안은 함께 공유한다고 생각할 수 있으니, 같은 이름의 변수는 하나만 선언 할수 있게 됨. 이때 즉시호출 함수를 써서, 변수를 내부에 위치 시키면 같은 변수이름이라도 사용 할 수 있게 됨
-
-~~~JavaScript
-(function(){
-    const a = 20
-    console.log(a)
-})()
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 선언적 함수, 익명 함수
-  - 선언적 함수 : 전체 코드를 실행하기 전에 만들어짐
-  - 익명 함수 : 코드를 하나하나 실행 하면서 만들어짐
-    - 대부분 익명 함수로 사용하게 된다. 선언적 함수를 사용하면 순서가 복잡하게 됨
-
-~~~JavaScript
-함수()
-// 먼저 만들어져 있는 선언적 함수 실행
-
-함수 = function () {
-    console.log("익명 함수") // 나중에 실행됨
-}
-
-function 함수() {
-    console.log("선언적 함수") // 먼저 만들어짐
-}
-
-함수()
-// 나중에 만들어지는 익명 함수가 선언적 함수를 덮어 버리기 때문에 익명 함수가 실행
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# map함수
-  - 배열일 때 하나하나를 특정한 것으로 작업을 해줌
-
-~~~JavaScript
-const arr = [1,2,3,4,5,6]
-const arr2 = arr.map(e=>e*2)
-console.log(arr2)
-
-// [ 2, 4, 6, 8, 10, 12 ]
+console.log(symbol1 === symbol2);  // false
 ~~~
 
 <br/>
 
-~~~JavaScript
-const arr = [ [1,2], [3,4] ,[5,6] ]
-const arr2 = arr.map(e=>e[0])
-console.log(arr2)
+  - Symbol.for
+    - 만든 symbol의 고유한 식별자가 같은 것으로 만들기 위해서
 
-// [ 1, 3, 5 ]
+~~~JavaScritp
+const symbol1 = Symbol.for('aa');
+const symbol2 = Symbol.for('aa');
+
+console.log(symbol1 === symbol2);  // false
 ~~~
 
-###### [함수](#함수)
+###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
-
-<br/>
-<br/>
 
 # new Set
-  - 중복이 허용되지 않는 객체이다
+  - 중복이 허용되지 않는 객체이다(일반 객체랑은 다르며 전혀 다른것으로 봐야 한다)
   - 객체로 만들어 주면서 중복을 제거해 준다
 
 ~~~JavaScript
@@ -609,11 +487,442 @@ console.log(arrarr)
 // [1,2,3,4,5,6,7]
 ~~~
 
+###### [자료형,변수](#자료형변수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 비교연산자
+  - "===" : (다른 언어와 달리 JavaScritp는 "=="가 아닌 "==="를 사용한다)
+  - "!==" : (이것도 다른 언어와 다르다..!)
+  - ">"
+  - ">="
+  - "<"
+  - "<="
+
+###### [비교연산자](#비교연산자)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 템플릿 문자열
+  - JavaScritp는 유연한 언어이기 때문에, 문자열 + 숫자를 해도 숫자가 자동으로 문자열되어 합쳐진다.
+  - 탬플릿 문자열을 사용하면 조금더 코드를 확인하기 좋아지고, 간편하게 문자열을 작성할 수 있다
+  - 탬플릿 문자열을 사용하지 않을경우 : "안녕하세요" + 1 + "ㄴㄴㄴ" -> “안녕하세요1ㄴㄴㄴ”
+  - 탬플릿 문자열을 사용할 경우 :  \`안녕하세요 ${1} ${"aaa"} 용용\` : “안녕하세요1aaa용용”이렇게 쓸수 있게 해준다
+    - 템플릿 문자열을 만들때 양쪽 끝에 \` 기호를 사용한다(키보드에 ~표시 키보드)
+    - 탬플릿 문자열 안쪽에 변수를 사용 할때는 "${}"로 감싸서 사용하게 된
+
+###### [템플릿 문자열](#템플릿-문자열)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# prompt,confirm,자료형변환
+ - prompt
+   - 문자열을 입력할 때 사용
+   - 숫자를 입력 받아야 하는 경우는 문자열로 입력 받은 뒤 변환
+   - 첫번째 매개변수는 입력 창에서 띄워줄 메시지
+   - 두번째 매개변수는 입력 부분의 기본 값
+   - 무조건 문자열로 입력받게 
+ - confirm
+   - 불린 값을 입력 받을 때 사용
+   - 확인을 누르면 true를 리턴
+   - 취소를 누르면 false를 리턴
+ - 자료형 변환
+   - Number(변환할 값)
+   - String(변환할 값)
+   - Boolean(변환할 값)
+
+~~~JavaScript
+ <script>
+        let a = prompt('첫 번째 숫자를 입력해주세요')
+        a = Number(a)
+        let b = prompt('두 번째 숫자를 입력해주세요')
+        b = Number(b)
+
+        alert(`${a} + ${b} + ${a + b}`)
+ </script>
+~~~
+
+###### [prompt,confirm,자료형변환](#promptconfirm자료형변환)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 논리 연산자 "||" 기호 사용시 주의
+  - || 이 기호를 사용하여 앞에 부분이 true가 되어 실행되면 뒤에는 볼것도 없기 때문에 뒤에는 실행 되지 않음
+
+~~~JavaScript
+<script>
+    alert("시작")
+    true || alert("트루1")
+    false || alert("트루2")
+    
+    alert(`${a} + ${b} + ${a + b}`)
+</script>
+
+// 시작, 트루2 만 출력됨
+~~~
+
+###### [논리 연산자 "||" 기호 사용시 주의](#논리-연산자-||-기호-사용시-주의)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 함수
+  - JavaScritp함수의 가장 기본적인 형태
+
+~~~JavaScript
+const f = function(매개변수, 매개변수...){
+    return 리턴값
+}
+~~~
+
+<br/>
+
+  - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
+  - [즉시호출 함수](#즉시호출-함수)
+  - [함수'=>'문법](#함수'=>'문법)
+  - [나머지 매개변수](#나머지-매개변수)
+  - [객체 매개변수](#객체-매개변수)
+  - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
+
 ###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
 <br/>
+
+# 선언적 함수, 익명 함수
+  - 선언적 함수 : 전체 코드를 실행하기 전에 만들어짐
+  - 익명 함수 : 코드를 하나하나 실행 하면서 만들어짐
+    - 대부분 익명 함수로 사용하게 된다. 선언적 함수를 사용하면 순서가 복잡하게 됨
+
+~~~JavaScript
+함수()
+// 먼저 만들어져 있는 선언적 함수 실행
+
+함수 = function () {
+    console.log("익명 함수") // 나중에 실행됨
+}
+
+function 함수() {
+    console.log("선언적 함수") // 먼저 만들어짐
+}
+
+함수()
+// 나중에 만들어지는 익명 함수가 선언적 함수를 덮어 버리기 때문에 익명 함수가 실행
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 즉시호출 함수
+  - html내의 각각의 scritp태그 안은 함께 공유한다고 생각할 수 있으니, 같은 이름의 변수는 하나만 선언 할수 있게 됨. 이때 즉시호출 함수를 써서, 변수를 내부에 위치 시키면 같은 변수이름이라도 사용 할 수 있게 됨
+
+~~~JavaScript
+(function(){
+    const a = 20
+    console.log(a)
+})()
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 함수'=>'문법
+  - forEach, filer, map함수 처럼 function키워드를 사용하는 함수는 화살표 문법을 이용할 수 있다
+  - 함수가 한줄이라면 function과 {}와 return까지 모두 줄일 수 있게 된다
+  - "=>" 문법을 사용하여 나타내는것이 속도 측면에서 더 빠름. function에는 this를 사용 할 수 있는 것들이 포함 되어 있기 때문에 더 무겁고 느림
+
+~~~JavaScript
+const f = function(매개변수){
+    console.log(매개변수)
+}
+
+// 위와 같은 함수를 아래와 같이 바꿀 수 있다
+
+const f = (매개변수) => console.log(매개변수)
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 나머지 매개변수
+  - JavaScritp에서 함수의 넘겨주는 인수의 갯수는 제한이 없다
+  - 함수를 만들때 매개 변수의 마지막 변수앞에 ‘…’을 달게 되면 나머지 매개 변수가 된다
+  - 나머지 매개 변수는 맨 마지막에 인수로만 쓸 수 있다.
+  - 나머지 매개 변수를 사용하면, 전달된 인수들의 목록을 배열로 압축할때 사용되어 진다
+
+<br/>
+
+  - JavaScritp는 유연하기 때문에, 함수에 인수 목록을 1개만 적고, 함수를 실행할때 인수를 2개 넣어도 에러가 나지 않고, 1개만 출력 된다
+
+~~~JavaScript
+const f = function(매개변수){
+    console.log(매개변수)
+}
+
+f("ㅁ", "ㄷ")
+
+// ㅁ
+~~~
+
+<br/>
+
+  - 나머지 매개 변수를 사용하게 되면, 뒤에 몇개의 매개변수를 넣어 함수를 실행하든 매개변수의 목록을 배열로 압축하여 전달 한다
+
+~~~JavaScript
+const f = function(...매개변수){
+    console.log(...매개변수)
+}
+
+f("ㅁ", "ㄷ")
+
+// ㅁ
+// 
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 객체 매개변수
+
+~~~JavaScript
+<script>
+
+
+    //#1
+    function mailSend(obj){
+        console.log(obj.i)
+        console.log(obj.j)
+        console.log(obj.k)
+    }
+   
+    mailSend({
+        i : "아이1",
+        j : "제이1",
+        k : "케이1"
+    })
+
+
+    //#2
+    function mailSend2({i, j, k}){
+        console.log(i)
+        console.log(j)
+        console.log(k)
+    }
+
+
+    mailSend2({
+        i : "아이2",
+        j : "제이2",
+        k : "케이2"
+    })
+</script>
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# setTimeout,setInterval,clearTimeout,clearInterval함수
+  - setTimeout : 주어진 시간이 되면 한번 호출 한다
+  - setInterval : 인터벌 시간마다 반복 호출 한다
+    - 두번째 인자는 실행되는 속도를 말한다
+
+<br/>
+
+  - setInterval
+~~~JavaScript
+<script>
+    import { onDestroy } from "svelte";
+
+    let seconds = 0;
+    const internal = setInterval(() => seconds += 1, 1000);
+
+    onDestroy(() => clearInterval(internal));
+</script>
+
+<p>{seconds}</p>
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/>
+<br/>
+
+# filer함수
+  - filter : 조건을 확인하여 true인것만 출력해줌
+  - map : 뒤에 추가적으로 뭔가 붙일때 사용
+
+~~~JavaScript
+const ar = [10,40,20,70,1]
+const ar2 = ar.filter(function(value, index){
+    return value === 40 || value === 20
+})
+
+console.log(ar2)
+
+// [40, 20]
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# map함수
+  - 배열일 때 하나하나를 특정한 것으로 작업을 해줌
+
+~~~JavaScript
+const arr = [1,2,3,4,5,6]
+const arr2 = arr.map(e=>e*2)
+console.log(arr2)
+
+// [ 2, 4, 6, 8, 10, 12 ]
+~~~
+
+<br/>
+
+~~~JavaScript
+const arr = [ [1,2], [3,4] ,[5,6] ]
+const arr2 = arr.map(e=>e[0])
+console.log(arr2)
+
+// [ 1, 3, 5 ]
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# forEach,forin,forof
+  - for문과 같이 배열을 순회하는 방버들이다
+  - forin,forof는 함수는 아니지만 forEach를 설명하면서 같이 설명진행한다
+
+<br/>
+
+  - forin
+~~~JavaScript
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+for (const key in arr) {
+  console.log(key, typeof key, arr[key])
+}
+
+// 0 "string" a
+// 1 "string" b
+// 2 "string" c
+// 3 "string" prop prop
+~~~
+
+<br/>
+
+  - forEach
+~~~JavaScript
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+arr.forEach((e, index) => {
+  console.log(e, index)
+})
+
+// a 0
+// b 1
+// c 2
+~~~
+
+<br/>
+
+  - forof
+~~~JavaScript
+const arr = ['a', 'b', 'c']
+arr.prop = 'prop'
+
+for (const e of arr) {
+  console.log(e)
+}
+
+// a
+// b
+// c
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+
 
 # Object.keys, Object.values
   - 객체의 key와 value만 잡아서 배열로 만듬
@@ -662,29 +971,36 @@ console.log(arr)
 <br/>
 <br/>
 
-# setInterval
-  - setInterval의 두번째 인자는 실행되는 속도를 말한다
-
-~~~JavaScript
-<script>
-    import { onDestroy } from "svelte";
-
-    let seconds = 0;
-    const internal = setInterval(() => seconds += 1, 1000);
-
-    onDestroy(() => clearInterval(internal));
-</script>
-
-<p>{seconds}</p>
-~~~
-
-###### [함수](#함수)
-###### [Top](#top)
-
-<br/>
-<br/>
-
 ***
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 엄격 모드
   - 순수 JS로 개발할 때 에는 JS파일의 맨 위에 'use strict' 를 사용하는 것이 좋다
@@ -1848,50 +2164,6 @@ localStorage.clear() // 전체 제거
 ~~~
 
 ###### [json](#json)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# 객체 매개변수
-
-~~~JavaScript
-<script>
-
-
-    //#1
-    function mailSend(obj){
-        console.log(obj.i)
-        console.log(obj.j)
-        console.log(obj.k)
-    }
-   
-    mailSend({
-        i : "아이1",
-        j : "제이1",
-        k : "케이1"
-    })
-
-
-    //#2
-    function mailSend2({i, j, k}){
-        console.log(i)
-        console.log(j)
-        console.log(k)
-    }
-
-
-    mailSend2({
-        i : "아이2",
-        j : "제이2",
-        k : "케이2"
-    })
-</script>
-~~~
-
-###### [객체 매개변수](#객체-매개변수)
 ###### [Top](#top)
 
 <br/>
