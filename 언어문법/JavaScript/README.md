@@ -19,6 +19,9 @@
   - [prompt,confirm,자료형변환](#promptconfirm자료형변환)
   - [논리 연산자 "||" 기호 사용시 주의](#논리-연산자--기호-사용시-주의)
   - [배열(array)](#배열array)
+    - [push, pop, unshift, shift](#push-pop-unshift-shift)
+    - [splice](#splice)
+    - [concat](#concat)
     - [filer함수](#filer함수)
     - [map함수](#map함수)
     - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
@@ -41,6 +44,18 @@
     - [get,set문법](#getset문법)
     - [static](#static)
     - [상속](#상속)
+  - [동기,비동기](#동기비동기)
+    - [setTimeout](#settimeout)
+    - [promise](#promise)
+    - [finally](#finally)
+    - [promise, then, setTimeout사용](#promise-then-settimeout사용)
+    - [pending상태](#pending상태)
+    - [fulfilled상태](#fulfilled상태)
+    - [promise에서 받아온 데이터 출력하기(then)](#promise에서-받아온-데이터-출력하기then)
+    - [async](#async)
+    - [promise, async, await이해하기](#promise-async-await이해하기)
+    - [Promise.all](#promiseall)
+    - [Promise.race](#promiserace)
   - [외부 자바스크립트 파일 읽어 오기](#외부-자바스크립트-파일-읽어-오기)
   - [자바스크립트로 문서조작하기](#자바스크립트로-문서조작하기)
     - [querySelector,querySelectorAll](#queryselectorqueryselectorall)
@@ -592,6 +607,9 @@ console.log(arrarr)
 ***
 
 # 배열(array)
+    - [push, pop, unshift, shift](#push-pop-unshift-shift)
+    - [splice](#splice)
+    - [concat](#concat)
     - [filer함수](#filer함수)
     - [map함수](#map함수)
     - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
@@ -608,9 +626,70 @@ console.log(fruits); // ["apple", "banana", "orange"]
 <br/>
 <br/>
 
+# push, pop, unshift, shift
+  - push, pop, unshift, shift
+  - unshift와 shift는 느리니 주의 하자!, 앞에 있는 데이터를 전부 땡겨서 움직여야 한다
+
+~~~JavaScript
+let arr = [1,2,3];
+console.log(arr); // [1, 2, 3]
+
+arr.push(1) // 맨뒤에 들어감
+console.log(arr); // [1, 2, 3, 1]
+
+arr.pop(); // 맨뒤에 빠짐
+console.log(arr); // [1, 2, 3]
+
+arr.unshift(1); // 맨앞에 들어감
+console.log(arr); // [1, 1, 2, 3]
+
+arr.shift(1); // 맨앞에 빠짐
+console.log(arr); // [1, 2, 3]
+~~~
+
+###### 배열(array)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# splice
+  - 첫번째 인자 : 몇번째 인덱스 부터 시작할지
+  - 두번째 인자 : 몇개 선택할지
+  - 세번째 인자부터 : 지운 자리에 새로 넣을 자료
+
+~~~JavaScript
+let arr = [1,2,3];
+arr.splice(1,1,6,7); // [1, 6, 7, 3]
+console.log(arr)
+~~~
+
+###### 배열(array)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# concat
+  - 배열 합치기
+
+~~~JavaScript
+let arr = [1,2,3];
+let arr2 = [1,2,3]
+
+const newArr = arr.concat(arr2);
+
+console.log(newArr); // [1, 2, 3, 1, 2, 3]
+~~~
+
+###### 배열(array)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 # filer함수
   - filter : 조건을 확인하여 true인것만 출력해줌
-  - map : 뒤에 추가적으로 뭔가 붙일때 사용
 
 ~~~JavaScript
 const ar = [10,40,20,70,1]
@@ -1599,8 +1678,720 @@ students.add(new Student('ㄹ', 14,25,36,47))
 
 ***
 
+# 동기,비동기
+  - js는 일반적으로는 위에서부터 한줄 한줄 동기작업으로 이루어져 있다
+
+<br/>
+  
+  - [setTimeout](#settimeout)
+  - [promise](#promise)
+  - [finally](#finally)
+  - [promise, then, setTimeout사용](#promise-then-settimeout사용)
+  - [pending상태](#pending상태)
+  - [fulfilled상태](#fulfilled상태)
+  - [promise에서 받아온 데이터 출력하기(then)](#promise에서-받아온-데이터-출력하기then)
+  - [async](#async)
+  - [promise, async, await이해하기](#promise-async-await이해하기)
+  - [Promise.all](#promiseall)
+  - [Promise.race](#promiserace)
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# setTimeout
+  - setTimeout을 사용 함으로써 해당하는 것들을 비동기 적으로 실행한다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+// 동기
+console.log('1');
+
+// 비동기
+setTimeout(() => {
+    console.log('2');
+}, 2000);
+
+// 동기
+console.log('3')
+~~~
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# promise
+  - JavaScript안에 내장되어 있는 object
+  - 비동기 적인 것을 수행할 때 콜백함수 대신에 유용하게 쓸 수 있는 object
+  - 두가지포인트
+    - State
+      - pending :  수행중
+      - fulfilled : 완료
+      - rejected : 파일을 찾을 수 없거나, 네트워크 문제
+
+<br/>
+
+  - 실행하지 않아도, Promise안에 있는 executor라는 콜백함수가 바로 이것을 실행 해줌
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const promise = new Promise((resolve, reject) => {
+    console.log("바로 통신");
+});
+~~~
+
+  - promise안에 전달된 resolve데이터 출력
+    - 아래와 같이 promise안에 전달된 값을 출력할 때 꼭 value변수를 사용하지 않아도 된다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+// 실행하지 않아도, Promise안에 있는 executor라는 콜백함수가 바로 이것을 실행 해줌
+const promise = new Promise((resolve, reject) => {
+    console.log("바로 통신");
+    setTimeout(() => {
+        resolve('블라블라 전송');
+    }, 2000);
+});
+
+// promise안에 전달된 resolve데이터 출력
+promise.then(value => {
+    console.log(value);
+})
+~~~
+
+<br/>
+
+  - reject에러 발생시키기
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+// 실행하지 않아도, Promise안에 있는 executor라는 콜백함수가 바로 이것을 실행 해줌
+const promise = new Promise((resolve, reject) => {
+    console.log("바로 통신");
+    setTimeout(() => {
+        reject("ㅇㅇㅇㅇㅇ");
+    }, 2000);
+});
+
+// promise안에 전달된 resolve데이터 출력
+promise.then(value => {
+    console.log(value);
+})
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/eeebab2e-4c96-4e00-b194-269f918e981a)
+
+  - reject에러 발생시키기2
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+// 실행하지 않아도, Promise안에 있는 executor라는 콜백함수가 바로 이것을 실행 해줌
+const promise = new Promise((resolve, reject) => {
+    console.log("바로 통신");
+    setTimeout(() => {
+        reject(new Error('에러~~'))
+    }, 2000);
+});
+
+// promise안에 전달된 resolve데이터 출력
+promise.then(value => {
+    console.log(value);
+})
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/40ac6b60-2cc8-447e-a8d6-28757c26d380)
+
+<br/>
+
+  - reject에러 잡기(catch)
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+// 실행하지 않아도, Promise안에 있는 executor라는 콜백함수가 바로 이것을 실행 해줌
+const promise = new Promise((resolve, reject) => {
+    console.log("바로 통신");
+    setTimeout(() => {
+        reject(new Error('에러~~'))
+    }, 2000);
+});
+
+// promise안에 전달된 resolve데이터 출력
+promise
+.then(value => {
+    console.log(value);
+})
+.catch(error => {
+    console.log(error);
+});
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c9dbb9b8-3810-4865-907d-046d761a2cfd)
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# finally
+  - 잘 출력되든, 에러가 나든 finally안에 있는 것은 무조건 실행이 된다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+// 실행하지 않아도, Promise안에 있는 executor라는 콜백함수가 바로 이것을 실행 해줌
+const promise = new Promise((resolve, reject) => {
+    console.log("바로 통신");
+    setTimeout(() => {
+        reject(new Error('에러~~'))
+    }, 2000);
+});
+
+// promise안에 전달된 resolve데이터 출력
+promise
+.then(value => {
+    console.log(value);
+})
+.catch(error => {
+    console.log(error);
+})
+.finally(() => {
+    console.log('무조건 실행');
+})
+~~~
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# promise, then, setTimeout사용
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+// 실행하지 않아도, Promise안에 있는 executor라는 콜백함수가 바로 이것을 실행 해줌
+const promise = new Promise((resolve, reject) => {
+    console.log("바로 통신"); // 바로 통신
+    setTimeout(() => {
+        resolve(1);
+    }, 2000);
+});
+
+// promise안에 전달된 resolve데이터 출력
+promise
+.then(data => data + 1)
+.then(data => data + 1)
+.then(data => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+           resolve(data + 10)
+        }, 1000);
+    });
+})
+.then(data => console.log(data)); // 13
+~~~
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# pending상태
+  - resolve나 reject가 없다면 pending상태가 된다
+  따라서 Promise안에서는 resolve나 reject가 존재해야 한다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const fetchUser = function(){
+    return new Promise((resolve, reject) => {
+        return 'aaa';
+    });
+}
+
+const user = fetchUser();
+console.log(user);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/bf6c4b7f-bd57-42a0-a5b0-66de1b0da497)
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# fulfilled상태
+  - resolve나 reject가 존재 함으로써 promise데이터를 받아 올 수 있게 된다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const fetchUser = function(){
+    return new Promise((resolve, reject) => {
+        resolve('aaa');
+    });
+}
+
+const user = fetchUser();
+console.log(user);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0a9587f2-1c3e-4524-9914-76b1f5ff1ce6)
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# promise에서 받아온 데이터 출력하기(then)
+  - promise에서 받아온 데이터는 then을 이용해 출력해 올 수 있다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const fetchUser = function(){
+    return new Promise((resolve, reject) => {
+        resolve('aaa');
+    });
+}
+
+const user = fetchUser();
+user.then(value => console.log(value));
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/363f2a5b-4eca-464e-b7f3-3270f5daab39)
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# async
+  - async를 사용하게 되면 promise객체를 만들지 않아도 자동으로 promise로 뽑아내 준다
+  - user.then(value => console.log(value)); return 값 출력하기
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const fetchUser = async function(){
+    return 'aaa';
+}
+
+const user = fetchUser();
+console.log(user);
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6404ffdd-4a74-48c0-90e6-99a45016c1b1)
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# promise, async, await이해하기
+  - 비동기 작업을 하기 위해 promise를 사용하게 됨
+    - new Promise()메서드를 호출하면 Pending상태가 됨
+    - resolve를 실행하면 Fulfilled상태가 되고 then()을 이용해 값을 받을 수 있음
+    - reject를 호출하면 실패상태가 되고, catch()로 받을 수 있음
+    - Promise안에서는 “동기 처리 하고 싶은 비동기 처리를” 담는것!! 이게 가장 중요한 포인트가 된다
+  - async키워드를 사용하여 promise를 쉽게 사용할 수 있음
+  - 그런 비동기 작업을 await가 동기로 기다려준다(then과 같은것)
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const PromiseRrturn = function() {
+    return new Promise((resolve, reject) => {
+      // 비동기 작업 수행
+      setTimeout(() => {
+        resolve(console.log("난 promise 비동기 작업"));
+      }, 2000);
+    });
+  }
+
+  PromiseRrturn()
+  .then(console.log("promise이후 작업"));
+
+  // promise이후 작업
+  // 난 promise 비동기 작업
+~~~
+
+<br/>
+
+  - .then 동기작업
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const PromiseRrturn = function() {
+    return new Promise((resolve, reject) => {
+      // 비동기 작업 수행
+      setTimeout(() => {
+        resolve(console.log("난 promise 비동기 작업"));
+      }, 2000);
+    });
+  }
+
+  PromiseRrturn()
+  .then(value => console.log("promise이후 작업"));
+
+  // 난 promise 비동기 작업
+  // promise이후 작업
+~~~
+
+<br/>
+
+  - 함수 내부에서도 위와 같이 똑같이 사용하게 된다는점 헷갈려 하지 말자
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const PromiseRrturn = function() {
+    return new Promise((resolve, reject) => {
+      // 비동기 작업 수행
+      setTimeout(() => {
+        resolve(console.log("난 promise 비동기 작업"));
+      }, 2000);
+    });
+  }
+
+const get = function(){
+    PromiseRrturn();
+    console.log("promise이후 작업");
+}
+
+get();
+
+ // promise이후 작업
+ // 난 promise 비동기 작업
+~~~
+
+<br/>
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const PromiseRrturn = function() {
+    return new Promise((resolve, reject) => {
+      // 비동기 작업 수행
+      setTimeout(() => {
+        resolve(console.log("난 promise 비동기 작업"));
+      }, 2000);
+    });
+  }
+
+const get = function(){
+    PromiseRrturn()
+    .then(() => console.log("promise이후 작업"));
+}
+
+get();
+
+ // 난 promise 비동기 작업
+ // promise이후 작업
+~~~
+
+<br/>
+
+  - 바로 위에 있는 .then을 await로 바꾸었을때
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const PromiseRrturn = function() {
+    return new Promise((resolve, reject) => {
+      // 비동기 작업 수행
+      setTimeout(() => {
+        resolve(console.log("난 promise 비동기 작업"));
+      }, 2000);
+    });
+  }
+
+const get = async function(){
+    await PromiseRrturn();
+    console.log("promise이후 작업");
+}
+
+get();
+
+ // 난 promise 비동기 작업
+ // promise이후 작업
+~~~
+
+<br/>
+
+  - 전에 있었던 코드 어떻게 바꿔야 할지 깨닭음
+
+Dir : .js
+~~~JavaScript
+console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+ let ss = indexM(HPL_CD)
+ ss.then((value) => indexMdata = value)
+
+ <div>{indexMdata}</div>
+~~~
+
+<br/>
+
+  - 빠른 병렬 처리 하기
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+};
+
+async function getApple() {
+    await delay(1000);
+    return '사과';
+}
+
+async function getBanana() {
+    await delay(1000);
+    return '바나나';
+}
+
+async function pickFruite(){
+    const name1 = await getApple();
+    const name2 = await getBanana();
+    return `${name1} + ${name2}`
+}
+
+pickFruite().then(console.log)
+~~~
+
+<br/>
+
+  - 위의 코드는 await 두개를 1초씩 기다려야 하지만, 아래 처리는 1초만 기다리면 된다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+};
+
+async function getApple() {
+    await delay(1000);
+    return '사과';
+}
+
+async function getBanana() {
+    await delay(1000);
+    return '바나나';
+}
+
+async function pickFruite(){
+    const applePromise = getApple();
+    const bananaPromise = getBanana();
+    const name1 = await applePromise;
+    const name2 = await bananaPromise;
+    return `${name1} + ${name2}`
+}
+
+pickFruite().then(console.log) // 사과 + 바나나
+~~~
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Promise.all
+  - 비동기 병렬 처리
+  - 위와 같이 병렬 처리를 하는 경우는 Promise.all이라는 것을 사용해서 간결하게 처리하게 된다
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+};
+
+async function getApple() {
+    await delay(1000);
+    return '사과';
+}
+
+async function getBanana() {
+    await delay(1000);
+    return '바나나';
+}
+
+async function pickFruite(){
+    return Promise.all([getApple(), getBanana()])
+    .then(frutes => frutes.join(' + '));
+}
+
+pickFruite().then(console.log) // 사과 + 바나나
+~~~
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Promise.race
+  - 먼저 처리된것이 반환됨
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+};
+
+async function getApple() {
+    await delay(2000);
+    return '사과';
+}
+
+async function getBanana() {
+    await delay(1000);
+    return '바나나';
+}
+
+async function pickFruite(){
+    return Promise.race([getApple(), getBanana()])
+}
+
+pickFruite().then(console.log) // 바나나
+~~~
+
+###### [동기,비동기](#동기비동기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # 외부 자바스크립트 파일 읽어 오기
-  - <script src=”b.js”></script> 와 같이 src키워드를 써서 파일을 불러 올 수 있다
+  - html에 js불러오기
+    - head에 불러오기
+      - js파일을 head부분에 불러오게 되면, 웹사이트가 html을 위에서부터 분석하면서 script태그를 만나게 되고, js파일을 다운받을 때 가지 block되기 때문에 js파일의 용량이 크다면 웹사이트가 늦게 뜨게 된다
+      - parsing HTML -> (blocked) js파일 다운 -> (blocked) js파일 실행 -> parsing HTML -> page is ready!
+
+Dir : index.html
+~~~Html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="main.js"> </script>
+</head>
+<body>
+</body>
+</html>
+~~~
+
+<br/>
+
+  - body에 불러오기
+    - body에 불러오게 되면 head에 불러온 것보다 웹사이트 준비가 미리 되어서 보여지겠지만, 만약 js파일에 굉장히 의존적인 사이트라면, 의미 있는 정보를 보여주는 화면이 나오기 위해서는 결국 js파일이 전부 로드 되어야 보여질 수 있을 것이다
+    - parsing HTML -> page is ready -> js파일 다운 -> js파일 실행
+
+Dir : index.html
+~~~Html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="main.js"> </script>
+</body>
+</html>
+~~~
+
+<br/>
+
+  - head에 async로 불러오기
+    - html parsing을 진행하다가, 병렬로 js파일이 다운로드 진행되고, 그 후 js파일이 다운로드 되면 js파일을 해석하기 위해 block 되었다가 해석이 끝나면 다시 html parsing을 시작한다
+    - js 파일을 다운로드 하는 시간을 절약할 수 있지만, html이 parsing되기도 전에 js파일에서 dom요소를 조작하려고 했다면 dom요소가 생성되기 전이기 때문에 위험할 수 있다, 또한 js파일을 다운후, 그것을 실행하기 위해서 얼마든지 웹사이트가 멈출 수 있기때문에 단점을 해결하지 못한 부분도 있게 된다
+    - 또한, 다운로드가 먼저 되는 js파일 순서로 실행이 되버리기 때문에, 선행 되어야 하는 js파일이 있다면 위험할 수 있다
+    - parsing HTML and js파일 다운 -> (block) js실행 -> parsing HTML -> page is ready
+
+Dir : index.html
+~~~Html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script async src="main.js"> </script>
+</head>
+<body>
+</body>
+</html>
+~~~
+
+<br/>
+
+  - head에 defer로 불러오기
+    - defer로 설정하게 되면, js파일을 미리 다운 받고, 페이지 로드 후에 js파일을 실행하기 때문에 가장 좋다 또한, 먼저 다운로드 된 js파일을 실행하는 것이 아니라, 먼저 읽은 순서대로 마지막에 실행하기 때문에 순서에 대해서도 지킬 수가 있다
+    - parsing HTML and js파일 다운-> page is ready -> js파일 실행 
+
+Dir : index.html
+~~~Html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script defer src="main.js"> </script>
+</head>
+<body>
+</body>
+</html>
+~~~
 
 ###### [외부 자바스크립트 파일 읽어 오기](#외부-자바스크립트-파일-읽어-오기)
 ###### [Top](#top)
