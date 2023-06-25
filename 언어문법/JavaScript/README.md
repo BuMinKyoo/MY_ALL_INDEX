@@ -2,6 +2,7 @@
 
 ###### Top
 
+  - [JavaScript디버깅](#javascript디버깅)
   - [JavaScript 사용(Script태크)](#javascript-사용script태크)
   - [JavaScript 코드실행 3가지](#javascript-코드실행-3가지)
   - [JavaScript 코드실행에러 확인](#javascript-코드실행에러-확인)
@@ -25,6 +26,7 @@
     - [filer함수](#filer함수)
     - [map함수](#map함수)
     - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+    - [스프레드 문법 추가](#스프레드-문법-추가)
   - [함수](#함수)
     - [선언적 함수, 익명 함수](#선언적-함수-익명-함수)
     - [즉시호출 함수](#즉시호출-함수)
@@ -32,9 +34,13 @@
     - [나머지 매개변수](#나머지-매개변수)
     - [객체 매개변수](#객체-매개변수)
     - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
+    - [Default parameters](#default-parameters)
   - [객체(Object)](#객체object)
     - [객체 생성](#객체-생성)
     - [객체내 this](#객체내-this)
+    - [Object.keys, Object.values](#objectkeys-objectvalues)
+    - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
+    - [Destructuring assignment](#destructuring-assignment)
   - [forEach,forin,forof](#forEach,forin,forof)
   - [엄격 모드](#엄격-모드)
   - [prototype문법](#prototype문법)
@@ -75,6 +81,73 @@
   - [json](#json)
 
    
+<br/>
+<br/>
+
+***
+
+# JavaScript디버깅
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6d8050b3-e72d-4d56-8d00-376d48f4c2ec)
+
+  - 1.‘Resume’ : 스크립트 실행을 다시 시작함(단축키 F8)
+  - 2.‘Step over’ : 다음 명령어를 실행하되, 함수 안으로 들어가진 않음(단축키 F10)
+  - 3.‘Step into’ : step과 비슷하지만, 비동기 동작을 담당하는 코드로 진입하고, 필요하다면 비동기 동작이 완료될 때까지 대기함
+  - 4.‘Step out’ : 실행 중인 함수의 실행이 끝날 때 까지 실행을 계속함(단축키 Shift+F11)
+  - 5.‘Step’ : 다음 명령어를 실행함(비동기 동작을 무시함) (단축키 F9)
+  - 6.모든 중단점을 활성화/비활성화
+
+<br/>
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const PromiseRrturn = function() {
+    return new Promise((resolve, reject) => {
+      // 비동기 작업 수행
+      setTimeout(() => {
+        resolve("난 promise 비동기 작업");
+      }, 2000);
+    });
+  }
+
+const get = async function(){
+    let data = PromiseRrturn()
+    data.then((value) => console.log(value))
+    .then(() => console.log("비동기 이후 작업"))
+}
+
+get();
+~~~
+
+<br/>
+
+Dir : .js
+~~~JavaScript
+'use strict';
+
+const PromiseRrturn = function() {
+    return new Promise((resolve, reject) => {
+      // 비동기 작업 수행
+      setTimeout(() => {
+        resolve("난 promise 비동기 작업");
+      }, 2000);
+    });
+  }
+
+const get = async function(){
+    let data = PromiseRrturn()
+    data.then((value) => console.log(value))
+    console.log("비동기 이후 작업")
+}
+
+get();
+~~~
+
+###### [JavaScript디버깅](#javascript디버깅)
+###### [Top](#top)
+
 <br/>
 <br/>
 
@@ -613,6 +686,7 @@ console.log(arrarr)
     - [filer함수](#filer함수)
     - [map함수](#map함수)
     - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+    - [스프레드 문법 추가](#스프레드-문법-추가)
 
 ~~~JavaScript
 const fruits = ["apple", "banana", "orange"];
@@ -775,8 +849,44 @@ console.log(arr2)
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fe5f1649-3300-4a56-8ddd-ae67585dcda4)
 
-###### [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+###### [배열(array)](#배열array)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# 스프레드 문법 추가
+
+Dir : .js
+~~~JavaScript
+const array = [1,2,3];
+
+const array2 = [...array, 5,6];
+
+console.log(array2);
+// [1, 2, 3, 5, 6]
+~~~
+
+<br/>
+
+Dir : .js
+~~~JavaScript
+onst array1 = [1,2,3];
+const array2 = [1,2,3];
+
+const array3 = [...array1, ...array2];
+
+console.log(array3);
+// [1, 2, 3, 1, 2, 3]
+~~~
+
+###### [배열(array)](#배열array)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
 
 # 함수
   - JavaScritp함수의 가장 기본적인 형태
@@ -795,6 +905,7 @@ const f = function(매개변수, 매개변수...){
   - [나머지 매개변수](#나머지-매개변수)
   - [객체 매개변수](#객체-매개변수)
   - [setTimeout,setInterval,clearTimeout,clearInterval함수](#settimeoutsetintervalcleartimeoutclearinterval함수)
+  - [Default parameters](#default-parameters)
 
 ###### [함수](#함수)
 ###### [Top](#top)
@@ -976,6 +1087,23 @@ f("ㅁ", "ㄷ")
 <br/>
 <br/>
 
+# Default parameters
+
+~~~JavaScript
+const input = function(messege = '난 디폴트') {
+    console.log(messege);
+};
+
+input('aaa'); // aaa
+input(); // 난 디폴트
+~~~
+
+###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 ***
 
 # 객체(Object)
@@ -983,6 +1111,7 @@ f("ㅁ", "ㄷ")
   - [객체내 this](#객체내-this)
   - [Object.keys, Object.values](#objectkeys-objectvalues)
   - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
+  - [Destructuring assignment](#destructuring-assignment)
 
 ~~~JavaScript
 var person = {
@@ -1140,6 +1269,41 @@ let arr = Object.entries(arrObj)
 console.log(arr)
 
 // [ [ 'a', 1 ], [ 'b', 2 ], [ 'c', 3 ] ]
+~~~
+
+###### [객체(Object)](#객체object)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Destructuring assignment
+  - 괄호 안에 변수들을 잡아 놓을 수 있다
+
+~~~JavaScript
+const student = {
+    name: 'Anna',
+    level: 1
+}
+
+{
+    const {name, level} = student;
+    console.log(name, level); // Anna 1
+}
+~~~
+
+<br/>
+
+  - 변수들의 이름을 변경할 수 있다
+
+~~~JavaScript
+const student = {
+    name: 'Anna',
+    level: 1
+}
+
+const {name: aa, level: bb} = student;
+    console.log(aa, bb); // Anna 1
 ~~~
 
 ###### [객체(Object)](#객체object)
