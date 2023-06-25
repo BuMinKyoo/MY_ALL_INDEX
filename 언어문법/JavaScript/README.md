@@ -42,7 +42,7 @@
     - [Object.keys, Object.values](#objectkeys-objectvalues)
     - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
     - [Destructuring assignment](#destructuring-assignment)
-    - [Optional chaining](#Optional chaining)
+    - [Optional chaining](#optional-chaining)
   - [forEach,forin,forof](#forEach,forin,forof)
   - [엄격 모드](#엄격-모드)
   - [prototype문법](#prototype문법)
@@ -1116,7 +1116,7 @@ input(); // 난 디폴트
   - [Object.keys, Object.values](#objectkeys-objectvalues)
   - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
   - [Destructuring assignment](#destructuring-assignment)
-  - [Optional chaining](#Optional chaining)
+  - [Optional chaining](#optional-chaining)
 
 ~~~JavaScript
 var person = {
