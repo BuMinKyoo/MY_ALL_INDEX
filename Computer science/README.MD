@@ -128,6 +128,19 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
   </div>
   </details>
 
+
+- <details markdown="1">
+  <summary>Web</summary>
+  <div markdown="1">
+  
+  - [Web](#web)
+    - [CSR,SSR,TTV,TTI](#csr,ssr,ttv,tti)
+    - [웹 어셈블리(WebAssembly 혹은 WASM)](#웹-어셈블리webassembly-혹은-wasm)
+    
+  </div>
+  </details>
+
+
 <br/>
 <br/>
 
@@ -1952,4 +1965,83 @@ a : 8, b : 3
     - Swap Out : RAM -> HDD
 
 ###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Web
+  - [CSR,SSR,TTV,TTI](#csr,ssr,ttv,tti)
+  - [웹 어셈블리(WebAssembly 혹은 WASM)](#웹-어셈블리webassembly-혹은-wasm)
+
+###### [Web](#web)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# CSR,SSR,TTV,TTI
+  - CSR(Client Side Rendering)
+    - 1.클라이언트가 서버에서 index.html파일을 받아온다(html파일은 텅텅 비어 있기 때문에 사용자 에게는 아무것도 보여지지 않는다)
+    - 2.index파일에 링크되어 있는 js파일을 요청
+    - 3.서버는 클라이언트에게 js파일을 전해 준다
+    - 4.그 후 사용자는 웹사이트를 볼 수 있게 된다(사용자가 클릭할 수도 있다)
+
+TTV : 사용자가 웹사이트를 볼 수 있음
+TTI : 클릭을 하거나 인터랙션이 가능함
+
+  - SSR(Server Side Rendering)
+    - 1.클라이언트가 서버에서 요청을 보내면, 서버에서 이미 잘 만들어진 index파일을 준다
+    - 2.사용자가 웹 사이트를 볼 수가 있다
+    - 3.하지만 아직 동적으로 인터랙션 할 수 있는 js파일을 받지 않았기 때문에, 클릭과 같은 아무 것도 처리 할 수가 없다
+    - 4.그 후 js파일을 요청하게 되고, js파일을 받은 후에야 클릭과 같은 인터랙션을 할 수 있게 된다
+
+사용자가 웹사이트를 보는 시간과, 그것을 인터랙션 하는 시간의 공백 기간이 있는 편이다
+
+###### [Web](#web)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 웹 어셈블리(WebAssembly 혹은 WASM)
+  - 1. git clone https://github.com/emscripten-core/emsdk.git
+  - 2. cd emsdk
+  - 3. ./emsdk install latest(emsdk install latest)
+  - 4. ./emsdk activate latest(emsdk activate latest)
+  - 5. emsdk_env.bat
+
+Dir : hello.cpp
+~~~C++
+#include <iostream>
+int main() {
+  std::cout << "Hello WebAssembly!" << std::endl;
+  return 0;
+}
+~~~
+
+  - 6. emcc hello.cpp -o hello.html
+    - emcc로 생성된 HTML 파일을 직접 브라우저에서 열면 일부 보안 정책 때문에 웹 어셈블리 코드가 실행되지 않을 수 있다. 브라우저가 파일 URL (file://) 에서 AJAX 요청을 차단하기 때문에
+    - 터미널에서 직접 html파일을 실행하자
+      - emrun hello.html
+
+<br/>
+
+  - gpt답변….
+
+Q. 일반 콘솔이 아닌, mfc로 되어진 프로젝트 파일을 웹 어셈블리화 하는것은 어떻게 해?
+
+A. MFC (Microsoft Foundation Classes)는 Microsoft가 제공하는 C++ 클래스 라이브러리로, Windows 응용 프로그램 개발을 위한 다양한 GUI 요소와 통합 개발 환경을 제공합니다. 이는 특히 Windows 운영 체제에 특화되어 있으며, Windows API에 대한 래퍼 함수를 제공하여 Windows 응용 프로그램 개발을 쉽게 만듭니다.
+
+그러나 Emscripten과 WebAssembly는 브라우저에서 실행되도록 설계된 기술이므로, Windows나 MFC와 같은 플랫폼에 종속적인 코드를 그대로 변환하는 것은 불가능합니다. 브라우저 환경은 파일 시스템이나 네트워크, UI와 같은 시스템 리소스에 직접 접근하는 것을 제한하며, MFC와 같은 특정 운영 체제의 UI 툴킷을 사용하는 것도 불가능합니다.
+
+따라서 MFC 응용 프로그램을 웹으로 이식하려면, GUI를 HTML, CSS, JavaScript와 같은 웹 기술을 사용하여 재구현해야 합니다. 그리고 시스템 리소스에 대한 액세스는 브라우저 API나 Emscripten이 제공하는 API를 사용하여 재구현해야 합니다.
+
+웹에서 복잡한 GUI를 구현하기 위한 다양한 라이브러리와 툴킷이 있으므로, 해당 응용 프로그램의 요구 사항에 맞는 것을 선택하여 사용할 수 있습니다. 예를 들어, React, Vue, Angular와 같은 프레임워크를 사용할 수 있고, WebGL이나 Three.js를 사용하여 3D 그래픽을 구현할 수 있습니다.
+
+그러므로 기존의 MFC 프로젝트를 웹으로 이식하는 작업은 많은 시간과 노력을 필요로 하며, 웹 개발에 대한 충분한 지식이 필요합니다.
+
+###### [Web](#web)
 ###### [Top](#top)
