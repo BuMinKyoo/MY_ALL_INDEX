@@ -1774,6 +1774,8 @@ Dir : +page.svelte
 ***
 
 # svelte간 데이터 전달
+  - 데이터 전달하는 과정을, 양방향 bind와, 단방향 전달로 잘 보여주고 있다.
+  - 여기서 input.svelte의 버튼을 클릭해 데이터를 20으로 전부 바꾸고, inputChild.svelte의 버튼을 클릭해 본인만 데이터가 30이 되었을 때, 다시 inputChild.svelte의 버튼을 클릭하면 inputChild.svelte의 값이 20으로 돌아가지 않게 되는데, 이는 이미 input.svelte 자신의 데이터가 20임으로 값이 그대로인 20으로 바꾸려는 것 때문에 html의 최신화가 이루어지지 않기 때문이다
 
 Dir : +page.svelte
 ~~~JavaScript
@@ -1844,6 +1846,67 @@ Dir : inputChild.svelte
 </button>
 
     <h1>나는 inputChild의 값 : {num2}</h1>
+~~~
+
+<br/>
+
+  - 함수 전달
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import Input from "./input.svelte";
+
+    function deiley(){
+        console.log("나는 함수");
+    }
+</script>
+
+<div>
+    <div>
+        <Input f2={deiley}/>
+    </div>
+</div>
+~~~
+
+Dir : input.svelte
+~~~JavaScript
+<script>
+    export let f2
+
+    f2() // 나는 함수라는 스트링이 터미널에 출력된다
+</script>
+~~~
+
+  - 함수도 bind로 가져올 수 있음
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    import Input from "./input.svelte";
+
+    let deiley;
+
+</script>
+
+<div>
+    <div>
+        <Input bind:f2={deiley}/>
+    </div>
+</div>
+
+<button on:click={() => deiley()}>deiley 함수 실행</button>
+~~~
+
+<br/>
+
+Dir : input.svelte
+~~~JavaScript
+<script>
+    export function f2(){
+        console.log("나는 함수")
+    }
+</script>
 ~~~
 
 ###### [svelte간 데이터 전달](#svelte간-데이터-전달)
