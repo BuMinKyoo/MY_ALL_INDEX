@@ -38,9 +38,11 @@
   - [객체(Object)](#객체object)
     - [객체 생성](#객체-생성)
     - [객체내 this](#객체내-this)
+    - [객체 매핑](#객체-매핑)
     - [Object.keys, Object.values](#objectkeys-objectvalues)
     - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
     - [Destructuring assignment](#destructuring-assignment)
+    - [Optional chaining](#Optional chaining)
   - [forEach,forin,forof](#forEach,forin,forof)
   - [엄격 모드](#엄격-모드)
   - [prototype문법](#prototype문법)
@@ -79,7 +81,8 @@
     - [textContent,value차이](#textcontentvalue차이)
   - [localStorage](#localstorage)
   - [json](#json)
-
+  - [html부분에 함수 실행시](#html부분에-함수-실행시)
+  - [브라우저의 싱글 스레드 동작에 관하여](#브라우저의-싱글-스레드-동작에-관하여)
    
 <br/>
 <br/>
@@ -1109,9 +1112,11 @@ input(); // 난 디폴트
 # 객체(Object)
   - [객체 생성](#객체-생성)
   - [객체내 this](#객체내-this)
+  - [객체 매핑](#객체-매핑)
   - [Object.keys, Object.values](#objectkeys-objectvalues)
   - [Object.fromEntries, Object.entries](#objectfromentries-objectentries)
   - [Destructuring assignment](#destructuring-assignment)
+  - [Optional chaining](#Optional chaining)
 
 ~~~JavaScript
 var person = {
@@ -1230,6 +1235,33 @@ object.bark()
 <br/>
 <br/>
 
+# 객체 매핑
+  - 객체에 key와 value를 설정할 때, 외부에 같은 변수명이 있다면 따로 명시해 주지 않아도 된다
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+    const data = 3;
+
+    const obj = {
+        name: '철수',
+        id: 3,
+        data
+    }
+
+</script>
+
+<div>{obj.data}</div>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/599b921e-73b5-41b8-8816-0fd4e5345539)
+
+###### [객체(Object)](#객체object)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 # Object.keys, Object.values
   - 객체의 key와 value만 잡아서 배열로 만듬
 
@@ -1304,6 +1336,94 @@ const student = {
 
 const {name: aa, level: bb} = student;
     console.log(aa, bb); // Anna 1
+~~~
+
+###### [객체(Object)](#객체object)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Optional chaining
+  - 어떤 객체 데이터 안에서, 다른 객체들이 들어왔을때 데이터가 없거나 하면 에러가 날 수 있다.
+  - 그때 사용 할 수 있는 방법론 문법
+
+Dir : .js
+~~~JavaScript
+const person1 = {
+    name: 'minkyoo',
+    job: {
+        title: 'S/W Engineer',
+        manager: {
+            name: 'Bob'
+        }
+    }
+};
+
+const person2 = {
+    name: 'Bob'
+};
+
+function printManager(person){
+    console.log(person.job.manager.name); // person2는 에러가남
+}
+~~~
+
+<br/>
+
+  - 삼항 연산자로 만든 중첩문을 사용할 수도 있음
+
+Dir : .js
+~~~JavaScript
+const person1 = {
+    name: 'minkyoo',
+    job: {
+        title: 'S/W Engineer',
+        manager: {
+            name: 'Bob'
+        }
+    }
+};
+
+const person2 = {
+    name: 'Bob'
+};
+
+function printManager(person){
+    console.log(person.job
+        ? person.job.manager
+            ? person.job.manager.name
+            :undefined
+        :undefined); // person2는 에러가남
+}
+~~~
+
+<br/>
+
+  - Optional chaining을 이용한 간결문
+
+Dir : .js
+~~~JavaScript
+const person1 = {
+    name: 'minkyoo',
+    job: {
+        title: 'S/W Engineer',
+        manager: {
+            name: 'Bob'
+        }
+    }
+};
+
+const person2 = {
+    name: 'Bob'
+};
+
+function printManager(person){
+    console.log(person.job?.manager?.name);
+}
+
+printManager(person1); // Bob
+printManager(person2); // undefined
 ~~~
 
 ###### [객체(Object)](#객체object)
@@ -3544,9 +3664,6 @@ localStorage.clear() // 전체 제거
             console.log(string_obj.color) // blue
             console.log(string_obj.name) // minkyoo
 
-
-
-
         })
     </script>
 </head>
@@ -3558,6 +3675,191 @@ localStorage.clear() // 전체 제거
 ~~~
 
 ###### [json](#json)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# html부분에 함수 실행시
+  - on:click={aa()}
+    - 이렇게 사용하게 되면 클라이언트 리로드시에 바로 함수가 실행 된다
+    - 클릭해도 함수가 실행 되지 않는다
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+
+    function aa(){
+        console.log("난 aa")
+    }
+</script>
+
+<button on:click={aa()}>
+    버튼
+</button>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/01dff1df-0052-43fc-88f9-e8e3d412882b)
+
+<br/>
+
+  - on:click={aa}
+    - 이렇게 하면 실제로 클릭 버튼으로 작동하며, 클릭해야 함수가 실행 된다
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+
+    function aa(){
+        console.log("난 aa")
+    }
+</script>
+
+<button on:click={aa}>
+    버튼
+</button>
+~~~
+
+<br/>
+
+  - on:click={() => aa}
+    - 아예 작동하지 않는다
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+
+    function aa(){
+        console.log("난 aa")
+    }
+</script>
+
+<button on:click={() => aa}>
+    버튼
+</button>
+~~~
+
+<br/>
+
+  - on:click={() => aa()}
+    - on:click={aa}과 동일하게 작동하게 된다
+
+Dir : +page.svelte
+~~~JavaScript
+<script>
+
+    function aa(){
+        console.log("난 aa")
+    }
+</script>
+
+<button on:click={() => aa()}>
+    버튼
+</button>
+~~~
+
+###### [html부분에 함수 실행시](#html부분에-함수-실행시)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 브라우저의 싱글 스레드 동작에 관하여
+  - 1.Call Stack
+  - 2.Callback Queue
+    - MicroStack Queue
+      - Promise.then, async/await 같은것을 처리
+        - 여기에 등록된 모든 콜백이 처리될 때까지 계속 수행하게 된다
+          - 브라우저 콘솔에 넣어 보면 이것을 처리하느라 브라우자가 먹통이 된다
+    - Animation Frames
+      - 스크롤 이동과 같이 화면을 갱신해야 할때, requestAnimationFrames api를 사용했을 때와 같이 브라우저 렌더링과 관련된 Task를 받는 Queue
+    - MacroStack Queue(task queue)
+      - 콜백을 하나씩 실행(setTimeout, setInterval, onClick과 같은 비동기 호출의 콜백 함수)
+      - 콜백 함수 하나를 실행하면 이벤트 루프를 놓아주어 다른 동작을 수행할 수 있음
+
+
+Dir : .js
+~~~JavaScript
+// MicroStack Queue
+
+function loop() {
+    function infinityThen() {
+      Promise.resolve().then(infinityThen)
+      .then(() => console.log('Promise'));
+    }
+    Promise.resolve().then(infinityThen);
+  }
+ 
+  loop();
+~~~
+
+<br/>
+
+  - MacroStack Queue는 하나씩 실행하기 때문에 하나가 끝나면 이벤트 루프를 놓아 준다
+
+Dir : .js
+~~~JavaScript
+// MacroStack Queue
+
+function loop() {
+    function infinitySetTimeout() {
+        setTimeout(infinitySetTimeout, 0);
+    }
+
+    infinitySetTimeout();
+}
+
+loop();
+~~~
+
+<br/>
+
+  - 재귀함수로 호출해도 다른 동작들을 할 수 있다
+
+Dir : .js
+~~~JavaScript
+function loop() {
+    function infinityThen() {
+        setTimeout(() => infinityThen(), 0);
+        console.log("setTimeout");
+    }
+    setTimeout(() => infinityThen(), 0);
+  }
+ 
+  loop();
+~~~
+
+<br/>
+
+  - 3. Event Loop
+    - 현재 실행중인 Task가 없는지, Callback Queue에 Task가 있는지를 반복적으로 확인해 준다
+      - 처음에 Call Stack에 쌓여있는 Task를 모두 처리.
+      - MicroStack Queue에 쌓여있는 Task를 모두 처리.
+      - Animation Frames에 쌓여있는 Task를 처리.
+      - MacroStack Queue에 쌓여있는 Task를 하나씩 처리.
+      - MicroStack Queue → Animation Frames → MacroStack Queue 순으로 처리하게 된다
+
+Dir : .js
+~~~JavaScript
+setTimeout(() => console.log('태스크 큐!'), 0);
+requestAnimationFrame(() => {
+    console.log('애니메이션 프레임!');
+});
+Promise.resolve().then(() => console.log('마이크로태스크 큐!'));
+console.log('콜 스택!');
+
+
+// 콜 스택!
+// 마이크로태스크 큐!
+// 애니메이션 프레임!  -> 테스크 큐가 먼저 나올때가 있고 아닐때가 있음
+// 태스크 큐!
+~~~
+
+###### [브라우저의 싱글 스레드 동작에 관하여](#브라우저의-싱글-스레드-동작에-관하여)
 ###### [Top](#top)
 
 <br/>
