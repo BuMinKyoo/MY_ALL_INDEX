@@ -56,6 +56,8 @@
   - git merge 병합할브랜치
     - branch병합하기
     - branch를 merge하는 일은 '현재 branch에서 다른 branch를 가져와서 병합하는 것'만 가능하다
+  - git push origin master:minkyoo --force
+    - master에 있는 것을 minkyoo 브랜치에 강제 푸쉬 하겠다는 말
 
 <br/>
 
