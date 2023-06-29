@@ -58,6 +58,8 @@
     - branch를 merge하는 일은 '현재 branch에서 다른 branch를 가져와서 병합하는 것'만 가능하다
   - git push origin master:minkyoo --force
     - master에 있는 것을 minkyoo 브랜치에 강제 푸쉬 하겠다는 말
+  - git remote update
+    - 로컬 저장소에 있는 모든 branch의 원격저장소 정보를 업데이트 한다
 
 <br/>
 
@@ -75,6 +77,15 @@
     - commit을 제거할때(작업했던것 없어지지 않음!!)
   - git status
     - git add 했던것 전체 취소하기
+
+<br/>
+
+  - 다른 브랜치에 작업한 것을, 옮겨서 push하는법
+    - 1. git remote update
+    - 2. git add .
+    - 3. git stash -> add했던 파일들만 임시로 다른곳에 저장한다
+    - 4. git checkout -t origin/브랜치 -> 브랜치 이동하기
+    - 5. git stash pop
 
 ###### [Git명령어](#git명령어)
 ###### [Top](#top)
