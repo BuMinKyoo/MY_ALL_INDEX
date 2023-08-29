@@ -64,7 +64,7 @@
   <div markdown="1">
     
     - FrameworkElement
-      - [Decorator]
+      - Decorator
         - [Border](#border)
       - [TextBlock](#textblock)
         - [Run](#run)
@@ -121,24 +121,24 @@
         - [ItemsControl](#itemscontrol)
           - [MenuBase](#menubase)
             - [Menu](#menu)
-              - [MenuItem에 아이콘 넣기]
-              - [MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened]
+              - MenuItem에 아이콘 넣기
+              - MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
             - [ContextMenu](#contextmenu)
           - [Selector](#selector)
             - [TabControl](#tabcontrol)
             - [ComboBox](#combobox)
-              - [IsEditable속성]
-              - [ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력]
-              - [각각의 ComboBoxitem을 분리해서 나타나게 하기]
+              - IsEditable속성
+              - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
+              - 각각의 ComboBoxitem을 분리해서 나타나게 하기
             - [ListBox](#listbox)
-              - [ListBox바인딩 및 MessageBox로 출력하기]
-              - [ListBoxItem목록에서 Content출력하기]
+              - ListBox바인딩 및 MessageBox로 출력하기
+              - ListBoxItem목록에서 Content출력하기
               - [ListView](#listview)
-                - [SelectedItem]
-                - [SelectedItem에 대한 Content만 뽑아내기]
-                - [SelectedIndex]
-                - [ListView헤더 크기를 비율로 조절하기(Binding활용)]
-                - [DisplayMemberBinding]
+                - SelectedItem
+                - SelectedItem에 대한 Content만 뽑아내기
+                - SelectedIndex
+                - ListView헤더 크기를 비율로 조절하기(Binding활용)
+                - DisplayMemberBinding
 
   </div>
   </details>
