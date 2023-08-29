@@ -64,14 +64,11 @@
   <div markdown="1">
     
     - FrameworkElement
-      - [Decorator](#decorator)
+      - [Decorator]
         - [Border](#border)
       - [TextBlock](#textblock)
         - [Run](#run)
       - [Popup](#popup)
-        - [Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen](#placement-horizontaloffset-verticaloffset-allowstransparency-isopen)
-        - [AllowsTransparency(False일때)](#allowstransparencyfalse일때)
-        - [AllowsTransparency(True일때)](#allowstransparencytrue일때)
       - [Panel](#panel)
         - [Grid](#grid)
           - 다양한 요소안에 Grid를 만들기
@@ -124,24 +121,24 @@
         - [ItemsControl](#itemscontrol)
           - [MenuBase](#menubase)
             - [Menu](#menu)
-              - [MenuItem에 아이콘 넣기](#menuitem에-아이콘-넣기)
-              - [MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened](#menuitem-header-_단축키-inputgesturetext-ischeckable-submenuopened)
+              - [MenuItem에 아이콘 넣기]
+              - [MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened]
             - [ContextMenu](#contextmenu)
           - [Selector](#selector)
             - [TabControl](#tabcontrol)
             - [ComboBox](#combobox)
-              - [IsEditable속성](#iseditable속성)
-              - [ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력](#observablecollection을-이용한-combobox의-comboboxitem추가-comboboxitem의-content출력)
-              - [각각의 ComboBoxitem을 분리해서 나타나게 하기](#각각의-comboboxitem을-분리해서-나타나게-하기)
+              - [IsEditable속성]
+              - [ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력]
+              - [각각의 ComboBoxitem을 분리해서 나타나게 하기]
             - [ListBox](#listbox)
-              - [ListBox바인딩 및 MessageBox로 출력하기](#listbox바인딩-및-messagebox로-출력하기)
-              - [ListBoxItem목록에서 Content출력하기](#listboxitem목록에서-content출력하기)
+              - [ListBox바인딩 및 MessageBox로 출력하기]
+              - [ListBoxItem목록에서 Content출력하기]
               - [ListView](#listview)
-                - [SelectedItem](#selecteditem)
-                - [SelectedItem에 대한 Content만 뽑아내기](#selecteditem에-대한-content만-뽑아내기)
-                - [SelectedIndex](#selectedindex)
-                - [ListView헤더 크기를 비율로 조절하기(Binding활용)](#listview헤더-크기를-비율로-조절하기binding활용)
-                - [DisplayMemberBinding](#displaymemberbinding)
+                - [SelectedItem]
+                - [SelectedItem에 대한 Content만 뽑아내기]
+                - [SelectedIndex]
+                - [ListView헤더 크기를 비율로 조절하기(Binding활용)]
+                - [DisplayMemberBinding]
 
   </div>
   </details>
@@ -1205,9 +1202,6 @@ public class Car
 
 # Popup
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
-  - [Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen](#placement-horizontaloffset-verticaloffset-allowstransparency-isopen)
-  - [AllowsTransparency(False일때)](#allowstransparencyfalse일때)
-  - [AllowsTransparency(True일때)](#allowstransparencytrue일때)
 
 <br/>
 
@@ -1223,7 +1217,7 @@ public class Car
 <br/>
 <br/>
 
-# Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen
+  - Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen
 
 #MainWindow.xaml
 ~~~c#
@@ -1272,8 +1266,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-# AllowsTransparency(False일때)
-  - False 일때, Ellipse주변에 검정색 Background가 남아 있다
+  - AllowsTransparency(False일때)
+    - False 일때, Ellipse주변에 검정색 Background가 남아 있다
 
 #MainWindow.xaml
 ~~~c#
@@ -1297,8 +1291,8 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-# AllowsTransparency(True일때)
-  - True 일때, Ellipse주변에 검정색 Background가 없어 진다
+  - AllowsTransparency(True일때)
+    - True 일때, Ellipse주변에 검정색 Background가 없어 진다
 
 #MainWindow.xaml
 ~~~
@@ -1863,8 +1857,6 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-***
-
 # PasswordBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
   - TextBox와는 다르게, 비밀번호처럼 감춰지는 형태로 사용할 수 있다
@@ -2358,8 +2350,6 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-***
-
 # tooltip
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
   - ToolTip : 마우스를 올렸을때 나오는 설명창(ToolTip)
@@ -2382,8 +2372,6 @@ public partial class MainWindow : Window
 
 <br/>
 <br/>
-
-***
 
 # RepeatButton
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - ButtonBase
@@ -2554,22 +2542,19 @@ public partial class MainWindow : Window
 
 <br/>
 
-  - [MenuItem에 아이콘 넣기](#menuitem에-아이콘-넣기)
-  - [MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened](#menuitem-header-단축키-inputgesturetext-ischeckable-submenuopened)
-
 ###### [MenuBase](#menubase)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-## MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
-  - MenuItem : Menu안에 요소 생성
-  - Header : 이름을 바꿀 수 있음
-  - _(단축키) : 이것을 통해서 단축키를 설정 할 수 있음
-  - InputGestureText : 단축키 설정, 단지 표시용 이다. 실제 명령은 커맨드 바인딩 작업이 추가적으로 필요하다.
-  - IsCheckable 속성 값을 true/false로 설정
-  - SubmenuOpened : submenu를 오픈 했을때 발생하는 이벤트
+  - MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
+    - MenuItem : Menu안에 요소 생성
+    - Header : 이름을 바꿀 수 있음
+    - _(단축키) : 이것을 통해서 단축키를 설정 할 수 있음
+    - InputGestureText : 단축키 설정, 단지 표시용 이다. 실제 명령은 커맨드 바인딩 작업이 추가적으로 필요하다.
+    - IsCheckable 속성 값을 true/false로 설정
+    - SubmenuOpened : submenu를 오픈 했을때 발생하는 이벤트
 
 #MainWindow.xaml
 ~~~c#
@@ -2596,7 +2581,7 @@ public partial class MainWindow : Window
 ###### [Menu](#menu)
 ###### [Top](#top)
 
-## MenuItem에 아이콘 넣기
+  - MenuItem에 아이콘 넣기
 
 #MainWindow.xaml
 ~~~c#
@@ -2611,9 +2596,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # ContextMenu
@@ -2665,9 +2647,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # TabControl
@@ -2720,9 +2699,6 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
 <br/>
 
 # ComboBox
@@ -2733,10 +2709,6 @@ public partial class MainWindow : Window
   - DropDownClosed : 사용자가 목록을 접을 때 발생하는 이벤트
 
 <br/>
-
-  - [IsEditable속성](#iseditable속성)
-  - [ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력](#observablecollection을-이용한-combobox의-comboboxitem추가-comboboxitem의-content출력)
-  - [각각의 ComboBoxitem을 분리해서 나타나게 하기](#각각의-comboboxitem을-분리해서-나타나게-하기)
 
 #MainWindow.xaml
 ~~~c#
@@ -2758,8 +2730,8 @@ public partial class MainWindow : Window
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-## IsEditable속성
-  - 텍스트를 직접 편집할 수 있는지 여부를 지정, 속성값이 true일 경우 사용자가 목록에서 항목을 선택하면 SelectedItem 속성이 설정된다
+  - IsEditable속성
+    - 텍스트를 직접 편집할 수 있는지 여부를 지정, 속성값이 true일 경우 사용자가 목록에서 항목을 선택하면 SelectedItem 속성이 설정된다
 
 #MainWindow.xaml
 ~~~c#
@@ -2808,7 +2780,7 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
+  - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
 
 #MainWindow.xaml
 ~~~c#
@@ -2983,7 +2955,7 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-## 각각의 ComboBoxitem을 분리해서 나타나게 하기
+  - 각각의 ComboBoxitem을 분리해서 나타나게 하기
 
 #MainWindow.xaml
 ~~~c#
@@ -3194,8 +3166,6 @@ public class Price_list : INotifyPropertyChanged
 
 <br/>
 
-  - [ListBox바인딩 및 MessageBox로 출력하기](#listbox바인딩-및-messagebox로-출력하기)
-  - [ListBoxItem목록에서 Content출력하기](#listboxitem목록에서-content출력하기)
   - [ListView](lListview)
 
 #MainWindow.xaml
@@ -3217,7 +3187,7 @@ public class Price_list : INotifyPropertyChanged
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-## ListBoxItem목록에서 Content출력하기
+  - ListBoxItem목록에서 Content출력하기
 
 #MainWindow.xaml
 ~~~c#
@@ -3258,8 +3228,7 @@ public partial class MainWindow : Window
 
 <br/>
 <br/>
-
-## ListBox바인딩 및 MessageBox로 출력하기
+  - ListBox바인딩 및 MessageBox로 출력하기
 
 #MainWindow.xaml
 ~~~c#
@@ -3398,18 +3367,12 @@ public class Apple : INotifyPropertyChanged
 
 <br/>
 
-  - [SelectedItem](#selecteditem)
-  - [SelectedItem에 대한 Content만 뽑아내기](#selecteditem에-대한-content만-뽑아내기)
-  - [SelectedIndex](#selectedindex)
-  - [ListView헤더 크기를 비율로 조절하기(Binding활용)](#listview헤더-크기를-비율로-조절하기binding활용)
-  - [DisplayMemberBinding](#displaymemberbinding)
-
 ###### [ListBox](#listbox)
 ###### [Top](#top)
 
 #### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-## SelectedItem
+  - SelectedItem
 
 #MainWindow.xaml
 ~~~c#
@@ -3444,13 +3407,10 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152518058-4cb3e9f6-b744-442e-a980-07786e121536.png">
 
-###### [ListView](#listview)
-###### [Top](#top)
-
 <br/>
 <br/>
 
-## SelectedItem에 대한 Content만 뽑아내기
+  - SelectedItem에 대한 Content만 뽑아내기
 
 #MainWindow.xaml
 ~~~c#
@@ -3485,13 +3445,10 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152519055-3640bb45-fc94-499b-a3b9-959a3a7557f0.png">
 
-###### [ListView](#listview)
-###### [Top](#top)
-
 <br/>
 <br/>
 
-## SelectedIndex
+  - SelectedIndex
 
 #MainWindow.xaml
 ~~~c#
@@ -3526,14 +3483,11 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152517500-e7a55889-e2d2-4388-9847-d321ef45fd06.png">
 
-###### [ListView](#listview)
-###### [Top](#top)
-
 <br/>
 <br/>
 
-## ListView헤더 크기를 비율로 조절하기(Binding활용)
-  - ListView안쪽에서는 Grid를 따로 만들어 RowDefinition, ColumnDefinition을 통한 Height="1*"의 조절이 되지 않기 때문에 Grid와 Border값을 새로 하나 만들어 GridViewColumn Width="{Binding ElementName=dummywidth1, Path=ActualWidth}"이 방법을 통해서 크기를 맞춰 줄 수 있다.
+  - ListView헤더 크기를 비율로 조절하기(Binding활용)
+    - ListView안쪽에서는 Grid를 따로 만들어 RowDefinition, ColumnDefinition을 통한 Height="1*"의 조절이 되지 않기 때문에 Grid와 Border값을 새로 하나 만들어 GridViewColumn Width="{Binding ElementName=dummywidth1, Path=ActualWidth}"이 방법을 통해서 크기를 맞춰 줄 수 있다.
 
 #MainWindow.xaml
 ~~~c#
@@ -3560,15 +3514,12 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/151750523-8d72597c-0fb8-4b9a-9de1-6fea134b7861.png">
 
-###### [ListView](#listview)
-###### [Top](#top)
-
 <br/>
 <br/>
 
-## DisplayMemberBinding
-  - ListView에 Binding을 하기 위해서는ObservableCollection을 만들어 Binding을 해야
-  - GridViewColumn에 DisplayMemberBinding을 통해서 Binding 가능
+  - DisplayMemberBinding
+    - ListView에 Binding을 하기 위해서는ObservableCollection을 만들어 Binding을 해야
+    - GridViewColumn에 DisplayMemberBinding을 통해서 Binding 가능
 
 #MainWindow.xaml
 ~~~c#
