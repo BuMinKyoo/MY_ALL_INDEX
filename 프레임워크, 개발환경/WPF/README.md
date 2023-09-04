@@ -131,8 +131,9 @@
               - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
               - 각각의 ComboBoxitem을 분리해서 나타나게 하기
             - [ListBox](#listbox)
-              - ListBox바인딩 및 MessageBox로 출력하기
               - ListBoxItem목록에서 Content출력하기
+              - ListBox바인딩 및 MessageBox로 출력하기
+              - ItemsSource
               - [ListView](#listview)
                 - SelectedItem
                 - SelectedItem에 대한 Content만 뽑아내기
@@ -158,7 +159,6 @@
   <div markdown="1">  
 
     - [Button + Command](#button--command)
-    - [ItemsSource](#itemssource)
     - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
     - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
     
@@ -3228,6 +3228,7 @@ public partial class MainWindow : Window
 
 <br/>
 <br/>
+
   - ListBox바인딩 및 MessageBox로 출력하기
 
 #MainWindow.xaml
@@ -3351,6 +3352,116 @@ public class Apple : INotifyPropertyChanged
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152624201-265de94a-3442-4792-90ea-dbf127bebeea.png">
+
+<br/>
+<br/>
+
+  - ItemsSource
+    - ItemsControl을 상속받은 컨트롤들(TabControl, ComboBox, ListBox, ListView 등)을 Binding작업할때 사용
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <ListView ItemsSource="{Binding Class1_list}">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Width="100" DisplayMemberBinding="{Binding Name}"/>
+                <GridViewColumn Width="100" DisplayMemberBinding="{Binding Age}"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</Grid>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window,INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        Class1_list = new ObservableCollection<Class1>();
+        Class1_list.Add(new Class1() { Age=10, Name="PAPA"});
+        this.DataContext = this;
+    }
+
+    private ObservableCollection<Class1> m_Class1_list;
+    public ObservableCollection<Class1> Class1_list
+    {
+        get { return m_Class1_list; }
+        set
+        {
+            if(m_Class1_list != value)
+            {
+                m_Class1_list = value;
+                Notify("Class1_list");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Class1.cs
+~~~
+public class Class1 : INotifyPropertyChanged
+{
+    private string m_Name;
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if(m_Name != value)
+            {
+                m_Name = value;
+                Notify("Name");
+            }
+        }
+    }
+
+    private int m_Age;
+    public int Age
+    {
+        get { return m_Age; }
+        set
+        {
+            if (m_Age != value)
+            {
+                m_Age = value;
+                Notify("Age");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/154080138-6a6e136b-3475-446a-9ed4-8e56fdcc33b2.png">
 
 ###### [ListBox](#listbox)
 ###### [Top](#top)
@@ -4067,126 +4178,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
-
-***
-
-<br/>
-
-# ItemsSource
-  - ItemsControl을 상속받은 컨트롤들(TabControl, ComboBox, ListBox, ListView 등)을 Binding작업할때 사용
-
-#MainWindow.xaml
-~~~c#
-<Grid>
-    <ListView ItemsSource="{Binding Class1_list}">
-        <ListView.View>
-            <GridView>
-                <GridViewColumn Width="100" DisplayMemberBinding="{Binding Name}"/>
-                <GridViewColumn Width="100" DisplayMemberBinding="{Binding Age}"/>
-            </GridView>
-        </ListView.View>
-    </ListView>
-</Grid>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-public partial class MainWindow : Window,INotifyPropertyChanged
-{
-    public MainWindow()
-    {
-        InitializeComponent();
-        Class1_list = new ObservableCollection<Class1>();
-        Class1_list.Add(new Class1() { Age=10, Name="PAPA"});
-        this.DataContext = this;
-    }
-
-    private ObservableCollection<Class1> m_Class1_list;
-    public ObservableCollection<Class1> Class1_list
-    {
-        get { return m_Class1_list; }
-        set
-        {
-            if(m_Class1_list != value)
-            {
-                m_Class1_list = value;
-                Notify("Class1_list");
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Notify([CallerMemberName] string propertyName = null)
-    {
-        if (this.PropertyChanged != null)
-        {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    #endregion
-}
-~~~
-
-<br/>
-
-#Class1.cs
-~~~
-public class Class1 : INotifyPropertyChanged
-{
-    private string m_Name;
-    public string Name
-    {
-        get { return m_Name; }
-        set
-        {
-            if(m_Name != value)
-            {
-                m_Name = value;
-                Notify("Name");
-            }
-        }
-    }
-
-    private int m_Age;
-    public int Age
-    {
-        get { return m_Age; }
-        set
-        {
-            if (m_Age != value)
-            {
-                m_Age = value;
-                Notify("Age");
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Notify([CallerMemberName] string propertyName = null)
-    {
-        if (this.PropertyChanged != null)
-        {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    #endregion
-}
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/154080138-6a6e136b-3475-446a-9ed4-8e56fdcc33b2.png">
-
-###### [Binding](#binding)
-###### [Top](#top)
-
 <br/>
 
 ***
-
-<br/>
 
 # Workspace를 통한 UserControl끼리의 값 전달
 
