@@ -43,119 +43,113 @@
 
 <br/>
 
-- <details>
-  <summary>Object - DispatcherObject - DependencyObject - Visual - UIElement</summary>
-  <div markdown="1">
-    
-    - FrameworkElement
-      - Decorator
-        - [Border](#border)
-      - [TextBlock](#textblock)
-        - [Run](#run)
-      - [Popup](#popup)
-      - [Panel](#panel)
-        - [Grid](#grid)
-          - 다양한 요소안에 Grid를 만들기
-          - IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
-        - [Canvas](#canvas)
-        - [DockPanel](#dockpanel)
-        - [StackPanel](#stackpanel)
-          - Orientation="Horizontal"
-        - [WrapPanel](#wrappanel)
-          - Orientation="Vertical"
-        - [Viewbox](#viewbox)
-          - Stretch
-          - StretchDirection
-        - [UniformGrid](#uniformgrid)
-          - Columns,Rows지정
-          - ClipToBounds
-          - FirstColumn
-          - FlowDirection
-      - [Control](#control)
-        - [Separator](#separator)
-        - [PasswordBox](#passwordbox)
-        - [Thumb](#thumb)
-          - [GridSplitter](#gridsplitter)
-            - DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
-        - [RangeBase](#rangebase)
-          - [ProgressBar](#progressbar)
-            - IsIndeterminate
-          - [Slider](#slider)
-            - ValueChanged이벤트로 R,G,B값 표현하기
-            - ValueChanged이벤트로 R,G,B,A값 표현하기
-            - Orientation속성
-            - TickPlacement속성(눈금표시)
-        - [TextBoxBase](#textboxbase)
-          - [TextBox](#textbox)
-            - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
-            - TextChanged이벤트, SelectionChanged이벤트
-            - SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
-        - [ContentControl](#contentcontrol)
-          - [ScrollViewer](#scrollviewer)
-            - HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
-            - FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
-          - [ToolTip](#tooltip)
-          - ButtonBase
-            - [RepeatButton](#repeatbutton)
-          - [HeaderedContentControl](#headeredcontentcontrol)
-            - [Expander](#expander)
-              - Header를 따로 빼서 지정가능
-            - [GroupBox](#groupbox)
-              - FontFamily
-        - [ItemsControl](#itemscontrol)
-          - [MenuBase](#menubase)
-            - [Menu](#menu)
-              - MenuItem에 아이콘 넣기
-              - MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
-            - [ContextMenu](#contextmenu)
-          - [Selector](#selector)
-            - [TabControl](#tabcontrol)
-            - [ComboBox](#combobox)
-              - IsEditable속성
-              - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
-              - 각각의 ComboBoxitem을 분리해서 나타나게 하기
-            - [ListBox](#listbox)
-              - ListBoxItem목록에서 Content출력하기
-              - ListBox바인딩 및 MessageBox로 출력하기
-              - ItemsSource
-              - [ListView](#listview)
-                - SelectedItem
-                - SelectedItem에 대한 Content만 뽑아내기
-                - SelectedIndex
-                - ListView헤더 크기를 비율로 조절하기(Binding활용)
-                - DisplayMemberBinding
 
-  </div>
-  </details>
-  
+- FrameworkElement
+  - Decorator
+    - [Border](#border)
+    - [TextBlock](#textblock)
+      - [Run](#run)
+    - [Popup](#popup)
+    - [Panel](#panel)
+      - [Grid](#grid)
+        - 다양한 요소안에 Grid를 만들기
+        - IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
+      - [Canvas](#canvas)
+      - [DockPanel](#dockpanel)
+      - [StackPanel](#stackpanel)
+        - Orientation="Horizontal"
+      - [WrapPanel](#wrappanel)
+        - Orientation="Vertical"
+      - [Viewbox](#viewbox)
+        - Stretch
+        - StretchDirection
+      - [UniformGrid](#uniformgrid)
+        - Columns,Rows지정
+        - ClipToBounds
+        - FirstColumn
+        - FlowDirection
+    - [Control](#control)
+      - [Separator](#separator)
+      - [PasswordBox](#passwordbox)
+      - [Thumb](#thumb)
+        - [GridSplitter](#gridsplitter)
+          - DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
+      - [RangeBase](#rangebase)
+        - [ProgressBar](#progressbar)
+          - IsIndeterminate
+        - [Slider](#slider)
+          - ValueChanged이벤트로 R,G,B값 표현하기
+          - ValueChanged이벤트로 R,G,B,A값 표현하기
+          - Orientation속성
+          - TickPlacement속성(눈금표시)
+      - [TextBoxBase](#textboxbase)
+        - [TextBox](#textbox)
+          - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
+          - TextChanged이벤트, SelectionChanged이벤트
+          - SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
+      - [ContentControl](#contentcontrol)
+        - [ScrollViewer](#scrollviewer)
+          - HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
+          - FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
+        - [ToolTip](#tooltip)
+        - ButtonBase
+          - [RepeatButton](#repeatbutton)
+        - [HeaderedContentControl](#headeredcontentcontrol)
+          - [Expander](#expander)
+            - Header를 따로 빼서 지정가능
+          - [GroupBox](#groupbox)
+            - FontFamily
+      - [ItemsControl](#itemscontrol)
+        - [MenuBase](#menubase)
+          - [Menu](#menu)
+            - MenuItem에 아이콘 넣기
+            - MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
+          - [ContextMenu](#contextmenu)
+        - [Selector](#selector)
+          - [TabControl](#tabcontrol)
+          - [ComboBox](#combobox)
+            - IsEditable속성
+            - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
+            - 각각의 ComboBoxitem을 분리해서 나타나게 하기
+          - [ListBox](#listbox)
+            - ListBoxItem목록에서 Content출력하기
+            - ListBox바인딩 및 MessageBox로 출력하기
+            - ItemsSource
+            - [ListView](#listview)
+              - SelectedItem
+              - SelectedItem에 대한 Content만 뽑아내기
+              - SelectedIndex
+              - ListView헤더 크기를 비율로 조절하기(Binding활용)
+              - DisplayMemberBinding
+
 
 <br/>
 
-  - [ObservableCollection](#observablecollection)
-  - [INotifyPropertyChanged](#inotifypropertychanged)
-  - [Button + Command](#button--command)
-  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
-  - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
+- [ObservableCollection](#observablecollection)
+- [INotifyPropertyChanged](#inotifypropertychanged)
+- [Button + Command](#button--command)
+- [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+- [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
     
 <br/>
 
-  - [JsonParsing](#jsonparsing)
-    - [JsonParsing하기](#jsonparsing하기)
-    - [Json직렬화하기](#json직렬화하기)
+- [JsonParsing](#jsonparsing)
+  - [JsonParsing하기](#jsonparsing하기)
+  - [Json직렬화하기](#json직렬화하기)
 
 <br/>
 
 
-  - [소캣통신](#소캣통신)
-    - [Task](#task)
-    - [Dispatcher](#dispatcher)
+- [소캣통신](#소캣통신)
+  - [Task](#task)
+  - [Dispatcher](#dispatcher)
 
 <br/>
 
-  - [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_XML)
-  - [공공API 내용을 json파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_JSON)
-  - [화면에 있는 color값을 추출하는 color-picker]_Repository링크(https://github.com/BuMinKyoo/ColorPicker_WPF)
-  - [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
+- [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_XML)
+- [공공API 내용을 json파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_JSON)
+- [화면에 있는 color값을 추출하는 color-picker]_Repository링크(https://github.com/BuMinKyoo/ColorPicker_WPF)
+- [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
     
 <br/>
 <br/>
