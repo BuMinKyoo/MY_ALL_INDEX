@@ -2,63 +2,47 @@
 
 - [WPF class hierarchy](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/WPF/WPF%20class%20hierarchy.png)
 
+<br/>
+
 - [WPF로의시작...](#wpf의-시작)
 
-- <details>
-  <summary>Application</summary>  
-  <div markdown="1">
+<br/>
+
+- [Application](#application)
+  - [ShutdownMode](#shutdownmode)
+  - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
+
+<br/>
+
+- [Window](#window)
+  - [xmlns](#xmlns)
+  - [ResizeMode](#resizemode)
+  - [SizeToContent](#sizetocontent)
+  - [Window이벤트(Activated, Deactivated, Closing)](#window이벤트activated-deactivated-closing)
+
+<br/>
+
+- [다양한 참조법](#다양한-참조법)
+  - [xaml.cs에 있는 Class를 xaml안에 객체로 불러오기](#xamlcs에-있는-class를-xaml안에-객체로-불러오기)
+  - [같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기](#같은-프로젝트-cs에-있는-class를-xaml안에-객체로-불러오기)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
+  - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
+  - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
+  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
     
-    - [Application](#application)
-      - [ShutdownMode](#shutdownmode)
-      - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
+<br/>
 
-  </div>
-  </details>
+- [Style](#style)
+  - [Style의 key값으로 각각의 컨트롤에 Style을 적용](#style의-key값으로-각각의-컨트롤에-style을-적용)
+    - Style x:Key="(사용할 name)" TargetType="(적용시킬 컨트롤)"
+  - [TargetType속성으로 적용시킬 컨트롤 지정](#targettype속성으로-적용시킬-컨트롤-지정)
+    - Style TargetType="{x:Type 적용시킬 컨트롤}"
+  - [각각의 자식 컨트롤에 Style 적용하기](#각각의-자식-컨트롤에-style-적용하기)
+  - [BasedOn을 이용한 Style상속](#basedon을-이용한-style상속)
 
-- <details>
-  <summary>Window</summary>
-  <div markdown="1">
+<br/>
 
-    - [Window](#window)
-      - [xmlns](#xmlns)
-      - [ResizeMode](#resizemode)
-      - [SizeToContent](#sizetocontent)
-      - [Window이벤트(Activated, Deactivated, Closing)](#window이벤트activated-deactivated-closing)
-  
-  </div>
-  </details>
-
-- <details>
-  <summary>다양한 참조법</summary>
-  <div markdown="1">
-
-    - [다양한 참조법](#다양한-참조법)
-      - [xaml.cs에 있는 Class를 xaml안에 객체로 불러오기](#xamlcs에-있는-class를-xaml안에-객체로-불러오기)
-      - [같은 프로젝트 cs에 있는 Class를 xaml안에 객체로 불러오기](#같은-프로젝트-cs에-있는-class를-xaml안에-객체로-불러오기)
-      - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
-      - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-      - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
-      - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
-      - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
-    
-  </div>
-  </details>
-
-- <details>
-  <summary>Object - DispatcherObject</summary>
-  <div markdown="1">
-
-    - [Style](#style)
-      - [Style의 key값으로 각각의 컨트롤에 Style을 적용](#style의-key값으로-각각의-컨트롤에-style을-적용)
-        - Style x:Key="(사용할 name)" TargetType="(적용시킬 컨트롤)"
-      - [TargetType속성으로 적용시킬 컨트롤 지정](#targettype속성으로-적용시킬-컨트롤-지정)
-        - Style TargetType="{x:Type 적용시킬 컨트롤}"
-      - [각각의 자식 컨트롤에 Style 적용하기](#각각의-자식-컨트롤에-style-적용하기)
-      - [BasedOn을 이용한 Style상속](#basedon을-이용한-style상속)
-
-  </div>
-  </details>
-  
 - <details>
   <summary>Object - DispatcherObject - DependencyObject - Visual - UIElement</summary>
   <div markdown="1">
@@ -144,66 +128,35 @@
   </div>
   </details>
   
-- <details>
-  <summary>자주 활용하는 Class, Interface</summary>
-  <div markdown="1">  
 
-    - [ObservableCollection](#observablecollection)
-    - [INotifyPropertyChanged](#inotifypropertychanged)
+<br/>
+
+  - [ObservableCollection](#observablecollection)
+  - [INotifyPropertyChanged](#inotifypropertychanged)
+  - [Button + Command](#button--command)
+  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+  - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
     
-  </div>
-  </details>
+<br/>
 
-- <details>
-  <summary>Binding</summary>
-  <div markdown="1">  
+  - [JsonParsing](#jsonparsing)
+    - [JsonParsing하기](#jsonparsing하기)
+    - [Json직렬화하기](#json직렬화하기)
 
-    - [Button + Command](#button--command)
-    - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
-    - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
-    
-  </div>
-  </details>
+<br/>
 
 
-- <details>
-  <summary>JsonParsing</summary>
-  <div markdown="1">  
-
-- [JsonParsing](#jsonparsing)
-  - [JsonParsing하기](#jsonparsing하기)
-  - [Json직렬화하기](#json직렬화하기)
-
-  </div>
-  </details>
-
-
-
-- <details>
-  <summary>소캣통신</summary>
-  <div markdown="1">  
-
-    - [소캣통신](#소캣통신)
+  - [소캣통신](#소캣통신)
     - [Task](#task)
     - [Dispatcher](#dispatcher)
+
+<br/>
+
+  - [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_XML)
+  - [공공API 내용을 json파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_JSON)
+  - [화면에 있는 color값을 추출하는 color-picker]_Repository링크(https://github.com/BuMinKyoo/ColorPicker_WPF)
+  - [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
     
-  </div>
-  </details>
-
-
-
-- <details>
-  <summary>Try..</summary>
-  <div markdown="1">  
-
-    - [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_XML)
-    - [공공API 내용을 json파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_JSON)
-    - [화면에 있는 color값을 추출하는 color-picker]_Repository링크(https://github.com/BuMinKyoo/ColorPicker_WPF)
-    - [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
-    
-  </div>
-  </details>
-
 <br/>
 <br/>
 
