@@ -6,6 +6,7 @@
   - [Nuget사용법](#nuget사용법)
   - [Nuget패키지 버전 확인법](#nuget패키지-버전-확인법)
   - [Nuget종속성 버전 확인하기](#nuget종속성-버전-확인하기)
+  - [단축키](#단축키)
 
 <br/>
 
@@ -32,10 +33,9 @@
 
 ###### [Top](#top)
 
-<br/>
-
 ***
 
+<br/>
 <br/>
 
 ## Nuget사용법
@@ -83,10 +83,9 @@ Nuget검색으로 설치 하기
 
 ###### [Top](#top)
 
-<br/>
-
 ***
 
+<br/>
 <br/>
 
 ## Nuget패키지 버전 확인법
@@ -98,10 +97,9 @@ Nuget검색으로 설치 하기
 
 ###### [Top](#top)
 
-<br/>
-
 ***
 
+<br/>
 <br/>
 
 ## Nuget종속성 버전 확인하기
@@ -112,6 +110,25 @@ Nuget검색으로 설치 하기
 
   - 현재 사진을 해석하면, .NETFramework 에서는 4.5.2버전 이상일때 사용 가능하고, .NETCore에서는 3.1버전 이상일때 사용 가능하다는것
 <img src="https://user-images.githubusercontent.com/39178978/153407073-c2c341c3-015a-43b0-b955-848dc656e86c.png">
+
+
+###### [Top](#top)
+
+***
+
+<br/>
+<br/>
+
+## 단축키
+  - 비주얼 스튜디오 2022단축키
+  - cpp 및 h이동 : Ctrl + K + O
+  - 뷰 디자이너  보기 : Shift + F7
+  - 소스 보기 : F7
+  -  커서 앞으로 이동 : Ctrl + Shift + -
+  - 커서 뒤로 이동 : Ctrl + -
+  - 코드 검색 : Ctrl + T
+  - 파일검색 : Ctrl + Shift + T
+  - 구성원 검색 : Alt + \
 
 
 ###### [Top](#top)
