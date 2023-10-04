@@ -6,6 +6,10 @@
   - [ALU(산술 논리 장치)](#alu산술-논리-장치)
   - [폰 노이만 구조](#폰-노이만-구조)
   - [CPU 명령어 사이클(instruction cycle)](#cpu-명령어-사이클instruction-cycle)
+  - [명령어 집합(instruction set)](#명령어-집합instruction-set)
+  - [6502 Assembly](#6502-assembly)
+  - [명령어 집합 구조(ISA)](#명령어-집합-구조isa)
+  - [일반적인 ISA의 명령어 분류](#일반적인-isa의-명령어-분류)
 
 
 
@@ -33,6 +37,10 @@
 - [ALU(산술 논리 장치)](#alu산술-논리-장치)
 - [폰 노이만 구조](#폰-노이만-구조)
 - [CPU 명령어 사이클(instruction cycle)](#cpu-명령어-사이클instruction-cycle)
+- [명령어 집합(instruction set)](#명령어-집합instruction-set)
+- [6502 Assembly](#6502-assembly)
+- [명령어 집합 구조(ISA)](#명령어-집합-구조isa)
+- [일반적인 ISA의 명령어 분류](#일반적인-isa의-명령어-분류)
 
 ###### [컴퓨터 구조](#컴퓨터-구조)
 ###### [Top](#top)
@@ -95,7 +103,43 @@
       - ALU가 해줌
     - 4. write back : 연산 결과를 저장
 
-###### [CPU 명령어 사이클(instruction cycle)](#cpu-명령어-사이클instruction-cycle)
+###### [컴퓨터 구조](#컴퓨터-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 명령어 집합(instruction set)
+  - 
+
+###### [컴퓨터 구조](#컴퓨터-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 6502 Assembly
+  - 
+
+###### [컴퓨터 구조](#컴퓨터-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 명령어 집합 구조(ISA)
+  - 
+
+###### [컴퓨터 구조](#컴퓨터-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 일반적인 ISA의 명령어 분류
+  - 
+
+###### [컴퓨터 구조](#컴퓨터-구조)
 ###### [Top](#top)
 
 <br/>
