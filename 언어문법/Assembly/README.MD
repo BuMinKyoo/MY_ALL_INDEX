@@ -197,3 +197,225 @@
 
 <br/>
 <br/>
+
+# 6502CPU
+  - 6502CPU
+    - MOS 6502 프로세서
+      - 1975년에 출시된 NMOS 기반 8비트 마이크로프로세서
+      - 기존 8비트 CPU에 비해 단순한 설계로, 속도가 빠르고 가격이 저렴
+      - 개인 컴퓨터의 부흥을 가져옴
+      - cpu에서 하드웨어를 직접 제어
+        - 운영체제 : 없음
+        - BIOS : 없음
+        - 부트로더 : 없음
+    - WDC 65C02와 임베디드 시스템
+      - 1981년 Western Design Center사에서 개발
+      - MOS 6502와 후방 호환
+        - NMOS 대신 CMOS를 사용
+        - 전력 소비를 10~20배 줄임
+      - 임베디드 시스템에서 매우 많이 쓰임
+      - 데이터 너비 : 8비트
+        - 한번에 8비트 단위로 데이터를 읽어 올 수 있다는 의미
+      - 레지스터 수 : 6개
+      - 명령어 수 : 56개
+
+![20231004_172643](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/cabf8fec-cebd-4895-836e-0943899c7194)
+
+
+![20231004_172655](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c2819188-ae20-409c-a43d-863716495f39)
+
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 폰노이만 구조와 프로그램 실행
+  - 프로그램은 외부장치에 저장되어 있음
+  - 따라서 cpu에게 프로그램이 저장된 위치를 알려줘야 한다
+  - 데스크톱 컴퓨터에서는 보통 운영체제가 이런일을 해준다
+    - 1. 운영체제로 컴퓨터가 부팅
+    - 2. 사용자가 원하는 프로그램을 선택
+    - 3. OS가 실행 권한을 그 프로그램에게 넘겨줌
+  - 니모닉을 통해, 바이트를 하나하나 읽고 옵코드를 확인하고, fetch하고 실행하는 과정을 가진다
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 임베디드 시스템과 프로그램 실행
+  - 보통 전원을 켜면 곧바로 프로그램 실행
+  - 6502에서 흔히 사용하는 방법
+    - 1. cpu리셋될 때 특정 메모리 주소에 저장된 값을 읽어옴
+    - 2. 그 값이 가리키는 주소로 점프
+    - 3. 그 주소에 저장된 명령어가 실행됨
+    - 전원을 켜면, 운영체제를 실행하는것이 아니라, 내가 만든 프로그램을 곧바로 실행한다는것이 다르다.
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 65C02의 핀 구성
+  - 각 핀들의 의미는 해당하는 CPU의 ‘datasheet’를 통해 아래와 같이 확인할 수 있다
+    - 데이터핀 : 8비트(26번~33번)
+    - 주소핀 : 16비트(9번~20번, 22번~25번)
+    - VDD : 전원 전압의 +극 : 전원을 연결하는 곳
+    - VSS : 접지(ground)
+
+![20231004_173057](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fff6459d-850d-467b-ae90-b1c486f8a7e4)
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 조립하기
+  - 1. 브레드보드 준비(빵판)
+    - 전도체를 꽂을 수 있는 구멍이 있음
+    - 전기가 통하는 거라면 뭐든 꼽기 가능
+    - 동일한 전류가 흐르는 영역이 존재
+      - 터미널 띠(5개의 공간중 하나만 꼽아도 전기가 흐른다)
+
+![20231004_173213](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b5aa5deb-1b23-4ac9-b95e-6fdff8aa3751)
+
+  - 각각 줄들의 값을 같게 하고 싶다면, 연결해 주면 된다
+
+![20231004_173222](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0ea79245-c0c9-4891-a6a4-21ef02798349)
+
+![20231004_173233](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8c60b7ab-d34b-4c52-a9a0-8ee30e27f295)
+
+  - 버스띠
+    - 전원을 연결해 주기 위해 존재
+
+![20231004_173241](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/75b90b87-a818-44da-8e52-e32269ab8f30)
+
+![20231004_173248](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/ebb2d282-b6a1-40ba-bec4-bec3a0f0451e)
+
+  - 2. cpu설치 및 vdd, vss연결하기(전원연결)
+
+![20231004_173255](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/822766fe-6f7e-40cd-b6a6-96938047c00d)
+
+  - 3. 클럭 및 기타 선 연결하기
+  - 4.기타 high핀을 연결
+  - 5. cpu리셋 스위치 추가하기
+  - 6. 클럭속도 늦추기
+  - 7. 스파이더 연결하기
+  - 기타 등등의 과정이 밑에 더 있음
+  - 영상을 참고하면서 기억나지 않을때 다시 따라 해보기
+
+![20231004_173302](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/7ab07d5e-989f-4549-8209-b93dbcc7a5a3)
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ROM
+  - 원칙상 한 번 쓰면 다시 수정 못하는 메모리
+  - 요즘은 여러 번 쓸 수 있는 ROM을 주로 사용
+    - EPROM, EEPROM
+    - 그래도 실행 중에는 쓸 수 없게 하는 게 보통
+    - 별도 하드웨어를 통해서만 쓸 수 있게 함
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 프로그램 작성하기
+  - 6502CPU의 리셋백터는 0xFFFC, 0xFFFD이므로, 이곳에 프로그램 시작 주소를 적어야 한다
+
+#test.c
+~~~c
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning(disable: 4996)
+#define SIZE (0x8000)
+
+int main()
+{
+	const char* FILENAME = "program.bin";
+
+	FILE* outfile;
+	char bin_out[SIZE] = { 0 };
+	size_t program_size;
+
+	const char program[] = {
+		0x18,  // CLC
+		0xA9, 0x0A, // LDA #$0A
+		0x69, 0x06,  // ADC #$06
+		0x8D, 0x00, 0x22  // STA $2200
+	};
+
+	program_size = sizeof(program) / sizeof(char);
+
+	assert(program_size < 0x7FFC);
+
+	memcpy(bin_out, program, program_size);
+
+	bin_out[0x7FFC] = 0x00;
+	bin_out[0x7FFD] = 0x80;
+
+	outfile = fopen(FILENAME, "wb");
+
+	if (outfile == NULL)
+	{
+		fprintf(stderr, "cannot open outfile");
+
+		return -1;
+	}
+
+	fwrite(bin_out, sizeof(char), SIZE, outfile);
+
+	fclose(outfile);
+
+	return 0;
+}
+~~~
+
+![20231004_173708](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f20edbe7-8278-4f41-96b9-4e007d4e0d7c)
+
+  - FFFC와 FFFD는 리셋 백터 이기 때문에 여기서 8000주소로 점프하게 된다
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 타이밍 다이어그램
+  - CPU가 RAM보다 속도가 빠르기 때문에, 서로간의 1사이클 동안에 어떤 EmptyButton시간에 어떻게 작동 되는지나와 있으며, 각자의 유효한 시간안에 정확하게 데이터를 교환하기 위함
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ROM과 RAM의 분리
+  - 코드와 데이터를 별도의 메모리에 담는 것 좋은 생각
+  - 실행 중에 코드가 저장된 메모리를 덮어쓸 수 있으면 위험
+    - 내가 작성한 코드의 동작을 남이 변경할 수 있음
+    - 버퍼 오버 프로를 이용한 해킹이 그러한것
+  - 따라서 아예 하드웨어 수준에서 방지하는게 최선책
+    - 코드가 들어가 있는 메모리는 쓰기 금지
+  - 하지만 최근 PC에는 ROM이 따로 없음
+    - RAM에 모든 걸 집어넣되 다른 방법으로 막으려고 함
+    - 예 : C언어의 코드 세그먼트와 데이터 세그먼트의 분리
+
+###### [기계어 프로그래밍](#기계어-프로그래밍)
+###### [Top](#top)
+
+<br/>
+<br/>
