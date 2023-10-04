@@ -5,6 +5,7 @@
 - [컴퓨터 구조](#컴퓨터-구조)
   - [ALU(산술 논리 장치)](#alu산술-논리-장치)
   - [폰 노이만 구조](#폰-노이만-구조)
+  - [CPU 명령어 사이클(instruction cycle)](#cpu-명령어-사이클instruction-cycle)
 
 
 
@@ -79,6 +80,21 @@
 ![20231004_085609](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f08f5bee-2310-4912-b4fe-239cd30d7ef3)
 
 ###### [컴퓨터 구조](#컴퓨터-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# CPU 명령어 사이클(instruction cycle)
+  - CPU가 메모리에 저장된 기계어 하나를 실행할 때 거치는 과정들
+    - 1. fetch :  명령어를 가져옴
+    - 2. decode : (명령코드) opcode와 (피연산자)operand로 디코딩
+      - Control Unit이 해줌
+    - 3. execute : 산술/논리/분기 연산 등을 실행
+      - ALU가 해줌
+    - 4. write back : 연산 결과를 저장
+
+###### [CPU 명령어 사이클(instruction cycle)](#cpu-명령어-사이클instruction-cycle)
 ###### [Top](#top)
 
 <br/>
