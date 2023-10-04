@@ -32,6 +32,7 @@
 
 - [ALU(산술 논리 장치)](#alu산술-논리-장치)
 - [폰 노이만 구조](#폰-노이만-구조)
+- [CPU 명령어 사이클(instruction cycle)](#cpu-명령어-사이클instruction-cycle)
 
 ###### [컴퓨터 구조](#컴퓨터-구조)
 ###### [Top](#top)
