@@ -611,7 +611,7 @@ dasm add.asm -f3 -oadd.bin
   - ORG $FFFC, 0은 EFFFC,0부터 기록이 된다
 
 # a.asm
-~~~asm
+~~~c
 	.PROCESSOR 6502
 	.ORG $8000
 
