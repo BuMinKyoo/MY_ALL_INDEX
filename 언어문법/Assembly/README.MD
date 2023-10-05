@@ -543,7 +543,7 @@ int main()
   - 4. add.asm파일 만들고, cmd를 그곳에서 명령 실행하기
   - 5. 명령어
 
-~~~asm
+~~~c++
 dasm add.asm -f3 -oadd.bin
 // dasm을 실행하고, add.asm은 내가 만든 파일, -f3은 컴파일 옵션, -o는 어떤 파일을 아웃풋으로 낼껀지, add.bin파일을 아웃풋으로 내겠다는뜻
 ~~~
@@ -551,7 +551,7 @@ dasm add.asm -f3 -oadd.bin
 <br/>
 
 # add.asm
-~~~asm
+~~~c++
 // 코드를 쓸때 TAB을 해준다
 // 다양한 ISA를 어셈블 할 수 있기 때문에 맨 위에 어떤 ISA를 사용하는 CPU 프로세서를 명시해준다(ex. .PROCESSOR 6502)
 	.PROCESSOR 6502 
@@ -584,7 +584,7 @@ dasm add.asm -f3 -oadd.bin
   	- 실행할때 powerShell에서 하면 명령어 작동이 되지 않았음..참고! 
 
 # a.asm
-~~~asm
+~~~c++
 	.PROCESSOR 6502
 	.ORG $1000
 
@@ -611,7 +611,7 @@ dasm add.asm -f3 -oadd.bin
   - ORG $FFFC, 0은 EFFFC,0부터 기록이 된다
 
 # a.asm
-~~~c
+~~~c++
 	.PROCESSOR 6502
 	.ORG $8000
 
