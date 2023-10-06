@@ -81,6 +81,13 @@
   - [6502의 간접 참조 주소지정 모드](#6502의-간접-참조-주소지정-모드)
   - [배열의 배열](#배열의-배열)
   - [함수 오버로딩, 기본값 인자, 함수 포인터](#함수-오버로딩-기본값-인자-함수-포인터)
+- [매크로](#매크로)
+  - [매크로예시](#매크로예시)
+  - [.IF, .ELSE, .ENDIF](#.if-.else-.endif)
+  - [.IFCONST, .IFNCONST](#.ifconst-.ifnconst)
+  - [.REPEAT](#.repeat)
+  - [.INCLUDE](#.include)
+  - [null 포인터](#null-포인터)
 
 
 
@@ -3597,6 +3604,450 @@ exit:
     - 고수준 언어의 컴파일러가 매개 변수 목록과 반환형이 같은지 확인
 
 ###### [함수](#함수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 매크로
+  - [매크로예시](#매크로예시)
+  - [.IF, .ELSE, .ENDIF](#.if-.else-.endif)
+  - [.IFCONST, .IFNCONST](#.ifconst-.ifnconst)
+  - [.REPEAT](#.repeat)
+  - [.INCLUDE](#.include)
+  - [null 포인터](#null-포인터)
+
+###### [매크로](#매크로)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 매크로예시
+  - 지시문 중 하나(=어셈블러의 기능)
+  - 어셈블 과정에서 직접 함수 코드를 복붙 해줌
+    - 사실 함수 외에 아무 코드나 복붙 가능
+    - C의 매크로와 작동법은 동일
+  - 어셈블리어에는 inline함수가 없음
+  - 매크로를 쓰면 속도가 빨라진다..!
+    - 간접 주소 지정으로 써야 했던 것들을 그렇게 쓰지 않고 사용 할 수 있게 때문에
+
+#a.asm
+~~~c
+// 매크로 예1
+// .MACRO와 .ENDM처럼 매크로를 사용하는 문법은 어셈블러에 따라 다르니 참고하여야함
+
+str=$1000
+copy=$1010
+
+    .MACRO phaddr
+    lda #<{1}
+    pha
+    lda #>{1}
+    pha
+    .ENDM
+
+    phaddr str
+    phaddr copy
+    jsr strcpy
+
+end:
+    jmp end
+~~~
+
+  - 현재 아래에 있는 코드를 어셈블 하게 되면, .notfound와 .loop라는 라벨이 각각 2개 나오기 때문에 jmp를 할때 .SUBROUTINE이 없기때문에 어디로 뛰어야 할지 모를 수 있다.
+    - 하지만 매크로 함수는 전부 각각 .SUBROUTINE이 있는 것처럼 지역으로 되어 있기 때문에 신경 쓰지 않아도 된다(어셈블러가 알아서 해주는것)
+
+#a.asm
+~~~c
+// 매크로 예2
+// Indexof()
+
+    idxof str, ‘e
+    ; printx 호출
+    …
+
+    idxof str, ‘l
+    ; printx 호출
+    …
+
+end:
+    jmp end
+
+    .ORG $C000, 0
+str:
+    .BYTE “Hello World”
+    .BYTE 0 ; 널문자
+
+; 문자열에서 문자가 첫 번째로 등장하는 위치를 반환
+    .MACRO idxof ; (str, char) - > X | <A, P>
+    ldx #$00 ; X = 결과
+.loop:
+    lda {1}, x
+    beq .notfound
+
+    cmp #{2}
+    beq .exit
+
+    inx
+    jmp .loop
+.notfound:
+    ldx #$FF
+.exit:
+    .ENDM
+~~~
+
+<br/>
+
+#a.asm
+~~~c
+// 매크로 예3
+// printX()
+
+out=$4000
+column=$4001
+vstr=$10
+
+    idxof str, 'e
+    printx
+
+    idxof str, 'l
+    printx
+
+end:
+    jmp end
+
+    .ORG $C000, 0
+str:
+    .BYTE "Hello World"
+    .BYTE 0  ; 널 문자
+
+; X를 LCD로 출력
+    .MACRO printx ; () <A, X, Y,, P, vsrt~vstr+10>
+; 1. 정수 X를 아스키 문자열(vstr)로 변환
+; 2. LCD 커서의 열 위치를 Y에 저장
+    ...
+
+    ldx
+
+.loop:
+    inx
+    iny
+    lda
+    sta
+    sty
+    bne
+    .ENDM
+
+
+; 문자열에서 문자가 첫 번째로 등장하는 위치를 반환
+    .MACRO idxof ; (str, char) - > X | <A, P>
+    ldx #$00 ; X = 결과
+.loop:
+    lda {1}, x
+    beq .notfound
+
+    cmp #{2}
+    beq .exit
+
+    inx
+    jmp .loop
+.notfound:
+    ldx #$FF
+.exit:
+    .ENDM
+~~~
+
+<br/>
+
+#a.asm
+~~~c
+// 매크로 예4
+// swap()
+
+num0=$3000
+num1=$3001
+
+    swap num0, num1
+
+    ...
+
+end:
+    jmp end
+
+; n0와 n1의 값 교환
+    .MACRO swap  ;(n0, n1) <A, P, X, n0, n1>
+    lda {1}
+    tax
+    lda {2}
+    sta {1}
+
+    txa
+    sta {2}
+    .ENDM
+~~~
+
+###### [매크로](#매크로)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# .IF, .ELSE, .ENDIF
+  - 소스 파일의 일부를 조건부로 최종 코드에 넣어 줌
+
+#a.asm
+~~~c
+.IF <표현식>
+	; TRUE일 때 들어가는 코드
+.ELSE
+	; FALSE일 때 들어가는 코드
+.ENDIF
+~~~
+
+  - 아래와 같이  해당되지 않는 오퍼레이션이 들어오게 되면,  ERROR: ADD OPERATOR! 이 복사되어 붙여지게 되는데, 그렇게 되면 컴파일 에러가 발생하게 된다. 이것은 마치 고수준에서 asser를 사용하는 것과 같다
+
+#a.asm
+~~~c
+// .IF, .ELSE, .ENDIF 예시
+
+v0=$00
+v1=$01
+out=$4000
+column=$4001
+vstr=$10
+
+; 사용자에게 두 수를 입력받아
+; v0와 v1에 저장
+
+    calc v0, '+, v1
+
+    printa
+
+    calc v0, '-, v1
+
+    printa
+
+    calc v0, '*, v1
+
+    printa
+
+end:
+    jmp end
+
+; A를 LCD로 출력
+.MACRO printa ; () <A, X, Y, P, vstr~vstr+10>
+; 1. 정수 A를 아스키 문자열(vstr)로 변환
+; 2. LCD 커서의 열 위치를 Y에 저장
+...
+
+    ldx #$FF
+
+.loop:
+    inx
+    iny
+    lda vstr, x
+    sta out
+    sty column
+    bne .loop
+.ENDM
+
+
+; A = a op b
+    .MACRO calc ; (a, op, b) - > A | <X, P>
+    .IF {2} = '+
+        clc
+        lda {1}
+        adc {3}
+    .ELSE
+        .IF {2}='-
+            sec
+            lda {1}
+            sbc {3}
+        .ELSE
+            .IF {2}='*
+	        ; A = a x b
+	        ...
+            .ELSE
+	        ERROR: ADD OPERATOR!
+            .ENDIF
+        .ENDIF
+    .ENDIF
+.ENDM
+~~~
+
+###### [매크로](#매크로)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# .IFCONST, .IFNCONST
+  - 소스 파일의 일부를 A정의 여부에 따라 조건부로 최종 코드에 넣어 줌
+
+#a.asm
+~~~c
+.IFCONST A
+	; A가 정의되어 있을 때 들어가는 코드
+.ENDIF
+
+.IFNCONST A
+	; A가 정의되지 않았을 때 들어가는 코드
+.ENDIF
+~~~
+
+  - 컴파일 할때  “dasm add.asm -f3 -oadd.bin -DDBGPRINT”를 넣어 줘야 아래의 코드를 같이 컴파일 하게 된다
+
+#a.asm
+~~~c
+// .IFCONST, .IFNCONST예시
+// 디버그용 print()
+
+; A를 LCD로 출력
+    .MACRO printa ; () <A, X, Y, P, vstr~vstr+10>
+        .IFCONST DBGPRINT
+; 1. itoa(A)를 호출하여 주소 vstr 문자열 저장
+; 2. LCD 커서의 열 위치를 Y에 저장
+        ...
+
+            ldx #$FF
+
+.loop:
+            inx
+            iny
+            lda vstr, x
+            sta out
+            sty column
+            bne .loop
+        .ENDIF
+    .ENDM
+~~~
+
+  - 아래와 같이 nop 2개를 같이 컴파일 하기 위해서는 “dasm add.asm -f3 -oadd.bin -DDBGPRINT -DSCRDELAY” 을 하면 된다
+
+#a.asm
+~~~c
+// .IFCONST, .IFNCONST예시
+// 디버그용 print()
+
+; A를 LCD로 출력
+    .MACRO printa ; () <A, X, Y, P, vstr~vstr+10>
+        .IFCONST DBGPRINT
+; 1. itoa(A)를 호출하여 주소 vstr 문자열 저장
+; 2. LCD 커서의 열 위치를 Y에 저장
+        …
+            .IFCONST SCRDELAY
+                nop
+                nop
+            .ENDIF
+            ldx #$FF
+
+.loop:
+            inx
+            iny
+            lda vstr, x
+            sta out
+            sty column
+            bne .loop
+        .ENDIF
+    .ENDM
+~~~
+
+###### [매크로](#매크로)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# .REPEAT
+  - 코드본문을 count 수 만큼 최종 코드에 복붙해 줌
+
+#a.asm
+~~~c
+.REPEAT <count>
+	; 코드 본문
+.REPEND
+~~~
+
+  - 아래가, .REPEAT문을 사용하는 방법이며, 컴파일시 “dasm add.asm -f3 -oadd.bin -DDBGPRINT -DSCRDELAY=1000” 와 같이 사용하여 컴파일 한다
+
+#a.asm
+~~~c
+// .REPEAT 예시
+// 디버그용 print()
+
+; A를 LCD로 출력
+    .MACRO printa ; () <A, X, Y, P, vstr~vstr+10>
+        .IFCONST DBGPRINT
+; 1. itoa(A)를 호출하여 주소 vstr 문자열 저장
+; 2. LCD 커서의 열 위치를 Y에 저장
+        …
+            .REPEAT SCRDELAY
+                nop
+            .REPEND
+            ldx #$FF
+
+.loop:
+            inx
+            iny
+            lda vstr, x
+            sta out
+            sty column
+            bne .loop
+        .ENDIF
+    .ENDM
+~~~
+
+###### [매크로](#매크로)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# .INCLUDE
+  - .INCLUDE <파일이름>
+  - C의 #include와 동일하게 동작(=텍스트 복붙)
+  - 기능 및 데이터를 여러 파일에 나눠서 개발할 수 있음
+    - 그 기능 및 데이터를 사용하는 곳에서 인클루드
+    - 어셈블 결과는 원래 한 파일이었던 것과 동일
+
+#a.asm
+~~~c
+// .INCLUDE 예: 메인 코드
+    .INCLUDE "macros.asm"
+
+    ...
+    phaddr str
+    phaddr copy
+    jsr strcpy
+
+    setaddr p0, num0
+    setaddr p1, num1
+    jsr swap
+
+end:
+    jmp end
+
+    .INCLUDE "lib.asm"
+~~~
+
+###### [매크로](#매크로)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# null 포인터
+  - 6502에서 0은 유효한 메모리 주소
+    - 제로 페이지의 첫 번째 주소!
+  - null포인터는 하드웨어가 아닌 개념적인 정의
+    - 어느 메모리 공간도 가리키지 않음을 의미하는 감시값
+    - null포인터 개념을 사용하면 주소0은 사용하지 않음
+  - C언어에서 하드웨어로 그대로 대칭되지 않는 개념 중 하나
+
+###### [매크로](#매크로)
 ###### [Top](#top)
 
 <br/>
