@@ -5220,6 +5220,158 @@ loopne not_zero
   - rep : 문자열 반복
   - repㅁㅁ : 조건부 문자열 반복
 
+<br/>
+
+  - string : 바이트 혹은 워드들을 나열해 놓은 것
+    - 문자(character)에 국한하지 않음
+    - 배열이라 보는 게 더 맞음
+  - x86은 string 전용 니모닉을 제공
+    - 복사 : movs, movsb, movsw
+    - 로드 : lods, lodsb, lodsw
+    - 채우기  : stos, stosb, stows
+    - 배교 : cmps, cmpsb, cmpsw
+    - 검색 : scas, scasb, scasw
+  - 모든 string 전용 니모닉에 공통되는 내용
+    - 레지스터들을 동일한 방법으로 사용
+    - 비슷한 문법을 따름
+    - 대부분 반복 명령어를 앞에 붙여서 사용
+    - byte버전과 word버전이 있음
+      - -sb : 바이트
+      - -sw : 워드
+      - -s : 피연산자에 따라 위 둘 중 하나를 선택
+    - 최적화 팁 : 데이터 버스 크기와 일치하는 버전을 사용할 것
+  - string전용 니모닉 사용법
+    - 방향 플래그를 올바르게 설정
+      - cld : low to high
+        - 작은 바이트 부터 높은 바이트까지
+      - std : high to low
+        - 높은 바이트 부터 작은 바이트로
+    - cx 레지스터에 반복 횟수를 저장
+    - string 의 포인터를 저장
+      - ds : si - src문자열
+      - es : di - dst문자열
+    - 올바른 반복 접두사 명령어를 선택
+    - 접두사 명령어 바로 오른쪽에 string 니모닉을 적음
+
+~~~c
+    cld
+    mov cx, 16
+    mov si, OFFSET src
+    mov di, OFFSET dst
+    rep movsb
+~~~
+
+  - movs : string복사
+  - ds : si에서 es : di 로 string을 복사
+    - ds 대신 다른 세그먼트 레지스터도 사용 가능
+  - 각 요소가 복사될 때마다 si, di가 요소 크기만큼 증감
+
+~~~c
+// movsb를 사용한 string복사
+    cld
+    mov cx, 16
+    mov si, OFFSET src
+    mov di, OFFSER dst
+    rep movsb
+~~~
+
+<br/>
+
+~~~c
+// 반복문을 사용한 string 복사
+    mov cx, 16
+    mov si, OFFSET src
+    mov di, OFFSET dst
+copy_loop : 
+    mov al, es : [si]
+    mov [di], al
+    inc si
+    inc di
+    loop copy_loop
+~~~
+
+  - lods : string 로드
+    - ds : si로부터 a레지스터로 값을 읽어옴
+      - ds 대신 다른 세그먼트 레지스터도 사용 가능
+    - rep와 같이 사용할 실익이 없음
+  - stos : string 채우기
+    - es : di를 a레지스터 값으로 채움
+      - C의 memset()과 비슷
+        - 특히 stosb를 사용할 때
+
+~~~c
+// memset(nums, 3, 16)과 아래의 코드가 같다
+// 16바이트를 3으로 채워 주겠다는것
+    mov al, 3
+
+    cld
+    mov cx, 16
+    mov di, OFFSET dst
+    rep stosb
+~~~
+
+  - cmps : string 비교
+    - es : di 를 ds : si와 비교
+      - ds 대신 다른 세그먼트 레지스터도 사용 가능
+      - 플래그가 변경됨
+    - repe / repne 와 주로 사용
+      - repne cmps 후, Z == 0 : match를 찾을 수 없었음
+      - repe cmps 후, Z == 1 : string이 동일
+
+~~~c
+// cmpsb를 사용한 string비교
+    cld
+    mov cx, 15
+    mov si, OFFSET s0
+    mov di, OFFSET s1
+    repe cmpsb
+    jne not_equal
+
+equal:
+    ...
+~~~
+
+<br/>
+
+~~~c
+// 반복문을 사용한 string 비교
+    cld
+
+    mov cx, 15
+    mov si, OFFSET s0
+    mov di, OFFSET s1
+
+compare_loop : 
+    lodsb // si에서 al로 문자열 하나를 읽어옴
+    cmp al, [di]
+    jne not_equal
+
+    inc di
+    loop compare_loop
+
+equal : 
+    ...
+~~~
+
+  - scas : string 검색
+    - es : di 에서 a레지스터의 값을 찾음
+    - 결과
+      - repne scas 후, Z == 0 : 값을 찾지 못했음
+      - repn scas 후, Z == 1 : 모든 요소가 a와 같음
+
+~~~c
+    cld
+    mov cx, 16
+    mov di, OFFSET msg
+    mov al, 'P'
+
+    repne scasb
+    jz found
+
+not_found : 
+    ...
+~~~
+
 ###### [x86-16 니모닉 소개](#x8616-니모닉-소개)
 ###### [Top](#top)
 
