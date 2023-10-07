@@ -11,6 +11,7 @@
 - [Application](#application)
   - [ShutdownMode](#shutdownmode)
   - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
+  - [StartupUri](#startupuri)
 
 <br/>
 
@@ -123,6 +124,11 @@
 
 <br/>
 
+- [데이터 연결하기](#데이터-연결하기)
+  - [자기 자신 class](#자기-자신-class)
+  - [다른 class](#다른-class)
+  - [xaml_Window.DataContext](#xaml_windowdatacontext)
+  - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
 - [Button + Command](#button--command)
@@ -232,14 +238,14 @@ public static void Main() {
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # Application
   - [ShutdownMode](#shutdownmode)
   - [Event(Startup, Activated, Deactivated, Exit)](#eventstartup-activated-deactivated-exit)
+  - [StartupUri](#startupuri)
 
 ###### [Application](#application)
 ###### [Top](#top)
@@ -443,10 +449,34 @@ Exit
 ###### [Top](#top)
 
 <br/>
+<br/>
 
-***
+# StartupUri
+  - StartupUri="MainWindow.xaml"
+    - StartupUri 를 통해 어떤 xaml이 현재 어플리케이션 프로젝트의 main으로 시작되는지 알 수 있다
 
 <br/>
+
+#App.xaml
+~~~c#
+<Application x:Class="test1.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:test1"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
+~~~
+
+###### [Application](#application)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
 
 # Window
   - [xmlns](#xmlns)
@@ -3614,22 +3644,315 @@ public class RGB_HEX : INotifyPropertyChanged
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
 
+# 데이터 연결하기
+  - [자기 자신 class](#자기-자신-class)
+  - [다른 class](#다른-class)
+  - [xaml_Window.DataContext](#xaml_windowdatacontext)
+  - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
+
 <br/>
 
-# 자주 활용하는 Class, Interface
-  - [ObservableCollection](#observablecollection)
-  - [INotifyPropertyChanged](#inotifypropertychanged)
-
+###### [데이터 연결하기](#데이터-연결하기)
 ###### [Top](#top)
 
 <br/>
+<br/>
 
-***
+# 자기 자신 class
+  - 현재 화면에, this(즉 자기 자신)의 데이터를 연결하겠다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
 
 <br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [데이터 연결하기](#데이터-연결하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 다른 class
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = new Bus();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus()
+        {
+
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [데이터 연결하기](#데이터-연결하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+# xaml_Window.DataContext
+  - Window.DataContext 속성은 하나만 설정이 가능하다
+  - xaml에 딸려 오는 xaml.cs만 가능한 것이 아니라, 일반 cs파일안에 class라면 DataContext작업을 할 수 있다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.DataContext>
+        <local:Bus/>
+    </Window.DataContext>
+
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus()
+        {
+
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [데이터 연결하기](#데이터-연결하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# xaml_Window.DataContext_다른프로젝트
+  - 참조 연결하기
+    - 현재 있는것 여기에 연결하기
+  - 네임스페이스 지정하기
+  - Window.DataContext 사용하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        xmlns:Data="clr-namespace:Sample.Data;assembly=Sample.Data"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.DataContext>
+        <Data:MainView/>
+    </Window.DataContext>
+
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Sample.Data프로젝트
+#MainView.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sample.Data
+{
+    public class MainView
+    {
+        public MainView()
+        {
+
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [데이터 연결하기](#데이터-연결하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
 
 # ObservableCollection
   - ObservableCollection 과 List차이 : WPF에서는 ListBox와ListView같은 곳에서 바인딩 사용시(ItemSource) ObserableColletion을 대부분 사용하게 된다. ObserableColletion는 UI에서 실시간으로 반영을 해주기 때문이다, 그러나 일반적인 List 는 변경된 List의 내용을 UI 에서 실시간으로 반영하지 않는다
