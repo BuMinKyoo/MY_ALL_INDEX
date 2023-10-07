@@ -42,6 +42,13 @@
 
 <br/>
 
+- [Window.Resources](#windowresources)
+  - [DataTemplate 사용하기](#datatemplate사용하기)
+  - [다른 xaml파일을 DataContext로 출력하기](#다른-xaml파일을-datacontext로-출력하기)
+  - [ItemsControl의 ItemsSource로 DataTemplate출력하기](#itemscontrol의-itemssource로-datatemplate출력하기)
+  - [ContentControl의 Content로 DataTemplate출력하기](#contentcontrol의-content로-datatemplate출력하기)
+
+<br/>
 
 - FrameworkElement
   - Decorator
@@ -135,6 +142,10 @@
 - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
 - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
     
+<br/>
+
+- [클래스 라이브러리](#클래스 라이브러리)
+
 <br/>
 
 - [JsonParsing](#jsonparsing)
@@ -254,16 +265,15 @@ public static void Main() {
 <br/>
 
 # ShutdownMode
+  - Application.Current : Application을 시작하는 메인Window는 한개 뿐이기 때문에, 어디서든 메인Window에 접근하기 위해서 사용 할 수 있다.
+
+<br/>
+
   - ShutdownMode="OnExplicitShutdown" : 종료를 아예 말해야함
   - ShutdownMode="OnLastWindowClose" : 위도우창을 전부 종료해야함
   - ShutdownMode="OnMainWindowClose" : 메인 윈도우 창을 종료하면 됨
 
 <br/>
-
-  - Application.Current : Application을 시작하는 메인Window는 한개 뿐이기 때문에, 어디서든 메인Window에 접근하기 위해서 사용 할 수 있다.
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
 <br/>
 
   - ShutdownMode="OnExplicitShutdown"
@@ -313,9 +323,6 @@ public partial class MainWindow : Window
 연결된 Application.Current.Shutdown();을 실행 함으로써 종료가 된다.
 
 <br/>
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
 <br/>
 
   - ShutdownMode="OnLastWindowClose"
@@ -386,8 +393,7 @@ public partial class MainWindow : Window
   - Deactivated : Application이 가지고 있는 어떤 Window라도 포커스 잃으면 발생
   - Exit : Application종료시 발생
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #App.xaml
@@ -545,8 +551,7 @@ Title="MainWindow" SizeToContent="WidthAndHeight"
   - Deactivated : 메인 윈도우가 포커스 되지 않았을 때 발생
   - Closing : 메인 윈도우를 닫을때 이벤트 발생
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #MainWindow.XAML
@@ -604,10 +609,9 @@ public partial class MainWindow : Window
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # 다양한 참조법
   - Class를 참조할 경우 일반적으로 클래스 라이브 러리의 .NET Standard 프레임 워크를 이용하여 참조한다(이유 : .NET Framework, .NET Core, Xamarin 전부 호환 되기 때문에)
@@ -1018,6 +1022,571 @@ public class Car
 
 ***
 
+# Window.Resources
+  - [DataTemplate 사용하기](#datatemplate사용하기)
+  - [다른 xaml파일을 DataContext로 출력하기](#다른-xaml파일을-datacontext로-출력하기)
+  - [ItemsControl의 ItemsSource로 DataTemplate출력하기](#itemscontrol의-itemssource로-datatemplate출력하기)
+  - [ContentControl의 Content로 DataTemplate출력하기](#contentcontrol의-content로-datatemplate출력하기)
+
+###### [Window.Resources](#windowresources)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DataTemplate 사용하기
+  - 아래의 코드는 클래스 데이터 자체를 불러왔기 때문에 클래스명을 그대로 출력하게 된다
+  - 이는, 내부적으로 ToString()메소드가 설정되어 있기 때문이다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.Resources>
+        <local:Bus x:Key="bus"/>
+    </Window.Resources>
+    
+    <Grid>
+        <ContentControl Content="{StaticResource bus}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus() { }
+    }
+}
+~~~
+
+![20231008_010648](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/7317633f-b9de-4a5f-b602-a003b49639db)
+
+<br/>
+
+  - ToString()메소드 변경하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.Resources>
+        <local:Bus x:Key="bus"/>
+    </Window.Resources>
+    
+    <Grid>
+        <ContentControl Content="{StaticResource bus}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus() { }
+
+        public string Name { get; set; } = "키키";
+
+        public int Age { get; set; } = 30;
+
+        public override string ToString()
+        {
+            return $"이름은{Name}이고 나이는{Age}";
+        }
+    }
+}
+~~~
+
+![20231008_010801](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/5f87061f-50ce-4ed3-816f-7a071f3db233)
+
+  - 이렇게 ToString() 메소드를 재정의 하여 수정할 수 있지만, 한계가 있기 때문에 DataTemplate를 이용하게 된다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type local:Bus}">
+            <!--누군가 Bus클래스를 출력하려고하면 여기에 작성한 대로 출력하라 라는 의미-->
+        </DataTemplate>
+    </Window.Resources>
+</Window>
+~~~
+
+<br/>
+
+  - DataTemplate 안에서 지정된 대로 출력을 하게 된다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.Resources>
+        <local:Bus x:Key="bus"/>
+
+        <DataTemplate DataType="{x:Type local:Bus}">
+            <TextBlock>안녕하세요</TextBlock>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <ContentControl Content="{StaticResource bus}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus() { }
+
+        public string Name { get; set; } = "키키";
+
+        public int Age { get; set; } = 30;
+    }
+}
+~~~
+
+![20231008_010944](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/7f3f6df6-5add-4a90-a401-faad6faa7c31)
+
+###### [Window.Resources](#windowresources)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 다른 xaml파일을 DataContext로 출력하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.Resources>
+        <local:Bus x:Key="bus"/>
+
+        <DataTemplate DataType="{x:Type local:Bus}">
+            <local:UserControl1/>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <ContentControl Content="{StaticResource bus}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus() { }
+
+        public string Name { get; set; } = "키키";
+
+        public int Age { get; set; } = 30;
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="test1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:test1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="100" Content="버튼"/>
+    </Grid>
+</UserControl>
+~~~
+
+![20231008_011056](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/355be125-54c5-45f4-8cbf-4a0a4d865926)
+
+###### [Window.Resources](#windowresources)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ItemsControl의 ItemsSource로 DataTemplate출력하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Sample.Data;assembly=Sample.Data"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.DataContext>
+        <vm:MainView/>
+    </Window.DataContext>
+    
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:TabHead}">
+            <local:UserControl1/>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <ItemsControl ItemsSource="{Binding MenuTab}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="test1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:test1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="100" Content="{Binding MenuCode}"/>
+        <TextBlock Text="{Binding Title}"/>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#Sample.Data프로젝트
+#MainView.cs
+~~~c#
+using System.Collections.ObjectModel;
+
+namespace Sample.Data
+{
+    public class MainView
+    {
+        public MainView()
+        {
+            MenuTab = new ObservableCollection<TabHead>()
+            {
+                new TabHead() { Selected = true, MenuCode = "MenuAll", Title = "전체" },
+                new TabHead() {  Selected = false, MenuCode = "MenuExtra", Title = "엑스트라" }
+            };
+        }
+
+        public ObservableCollection<TabHead> _menuTab = null;
+        public ObservableCollection<TabHead> MenuTab
+        {
+            get => _menuTab;
+            private set
+            {
+                _menuTab = value;
+            }
+        }
+    }
+
+}
+~~~
+
+<br/>
+
+#Sample.Data프로젝트
+#TabHead.cs
+~~~c#
+namespace Sample.Data
+{
+    public class TabHead
+    {
+        bool _selected;
+        public bool Selected
+        {
+            get => _selected;
+            set
+            {
+                _selected = value;
+            }
+        }
+
+        string _menuCode = null;
+        public string MenuCode
+        {
+            get => _menuCode;
+            set
+            {
+                _menuCode = value;
+            }
+        }
+
+        string _title = null;
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+            }
+        }
+    }
+}
+~~~
+
+![20231008_011234](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1e86a3df-be4f-407d-b6b9-bfb7352f9e43)
+
+###### [Window.Resources](#windowresources)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ContentControl의 Content로 DataTemplate출력하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Sample.Data;assembly=Sample.Data"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.DataContext>
+        <vm:MainView/>
+    </Window.DataContext>
+    
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:TabHead}">
+            <local:UserControl1/>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <ContentControl Content="{Binding MenuTab}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="test1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:test1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="100" Content="{Binding Id}"/>
+        <TextBlock Text="{Binding Pw}"/>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#Sample.Data프로젝트
+#MainView.cs
+~~~c#
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+namespace Sample.Data
+{
+    public class MainView
+    {
+        public MainView()
+        {
+            //MenuTab = new List<TabHead>()
+            //{
+            //    new TabHead(),
+            //    new TabHead()
+            //};
+
+            //MenuTab.Add(new TabHead());
+        }
+
+        public TabHead _menuTab = new TabHead();
+        public TabHead MenuTab
+        {
+            get => _menuTab;
+            private set
+            {
+                _menuTab = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Sample.Data프로젝트
+#TabHead.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sample.Data
+{
+    public class TabHead
+    {
+        string _Id = "aaa";
+        public string Id
+        {
+            get => _Id;
+            set
+            {
+                _Id = value;
+            }
+        }
+
+
+        bool _Pw = false;
+        public bool Pw
+        {
+            get => _Pw;
+            set
+            {
+                _Pw = value;
+            }
+        }
+    }
+}
+~~~
+
+![20231008_011414](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c186a110-f493-40c5-b44c-bd6e4c2b9393)
+
+###### [Window.Resources](#windowresources)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # Border
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Decorator
   - 모서리를 동그랗게 만들어줌
@@ -1273,7 +1842,8 @@ public partial class MainWindow : Window
 ###### [Panel](#panel)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
   - 다양한 요소안에 Grid를 만들기
 
@@ -1424,7 +1994,8 @@ public partial class MainWindow : Window
 ###### [Panel](#panel)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
   - Orientation="Horizontal"
     - 정렬 방향을 수평으로 바꿀 수 있음
@@ -2102,7 +2673,8 @@ public partial class MainWindow : Window
 ###### [TextBoxBase](#textboxbase)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
   - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
     - AcceptsReturn="True" 속성 : 엔터키를 사용 할 수 있게함
@@ -2517,11 +3089,10 @@ public partial class MainWindow : Window
 ###### [MenuBase](#menubase)
 ###### [Top](#top)
 
+<br/
 <br/>
 
 ***
-
-<br/>
 
 # Selector
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl
@@ -2624,7 +3195,8 @@ public partial class MainWindow : Window
 ###### [Selector](#selector)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
   - IsEditable속성
     - 텍스트를 직접 편집할 수 있는지 여부를 지정, 속성값이 true일 경우 사용자가 목록에서 항목을 선택하면 SelectedItem 속성이 설정된다
@@ -3050,10 +3622,9 @@ public class Price_list : INotifyPropertyChanged
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # ListBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector
@@ -3081,7 +3652,8 @@ public class Price_list : INotifyPropertyChanged
 ###### [Selector](#selector)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
   - ListBoxItem목록에서 Content출력하기
 
@@ -3363,10 +3935,9 @@ public class Class1 : INotifyPropertyChanged
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # ListView
   - Selector를 상속받은 속성 활용
@@ -3377,7 +3948,8 @@ public class Class1 : INotifyPropertyChanged
 ###### [ListBox](#listbox)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
   - SelectedItem
 
@@ -4177,14 +4749,13 @@ public class Apple : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/152622892-24a626c9-c433-48a7-86e7-a229d61311ab.png">
 
-###### [자주 활용하는 Class, Interface](#자주-활용하는-class-interface)
+###### [ObservableCollection](#observablecollection)
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # INotifyPropertyChanged
   - 인터페이스로써, 속성 값이 변경 되었을 때 알림을 준다. 예를 들어 디자인 폼에서 속성을 변경 했을때 백단의 데이터까지 바뀌게 해준다.
@@ -4220,28 +4791,13 @@ public class Class1 : INotifyPropertyChanged
 }
 ~~~
 
-###### [자주 활용하는 Class, Interface](#자주-활용하는-class-interface)
+###### [INotifyPropertyChanged](#inotifypropertychanged)
 ###### [Top](#top)
 
 <br/>
-
-***
-
-<br/>
-
-# Binding
-  - [Button + Command](#button--command)
-  - [ItemsSource](#itemssource)
-  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
-  - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
-
-###### [Top](#top)
-
 <br/>
 
 ***
-
-<br/>
 
 # Button + Command
 
@@ -4363,7 +4919,7 @@ public partial class MainWindow : Window
 }
 ~~~
 
-###### [Binding](#binding)
+###### [Button + Command](#button--command)
 ###### [Top](#top)
 
 <br/>
@@ -4597,14 +5153,13 @@ class Workspace : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/158002074-53c25c5e-e955-44b3-8f25-03c27f839310.gif" height="400" width="400">
 
-###### [Binding](#binding)
+###### [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # ContentControl을 활용한 UserControl끼리의 값 전달
 
@@ -4779,24 +5334,39 @@ class Workspace : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/158002648-4572bcdb-a67c-4d57-b337-67e14c2d493b.gif" width="400" height="400">
 
-###### [Binding](#binding)
+###### [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
 ###### [Top](#top)
 
+<br/>
 <br/>
 
 ***
 
+# 클래스 라이브러리
+  - 메인 Windows 애플리케이션을 개발할때, 싱글톤 개발이 아니라면, 다른 추가 프로젝트는 “클래스 라이브러리” 로 만들어서 메인 Windows 애플리케이션에 참조로써 이용하게 된다
+  - .NET Framework라면, 아래의 클래스 라이브러리를 이용한다
+
+![20231008_005645](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f7934a30-3418-4084-b247-a963b88b7bc7)
+
+###### [클래스 라이브러리](#클래스 라이브러리)
+###### [Top](#top)
+
 <br/>
+<br/>
+
+***
 
 # JsonParsing
   - [JsonParsing하기](#jsonparsing하기)
   - [Json직렬화하기](#json직렬화하기)
 
+###### [JsonParsing](#jsonparsing)
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## JsonParsing하기
+# JsonParsing하기
 
 #MainWindow.xaml
 ~~~c#
@@ -5137,10 +5707,9 @@ public class row
 ###### [Top](#top)
 
 <br/>
+<br/>
 
 ***
-
-<br/>
 
 # 소캣통신
   - [Task](#task)
@@ -5148,9 +5717,10 @@ public class row
 
 ###### [Top](#top)
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<br/>
+<br/>
 
-## Task
+# Task
   - 스레드를 돌리는것
 
 #cs(예시)
@@ -5205,11 +5775,11 @@ this.Dispatcher.BeginInvoke(new Action(() => {실행할 코드} )); 공식을 �
 
 ###### [소캣통신](#소캣통신)
 ###### [Top](#top)
+
+<br/>
 <br/>
 
 ***
-
-<br/>
 
 # etc...
 
