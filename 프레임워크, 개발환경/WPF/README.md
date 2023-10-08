@@ -50,50 +50,38 @@
 
 <br/>
 
-- FrameworkElement
-  - Decorator
-    - [Border](#border)
-    - [TextBlock](#textblock)
-      - [Run](#run)
-    - [Popup](#popup)
-    - [Panel](#panel)
-      - [Grid](#grid)
-        - 다양한 요소안에 Grid를 만들기
-        - IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
-      - [Canvas](#canvas)
-      - [DockPanel](#dockpanel)
-      - [StackPanel](#stackpanel)
-        - Orientation="Horizontal"
-      - [WrapPanel](#wrappanel)
-        - Orientation="Vertical"
-      - [Viewbox](#viewbox)
-        - Stretch
-        - StretchDirection
-      - [UniformGrid](#uniformgrid)
-        - Columns,Rows지정
-        - ClipToBounds
-        - FirstColumn
-        - FlowDirection
-    - [Control](#control)
-      - [Separator](#separator)
-      - [PasswordBox](#passwordbox)
-      - [Thumb](#thumb)
-        - [GridSplitter](#gridsplitter)
-          - DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
-      - [RangeBase](#rangebase)
-        - [ProgressBar](#progressbar)
-          - IsIndeterminate
-        - [Slider](#slider)
-          - ValueChanged이벤트로 R,G,B값 표현하기
-          - ValueChanged이벤트로 R,G,B,A값 표현하기
-          - Orientation속성
-          - TickPlacement속성(눈금표시)
-      - [TextBoxBase](#textboxbase)
-        - [TextBox](#textbox)
-          - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
-          - TextChanged이벤트, SelectionChanged이벤트
-          - SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
-      - [ContentControl](#contentcontrol)
+- [Border](#border)
+- [TextBlock](#textblock)
+  - [Run](#run)
+- [Popup](#popup)
+- [Panel](#panel)
+  - [Grid](#grid)
+  - [Canvas](#canvas)
+  - [DockPanel](#dockpanel)
+  - [StackPanel](#stackpanel)
+  - [WrapPanel](#wrappanel)
+  - [Viewbox](#viewbox)
+  - [UniformGrid](#uniformgrid)
+- [Separator](#separator)
+- [PasswordBox](#passwordbox)
+- [Thumb](#thumb)
+  - [GridSplitter](#gridsplitter)
+- [RangeBase](#rangebase)
+  - [ProgressBar](#progressbar)
+  - [Slider](#slider)
+- [TextBox](#textbox)
+  - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
+  - TextChanged이벤트, SelectionChanged이벤트
+  - SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
+
+
+
+
+
+
+
+
+- [ContentControl](#contentcontrol)
         - [ScrollViewer](#scrollviewer)
           - HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
           - FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
@@ -1678,9 +1666,6 @@ namespace Sample.Data
   - AllowsTransparency : 팝업창의 배경을 투명으로 할 수 있음
   - IsOpen : 팝업을 띄워주고 닫아줌 
 
-###### [Popup](#popup)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -1727,9 +1712,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152073966-9993fda4-80c5-4aec-b2e2-7d0b6df20db6.png">
 
-###### [Popup](#popup)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -1751,9 +1733,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152074233-11a3764f-b8a7-4724-ac7c-27b3dcaede9e.png">
-
-###### [Popup](#popup)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -1841,9 +1820,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/147874900-2aab4125-8b19-4c41-9804-d39d12ac353b.png">
 
-###### [Panel](#panel)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -1863,9 +1839,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/148070083-3a53e213-6cbc-43dd-88b6-81cba330675f.png">
-
-###### [Grid](#grid)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -1928,7 +1901,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/148079616-5703ff5f-5acd-4e5a-b50f-35f8e8008ad7.png">
 
-###### [Grid](#grid)
+###### [Panel](#panel)
 ###### [Top](#top)
 
 <br/>
@@ -1993,9 +1966,6 @@ public partial class MainWindow : Window
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
   - 자식 요소들을 행이나 열로 나열
 
-###### [Panel](#panel)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2024,7 +1994,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/148635073-d7d3a64d-81c6-48a3-b9d0-4f370a1d124c.png">
 
-###### [StackPanel](#stackpanel)
+###### [Panel](#panel)
 ###### [Top](#top)
 
 <br/>
@@ -2057,9 +2027,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/148635594-dfe37a6a-08cf-49d8-baf5-a2a6e81e7874.png">
 
-###### [Panel](#panel)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2086,7 +2053,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/148635557-b0904ba7-1de7-4d20-8548-d90ddbe79d16.png">
 
-###### [WrapPanel](#wrappanel)
+###### [Panel](#panel)
 ###### [Top](#top)
 
 <br/>
@@ -2095,11 +2062,6 @@ public partial class MainWindow : Window
 # Viewbox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Panel
   - 화면의 크기를 늘리고 줄였을때 그 안에 요소들을 일정한 비율로 늘리고 줄일 수 있음
-
-<br/>
-
-###### [Panel](#panel)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2126,9 +2088,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/148673507-8e1abe94-d180-47ab-8db7-cbaea328c5f1.png">
 
-###### [Viewbox](#viewbox)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2137,7 +2096,7 @@ public partial class MainWindow : Window
   - UpOnly : 기본 크기보다 큰 크기에서만 크기조정을 허용
   - DownOnly : 기본 크기보다 작은 크기에서만 조절이 가능
 
-###### [Viewbox](#viewbox)
+###### [Panel](#panel)
 ###### [Top](#top)
 
 <br/>
@@ -2165,9 +2124,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/149927550-e3de207c-7c2b-4e82-b2ce-9ea0f9b95212.png" width="300" height="300">
-
-###### [Panel](#panel)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2200,9 +2156,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/149928370-36e15e1c-c3e7-4e48-b6f5-fcd3c2f9c84a.png">
 
-###### [UniformGrid](#uniformgrid)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2226,9 +2179,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/149928819-757fbb07-4bc2-475d-9fd7-746c796cc6d4.png">
 
-###### [UniformGrid](#uniformgrid)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2248,9 +2198,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/149929403-9ba21762-33f5-4ed1-9982-c61cf276d527.png">
-
-###### [UniformGrid](#uniformgrid)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2272,34 +2219,13 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/149929712-91144101-18c8-41fe-800e-e09e6dab4b03.png">
 
-###### [UniformGrid](#uniformgrid)
+###### [Panel](#panel)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
 ***
-
-# Control
-  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement
-  - TabIndex(int값) : Tab키를 눌렀을때 이동하는 순서를 나타낸다
-  - IsTabStop(boll값) : Tab키를 눌렀을때 지나치게 됨
-
-<br/>
-
-  - [Separator](#separator)
-  - [PasswordBox](#passwordbox)
-  - [Thumb](#thumb)
-  - [RangeBase](#rangebase)
-  - [TextBoxBase](#textboxbase)
-  - [ContentControl](#contentcontrol)
-  - [ItemsControl](#ItemsControl)
-
-###### [FrameworkElement](#frameworkelement)
-###### [Top](#top)
-
-<br/>
-<br/>
 
 # Separator
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -2320,11 +2246,13 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/150148233-147bd185-e175-42e1-9073-375bb2246c0d.png">
 
-###### [Control](#control)
+###### [Separator](#separator)
 ###### [Top](#top)
 
 <br/>
 <br/>
+
+***
 
 # PasswordBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
@@ -2341,7 +2269,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/153541148-8bd20629-0fd4-4fed-a57e-2e193201a6ef.png">
 
-###### [Control](#control)
+###### [PasswordBox](#passwordbox)
 ###### [Top](#top)
 
 <br/>
@@ -2362,7 +2290,7 @@ public partial class MainWindow : Window
 
   - [GridSplitter](#gridsplitter)
 
-###### [Control](#control)
+###### [Thumb](#thumb)
 ###### [Top](#top)
 
 <br/>
@@ -2393,9 +2321,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152299296-11475d66-9c58-438a-adda-bf7f81c905d4.png">
-
-###### [Thumb](#thumb)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2443,7 +2368,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152470717-b07933bd-b3a1-425d-b825-5a5f9af888a0.png">
 
-###### [GridSplitter](#gridsplitter)
+###### [Thumb](#thumb)
 ###### [Top](#top)
 
 <br/>
@@ -2456,7 +2381,7 @@ public partial class MainWindow : Window
   - [ProgressBar](#progressbar)
   - [Slider](#slider)
 
-###### [Control](#control)
+###### [RangeBase](#rangebase)
 ###### [Top](#top)
 
 <br/>
@@ -2480,9 +2405,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152511866-40517ab8-2852-450b-b8a8-ac440eb24a36.png">
 
-###### [RangeBase](#rangebase)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2499,7 +2421,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152512413-748e0114-3c63-4fbd-859c-b79482c9efe3.png">
 
-###### [ProgressBar](#progressbar)
+###### [RangeBase](#rangebase)
 ###### [Top](#top)
 
 <br/>
@@ -2510,9 +2432,6 @@ public partial class MainWindow : Window
   - Minimum 속성 : 최소 작은수 지정
   - Maximum 속성 : 최대 큰 수 지정
   - IsDirectionReversed : 슬라이더의 최대, 최소값의 위치가 바뀜(true이면 최대 최소의 방향이 바뀐다)
-
-###### [RangeBase](#rangebase)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2555,9 +2474,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/156905759-405d0d68-7c25-43ea-a891-056f94ae35e8.png">
-
-###### [Slider](#slider)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2604,9 +2520,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/156906074-7f9e7cbb-1f3d-4b19-9e51-94728cc6973c.png">
 
-###### [Slider](#slider)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2625,9 +2538,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/156905872-8881619d-6b72-424e-8cf3-4286f49b676b.png">
-
-###### [Slider](#slider)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2652,7 +2562,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/156905997-b90525ab-d615-42fc-9fdb-933676cab050.png">
 
-###### [Slider](#slider)
+###### [RangeBase](#rangebase)
 ###### [Top](#top)
 
 <br/>
@@ -2660,20 +2570,9 @@ public partial class MainWindow : Window
 
 ***
 
-# TextBoxBase
-  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
-
-###### [Control](#control)
-###### [Top](#top)
-
 # TextBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - TextBoxBase
   - 사용자가 Box내부에 string을 적을 수 있는 컨텐트
-
-<br/>
-
-###### [TextBoxBase](#textboxbase)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2685,18 +2584,12 @@ public partial class MainWindow : Window
     - MaxLength 속성 : 글자수를 제한해줌
     - CharacterCasing 속성 : 자동으로 대문자 소문자로 입력되게 함
 
-###### [TextBox](#textbox)
-###### [Top](#top)
-
 <br/>
 <br/>
 
   - TextChanged이벤트, SelectionChanged이벤트
     - TextChanged 이벤트 : 글자가 바뀔 때마다 이벤트를 실행하게함(TextBox안에 글자가 지정되어 있으면 예외가 발생하여 실행이 안됨)
     - SelectionChanged 이벤트 : 선택한 텍스트를 변경하거나 캐럿을 이동할 때 발생하는 이벤트, 마우스나 키보드 등의 입력장치를 사용해서 선택을 조정할 때마다 발생하는 이벤트
-
-###### [TextBox](#textbox)
-###### [Top](#top)
 
 <br/>
 <br/>
