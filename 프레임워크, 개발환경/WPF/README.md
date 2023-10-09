@@ -51,71 +51,73 @@
 <br/>
 
 - [Border](#border)
+  - BorderBrush, BorderThickness, CornerRadius
 - [TextBlock](#textblock)
   - [Run](#run)
 - [Popup](#popup)
+  - Placement, HorizontalOffset, VerticalOffset, AllowsTransparency, IsOpen
+  - AllowsTransparency(False일때)
+  - AllowsTransparency(True일때)
 - [Panel](#panel)
   - [Grid](#grid)
+    - 다양한 요소안에 Grid를 만들기
+    - IsSharedSizeScope속성을 이용해 Grid의 폭과 넓이 맟주기
   - [Canvas](#canvas)
   - [DockPanel](#dockpanel)
   - [StackPanel](#stackpanel)
+    - Orientation="Horizontal"
   - [WrapPanel](#wrappanel)
   - [Viewbox](#viewbox)
+    - Stretch, StretchDirection
   - [UniformGrid](#uniformgrid)
+    - Columns,Rows지정, ClipToBounds, FirstColumn, FlowDirection
 - [Separator](#separator)
 - [PasswordBox](#passwordbox)
 - [Thumb](#thumb)
   - [GridSplitter](#gridsplitter)
+    - DragStarted. DragCompleted, DragDelta, IsDragging, CancelDrag
 - [RangeBase](#rangebase)
   - [ProgressBar](#progressbar)
+    - IsIndeterminate
   - [Slider](#slider)
+    - ValueChanged이벤트로 R,G,B값 표현하기
+    - ValueChanged이벤트로 R,G,B,A값 표현하기
+    - Orientation속성
+    - TickPlacement속성(눈금표시)
 - [TextBox](#textbox)
   - AcceptsReturn, AcceptsTab, VerticalScrollBarVisibility, MaxLength, CharacterCasing
   - TextChanged이벤트, SelectionChanged이벤트
   - SelectedText, CaretIndex, SelectionStart, SelectionLength, Select(1,4), SelectAllAll()
-
-
-
-
-
-
-
-
-- [ContentControl](#contentcontrol)
-        - [ScrollViewer](#scrollviewer)
-          - HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
-          - FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
-        - [ToolTip](#tooltip)
-        - ButtonBase
-          - [RepeatButton](#repeatbutton)
-        - [HeaderedContentControl](#headeredcontentcontrol)
-          - [Expander](#expander)
-            - Header를 따로 빼서 지정가능
-          - [GroupBox](#groupbox)
-            - FontFamily
-      - [ItemsControl](#itemscontrol)
-        - [MenuBase](#menubase)
-          - [Menu](#menu)
-            - MenuItem에 아이콘 넣기
-            - MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
-          - [ContextMenu](#contextmenu)
-        - [Selector](#selector)
-          - [TabControl](#tabcontrol)
-          - [ComboBox](#combobox)
-            - IsEditable속성
-            - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
-            - 각각의 ComboBoxitem을 분리해서 나타나게 하기
-          - [ListBox](#listbox)
-            - ListBoxItem목록에서 Content출력하기
-            - ListBox바인딩 및 MessageBox로 출력하기
-            - ItemsSource
-            - [ListView](#listview)
-              - SelectedItem
-              - SelectedItem에 대한 Content만 뽑아내기
-              - SelectedIndex
-              - ListView헤더 크기를 비율로 조절하기(Binding활용)
-              - DisplayMemberBinding
-
+- [ScrollViewer](#scrollviewer)
+  - HorizontalScrollBarVisibility, VerticalScrollBarVisibility(visible, Hidden, Auto, Disabled)
+  - FrameworkElement를 이용해 ScrollViewer의 시스템 whith사이즈를 불러오기
+- [ToolTip](#tooltip)
+- [RepeatButton](#repeatbutton)
+- [HeaderedContentControl](#headeredcontentcontrol)
+  - [Expander](#expander)
+    - Header를 따로 빼서 지정가능
+  - [GroupBox](#groupbox)
+    - FontFamily
+- [Menu](#menu)
+  - MenuItem, Header, _(단축키), InputGestureText, IsCheckable, SubmenuOpened
+  - MenuItem에 아이콘 넣기
+- [ContextMenu](#contextmenu)
+- [Selector](#selector)
+  - [TabControl](#tabcontrol)
+  - [ComboBox](#combobox)
+    - IsEditable속성
+    - ObservableCollection을 이용한 ComboBox의 ComboBoxItem추가, ComboBoxItem의 Content출력
+    - 각각의 ComboBoxitem을 분리해서 나타나게 하기
+  - [ListBox](#listbox)
+    - ListBoxItem목록에서 Content출력하기
+    - ListBox바인딩 및 MessageBox로 출력하기
+    - ItemsSource
+  - [ListView](#listview)
+    - SelectedItem
+    - SelectedItem에 대한 Content만 뽑아내기
+    - SelectedIndex
+    - ListView헤더 크기를 비율로 조절하기(Binding활용)
+    - DisplayMemberBinding
 
 <br/>
 
@@ -2610,26 +2612,10 @@ public partial class MainWindow : Window
 
 ***
 
-# ContentControl
-  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
-  - [ScrollViewer](#ScrollViewer)
-  - [ToolTip](#tooltip)
-  - [ButtonBase](#ButtonBase)
-  - [HeaderedContentControl](#HeaderedContentControl)
-
-###### [Control](#control)
-###### [Top](#top)
-
-<br/>
-<br/>
-
 # ScrollViewer
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
   - ScrollViewer내부에 있는 객체들을 스크롤로 나타내줌
   - 기본적으로, VerticalScrollBarVisibility="Visible"로 되어 있기 때문에 VerticalScrollBarVisibility="Hidden"을 해줘야 수직 스크롤 막대가 없어짐
-
-###### [ContentControl](#contentcontrol)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2658,9 +2644,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152088288-d03304dc-49c9-4aa8-b698-be87473247bd.png">
-
-###### [ScrollViewer](#ScrollViewer)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2707,11 +2690,13 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152091900-c7834135-e50c-4e4f-a8d2-722a35cc0d70.png">
 
-###### [ScrollViewer](#ScrollViewer)
+###### [ScrollViewer](#scrollviewer)
 ###### [Top](#top)
 
 <br/>
 <br/>
+
+***
 
 # tooltip
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl
@@ -2730,11 +2715,13 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152283585-98284fcf-ae1c-48b8-b6d9-2ba1f978d815.png">
 
-###### [ContentControl](#contentcontrol)
+###### [ToolTip](#tooltip)
 ###### [Top](#top)
 
 <br/>
 <br/>
+
+***
 
 # RepeatButton
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - ButtonBase
@@ -2756,7 +2743,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152261245-cadbc91f-47a7-4060-9c09-61077cdbc36d.png">
 
-###### [ButtonBase](#ButtonBase)
+###### [RepeatButton](#repeatbutton)
 ###### [Top](#top)
 
 <br/>
@@ -2769,7 +2756,7 @@ public partial class MainWindow : Window
   - [Expander](#Expander)
   - [GroupBox](#GroupBox)
 
-###### [ContentControl](#contentcontrol)
+###### [HeaderedContentControl](#headeredcontentcontrol)
 ###### [Top](#top)
 
 <br/>
@@ -2798,9 +2785,6 @@ public partial class MainWindow : Window
 <img src="https://user-images.githubusercontent.com/39178978/152100796-40fe916c-ad5f-4b0f-a92d-4b6e00ab1f21.png">
 <img src="https://user-images.githubusercontent.com/39178978/152100820-d0b4e2da-168d-47b0-9e35-b561147753e3.png">
 
-###### [HeaderedContentControl](#headeredcontentcontrol)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -2828,7 +2812,7 @@ public partial class MainWindow : Window
 <img src="https://user-images.githubusercontent.com/39178978/152101199-cbffb3c5-31db-40f3-968a-15d522948e79.png">
 <img src="https://user-images.githubusercontent.com/39178978/152101208-c43eb6b5-7ba8-4069-abf3-d820ec514f45.png">
 
-###### [Expander](#expander)
+###### [HeaderedContentControl](#headeredcontentcontrol)
 ###### [Top](#top)
 
 <br/>
@@ -2837,11 +2821,6 @@ public partial class MainWindow : Window
 # GroupBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ContentControl - HeaderedContentControl
   - 여러 객체들을 목록으로 묶어 표현해줌
-
-<br/>
-
-###### [HeaderedContentControl](#headeredcontentcontrol)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2869,7 +2848,7 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152258610-a876a9c0-1bb5-4299-9462-5d42fd675097.png">
 
-###### [GroupBox](#groupbox)
+###### [HeaderedContentControl](#headeredcontentcontrol)
 ###### [Top](#top)
 
 <br/>
@@ -2877,36 +2856,9 @@ public partial class MainWindow : Window
 
 ***
 
-# ItemsControl
-  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control
-  - [MenuBase](#menubase)
-  - [Selector](#selector)
-
-###### [Control](#control)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# MenuBase
-  - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl
-  - [Menu](#Menu)
-  - [ContextMenu](#ContextMenu)
-
-###### [ItemsControl](#itemscontrol)
-###### [Top](#top)
-
-<br/>
-<br/>
-
 # Menu
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - MenuBase
   - 메뉴를 생성
-
-<br/>
-
-###### [MenuBase](#menubase)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -2941,9 +2893,6 @@ public partial class MainWindow : Window
 <br/>
 <br/>
 
-###### [Menu](#menu)
-###### [Top](#top)
-
   - MenuItem에 아이콘 넣기
 
 #MainWindow.xaml
@@ -2960,6 +2909,8 @@ public partial class MainWindow : Window
 
 <br/>
 <br/>
+
+***
 
 # ContextMenu
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - MenuBase
@@ -2981,10 +2932,10 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152800620-2a7e093c-cf50-45bb-8733-914bec5f3776.png">
 
-###### [MenuBase](#menubase)
+###### [ContextMenu](#contextmenu)
 ###### [Top](#top)
 
-<br/
+<br/>
 <br/>
 
 ***
@@ -3005,7 +2956,7 @@ public partial class MainWindow : Window
   - [ComboBox](#combobox)
   - [ListBox](#listbox)
 
-###### [ItemsControl](#itemscontrol)
+###### [Selector](#selector)
 ###### [Top](#top)
 
 <br/>
@@ -3087,9 +3038,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152633117-b34d6a50-9cd7-411c-bb83-c942076b5b85.png">
 
-###### [Selector](#selector)
-###### [Top](#top)
-
 <br/>
 <br/>
 
@@ -3136,9 +3084,6 @@ public partial class MainWindow : Window
 
 <img src="https://user-images.githubusercontent.com/39178978/152633424-730dd3cc-0dff-4d31-9376-deb7949e7414.png">
   현재 버튼을 클릭하면 cbox.SelectedIndex가 1씩 증가하면서 ComboBoxItem을 차례로 보여주게 되고, IsEditable="True"이기 때문에 직접 박스를 클릭해 숫자를 바꿔 줘도 cbox.SelectedIndex가 같이 변하게 된다
-
-###### [ComboBox](#combobox)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -3311,9 +3256,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152634765-c98a39f4-ec57-4510-a3a5-1ddf1d94e5af.png">
-
-###### [ComboBox](#combobox)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -3513,13 +3455,11 @@ public class Price_list : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/158348673-70cfd96b-2b96-4eed-8144-f0a2990f437a.png">
 
-###### [ComboBox](#combobox)
+###### [Selector](#selector)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # ListBox
   - 상속 : Object - DispatcherObject - DependencyObject - Visual - UIElement - FrameworkElement - Control - ItemsControl - Selector
@@ -3542,10 +3482,6 @@ public class Price_list : INotifyPropertyChanged
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152623676-b2a1e970-68a7-4c82-9c6a-9b2edbd7df18.png">
-
-
-###### [Selector](#selector)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -3585,9 +3521,6 @@ public partial class MainWindow : Window
 ~~~
 
 <img src="https://user-images.githubusercontent.com/39178978/152624081-24ddc690-9abe-4806-8450-6dd4b2128632.png">
-
-###### [ListBox](#listbox)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -3826,22 +3759,15 @@ public class Class1 : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/154080138-6a6e136b-3475-446a-9ed4-8e56fdcc33b2.png">
 
-###### [ListBox](#listbox)
+###### [Selector](#selector)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # ListView
   - Selector를 상속받은 속성 활용
   - SelectedItem, SelectedItems, SelectedIndex, SelectedValue, SelectedValuedPath
-
-<br/>
-
-###### [ListBox](#listbox)
-###### [Top](#top)
 
 <br/>
 <br/>
@@ -4107,7 +4033,7 @@ public class RGB_HEX : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/151805276-717892ef-8192-4150-9118-fd928e956dd2.png">
 
-###### [ListView](#listview)
+###### [Selector](#selector)
 ###### [Top](#top)
 
 <br/>
