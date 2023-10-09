@@ -118,6 +118,15 @@
     - SelectedIndex
     - ListView헤더 크기를 비율로 조절하기(Binding활용)
     - DisplayMemberBinding
+  - [ItemsControl](#itemscontrol)
+    - [ItemsControl 을 class를 xml로 불러오기](#itemscontrol-을-class를-xml로-불러오기)
+    - [ItemsControl 을 class를 xml로 불러오기2](#itemscontrol-을-class를-xml로-불러오기2)
+    - [ItemsControl을 Style적용시키기](#itemscontrol을-style적용시키기)
+  - [트리거](#트리거)
+    - [Trigger](#trigger)
+    - [애니메이션](#애니메이션)
+    - [MultiTrigger](#multitrigger)
+    - [DataTrigger](#datatrigger)
 
 <br/>
 
@@ -143,7 +152,6 @@
   - [Json직렬화하기](#json직렬화하기)
 
 <br/>
-
 
 - [소캣통신](#소캣통신)
   - [Task](#task)
@@ -4034,6 +4042,575 @@ public class RGB_HEX : INotifyPropertyChanged
 <img src="https://user-images.githubusercontent.com/39178978/151805276-717892ef-8192-4150-9118-fd928e956dd2.png">
 
 ###### [Selector](#selector)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ItemsControl
+  - ItemsSource를 통해 데이터 적용
+  - ItemsControl.ItemsPanel을 통해서 ItemsControl에서 출력되는 아이템들의 배치를 조절
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Grid>
+        <ItemsControl ItemsSource="{Binding MenuTab}" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+  - [ItemsControl 을 class를 xml로 불러오기](#itemscontrol-을-class를-xml로-불러오기)
+  - [ItemsControl 을 class를 xml로 불러오기2](#itemscontrol-을-class를-xml로-불러오기2)
+  - [ItemsControl을 Style적용시키기](#itemscontrol을-style적용시키기)
+
+
+###### [ItemsControl](#itemscontrol)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ItemsControl 을 class를 xml로 불러오기
+    - 아래와 같은 코드에, ItemsSource나 ItemsPanel을 설정해서 위와 같이 적용할 수 있다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Grid>
+        <local:Control/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#Control.xaml
+~~~c#
+<ItemsControl x:Class="test1.Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:test1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="100" Content="{Binding Id}"/>
+        <TextBlock Text="{Binding Pw}"/>
+    </Grid>
+</ItemsControl>
+~~~
+
+<br/>
+
+#Control.xaml.cs
+~~~c#
+using System.Windows.Controls;
+
+namespace test1
+{
+    /// <summary>
+    /// Control.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class Control : ItemsControl
+    {
+        public Control()
+        {
+            InitializeComponent();
+        }
+    }
+}
+~~~
+
+![20231009_135603](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4abd1783-7a1b-41ba-b6ed-e6f8e85dc318)
+
+###### [ItemsControl](#itemscontrol)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ItemsControl 을 class를 xml로 불러오기2
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Sample.Data;assembly=Sample.Data"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.DataContext>
+        <vm:MainView />
+    </Window.DataContext>
+
+
+    <Grid Width="1024" Height="768">
+        <local:Control ItemsSource="{Binding MenuTab}" VerticalAlignment="Top" HorizontalAlignment="Left">
+        </local:Control>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#Control.xaml
+~~~c#
+<ItemsControl x:Class="test1.Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:test1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <ItemsControl.ItemTemplate>
+        <DataTemplate>
+            <local:UserControl_TabHead />
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+
+    <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"/>
+        </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+</ItemsControl>
+~~~
+
+<br/>
+
+#Control.xaml.cs
+~~~c#
+using System.Windows.Controls;
+
+namespace test1
+{
+    /// <summary>
+    /// Control.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class Control : ItemsControl
+    {
+        public Control()
+        {
+            InitializeComponent();
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl_TabHead.xaml
+~~~c#
+<UserControl x:Class="test1.UserControl_TabHead"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:test1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="100" Content="{Binding Id}"/>
+        <TextBlock Text="{Binding Pw}"/>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#MainView.cs
+~~~c#
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+namespace Sample.Data
+{
+    public class MainView
+    {
+        public MainView()
+        {
+            MenuTab = new ObservableCollection<TabHead>()
+            {
+                new TabHead(),
+                new TabHead()
+            };
+        }
+
+        ObservableCollection<TabHead> _menuTab = null;
+        public ObservableCollection<TabHead> MenuTab
+        {
+            get => _menuTab;
+            private set
+            {
+                _menuTab = value;
+            }
+        }
+    }
+
+}
+~~~
+
+<br/>
+
+#TabHead.cs
+~~~c#
+namespace Sample.Data
+{
+    public class TabHead
+    {
+        string _Id = "aaa";
+        public string Id
+        {
+            get => _Id;
+            set
+            {
+                _Id = value;
+            }
+        }
+
+
+        bool _Pw = false;
+        public bool Pw
+        {
+            get => _Pw;
+            set
+            {
+                _Pw = value;
+            }
+        }
+    }
+}
+~~~
+
+![20231009_135838](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f7cec09c-c483-45b1-8d4a-f0e38bcc84c6)
+
+###### [ItemsControl](#itemscontrol)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ItemsControl을 Style적용시키기
+    - 특정 패널 안쪽에, Style태그를 사용할 수 있고, TargetType또한 지정해서 사용할 수 있음. 해당 패널의 다른것을 TargetType으로 지정하면 에러가 발생함
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+
+    <Grid Width="1024" Height="768">
+        <local:Control ItemsSource="{Binding MenuTab}" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Control.Style>
+                <Style TargetType="ItemsControl">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </Style>
+            </Control.Style>
+        </local:Control>
+    </Grid>
+</Window>
+~~~
+
+###### [ItemsControl](#itemscontrol)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 트리거
+  - 어떤 속성이 만족했을 경우에 작동하게 된다
+  - 트리거 종류
+    - EventTrigger
+    - MultiDataTrigger
+    - MultiTrigger
+    - Trigger
+  - 애니메이션 만들기
+    - Trigger.EnterActions
+    - Trigger.ExitActions
+      - To : 최종값
+      - Duration : 지속시간
+      - Stroyboard.TargetProperty : 애니메이션을 적용할 속성
+
+<br/>
+
+  - [Trigger](#trigger)
+  - [애니메이션](#애니메이션)
+  - [MultiTrigger](#multitrigger)
+  - [DataTrigger](#datatrigger)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Trigger
+  - 아래의 Trigger는 Text가 없다면 빨간색으로 표시하라는것
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="NameBox" TargetType="TextBox">
+            <Setter Property="Background" Value="Aquamarine"/>
+            <Setter Property="Margin"  Value="5,0,5,5"/>
+
+            <Style.Triggers>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Background" Value="red"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel>
+        <Label Content="이름"/>
+        <TextBox Style="{StaticResource NameBox}"/>
+        <Label Content="아이디"/>
+        <TextBox Style="{StaticResource NameBox}"/>
+    </StackPanel>
+</Window>
+~~~
+
+![20231009_140631](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0944ad96-7202-4624-b8c2-f633fec73d32)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 애니메이션
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,20,0,0"/>
+            <Setter Property="Opacity" Value="0.5"/>
+            <Setter Property="Width" Value="100"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation To="1" Duration="0:0:1"
+                                                Storyboard.TargetProperty="Opacity"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation To="0.5" Duration="0:0:1"
+                                                Storyboard.TargetProperty="Opacity"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button Style="{StaticResource ButtonStyle}">확인</Button>
+        <Button Style="{StaticResource ButtonStyle}">취소</Button>
+    </StackPanel>
+</Window>
+~~~
+
+![20231009_140710](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/a230c25a-8477-423d-bc48-95f79336aff7)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MultiTrigger
+  -  정의 된 모든 트리거가 작동이 되면 작동된다.
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Aqua"/>
+
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                        <Condition Property="Content" Value="목록3"/>
+                    </MultiTrigger.Conditions>
+                    <MultiTrigger.Setters>
+                        <Setter Property="Foreground" Value="red"/>
+                        <Setter Property="FontSize" Value="15"/>
+                    </MultiTrigger.Setters>
+                </MultiTrigger>
+
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <ListBox>
+        <ListBoxItem>목록1</ListBoxItem>
+        <ListBoxItem>목록2</ListBoxItem>
+        <ListBoxItem>목록3</ListBoxItem>
+        <ListBoxItem>목록4</ListBoxItem>
+        <ListBoxItem>목록5</ListBoxItem>
+        <ListBoxItem>목록6</ListBoxItem>
+        <ListBoxItem>목록7</ListBoxItem>
+        <ListBoxItem>목록8</ListBoxItem>
+        <ListBoxItem>목록9</ListBoxItem>
+        <ListBoxItem>목록10</ListBoxItem>
+    </ListBox>
+</Window>
+~~~
+
+![20231009_140748](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d867daab-03ef-4441-9afc-9785a2fa074d)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DataTrigger
+  - Binding한 변수의 데이터가 Value값을 가졌을 경우 작동 된다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="300">
+    <Window.Resources>
+        <Style TargetType="ProgressBar">
+            <Setter Property="Foreground" Value="Aqua"/>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TheValue}" Value="100">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Slider Name="slider" Margin="5" Minimum="0" Maximum="100" Value="{Binding TheValue}"/>
+        <ProgressBar Grid.Row="1" Value="{Binding TheValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = new MyObject();
+        }
+    }
+
+    public class MyObject
+    {
+        public int TheValue { get; set; }
+    }
+}
+~~~
+
+![20231009_140850](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6897431e-f084-43d0-af29-1378a0bd97a1)
+
+###### [트리거](#트리거)
 ###### [Top](#top)
 
 <br/>
