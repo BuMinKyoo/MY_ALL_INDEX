@@ -127,6 +127,9 @@
     - [애니메이션](#애니메이션)
     - [MultiTrigger](#multitrigger)
     - [DataTrigger](#datatrigger)
+  - [ControlTemplate](#controltemplate)
+    - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
+  - [Converter](#Converter)
 
 <br/>
 
@@ -4611,6 +4614,189 @@ namespace WpfApp1
 ![20231009_140850](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6897431e-f084-43d0-af29-1378a0bd97a1)
 
 ###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ControlTemplate
+  - 기본 컨트롤 모양 바꾸기(Template)(ControlTemplate)
+    - 기본 컨트롤의 모양을 바꿀 수 있음
+    - ControlTemplate 개체 내의 새로운 템플릿을 만든다.
+    - Template 속성을 이용해서 적용을 한다.
+  - ControlTemplate속성을 사용하고 있다면 Button 내부에 직접 속성을 바꿔도 바뀌지가 않는다.
+
+#MainWindow.xaml
+~~~c#
+ <Window.Resources>
+       <ControlTemplate x:Key="UserButton" TargetType="Button">
+           <Grid>
+               <Border Background="DarkGreen" Margin="5,5,0,0"/>
+               <Border BorderBrush="Black" BorderThickness="1"
+                   Background="Aquamarine" Margin="0,0,5,5">
+                   <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">확인</TextBlock>
+               </Border>
+           </Grid>
+       </ControlTemplate>
+   </Window.Resources>
+
+   <Grid>
+       <Button Width="100" Height="50" Template="{StaticResource UserButton}">확인</Button>
+   </Grid>
+~~~
+
+![20231009_155021](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/788875db-3a0c-4b5e-8360-92c5225a0338)
+
+<br/>
+
+  - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
+
+###### [ControlTemplate](#controltemplate)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 버튼 모양 바꾸기
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+        <Button Width="100" Height="30" Content="버튼" Click="Button_Click">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Ellipse Width="100" Height="30" Fill="Yellow" Stroke="Black"/>
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Grid>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+~~~
+
+![20231009_155125](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/faa31a73-1127-4c06-a99c-6bbce5e6f03d)
+
+###### [ControlTemplate](#controltemplate)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Converter
+
+#MainWindow.xaml
+~~~c#
+ <Window.Resources>
+        <local:IntToColorConverter x:Key="IntToColorConverter"/>
+        <local:DoubleNumConverter x:Key="DoubleNumConverter"/>
+    </Window.Resources>
+    <Grid Background="{Binding PersonCount, Converter={StaticResource IntToColorConverter}}">
+        <TextBox HorizontalAlignment="Center" VerticalAlignment="Center" Width="80" Height="50" FontSize="25" Text="{Binding PersonCount, Converter={StaticResource DoubleNumConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Media;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window, INotifyPropertyChanged
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private int _personCount;
+        public int PersonCount
+        {
+            get => _personCount;
+            set
+            {
+                _personCount = value;
+                Notify();
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+
+    public class IntToColorConverter : IValueConverter
+    {
+        // ViewModel -> View
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            SolidColorBrush color = new SolidColorBrush(Colors.Transparent);
+            if (value == null)
+            {
+                return color;
+            }
+            int personCount = (int)value;
+
+            // 5인 이상 집합 금지!
+            if (personCount >= 5)
+            {
+                color = new SolidColorBrush(Colors.Red);
+            }
+
+            return color;
+        }
+
+        // View -> ViewModel
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class DoubleNumConverter : IValueConverter
+    {
+        // ViewModel -> View
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+
+        // View -> ViewModel
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int DoubleNum = int.Parse((string)value);
+            return DoubleNum * 2;
+        }
+    }
+}
+
+~~~
+
+###### [Converter](#Converter)
 ###### [Top](#top)
 
 <br/>
