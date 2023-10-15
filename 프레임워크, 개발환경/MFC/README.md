@@ -6601,4 +6601,22 @@ mciSendCommand(dwID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&openBgm);    //반복
 ###### [DB연결](#db연결)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
+# ODBC
+  - 
+
+
+###### [DB연결](#db연결)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# OLEDB
+  - 
+
+
+###### [DB연결](#db연결)
+###### [Top](#top)
