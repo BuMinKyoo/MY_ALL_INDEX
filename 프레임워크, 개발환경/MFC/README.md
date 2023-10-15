@@ -252,6 +252,15 @@
 - [Windows Media Player ActiveX컨트롤 사용하기](#windows-media-player-activex컨트롤-사용하기)
 - [음악 재생하기](#음악-재생하기)
 
+<br/>
+
+- [RS232 시리얼 통신](#rs232-시리얼-통신)
+
+<br/>
+
+- [DB연결](#db연결)
+  - [ODBC](#odbc)
+  - [OLEDB](#oledb)
 
 <br/>
 <br/>
@@ -6518,4 +6527,78 @@ mciSendCommand(dwID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&openBgm);    //반복
 
 ###### [음악 재생하기](#음악-재생하기)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# RS232 시리얼 통신
+  - RS232(Recommended Standard 232)는 직렬통신 방식 표준의 하나로 터미널 단말기와 모뎀의 접속용으로 쓰였다.
+  - 인터페이스는 직렬포트라고 한다. 장비간의 통신을 전송하기위한 전기적, 기계적 특성을 정의 한것이다. 장비간 1대1 통신에서 사용한다.
+  - 윈도우는 아래 사진과 같이 장치 관리자에서 포트를 확인할 수 있다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/860be006-e305-478c-b73d-a3486f619901)
+
+  - 통신속도(baudrate)
+    - 보레이트는 1초동안 보낼수있는 비트수를 말한다.
+    - RS232의 통신 속도는 보레이트(baudrate)로 규정한다.
+    - 보레이트 9600은 1초동안 9600bit의 데이터를 전송 할수 있다는 것을 말한다.
+    - 보레이트는 4800, 9600, 19200, 38400, 115200 (단위:bit/s ) 등 다양하다.
+    - 이종장비간 통신을 위해서는 두장비간 보레이트를 동일하게 설정해야한다
+  - COMPORT: 하드웨어에 할당된 COMPORT이다.
+  - DATA BIT: 시리얼통신으로 데이터를 전송할 BIT의 개수를 설정한다.
+  - PARITY BIT: 비트의 합으로 데이터의 오류를 검사하는 비트이다.
+  - STOP BIT: STOP비트의 개수를 설정한다.
+  - 흐름제어: RTS(Request to pin)핀과 CTS(Clear to Send)핀을 이용하여 하드웨어 통신 제어를 한다.
+    - 송신측과 수신측 데이터를 송수신 할경우 수신측에서 데이터부하가 많아 질 경우 송신측에서 보내는 데이터의 흐름을    제한하기 위해 사용한다.
+    - 시리얼 포트에서 제공하는 RTS핀과 CTS 핀을 이용하여 핀의 상태를 이용하여 통신의 흐름을 제어한다.
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/5049b4f0-1bfe-49a2-92d6-176c440c49e2)
+
+###### [RS232 시리얼 통신](#rs232-시리얼-통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# DB연결
+  - ODBC (Open Database Connectivity)
+    - 예전의 데이터베이스는 폐쇄적으로 각 데이터베이스에서 제공하는 클라이언트가 없으면 데이터베이스 서버로 접근이 불가능 했다.
+    - 이러한 문제점을 보완하기 위해서 MS에서 ODBC라는 기술을 개발했다.
+    - 그림에서 알 수 있드시 ODBC를 사용하면 모든 DBMS에 접근이 가능하다.
+    - 여기서 더 발전된 기술이 oleDB 다.
+  - OLEDB
+    - ODBC를 모든 데이터베이스에 접근이 가능한 반면, oleDB 기술은 MS에서 UDA(Universal Data Access)란 개념을 체택 광범위한 데이터에 접근 할 수 있다. UDA는 실제 사용되는 기술이 아니라 개념일 뿐이다.
+    - ADO와 oleDB를 이용하여 광범위한 데이터를 처리하는 기술을 UDA라고 한다.
+  - ADO(ActiveX Data Object)
+    - ODBC와 OleDB는 데이터베이스를 연결하는 기술인반면, ADO는 연결된 통로를 통해서 데이터를 직접 가공하는 데이터를 핸들링 할수 있는 기술이다.(데이터를 처리하는 기술을 담당한다.)
+  - ODBC는 이기종의 데이터베이스(거의 모든 관계형 데이터베이스)에 접근을 가능하게 해주는 표준적인 방법인 반면에 oleDB는 이기종의 데이터베이스뿐만 아니라 비 관계형 데이터에도 접근이 가능, 즉 SQL서버나 Oracle, DB@ 뿐만 아니라 메일, 메일폴더, 텍스트, 디렉토리, 웹사이트등 비관계형 계층구조적인 데이터들에게도 접근을 가능하게 한다.
+  - ADO : 데이터를 다루는 객체(데이터를 처리하는 기술)
+  - ODBC, oleDB : 데이터 제공자 (원본 데이터를 사용할 수 있게 연결해주는 기술)
+
+  - OLEDB connection string
+    - Data Source
+      - SQL서버가 있는 위치가된다. IP주소가 될수도 있고 PC이름이 될수도 있다(= Server,Address,Addr, Network Address)
+    - User ID
+      - SQL로그인인 경우, 사용자User 이름
+    - Password
+      - SQL로그인인 경우, 사용자 Password
+    - Integrated Security
+      - 값이 True이면 윈도우 인증을 사용해서 SQL Server에 로그온을 시도한다 따라서 이키의 값이 True일때면 User ID/Password 와 동시에 사용하는것은 원도우인증과 SQL인증을 동시에 하겠다는것이며 이는 원하지 않는 결과를 얻을수있다 (True값대신 yes, sspi 값도 윈도우인증하겠다는 값으로 표시된다. MSDN에는 sspi가 권장됨)(= Trusted_Connection)
+    - 옵션
+      - Initial Catalog
+        - 접속되어질 Database이름, 생략되어지면 User에 따라설정된 Default Database로 자동연결된다, 옵션이긴 하지만 되도록이면 사용하는것이 좋다
+
+<br/>
+
+  - [ODBC](#odbc)
+  - [OLEDB](#oledb)
+
+
+###### [DB연결](#db연결)
+###### [Top](#top)
+
 
