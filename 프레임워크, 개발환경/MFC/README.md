@@ -263,6 +263,11 @@
   - [OLEDB](#oledb)
 
 <br/>
+
+- Toy프로젝트
+  - [시리얼통신](https://github.com/BuMinKyoo/MFCSerialPort)
+
+<br/>
 <br/>
 
 ***
