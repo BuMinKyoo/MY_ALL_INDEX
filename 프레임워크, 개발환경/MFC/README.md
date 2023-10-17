@@ -264,6 +264,10 @@
 
 <br/>
 
+- [형변환](#형변환)
+
+<br/>
+
 - Toy프로젝트
   - [시리얼통신](https://github.com/BuMinKyoo/MFCSerialPort)
 
@@ -6624,4 +6628,20 @@ mciSendCommand(dwID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&openBgm);    //반복
 
 
 ###### [DB연결](#db연결)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 형변환
+  - CString TCHAR형을 CHAR로 바꾸기
+~~~c++
+CStringA csBkDirA(csBkDir); // CStringA는 CHAR
+CString csfullPathA(csBkDirA); // CString은 TCHAR
+~~~
+
+
+###### [형변환](#형변환)
 ###### [Top](#top)
