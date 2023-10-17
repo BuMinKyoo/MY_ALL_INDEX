@@ -269,7 +269,10 @@
 <br/>
 
 - Toy프로젝트
-  - [시리얼통신](https://github.com/BuMinKyoo/MFCSerialPort)
+  - [MFCSerialPort](https://github.com/BuMinKyoo/MFCSerialPort)
+    - Rs232 시리얼통신, 프린터, QR코드 출력
+  - [MFCWebFileDown](https://github.com/BuMinKyoo/MFCWebFileDown)
+    - 웹파일 다운, 버전배포
 
 <br/>
 <br/>
