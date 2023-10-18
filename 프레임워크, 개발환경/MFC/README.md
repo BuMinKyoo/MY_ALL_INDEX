@@ -265,6 +265,7 @@
 <br/>
 
 - [형변환](#형변환)
+- [Thread](#thread)
 
 <br/>
 
@@ -6647,4 +6648,255 @@ CString csfullPathA(csBkDirA); // CString은 TCHAR
 
 
 ###### [형변환](#형변환)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Thread
+  - ID : 식별하는데 사용
+  - Handle : 제어까지 해야 한다면 사용
+
+<br/>
+
+  - Thread핵심 WIN32API
+    - CreateThread()
+    - OpenThread()
+    - ExitThread()
+    - TerminateThread()
+    - Get/SetThreadPriority()
+    - SuspendThread()
+    - ResumeThread()
+    - Sleep()
+    - GetCurrentThread()
+    - GetCurrentThreadId()
+    - SetThreadAffinityMask()
+
+<br/>
+
+  - Thread MFC API
+    - AfxBeginThread() : Thread 생성
+    - CreateEvent() : 이벤트 생성
+    - SetEvent() : 생성된 이벤트를 활성화 시켜줌
+    - ResetEvent() : 생성된 이벤트를 비활성화 시켜줌
+    - CloseHandle() : 이벤트 종료
+
+<br/>
+
+~~~c++
+CWinThread* AfxBeginThread(
+	AFX_THREADPROC pfnThreadProc,
+	LPVOID pParam,
+	int nPriority = THREAD_PRIORITY_NORMAL,
+	UINT nStackSize = 0,
+	DWORD dwCreateFlags = 0,
+	LPSECURITY_ATTRIBUTES lpSecurityAttrs = NULL
+);
+
+CWinThread*
+새롭게 생성된 Thread 객체의 포인터를 반환합니다. 만약 실패하면 NULL이 반환됩니다.
+pfnThreadProc
+작업자 Thread가 호출될 함수 포인터를 입력합니다. 전역 함수를 사용해야 합니다.
+pParam: 
+pfnThreadProc 함수로 넘길 인자를 입력합니다.
+
+AfxBeginThread() : 스레드 생성
+Thread할 함수는 static으로 선언되어야 한다
+함수의 리턴 형태는 int 값
+LPVOID aparam형태로 void포인터 형태로 받아 부모 변수들을 사용할 수 있다
+Thread는 다른 종료 방법보다 자연스럽게 return으로 종료되어야 가장 좋다
+~~~
+
+<br/>
+
+~~~c++
+HANDLE CreateEvent(
+  LPSECURITY_ATTRIBUTES lpEventAttributes, 
+  BOOL bManualReset, 
+  BOOL bInitialState, 
+  LPTSTR lpName 
+); 
+
+IpEventAttributes : 무시, NULL값 입력하면 된다.
+bManualReset : TRUE시에는 ResetEvent()을 활용해 Manual로 이벤트를 리셋 시켜야한다.
+bInitialState : 초기 이벤트 상태를 나타낸다. TRUE시 Signaled, FALSE시 Nonsignaled
+IpName : Event Object의 이름을 나타내는 포인터. 보통 NULL값을 사용한다.
+~~~
+
+<br/>
+
+~~~c++
+BOOL SetEvent(
+  HANDLE hEvent 
+);
+
+hEvent  : Event Object를 입력하면 된다.
+~~~
+
+<br/>
+
+~~~c++
+BOOL ResetEvent( 
+  HANDLE hEvent 
+); 
+
+hEvent  : Event Object를 입력하면 된다.
+~~~
+
+<br/>
+
+~~~c++
+DWORD WaitForSingleObject( 
+  HANDLE hHandle, 
+  DWORD dwMilliseconds 
+); 
+
+hHandle : Event Object를 입력하면 된다.
+dwMilliseconds  : Time Out 관련 변수이다. INFINITE가 입력되면 해당 Event Object가 Signaled가 될 때까지 계속 기다린다. 숫자가 입력되면 해당 숫자의 시간만큼(ms기준) 기다린 후, WAIT_TIMEOUT을 리턴한다.
+~~~
+
+<br/>
+
+  - Thread예제1
+    - main-start 출력후, 메인화면은 켜지지만, Thread는 돌아가기 때문에 Thread안에 있는 것들이 모두 출력된다
+
+#AppDlg.h
+~~~c++
+public:
+	CWinThread* m_pThread;
+	bool m_blWorkingThread;
+	static UINT ThreadOne(LPVOID param);
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+
+	AfxMessageBox(_T("main-start"));
+
+	m_blWorkingThread = TRUE;
+	m_pThread = AfxBeginThread(CMFCApplication1Dlg::ThreadOne, this);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+UINT CMFCApplication1Dlg::ThreadOne(LPVOID param)
+{
+	AfxMessageBox(_T("ThreadOne_start"));
+
+	CMFCApplication1Dlg* pDlg = (CMFCApplication1Dlg*)param;
+
+	int inNum = 0;
+	while (pDlg->m_blWorkingThread)
+	{
+		AfxMessageBox(_T("ThreadOne"));
+
+		inNum++;
+		if (inNum > 4)
+		{
+			pDlg->m_blWorkingThread = FALSE;
+		}
+	}
+
+	AfxMessageBox(_T("ThreadOne_end"));
+
+	return 0;
+}
+~~~
+
+<br/>
+
+  - Thread예제2
+
+#AppDlg.h
+~~~c++
+	CWinThread* m_pThreadOne;
+	CWinThread* m_pThreadTwo;
+	static UINT ThreadOne(LPVOID param);
+	static UINT ThreadTwo(LPVOID param);
+	HANDLE m_hEvent1;
+	HANDLE m_hEvent2;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+
+	AfxMessageBox(_T("main-start"));
+
+	m_hEvent1 = CreateEvent(NULL, TRUE, FALSE, NULL);
+	m_hEvent2 = CreateEvent(NULL, TRUE, FALSE, NULL);
+	m_pThreadOne = AfxBeginThread(CMFCApplication1Dlg::ThreadOne, this);
+	m_pThreadTwo = AfxBeginThread(CMFCApplication1Dlg::ThreadTwo, this);
+
+
+	AfxMessageBox(_T("main-end"));
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+UINT CMFCApplication1Dlg::ThreadOne(LPVOID param)
+{
+	AfxMessageBox(_T("ThreadOne_start"));
+
+	CMFCApplication1Dlg* pDlg = (CMFCApplication1Dlg*)param;
+
+	for (int i = 0; i < 5; i++)
+	{
+		AfxMessageBox(_T("ThreadOne"));
+		Sleep(100);
+	}
+
+	SetEvent(pDlg->m_hEvent1);
+
+	WaitForSingleObject(pDlg->m_hEvent2, INFINITE);
+
+	AfxMessageBox(_T("ThreadOne_end"));
+
+
+	return 0;
+}
+
+. . .
+
+UINT CMFCApplication1Dlg::ThreadTwo(LPVOID param)
+{
+	CMFCApplication1Dlg* pDlg = (CMFCApplication1Dlg*)param;
+
+
+	WaitForSingleObject(pDlg->m_hEvent1, INFINITE);
+
+	AfxMessageBox(_T("ThreadTwo_start"));
+
+	for (int i = 0; i < 5; i++)
+	{
+		AfxMessageBox(_T("ThreadTwo"));
+		Sleep(100);
+	}
+
+	AfxMessageBox(_T("ThreadTwo_end"));
+
+	SetEvent(pDlg->m_hEvent2);
+
+	return 0;
+}
+~~~
+
+###### [Thread](#thread)
 ###### [Top](#top)
