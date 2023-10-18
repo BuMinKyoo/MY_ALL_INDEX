@@ -7,6 +7,7 @@
   - [Nuget패키지 버전 확인법](#nuget패키지-버전-확인법)
   - [Nuget종속성 버전 확인하기](#nuget종속성-버전-확인하기)
   - [단축키](#단축키)
+  - [Nuget 패키지 검색 안될시](#nuget-패키지-검색-안될시)
 
 <br/>
 
@@ -31,6 +32,7 @@
 <img src="https://user-images.githubusercontent.com/39178978/153402781-8b7c32c7-7e49-4bbe-a380-ce16c6b462d2.png" width="600" height="400">
 
 
+###### [내 프로젝트 버전 확인](#내-프로젝트-버전-확인)
 ###### [Top](#top)
 
 ***
@@ -81,6 +83,7 @@ Nuget검색으로 설치 하기
   - 1.도구 -> NuGet패키지 관리자 -> 솔루션용 NuGet패키지 관리
 <img src="https://user-images.githubusercontent.com/39178978/153405938-9239c16d-f885-4c88-804b-e6fb506c19d6.png">
 
+###### [Nuget사용법](#nuget사용법)
 ###### [Top](#top)
 
 ***
@@ -95,6 +98,7 @@ Nuget검색으로 설치 하기
 위에서 보았던 'NuGet패키지 관리' 및 '솔루션용 NuGet패키지 관리'창에서 확인 가능 하며 버전을 바꿀 수 있다.
 <img src="https://user-images.githubusercontent.com/39178978/153406430-90fd7cbe-5766-42d5-97d3-5dd5081e1210.png" width="800" height="600">
 
+###### [Nuget패키지 버전 확인법](#nuget패키지-버전-확인법)
 ###### [Top](#top)
 
 ***
@@ -112,6 +116,7 @@ Nuget검색으로 설치 하기
 <img src="https://user-images.githubusercontent.com/39178978/153407073-c2c341c3-015a-43b0-b955-848dc656e86c.png">
 
 
+###### [Nuget종속성 버전 확인하기](#nuget종속성-버전-확인하기)
 ###### [Top](#top)
 
 ***
@@ -131,5 +136,22 @@ Nuget검색으로 설치 하기
   - 구성원 검색 : Alt + \
   - 탐색모음 : F2 + tab + tab + 함수 검색 + enter
 
+###### [단축키](#단축키)
+###### [Top](#top)
 
+***
+
+<br/>
+<br/>
+
+## Nuget 패키지 검색 안될시
+  - 1. NuGet 패키지 관리자에서 톱니바퀴 클릭
+
+![20231018_233221](https://github.com/BuMinKyoo/MFCMultiThread/assets/39178978/1d762d97-179a-4fc7-a5e3-99facd651330)
+
+  - 2. 패키지 소스에서 nuget.org소스 등록
+
+![20231018_233304](https://github.com/BuMinKyoo/MFCMultiThread/assets/39178978/24130ca7-71e9-4949-be7b-5f20f4a33386)
+
+###### [Nuget 패키지 검색 안될시](#nuget-패키지-검색-안될시)
 ###### [Top](#top)
