@@ -150,6 +150,7 @@
 
 <br/>
 
+- [Http,Https통신](#httphttps통신)
 - [JsonParsing](#jsonparsing)
   - [JsonParsing하기](#jsonparsing하기)
   - [Json직렬화하기](#json직렬화하기)
@@ -5932,6 +5933,117 @@ class Workspace : INotifyPropertyChanged
 ![20231008_005645](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f7934a30-3418-4084-b247-a963b88b7bc7)
 
 ###### [클래스 라이브러리](#클래스 라이브러리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Http,Https통신
+  - C#에서 Http통신을 하는 방법은 2가지 3가지 정도로 여러가지가 있지만 제일 권장하는 방법은 HttpClient을 이용한 방법이다
+  - 현재 아래의 코드는, euc-kr로 주는 한글 데이터가 깨져서 들어오게 되는데...아직 이유를 찾지 못했다..
+
+#MainWindow.xaml
+~~~c#
+    <Grid>
+        <Button Width="100" Height="30" Content="수신받기" Click="Button_Click"/>
+    </Grid>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private async void Button_Click(object sender, RoutedEventArgs e)
+    {
+        // Get방식
+        try
+        {
+            // HttpClient 인스턴스 생성
+            using (HttpClient client = new HttpClient())
+            {
+                // GET 요청 보내기
+                HttpResponseMessage response = await client.GetAsync("http://www2.atpos.co.kr/telex/M10S.php3?MsNo=NC1933&PosNo=01&LastSeq=All");
+                response.Content.Headers.ContentType.CharSet = "UTF-8"; // 인코딩 설정
+
+                // 응답 확인
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+                    //MessageBox.Show($"응답 내용:\n{content}", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // 데이터를 파일에 저장
+                    //string filePath = "D:\\Projec\\WPF\\WpfApp1\\response.dat"; // 파일 경로 및 이름
+                    //System.IO.File.WriteAllText(filePath, content);
+
+                    //MessageBox.Show($"응답 내용을 파일로 저장했습니다.\n파일 경로: {filePath}", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"HTTP 오류 코드: {response.StatusCode}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"오류 발생: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+
+
+
+        // POST방식
+        try
+        {
+            // HttpClient 인스턴스 생성
+            using (HttpClient client = new HttpClient())
+            {
+                // GET 요청 보내기
+                //HttpResponseMessage response = await client.GetAsync("https://www2.atpos.co.kr/telex/M10S.php3?MsNo=NC1933&PosNo=01&LastSeq=All");
+
+                // POST 요청 보내기
+                string xmlData = "<?xml version=\"1.0\" encoding=\"euc-kr\"?>\r\n<ASTEMS-ASP><TELEX-HD TelexId=\"R11R\" MsgCd=\"0000\"/><HEADER SaleDate=\"20231011\" MsNo=\"NC3474\" PosNo=\"01\" BillNo=\"0001\"/></ASTEMS-ASP>\r\n";
+
+                HttpContent xmlDataContent = new StringContent(xmlData, Encoding.GetEncoding("UTF-8"), "applicat-8n/xml");
+
+                HttpResponseMessage response = await client.PostAsync("https://www2.atpos.co.kr/telex/R11S.php3?MsNo=NC3474&PosNo=01", xmlDataContent);
+                //response.Content.Headers.ContentType.CharSet = "UTF-8"; // 인코딩 설정
+
+                // 응답 확인
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+                    //MessageBox.Show($"응답 내용:\n{content}", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // 데이터를 파일에 저장
+                    string filePath = "D:\\Projec\\WPF\\WpfApp1\\response.dat"; // 파일 경로 및 이름
+                    //System.IO.File.WriteAllText(filePath, content);
+
+                    MessageBox.Show($"응답 내용을 파일로 저장했습니다.\n파일 경로: {filePath}", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"HTTP 오류 코드: {response.StatusCode}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"오류 발생: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+}
+~~~
+
+###### [Http,Https통신](#httphttps통신)
 ###### [Top](#top)
 
 <br/>
