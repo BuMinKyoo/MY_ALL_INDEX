@@ -146,7 +146,7 @@
     
 <br/>
 
-- [클래스 라이브러리](#클래스 라이브러리)
+- [클래스 라이브러리](#클래스-라이브러리)
 
 <br/>
 
@@ -167,6 +167,7 @@
   - [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_XML)
   - [공공API 내용을 json파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_JSON)
   - [화면에 있는 color값을 추출하는 color-picker]_Repository링크(https://github.com/BuMinKyoo/ColorPicker_WPF)
+  - [WPFSerialPort]_Repository링크(https://github.com/BuMinKyoo/WPFSerialPort)
   - [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
     
 <br/>
@@ -5932,7 +5933,7 @@ class Workspace : INotifyPropertyChanged
 
 ![20231008_005645](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f7934a30-3418-4084-b247-a963b88b7bc7)
 
-###### [클래스 라이브러리](#클래스 라이브러리)
+###### [클래스 라이브러리](#클래스-라이브러리)
 ###### [Top](#top)
 
 <br/>
