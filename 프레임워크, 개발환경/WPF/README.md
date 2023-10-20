@@ -154,6 +154,7 @@
 - [JsonParsing](#jsonparsing)
   - [JsonParsing하기](#jsonparsing하기)
   - [Json직렬화하기](#json직렬화하기)
+- [DB연결](#db연결)
 
 <br/>
 
@@ -6400,6 +6401,109 @@ public class row
 <img src="https://user-images.githubusercontent.com/39178978/158618347-73edf2a4-7526-41b7-b42c-001a5c3da837.png">
 
 ###### [JsonParsing](#jsonparsing)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# DB연결
+  - DB연결시 SqlConnection을 사용하게 된다
+  - System.Data.SqlClient 패키지를 설치해야 한다
+
+MainWindow.xaml
+~~~c#
+    <UniformGrid>
+        <Button x:Name="Connetion" Width="100" Height="30" Content="DB연결테스트" Click="Connetion_Click"/>
+        <Button x:Name="Select" Width="100" Height="30" Content="DB조회" Click="Select_Click"/>
+        <Button x:Name="Queries" Width="100" Height="30" Content="DB쿼리" Click="Queries_Click"/>
+    </UniformGrid>
+~~~
+
+<br/>
+
+MainWindow.xaml.cs
+~~~c#
+using System;
+using System.Data.SqlClient;
+using System.Windows;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+
+        // 접속테스트
+        private void Connetion_Click(object sender, RoutedEventArgs e)
+        {
+            string connectString = string.Format("Server={0};Database={1};Uid ={2};Pwd={3};", "127.0.0.1",
+ "MyfirstDatabase", "qnalsrb", "1111");
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectString))
+                {
+                    conn.Open();
+                }
+                return ;
+            }
+            catch (Exception)
+            {
+                return ;
+            }
+        }
+
+        // 데이터 조회
+        private void Select_Click(object sender, RoutedEventArgs e)
+        {
+            string connectString = string.Format("Server={0};Database={1};Uid ={2};Pwd={3};", "127.0.0.1",
+ "MyfirstDatabase", "qnalsrb", "1111");
+            string sql = "select * from memberTB";
+
+            using (SqlConnection conn = new SqlConnection(connectString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    string csStr = dr.GetString(0);
+                }
+
+                dr.Close();
+            }
+        }
+
+        // INSERT, UPDATE, DELETE
+        private void Queries_Click(object sender, RoutedEventArgs e)
+        {
+            string connectString = string.Format("Server={0};Database={1};Uid ={2};Pwd={3};", "127.0.0.1",
+ "MyfirstDatabase", "qnalsrb", "1111");
+            string sql = "update memberTB\r\nset memverID = 'ooo'\r\nwhere memverNumber = '1'";
+            // insert into memberTB(memverID, memverNumber) values('bmk', '29')
+
+            using (SqlConnection conn = new SqlConnection(connectString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+            }
+        }
+    }
+}
+~~~
+
+###### [DB연결](#db연결)
 ###### [Top](#top)
 
 <br/>
