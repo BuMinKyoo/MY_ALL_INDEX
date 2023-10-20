@@ -158,9 +158,9 @@
 
 <br/>
 
-- [소캣통신](#소캣통신)
-  - [Task](#task)
-  - [Dispatcher](#dispatcher)
+- [Thread](#Thread)
+  - [Thread,Task](#threadtask)
+  - [다른 Thread에서 UI접근](#다른-thread에서-ui접근)
 
 <br/>
 
@@ -6511,19 +6511,22 @@ namespace WpfApp1
 
 ***
 
-# 소캣통신
-  - [Task](#task)
-  - [Dispatcher](#dispatcher)
+# Thread
+  - [Thread,Task](#threadtask)
+  - [다른 Thread에서 UI접근](#다른-thread에서-ui접근)
 
+###### [Thread](#Thread)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# Task
-  - 스레드를 돌리는것
+# Thread,Task
+  - Thread를 만드는 것은 2가지가 존재한다 Thread 와 Task
+    - Task는 구현하고 싶은 작업 자체를 의미(실행 중인 작업을 언제든지 중지할 수 있는 제어 수준 필요하다면 사용)
+    - Thread는 구현하고 싶은 작업을 수행하는 수많은 작업자들 중 하나를 의미(실행 중인 작업이 완료된 후 중지되는 정도의 제어 수준 필요하다면 사용)
 
-#cs(예시)
+MainWindow.xaml.cs
 ~~~
 await Task.Run(new Action(() => 
             {
@@ -6544,13 +6547,15 @@ await Task.Run(new Action(() =>
 
 await Task.Run(new Action(() => {실행할 코드} )); 공식을 이용
 
-###### [소캣통신](#소캣통신)
+###### [Thread](#Thread)
 ###### [Top](#top)
 <br/>
 <br/>
 
-## Dispatcher
-  - 스레드에서 다른 스레드로 접근
+## 다른 Thread에서 UI접근
+  - invoke(동기식), BeginInvoke(비동기식)
+    - 외부 thread가 현재 thread의 컨트롤에 액세스 하면 데이터가 깨질 수 있기 때문에, 메인 thread이게 읽고 쓰는 작업을 위임하는 것이다
+[별도의 스레드]에서 [main_form.Invoke(xxx) 를 호출] 한다는 것은, [별도의 스레드]가 [main_form 을 소유한 스레드]에게 [xxx 함수의 호출을 위임]한다는 뜻이 된다
 
 #cs(예시)
 ~~~
@@ -6573,7 +6578,7 @@ await Task.Run(new Action(() =>
 
 this.Dispatcher.BeginInvoke(new Action(() => {실행할 코드} )); 공식을 이용
 
-###### [소캣통신](#소캣통신)
+###### [Thread](#Thread)
 ###### [Top](#top)
 
 <br/>
