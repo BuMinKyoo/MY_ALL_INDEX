@@ -6526,8 +6526,548 @@ namespace WpfApp1
     - Task는 구현하고 싶은 작업 자체를 의미(실행 중인 작업을 언제든지 중지할 수 있는 제어 수준 필요하다면 사용)
     - Thread는 구현하고 싶은 작업을 수행하는 수많은 작업자들 중 하나를 의미(실행 중인 작업이 완료된 후 중지되는 정도의 제어 수준 필요하다면 사용)
 
+<br/>
+
+  - Thread생성 및 실행
+
 MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Thread t1 = new Thread(Run);
+            t1.Start();
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run()
+        {
+            Debug.WriteLine("Thread#: Begin");
+
+            // Do Something
+            Thread.Sleep(3000);
+            Debug.WriteLine("Thread#: End");
+
+        }
+    }
+
+}
 ~~~
+
+  - 직접 대리자를 지정하는 방법
+    - Thread 클래스의 생성자는 ThreadStart 대리자를 인수로 받을 수 있으며, 이를 사용하여 스레드를 초기화한다
+    - ThreadStart 대리자를 사용하여 명시적으로 메서드를 호출할 때는 인수가 없는 메서드를 대상으로 해야 한다. 따라서 Run 메서드의 시그니처는 void Run()이어야 한다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Thread t1 = new Thread(new ThreadStart(Run));
+            t1.Start();
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run()
+        {
+            Debug.WriteLine("Thread#: Begin");
+            // Do Something
+            Thread.Sleep(3000);
+            Debug.WriteLine("Thread#: End");
+        }
+    }
+
+}
+
+~~~
+
+  - Thread에 매개변수 전달하기
+    - 스레드가 실행할 메서드에서는 object형으로 받아온 후 형변환하여 사용하여야 한다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Thread t1 = new Thread(Run);
+            t1.Start(7);
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run(object obj)
+        {
+            Debug.WriteLine(obj.ToString());
+
+            Debug.WriteLine("Thread#: Begin");
+            // Do Something
+            Thread.Sleep(3000);
+            Debug.WriteLine("Thread#: End");
+        }
+    }
+}
+~~~
+
+<br/>
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Thread t1 = new Thread(new ThreadStart(() => Run(7)));
+            t1.Start();
+
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run(object obj)
+        {
+            Debug.WriteLine(obj.ToString());
+
+            Debug.WriteLine("Thread#: Begin");
+            // Do Something
+            Thread.Sleep(3000);
+            Debug.WriteLine("Thread#: End");
+        }
+    }
+}
+~~~
+
+  - Thread 블락시키기
+    - 서브Thread가 끝이 나야  t1.Join() 이후로 main Thread가 지나간다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Thread t1 = new Thread(new ThreadStart(() => Run(7)));
+            t1.Start();
+
+            t1.Join();
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run(object obj)
+        {
+            Debug.WriteLine(obj.ToString());
+
+            Debug.WriteLine("Thread#: Begin");
+            // Do Something
+            Thread.Sleep(3000);
+            Debug.WriteLine("Thread#: End");
+        }
+    }
+}
+~~~
+
+  - Thread를 사용하는 가장 일반적인 방법
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        static bool myFlag = true;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Thread t1 = new Thread(new ThreadStart(Run));
+            t1.Start();
+
+            Thread.Sleep(5000);
+            myFlag = false;
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run()
+        {
+            while (myFlag)
+            {
+                Debug.WriteLine("Thread#: Begin");
+                // Do Something
+                Thread.Sleep(1000);
+            }
+        }
+    }
+}
+~~~
+
+  - lock 동기화
+    - 아래의 코드를 실행하면, num의 같은 값들이 출력이 되게 된다. 이것은 두개의 Thread가 동시에 num이라는 변수에 접근하기 때문에 생긴것이다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+using System;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public int InNum = 0;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Data myData = new Data();
+            Thread t1 = new Thread(new ThreadStart( () => Run(myData)));
+            t1.Start();
+            Thread t2 = new Thread(new ThreadStart(() => Run(myData)));
+            t2.Start();
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run(object obj)
+        {
+            Data targetData = obj as Data;
+
+            for (int i = 0; i < 10; i++)
+            {
+                targetData.Increase();
+                Debug.WriteLine(targetData.num);
+            }
+        }
+    }
+    
+    class Data
+    {
+        public int num = 0;
+
+        public void Increase()
+        {
+            this.num++;
+            Thread.Sleep(5);
+        }
+    }
+}
+~~~
+
+  - 아래와 같이 lock을 써서 해결할 수 있다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+using System;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public int InNum = 0;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Data myData = new Data();
+            Thread t1 = new Thread(new ThreadStart( () => Run(myData)));
+            t1.Start();
+            Thread t2 = new Thread(new ThreadStart(() => Run(myData)));
+            t2.Start();
+
+            Debug.WriteLine("main#: End");
+        }
+
+        void Run(object obj)
+        {
+            Data targetData = obj as Data;
+
+            for (int i = 0; i < 10; i++)
+            {
+                targetData.Increase();
+                Debug.WriteLine(targetData.num);
+            }
+        }
+    }
+    
+    class Data
+    {
+        private object obj = new object();
+        public int num = 0;
+
+        public void Increase()
+        {
+            lock (obj)
+            {
+                this.num++;
+                Thread.Sleep(5);
+            }
+        }
+    }
+}
+
+~~~
+
+  - Task만들기
+    - 첫번째 인자로 함수를
+    - 두번째 인자로 매개변수를 넘겨준다
+    - Task.Factory.StartNew 를 사용하게 되면 생성과 동시에 시작하게 된다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Documents;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public bool bFlage = true;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Task.Factory.StartNew(new Action<object>(Run), "kkk");
+
+            for (int i = 0; i < 3; i++)
+            {
+                Debug.WriteLine("main~");
+                Thread.Sleep(100);
+            }
+
+            bFlage = false;
+
+            Debug.WriteLine("main#: End");
+        }
+
+        public void Run(object data)
+        {
+            while (bFlage)
+            {
+                Debug.WriteLine(data.ToString());
+                Debug.WriteLine("Thread~");
+            }
+        }
+    }
+}
+~~~
+
+  - Task생성후 나중에 실행시키기
+    - Wait() 함수를 사용하면 해당하는 Task가 모두 끝나야 그 다음으로 넘어갈 수 있게 된다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Documents;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public bool bFlage = true;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Task t1 = new Task(new Action(Run));
+            t1.Start();
+
+            for (int i = 0; i < 3; i++)
+            {
+                Debug.WriteLine("main~");
+                Thread.Sleep(100);
+            }
+
+            bFlage = false;
+
+            Debug.WriteLine("main#: End");
+        }
+
+        public void Run()
+        {
+            while (bFlage)
+            {
+                Debug.WriteLine("Thread~");
+            }
+        }
+    }
+}
+~~~
+
+
+  - Task.Run()
+    - 동기 메서드 내에서 비동기 메서드를 호출할 때는 Task.Run() 메서드를 사용할 수 있다
+
+MainWindow.xaml.cs
+~~~c#
+using System.Threading;
+using System.Windows;
+using System.Diagnostics;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Documents;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public bool bFlage = true;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Debug.WriteLine("main#: Begin");
+
+            Run();
+
+            for (int i = 0; i < 5; i++)
+            {
+                Debug.WriteLine("main~");
+                Thread.Sleep(100);
+            }
+
+            bFlage = false;
+
+            Debug.WriteLine("main#: End");
+        }
+
+        public async void Run()
+        {
+            await Task.Run(() =>
+            {
+                Debug.WriteLine("Run#: Begin");
+
+                while (bFlage)
+                {
+                    Debug.WriteLine("Run~");
+                    Task.Delay(100);
+                }
+
+                Debug.WriteLine("Run#: End");
+            });
+            
+        }
+    }
+}
+~~~
+
+<br/>
+
+MainWindow.xaml.cs
+~~~c#
 await Task.Run(new Action(() => 
             {
                 while (true)
