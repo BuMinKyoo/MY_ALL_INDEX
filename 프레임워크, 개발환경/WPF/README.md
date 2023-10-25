@@ -141,6 +141,7 @@
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
 - [Button + Command](#button--command)
+- [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
 - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
 - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
     
@@ -5507,6 +5508,223 @@ public partial class MainWindow : Window
 ~~~
 
 ###### [Button + Command](#button--command)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Button + Command다른클래스에서 사용
+
+  - 다른 클래스 라이브러리에서 ICommand사용하기1
+
+#Wpf프로젝트(클래스 라이브러리1 참조중)
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
+        mc:Ignorable="d"
+        Title="MainWindow" SizeToContent="WidthAndHeight">
+
+    <Grid Width="300" Height="300">
+        <ctrl:UserControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("클릭 이벤트 발생");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#클래스라이브러리1
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfLibrary1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfLibrary1"
+             mc:Ignorable="d" 
+             Height="50" Width="80">
+    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
+</UserControl>
+~~~
+
+<br/>
+
+  - 다른 클래스 라이브러리에서 ICommand사용하기2
+
+#Wpf프로젝트(클래스 라이브러리1 ,2  참조중)
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:vm="clr-namespace:WpfLibrary2;assembly=WpfLibrary2"
+        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
+        mc:Ignorable="d"
+        Title="MainWindow" SizeToContent="WidthAndHeight">
+
+    <Window.DataContext>
+        <vm:MainView/>
+    </Window.DataContext>
+    
+    <Grid Width="300" Height="300">
+        <ctrl:UserControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#클래스라이브러리1
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfLibrary1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfLibrary1"
+             mc:Ignorable="d" 
+             Height="50" Width="80">
+    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
+</UserControl>
+~~~
+
+<br/>
+
+#클래스라이브러리2
+#MainView.cs
+~~~c#
+using System.Windows.Input;
+using System.Windows;
+using WpfApp1;
+
+namespace WpfLibrary2
+{
+    public class MainView
+    {
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("클릭 이벤트 발생");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
+
+###### [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
 ###### [Top](#top)
 
 <br/>
