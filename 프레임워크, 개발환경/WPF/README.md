@@ -5518,6 +5518,16 @@ public partial class MainWindow : Window
 # Button + Command다른클래스에서 사용
 
   - 다른 클래스 라이브러리에서 ICommand사용하기1
+    - 다른 클래스 라이브러리에서 command를 사용하기 위해서는, 어려운 속성들을 지정해 주어야 한다
+   
+<br/>
+
+  - Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"
+    - RelativeSource : 바인딩 소스를 지정하기 위해 사용되는 속성
+    - FindAncestor : 지정된 조상 타입을 검색하여 해당 조상을 바인딩 소스로 사용한다
+    - AncestorType={x:Type Window} : 조상의 타입을 Window로 지정합니다. 즉, 가장 가까운 Window 타입의 조상을 찾는다
+    - AncestorLevel=1 : 얼마나 많은 수준의 조상을 건너뛸지 지정합니다. 여기서는 첫 번째 Window 조상을 사용한다
+    - Path=DataContext.OneClick : 바인딩 소스의 OneClick 속성을 지정한다. DataContext는 일반적으로 뷰 모델의 인스턴스를 참조하는데 사용된다
 
 #Wpf프로젝트(클래스 라이브러리1 참조중)  
 #MainWindow.xaml
