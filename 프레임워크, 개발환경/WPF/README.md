@@ -5935,6 +5935,12 @@ class Workspace : INotifyPropertyChanged
 
 ![20231008_005645](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f7934a30-3418-4084-b247-a963b88b7bc7)
 
+<br/>
+
+  - .NET 이라면, 아래의 클래스 라이브러리를 이용한다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/92d9387d-f614-480b-ae5c-df83f65c0217)
+
 ###### [클래스 라이브러리](#클래스-라이브러리)
 ###### [Top](#top)
 
