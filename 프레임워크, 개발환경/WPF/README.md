@@ -5519,7 +5519,7 @@ public partial class MainWindow : Window
 
   - 다른 클래스 라이브러리에서 ICommand사용하기1
 
-#Wpf프로젝트(클래스 라이브러리1 참조중)
+#Wpf프로젝트(클래스 라이브러리1 참조중)  
 #MainWindow.xaml
 ~~~c#
 <Window x:Class="WpfApp1.MainWindow"
@@ -5604,7 +5604,7 @@ namespace WpfApp1
 
 <br/>
 
-#클래스라이브러리1
+#클래스라이브러리1  
 #UserControl1.xaml
 ~~~c#
 <UserControl x:Class="WpfLibrary1.UserControl1"
@@ -5623,7 +5623,7 @@ namespace WpfApp1
 
   - 다른 클래스 라이브러리에서 ICommand사용하기2
 
-#Wpf프로젝트(클래스 라이브러리1 ,2  참조중)
+#Wpf프로젝트(클래스 라이브러리1 ,2  참조중)  
 #MainWindow.xaml
 ~~~c#
 <Window x:Class="WpfApp1.MainWindow"
@@ -5649,7 +5649,7 @@ namespace WpfApp1
 
 <br/>
 
-#클래스라이브러리1
+#클래스라이브러리1  
 #UserControl1.xaml
 ~~~c#
 <UserControl x:Class="WpfLibrary1.UserControl1"
@@ -5666,7 +5666,7 @@ namespace WpfApp1
 
 <br/>
 
-#클래스라이브러리2
+#클래스라이브러리2  
 #MainView.cs
 ~~~c#
 using System.Windows.Input;
