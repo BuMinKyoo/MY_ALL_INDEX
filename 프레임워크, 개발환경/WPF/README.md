@@ -6158,16 +6158,28 @@ class Workspace : INotifyPropertyChanged
 ***
 
 # 클래스 라이브러리
-  - 메인 Windows 애플리케이션을 개발할때, 싱글톤 개발이 아니라면, 다른 추가 프로젝트는 “클래스 라이브러리” 로 만들어서 메인 Windows 애플리케이션에 참조로써 이용하게 된다
-  - .NET Framework라면, 아래의 클래스 라이브러리를 이용한다
+  - 현재는 WPF로 개발을 할때 작은 프로그램은 싱글톤으로 개발하기도 하지만, 규모가 커지만 싱글톤으로 개발되지 않는다.
+  - 따라서, 프로젝트를 여러개 추가하여 참조하며 사용하게 된다
+  - 사용자 정의 컨트롤 라이브러리 와 사용자 지정 컨트롤 라이브러리의 차이점
+    - 사용자 정의 컨트롤은 UserControl 객체를 상속받고, 사용자 지정 컨트롤은 Control 객체를 상속 받는다
+    - UserControl 객체는 ContentControl 객체를 상속받고 ContentControl 객체는 Control 객체와  IAddChild 인터페이스를 상속받는다.
+    - 사용자 지정 컨트롤이 사용자 정의 컨트롤 보다 더 상위에 있음
+    - 사용자 지정 컨트롤이 사용자 정의 컨트롤 보다 좀 더 커스텀한 구현이 가능하다
+    - xaml과 함께하는(좀 더 편하고,단순한) 사용자 컨트롤 제작을 한다면 사용자 정의 컨트롤을 사용하고,  좀 더 구체적이고 세부적인 사용자 컨트롤 제작을 한다면 사용자 지정 컨트롤을 사용하면 됨
 
-![20231008_005645](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f7934a30-3418-4084-b247-a963b88b7bc7)
+<br/>
+
+  - .NET Framework라면 아래의 라이브러리를 사용
+
+<br/>
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d69e8e7a-f012-4ae1-b698-84f89746774d)
 
 <br/>
 
   - .NET 이라면, 아래의 클래스 라이브러리를 이용한다
 
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/92d9387d-f614-480b-ae5c-df83f65c0217)
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9fdc2dd0-5993-4914-b3c1-6923dd4584f9)
 
 ###### [클래스 라이브러리](#클래스-라이브러리)
 ###### [Top](#top)
