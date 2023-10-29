@@ -23,16 +23,12 @@
 
 <br/>
 
-- [다양한 참조법](#다양한-참조법)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
-    
-<br/>
-
 - [컨트롤 활용하기](#컨트롤-활용하기)
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
+  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
 
 <br/>
 
@@ -627,171 +623,13 @@ public partial class MainWindow : Window
 
 ***
 
-# 다양한 참조법
-  - Class를 참조할 경우 일반적으로 클래스 라이브 러리의 .NET Standard 프레임 워크를 이용하여 참조한다(이유 : .NET Framework, .NET Core, Xamarin 전부 호환 되기 때문에)
-
-  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
-
-###### [다양한 참조법](#다양한-참조법)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 같은 프로젝트에서 '리소스 사전' 불러오기
-
-~~~c#
-<ResourceDictionary>
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="(경로/리소스사전명)"/>
-    </ResourceDictionary.MergedDictionaries>
-</ResourceDictionary>
-~~~
-
-을 이용하여 리소스 사전을 불러올 수 있음
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp16.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="300" Width="300">
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-    <Grid>
-        <Button Width="100" Height="30" Style="{StaticResource buttonMade}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#Dictionary1.xaml
-~~~c#
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-    <Style x:Key="buttonMade" TargetType="Button">
-        <Setter Property="Background" Value="Green"/>
-    </Style>
-</ResourceDictionary>
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/153413299-1734d355-5add-48a2-9a08-86d3c9916d19.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153413366-74222a7b-96e6-45f3-b9de-bcfd0b7aae86.png">
-
-###### [다양한 참조법](#다양한-참조법)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우
-  - 위에 것으로 부터 이어 참고해서 보면, "Dictionary1.xaml" => "NewFolder/Dictionary1.xaml"이렇게 참조 했음을 알 수 있다.
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp16.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="300" Width="300">
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="NewFolder/Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-    <Grid>
-        <Button Width="100" Height="30" Style="{StaticResource buttonMade}"/>
-    </Grid>
-</Window>
-~~~
-로 이용 하면 된다.
-
-###### [다양한 참조법](#다양한-참조법)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 다른 프로젝트에서 '리소스사전' 참조하기
- 
-<br/>
-
-~~~c#
-<ResourceDictionary>
-  <ResourceDictionary.MergedDictionaries>
-      <ResourceDictionary Source="pack://application:,,,/(참조namespace명);component/(경로/리소스사전명)"/>
-  </ResourceDictionary.MergedDictionaries>
-</ResourceDictionary>
-~~~
-을 이용하면 된다
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp16.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="300" Width="300">
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Reference_project;component/Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
-    </Window.Resources>
-    <Grid>
-        <Button Width="100" Height="30" Content="{StaticResource buttonMade}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#Reference_project의 Dictionary1.xaml
-~~~c#
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-    <Style x:Key="buttonMade" TargetType="Button">
-        <Setter Property="Background" Value="Green"/>
-    </Style>
-    
-</ResourceDictionary>
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/153421493-311a3664-f837-4c2d-82c6-3b2d6ca82b89.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153421558-3042dbb3-c101-4a40-b134-7c8852b86186.png">
-
-###### [다양한 참조법](#다양한-참조법)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
 # 컨트롤 활용하기
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
+  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
+  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
+  - ['리소스사전' 활용하기](#리소스사전-활용하기)
 
 
 ###### [컨트롤 활용하기](#컨트롤-활용하기)
@@ -931,6 +769,153 @@ namespace WpfApp1
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0594fe73-ea53-4518-a9a7-804005516dca)
 
+
+###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 같은 프로젝트에서 '리소스 사전' 불러오기
+
+~~~c#
+<ResourceDictionary>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="(경로/리소스사전명)"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+~~~
+
+을 이용하여 리소스 사전을 불러올 수 있음
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp16.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Button Width="100" Height="30" Style="{StaticResource buttonMade}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="buttonMade" TargetType="Button">
+        <Setter Property="Background" Value="Green"/>
+    </Style>
+</ResourceDictionary>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153413299-1734d355-5add-48a2-9a08-86d3c9916d19.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153413366-74222a7b-96e6-45f3-b9de-bcfd0b7aae86.png">
+
+###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우
+  - 위에 것으로 부터 이어 참고해서 보면, "Dictionary1.xaml" => "NewFolder/Dictionary1.xaml"이렇게 참조 했음을 알 수 있다.
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp16.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="NewFolder/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Button Width="100" Height="30" Style="{StaticResource buttonMade}"/>
+    </Grid>
+</Window>
+~~~
+로 이용 하면 된다.
+
+###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 다른 프로젝트에서 '리소스사전' 참조하기
+ 
+<br/>
+
+~~~c#
+<ResourceDictionary>
+  <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="pack://application:,,,/(참조namespace명);component/(경로/리소스사전명)"/>
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+~~~
+을 이용하면 된다
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp16.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Reference_project;component/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Button Width="100" Height="30" Content="{StaticResource buttonMade}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#Reference_project의 Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="buttonMade" TargetType="Button">
+        <Setter Property="Background" Value="Green"/>
+    </Style>
+    
+</ResourceDictionary>
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153421493-311a3664-f837-4c2d-82c6-3b2d6ca82b89.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153421558-3042dbb3-c101-4a40-b134-7c8852b86186.png">
 
 ###### [컨트롤 활용하기](#컨트롤-활용하기)
 ###### [Top](#top)
