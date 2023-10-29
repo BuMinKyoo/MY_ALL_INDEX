@@ -26,10 +26,17 @@
 - [다양한 참조법](#다양한-참조법)
   - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
   - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-  - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
   - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
   - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
     
+<br/>
+
+- [컨트롤 활용하기](#컨트롤-활용하기)
+  - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
+  - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
+
+
+
 <br/>
 
 - [Style](#style)
@@ -624,7 +631,6 @@ public partial class MainWindow : Window
 
   - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
   - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-  - [같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기](#같은-프로젝트에서-usercontrol사용자-정의-컨트롤-불러오기)
   - [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
   - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
 
@@ -714,49 +720,6 @@ public partial class MainWindow : Window
 </Window>
 ~~~
 로 이용 하면 된다.
-
-###### [다양한 참조법](#다양한-참조법)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 같은 프로젝트에서 'UserControl(사용자 정의 컨트롤)' 불러오기
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp27.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:WpfApp27"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <local:UserControl1/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfApp27.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Height="200" Width="200">
-    <Grid>
-        <Rectangle Width="100" Height="100" Fill="red"/>
-    </Grid>
-</UserControl>
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/154071023-dc86e23e-7446-4666-b22b-5640a0088549.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/154070852-06c0695f-deae-435b-be8f-961da99fe395.png">
 
 ###### [다양한 참조법](#다양한-참조법)
 ###### [Top](#top)
@@ -892,6 +855,157 @@ public class Car
 <img src="https://user-images.githubusercontent.com/39178978/153421558-3042dbb3-c101-4a40-b134-7c8852b86186.png">
 
 ###### [다양한 참조법](#다양한-참조법)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 컨트롤 활용하기
+  - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
+  - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
+
+
+###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 사용자 정의 컨트롤(UserControl)
+  - 다른 프로젝트에서 사용자 정의 컨트롤을 불러오는것도 방법이 같다. 단지 불러올 프로젝트를 참조한후, xmlns를 등록해서 가져오면 된다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <local:UserControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="30" Content="qqqqqqq"/>
+    </Grid>
+</UserControl>
+~~~
+
+###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 사용자 지정 컨트롤(CustomControl)
+  - 다른 프로젝트에서 사용자 지정 컨트롤을 불러오는것도 방법이 같다. 단지 불러올 프로젝트를 참조한후, xmlns를 등록해서 가져오면 된다
+
+<br/>
+
+  - 사용자 지정 컨트롤 라이브러리는 Themes폴더가 생기며, Generic.xaml에서 화면을 표현 하게 된다. 만약 CustomControl을 여러개 만든다면 Generic.xaml에서 관리하는 것보다, 리소스 사전을 만들어서 관리하는 것이 더 좋다
+    - 이때는 "사용자 지정 컨트롤" 1개에 "리소스 사진"1개를 대응시켜서 만든다
+    - TemplateBinding : ControlTemplate안에서 바인딩하기 위해 사용하는것, 현재 템플릿을 적용하는 컨트롤의 값을 참조한다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <local:CustomControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#사용자지정 컨트롤
+#CustomControl1.cs
+~~~c#
+// 원하는 컨트롤을 기본 속성을 가져가기 위해 기본 컨틀로을 상속받는다
+
+using System.Windows;
+using System.Windows.Controls;
+
+namespace WpfApp1
+{
+    public class CustomControl1 : Button
+    {
+        static CustomControl1()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1), new FrameworkPropertyMetadata(typeof(CustomControl1)));
+        }
+    }
+}
+~~~
+
+<br/>
+
+#CustomControl1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:MAKE="clr-namespace:WpfApp1">
+    <Style TargetType="{x:Type MAKE:CustomControl1}">
+        <Setter Property="Background" Value="Blue"/>
+        <Setter Property="Width" Value="200"/>
+        <Setter Property="Height" Value="35"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type MAKE:CustomControl1}">
+                    <Border Background="{TemplateBinding Background}"
+                            Width="{TemplateBinding Width}">
+                        <TextBlock Text="버튼상속 CustomControl"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#Generic.xaml
+~~~c#
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/WpfApp1;component/Themes/CustomControl1.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0594fe73-ea53-4518-a9a7-804005516dca)
+
+
+###### [컨트롤 활용하기](#컨트롤-활용하기)
 ###### [Top](#top)
 
 <br/>
