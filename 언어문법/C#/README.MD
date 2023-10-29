@@ -727,9 +727,102 @@ namespace ConsoleApp9
 }
 ~~~
 
+<br/>
+
+  - 정적 생성자
+    - 클래스에서 정적 생성자는 오직 한 개만 존재한다.
+    - 정적 생성자는 매개변수가 없어야 한다
+    - 정적 생성자는 클래스의 정적 멤버에 접근할 수 있다
+    - 정적 생성자에는 접근 지정자(접근 제한자)가 없어야 한다
+    - 정적 생성자는 클래스가 로드될 때 한 번만 호출된다
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car1 = new Car();
+            Car car2 = new Car();
+        }
+    }
+
+    public class Car
+    {
+        public int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+
+        public Car()
+        {
+            Gas = 20;
+            Console.WriteLine("일반 생성자~");
+            Sound();
+        }
+
+        static Car()
+        {
+            Console.WriteLine("정적 생성자~");
+        }
+    }
+}
+
+//정적 생성자~
+//일반 생성자~
+//빵빵~
+//일반 생성자~
+//빵빵~
+~~~
+
+<br/>
+
+  - 정적 생성자와 마찬가지로 정적 멤버도 클래스의 인스턴스가 몇 개나 생성되는지에 상관없이 한 번만 만들어진다
+  - 정적 맴버를 호출할때도 정적 생성자가 발동 된다
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine(Car.Gas);
+        }
+    }
+
+    public class Car
+    {
+        public static int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+
+        public Car()
+        {
+            Console.WriteLine("일반 생성자~");
+            Sound();
+        }
+
+        static Car()
+        {
+            Console.WriteLine("정적 생성자~");
+            Car.Gas = 20;
+        }
+    }
+}
+
+//정적 생성자~
+//20
+~~~
+
   - 접근 제어자
     - public : 클래스 밖에서 호출 가능
     - private : 클래스 밖에서 호출 불가(클래스명.함수 x) -> 클래스 내부에서는 호출 가능
+    - protected : 상속 클래스 및 선언 클래스에서만 접근이 가능합니다.
 
 ~~~c#
 namespace ConsoleApp9
@@ -756,6 +849,60 @@ namespace ConsoleApp9
 }
 
 // car.Gas를 호출하는데 에러가 남
+~~~
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            //Console.WriteLine(car.Gas); // 외부에서 접근 안됨
+            car.Print();
+
+            Car2 car2 = new Car2();
+            //Console.WriteLine(car2.Gas); // 외부에서 접근 안됨
+            car2.Print();
+        }
+    }
+
+    public class Car
+    {
+        protected int Gas = 10;
+        public void Sound()
+        {
+            Console.WriteLine("빵빵~");
+        }
+
+        public Car()
+        {
+            Sound();
+            Gas = 10;
+        }
+
+        public void Print()
+        {
+            Console.WriteLine(Gas);
+        }   
+    }
+
+    public class Car2 : Car
+    {
+        public Car2()
+        {
+            Gas = 20;
+        }
+    }
+}
+
+//빵빵~
+//10
+//빵빵~
+//20
 ~~~
 
   - 정적 클래스
@@ -788,6 +935,23 @@ namespace ConsoleApp9
 
 // car.gas가 클래스 Car에 종속 되기 때문에, 클래스 이름으로 호출해야함
 ~~~
+
+  - 접근제어자와 static 정리
+    - 접근제어자 종류
+      - internal : 현재 프로젝트에만 접근가능
+      - public : 모든곳에 접근 가능
+      - private : 현재 Class에서만 접근 가능
+      - protected : 현재 Class 및 파생 Class에서만 접근 가능
+    - static : 사용하게 되면 클래스 수준에서 하나의 저장 공간을 갖기 때문에, 클래스의 모든 인스턴스들을 동일한 값을 가지게 된다
+    - 따라서 public static 일경우에만 인스턴스를 생성하지 않고도 접근할 수 있게 되며, 나머지는 접근만 다를 뿐 같은 클래스에서는 같은 값을 가지게 된다
+      - static(= public static)
+      - internal static
+      - public static
+      - private static
+      - protected static
+    - Class에서는 private , protected 를 사용할 수 없다. Class가 static이라면 해당하는 모든 멤버들은 static이 되어야 한다
+
+<br/>
 
   - getter함수 setter함수
 
@@ -887,12 +1051,112 @@ namespace ConsoleApp9
 }
 ~~~
 
-###### [Top](#top)
+  - 프로퍼티 키워드 init
+    - init 키워드를 사용하면 초기화 시점 외에는 변수 변경이 불가능하다.
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+            Console.WriteLine(car.Gas);
+            //car.Gas = 20; 이렇게 set할수 없음
+        }
+    }
+
+    public class Car
+    {
+        private int m_Gas;
+        public int Gas { get; init;}
+
+        public Car()
+        {
+            Gas = 10;
+        }
+    }
+}
+
+// 10
+~~~
 
 <br/>
 
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car()
+            {
+                Gas = 10
+            };
+            Console.WriteLine(car.Gas);
+        }
+    }
+
+    public class Car
+    {
+        private int m_Gas;
+        public int Gas { get; init;}
+    }
+}
+
+// 10
+~~~
+
+<br/>
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car()
+            {
+                Gas = 10
+            };
+            Console.WriteLine(car.Gas);
+        }
+    }
+
+    public class Car
+    {
+        private int m_Gas;
+        public int Gas
+        {
+            get
+            {
+                return m_Gas;
+            }
+            init
+            {
+                m_Gas = value;
+            }
+        }
+    }
+}
+
+// 10
+~~~
+
+###### [Top](#top)
+
 ***
 
+<br/>
 <br/>
 
 ## 범위
