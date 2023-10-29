@@ -1,4 +1,4 @@
-###### Top
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b17ad345-f716-48a6-995f-aae05b88ffdc)###### Top
 
 - [WPF class hierarchy](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/WPF/WPF%20class%20hierarchy.png)
 
@@ -29,6 +29,7 @@
   - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
   - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
   - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
+  - ['리소스사전' 활용하기(ContentPresenter,ItemsPresenter)](#리소스사전-활용하기contentpresenteritemspresenter)
 
 <br/>
 
@@ -629,7 +630,7 @@ public partial class MainWindow : Window
   - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
   - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
   - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
-  - ['리소스사전' 활용하기](#리소스사전-활용하기)
+  - ['리소스사전' 활용하기(ContentPresenter,ItemsPresenter)](#리소스사전-활용하기contentpresenteritemspresenter)
 
 
 ###### [컨트롤 활용하기](#컨트롤-활용하기)
@@ -916,6 +917,295 @@ namespace WpfApp1
 <br/>
 
 <img src="https://user-images.githubusercontent.com/39178978/153421558-3042dbb3-c101-4a40-b134-7c8852b86186.png">
+
+###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# '리소스사전' 활용하기(ContentPresenter,ItemsPresenter)
+  - ControlTemplate안에 있는 값들을 정의하기 위해서는 TemplateBinding을 써서 연결해야 한다. 이것으로 연결하지 않으면 위에 Setter에 속성이 정해져 있더라도 연결되지 않는다. 아래의 코드는 Background만 적용되고 나머지는 적용되지 않는다
+  - 현재 아래의 예시들은 리소스사전을 App.xaml에 정의후 불러오고 있다
+
+#DefaultStyle.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style x:Key="EmptyButton" TargetType="Button">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Width" Value="100" />
+        <Setter Property="ClickMode" Value="Release" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="Blue" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}">
+                        <TextBlock Text="버튼!!"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+~~~
+
+<br/>
+
+  - ContentControl은 내부적으로 전부 ContentPresenter을 가지고 있고, 이것은 데이터를 출력할 자리를 마련해 주는것이다.
+  - ContentSource는 ContentPresenter에 출력할 데이터 종류를 말하고, 표시하지 않으면 ContentSource="Content" 기본으로 갖는다
+
+#DefaultStyle.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style x:Key="EmptyButton" TargetType="Button">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Width" Value="100" />
+        <Setter Property="Background" Value="Blue" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}">
+                    <ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" ContentSource="Content"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Style="{StaticResource EmptyButton}" Content="버튼!!"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+  - 아래와 같이 ContentSource="Height"로 하게 되면(말도 안되는 값이지만..) 해당하는 컨트롤의 Height가 출력된다. ContentSource에는 그 무엇이든 올 수 있는것 같고 ContentPresenter를 두개 세개 데이터를 따로 따로 다른 포맷으로 출력 할 수 있게 해준다
+
+#DefaultStyle.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style x:Key="EmptyButton" TargetType="Button">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Width" Value="100" />
+        <Setter Property="Background" Value="Blue" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}">
+                        <StackPanel>
+                            <ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" ContentSource="Height"/>
+                            <ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" ContentSource="Content"/>
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Style="{StaticResource EmptyButton}" Content="버튼!!"/>
+    </Grid>
+</Window>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/088d871a-9dd7-4746-aca5-5ae3a8d436d1)
+
+<br/>
+
+  - ItemsPresenter
+    - ContentControl은 ContentPresenter를 사용하여 특정 부분만 외부에서 확장할 수 있도록 설계되는 반면, ItemsControl은 ItemsSource나 TreeViewItem 같은 자식 요소를 ItemsPresenter 요소에 반복적으로 추가하는 방식으로 동작한다
+    - ItemsControl 객체에서 파생된 대표적인 컨트롤
+      - ComboBox
+      - DataGrid
+      - ListBox
+      - ListView
+      - Menu
+      - TabControl
+      - TreeView
+      - TreeViewItem
+      - StatusBar
+      - ToolBar
+      - ContextMenu
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <ComboBox Style="{StaticResource EmptyComboBox}">
+            <ComboBoxItem>Item 1</ComboBoxItem>
+            <ComboBoxItem>Item 2</ComboBoxItem>
+            <ComboBoxItem>Item 3</ComboBoxItem>
+        </ComboBox>
+        
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#DefaultStyle.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style x:Key="EmptyComboBox" TargetType="ComboBox">
+        <Setter Property="Width" Value="100" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Background" Value="Gray" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Border Background="{TemplateBinding Background}"
+                            Width="{TemplateBinding Width}">
+                        <ScrollViewer Height="{TemplateBinding Height}">
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/53bdd606-2906-47b0-a4a1-9fe03b469aa7)
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <ComboBox Style="{StaticResource EmptyComboBox}" ItemsSource="{Binding ItemsList}">
+        </ComboBox>
+        
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Collections.ObjectModel;
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+
+            ItemsList = new ObservableCollection<string>();
+
+            ItemsList.Add("Item 1");
+            ItemsList.Add("Item 2");
+            ItemsList.Add("Item 3");
+            ItemsList.Add("Item 4");
+
+        }
+
+        private ObservableCollection<string> _itemsList;
+
+        public ObservableCollection<string> ItemsList
+        {
+            get { return _itemsList; }
+            set
+            {
+                if (_itemsList != value)
+                {
+                    _itemsList = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#DefaultStyle.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style x:Key="EmptyComboBox" TargetType="ComboBox">
+        <Setter Property="Width" Value="100" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Background" Value="Gray" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Border Background="{TemplateBinding Background}"
+                            Width="{TemplateBinding Width}">
+                        <StackPanel>
+                            <ScrollViewer Height="{TemplateBinding Height}">
+                                <ItemsPresenter/>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4c148b53-5e0f-4718-a4f0-2b03e565fec4)
 
 ###### [컨트롤 활용하기](#컨트롤-활용하기)
 ###### [Top](#top)
