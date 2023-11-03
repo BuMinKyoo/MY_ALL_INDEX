@@ -36,9 +36,7 @@
 - [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
+  - [리소스 사전 참조하기](#리소스-사전-참조하기)
   - ['리소스사전' 활용하기(ContentPresenter,ItemsPresenter)](#리소스사전-활용하기contentpresenteritemspresenter)
 
 <br/>
@@ -755,9 +753,7 @@ public partial class MainWindow : Window
 # UserControl,CustomControl,리소스
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
-  - [같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우](#같은-프로젝트에서-리소스-사전-불러오기2-newfolder라는-폴더-안에-들어-있는-경우)
-  - [다른 프로젝트에서 '리소스사전' 참조하기](#다른-프로젝트에서-리소스사전-참조하기)
+  - [리소스 사전 참조하기](#리소스-사전-참조하기)
   - ['리소스사전' 활용하기(ContentPresenter,ItemsPresenter)](#리소스사전-활용하기contentpresenteritemspresenter)
 
 
@@ -905,7 +901,7 @@ namespace WpfApp1
 <br/>
 <br/>
 
-# 같은 프로젝트에서 '리소스 사전' 불러오기
+# 리소스 사전 참조하기
 
 ~~~c#
 <ResourceDictionary>
@@ -957,14 +953,10 @@ namespace WpfApp1
 
 <img src="https://user-images.githubusercontent.com/39178978/153413366-74222a7b-96e6-45f3-b9de-bcfd0b7aae86.png">
 
-###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우
-  - 위에 것으로 부터 이어 참고해서 보면, "Dictionary1.xaml" => "NewFolder/Dictionary1.xaml"이렇게 참조 했음을 알 수 있다.
+  - 같은 프로젝트에서 '리소스 사전' 불러오기(2) NewFolder라는 폴더 안에 들어 있는 경우
+    - 위에 것으로 부터 이어 참고해서 보면, "Dictionary1.xaml" => "NewFolder/Dictionary1.xaml"이렇게 참조 했음을 알 수 있다.
 
 #MainWindow.xaml
 ~~~c#
@@ -986,13 +978,9 @@ namespace WpfApp1
 ~~~
 로 이용 하면 된다.
 
-###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 다른 프로젝트에서 '리소스사전' 참조하기
+  - 다른 프로젝트에서 '리소스사전' 참조하기
  
 <br/>
 
