@@ -23,7 +23,7 @@
 
 <br/>
 
-- [컨트롤 활용하기](#컨트롤-활용하기)
+- [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
   - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
@@ -119,10 +119,6 @@
     - SelectedIndex
     - ListView헤더 크기를 비율로 조절하기(Binding활용)
     - DisplayMemberBinding
-  - [ItemsControl](#itemscontrol)
-    - [ItemsControl 을 class를 xml로 불러오기](#itemscontrol-을-class를-xml로-불러오기)
-    - [ItemsControl 을 class를 xml로 불러오기2](#itemscontrol-을-class를-xml로-불러오기2)
-    - [ItemsControl을 Style적용시키기](#itemscontrol을-style적용시키기)
   - [트리거](#트리거)
     - [Trigger](#trigger)
     - [애니메이션](#애니메이션)
@@ -139,10 +135,16 @@
   - [다른 class](#다른-class)
   - [xaml_Window.DataContext](#xaml_windowdatacontext)
   - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
+
+<br/>
+ 
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
 - [Button + Command](#button--command)
 - [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
+
+<br/>
+
 - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
 - [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
     
@@ -621,7 +623,7 @@ public partial class MainWindow : Window
 
 ***
 
-# 컨트롤 활용하기
+# UserControl,CustomControl,리소스
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
   - [같은 프로젝트에서 '리소스 사전' 불러오기](#같은-프로젝트에서-리소스-사전-불러오기)
@@ -630,7 +632,7 @@ public partial class MainWindow : Window
   - ['리소스사전' 활용하기(ContentPresenter,ItemsPresenter)](#리소스사전-활용하기contentpresenteritemspresenter)
 
 
-###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
 ###### [Top](#top)
 
 <br/>
@@ -673,7 +675,7 @@ public partial class MainWindow : Window
 </UserControl>
 ~~~
 
-###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
 ###### [Top](#top)
 
 <br/>
@@ -768,7 +770,7 @@ namespace WpfApp1
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0594fe73-ea53-4518-a9a7-804005516dca)
 
 
-###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
 ###### [Top](#top)
 
 <br/>
@@ -826,7 +828,7 @@ namespace WpfApp1
 
 <img src="https://user-images.githubusercontent.com/39178978/153413366-74222a7b-96e6-45f3-b9de-bcfd0b7aae86.png">
 
-###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
 ###### [Top](#top)
 
 <br/>
@@ -855,7 +857,7 @@ namespace WpfApp1
 ~~~
 로 이용 하면 된다.
 
-###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
 ###### [Top](#top)
 
 <br/>
@@ -915,7 +917,7 @@ namespace WpfApp1
 
 <img src="https://user-images.githubusercontent.com/39178978/153421558-3042dbb3-c101-4a40-b134-7c8852b86186.png">
 
-###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
 ###### [Top](#top)
 
 <br/>
@@ -1204,7 +1206,7 @@ namespace WpfApp1
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4c148b53-5e0f-4718-a4f0-2b03e565fec4)
 
-###### [컨트롤 활용하기](#컨트롤-활용하기)
+###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
 ###### [Top](#top)
 
 <br/>
@@ -4361,318 +4363,6 @@ public class RGB_HEX : INotifyPropertyChanged
 <img src="https://user-images.githubusercontent.com/39178978/151805276-717892ef-8192-4150-9118-fd928e956dd2.png">
 
 ###### [Selector](#selector)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# ItemsControl
-  - ItemsSource를 통해 데이터 적용
-  - ItemsControl.ItemsPanel을 통해서 ItemsControl에서 출력되는 아이템들의 배치를 조절
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-
-    <Grid>
-        <ItemsControl ItemsSource="{Binding MenuTab}" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-  - [ItemsControl 을 class를 xml로 불러오기](#itemscontrol-을-class를-xml로-불러오기)
-  - [ItemsControl 을 class를 xml로 불러오기2](#itemscontrol-을-class를-xml로-불러오기2)
-  - [ItemsControl을 Style적용시키기](#itemscontrol을-style적용시키기)
-
-
-###### [ItemsControl](#itemscontrol)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# ItemsControl 을 class를 xml로 불러오기
-    - 아래와 같은 코드에, ItemsSource나 ItemsPanel을 설정해서 위와 같이 적용할 수 있다
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-
-    <Grid>
-        <local:Control/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#Control.xaml
-~~~c#
-<ItemsControl x:Class="test1.Control"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:test1"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Button Width="100" Height="100" Content="{Binding Id}"/>
-        <TextBlock Text="{Binding Pw}"/>
-    </Grid>
-</ItemsControl>
-~~~
-
-<br/>
-
-#Control.xaml.cs
-~~~c#
-using System.Windows.Controls;
-
-namespace test1
-{
-    /// <summary>
-    /// Control.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class Control : ItemsControl
-    {
-        public Control()
-        {
-            InitializeComponent();
-        }
-    }
-}
-~~~
-
-![20231009_135603](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4abd1783-7a1b-41ba-b6ed-e6f8e85dc318)
-
-###### [ItemsControl](#itemscontrol)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# ItemsControl 을 class를 xml로 불러오기2
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Sample.Data;assembly=Sample.Data"
-        xmlns:local="clr-namespace:test1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-
-    <Window.DataContext>
-        <vm:MainView />
-    </Window.DataContext>
-
-
-    <Grid Width="1024" Height="768">
-        <local:Control ItemsSource="{Binding MenuTab}" VerticalAlignment="Top" HorizontalAlignment="Left">
-        </local:Control>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#Control.xaml
-~~~c#
-<ItemsControl x:Class="test1.Control"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:test1"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-
-    <ItemsControl.ItemTemplate>
-        <DataTemplate>
-            <local:UserControl_TabHead />
-        </DataTemplate>
-    </ItemsControl.ItemTemplate>
-
-    <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-            <StackPanel Orientation="Vertical"/>
-        </ItemsPanelTemplate>
-    </ItemsControl.ItemsPanel>
-</ItemsControl>
-~~~
-
-<br/>
-
-#Control.xaml.cs
-~~~c#
-using System.Windows.Controls;
-
-namespace test1
-{
-    /// <summary>
-    /// Control.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class Control : ItemsControl
-    {
-        public Control()
-        {
-            InitializeComponent();
-        }
-    }
-}
-~~~
-
-<br/>
-
-#UserControl_TabHead.xaml
-~~~c#
-<UserControl x:Class="test1.UserControl_TabHead"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:test1"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Button Width="100" Height="100" Content="{Binding Id}"/>
-        <TextBlock Text="{Binding Pw}"/>
-    </Grid>
-</UserControl>
-~~~
-
-<br/>
-
-#MainView.cs
-~~~c#
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-
-namespace Sample.Data
-{
-    public class MainView
-    {
-        public MainView()
-        {
-            MenuTab = new ObservableCollection<TabHead>()
-            {
-                new TabHead(),
-                new TabHead()
-            };
-        }
-
-        ObservableCollection<TabHead> _menuTab = null;
-        public ObservableCollection<TabHead> MenuTab
-        {
-            get => _menuTab;
-            private set
-            {
-                _menuTab = value;
-            }
-        }
-    }
-
-}
-~~~
-
-<br/>
-
-#TabHead.cs
-~~~c#
-namespace Sample.Data
-{
-    public class TabHead
-    {
-        string _Id = "aaa";
-        public string Id
-        {
-            get => _Id;
-            set
-            {
-                _Id = value;
-            }
-        }
-
-
-        bool _Pw = false;
-        public bool Pw
-        {
-            get => _Pw;
-            set
-            {
-                _Pw = value;
-            }
-        }
-    }
-}
-~~~
-
-![20231009_135838](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f7cec09c-c483-45b1-8d4a-f0e38bcc84c6)
-
-###### [ItemsControl](#itemscontrol)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# ItemsControl을 Style적용시키기
-    - 특정 패널 안쪽에, Style태그를 사용할 수 있고, TargetType또한 지정해서 사용할 수 있음. 해당 패널의 다른것을 TargetType으로 지정하면 에러가 발생함
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-
-
-    <Grid Width="1024" Height="768">
-        <local:Control ItemsSource="{Binding MenuTab}" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <Control.Style>
-                <Style TargetType="ItemsControl">
-                    <Setter Property="Visibility" Value="Visible"/>
-                </Style>
-            </Control.Style>
-        </local:Control>
-    </Grid>
-</Window>
-~~~
-
-###### [ItemsControl](#itemscontrol)
 ###### [Top](#top)
 
 <br/>
