@@ -33,10 +33,6 @@
 
 <br/>
 
-- [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
-
-<br/>
-
 - [Style](#style)
   - [Style의 key값으로 각각의 컨트롤에 Style을 적용](#style의-key값으로-각각의-컨트롤에-style을-적용)
     - Style x:Key="(사용할 name)" TargetType="(적용시킬 컨트롤)"
@@ -153,6 +149,7 @@
 <br/>
 
 - [클래스 라이브러리](#클래스-라이브러리)
+- [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
 
 <br/>
 
@@ -1208,81 +1205,6 @@ namespace WpfApp1
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4c148b53-5e0f-4718-a4f0-2b03e565fec4)
 
 ###### [컨트롤 활용하기](#컨트롤-활용하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# 다른 프로젝트의 네임스페이스 참조하기
-  - CLR네임 스페이스 참조
-  - XML네임 스페이스 참조
- 
- <br>
- 
-   - 사전준비로 종속성, 참조 연결을 먼저 해준다.
-     - .NET 6.0에서는 '종속성'에서 마우스 우클릭 -> 프로젝트 참조 추가
-     - .NET Framework 4.7.2에서는 '참조'에서 마우스 우클릭 -> 참조 추가
-<img src="https://user-images.githubusercontent.com/39178978/153415481-826baaf5-1446-4596-a8cf-be1d3d81fca6.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153415583-7f5efdb4-3ce4-4a3a-8585-56646de09225.png">
-
-<br/>
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153415865-36d0e705-c45c-40fb-8fb8-5a7037140a5b.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153415903-f7ed0b43-d9ea-4e59-a1d5-5262ac3c1665.png">
-
-그 후에는 뒤를 따르면 된다.
- 
-<br/>
-
-  - CLR네임 스페이스 참조
-    - xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project" 이용한다
-    - xmlns:(접두사)="clr-namespace:(참조namespace명.경로);assembly=(namespace명)"
-    - 가령, NewFolder라는 폴더 안에 .cs의 class를 불러오려면, xmlns:reference_project="clr-namespace:Reference_project.NewFolder;assembly=Reference_project" 를 사용해야함
-
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp16.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project"
-        Title="MainWindow" Height="300" Width="300">
-    <Window.Resources>
-        <reference_project:Car x:Key="reference_project_car"/>
-    </Window.Resources>
-    <Grid>
-        <Button Width="100" Height="30" Content="{StaticResource reference_project_car}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#Reference_project.xaml.cs
-~~~c#
-public class Car
-{
-
-}
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/153417714-d042ca1b-9720-4e59-bac5-a613fc233078.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153417813-68f3e880-56c2-45d9-beb3-76a4d105ee7b.png">
-
-###### [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
 ###### [Top](#top)
 
 <br/>
@@ -6572,6 +6494,81 @@ class Workspace : INotifyPropertyChanged
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9fdc2dd0-5993-4914-b3c1-6923dd4584f9)
 
 ###### [클래스 라이브러리](#클래스-라이브러리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 다른 프로젝트의 네임스페이스 참조하기
+  - CLR네임 스페이스 참조
+  - XML네임 스페이스 참조
+ 
+ <br>
+ 
+   - 사전준비로 종속성, 참조 연결을 먼저 해준다.
+     - .NET 6.0에서는 '종속성'에서 마우스 우클릭 -> 프로젝트 참조 추가
+     - .NET Framework 4.7.2에서는 '참조'에서 마우스 우클릭 -> 참조 추가
+<img src="https://user-images.githubusercontent.com/39178978/153415481-826baaf5-1446-4596-a8cf-be1d3d81fca6.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153415583-7f5efdb4-3ce4-4a3a-8585-56646de09225.png">
+
+<br/>
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153415865-36d0e705-c45c-40fb-8fb8-5a7037140a5b.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153415903-f7ed0b43-d9ea-4e59-a1d5-5262ac3c1665.png">
+
+그 후에는 뒤를 따르면 된다.
+ 
+<br/>
+
+  - CLR네임 스페이스 참조
+    - xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project" 이용한다
+    - xmlns:(접두사)="clr-namespace:(참조namespace명.경로);assembly=(namespace명)"
+    - 가령, NewFolder라는 폴더 안에 .cs의 class를 불러오려면, xmlns:reference_project="clr-namespace:Reference_project.NewFolder;assembly=Reference_project" 를 사용해야함
+
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp16.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <reference_project:Car x:Key="reference_project_car"/>
+    </Window.Resources>
+    <Grid>
+        <Button Width="100" Height="30" Content="{StaticResource reference_project_car}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#Reference_project.xaml.cs
+~~~c#
+public class Car
+{
+
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153417714-d042ca1b-9720-4e59-bac5-a613fc233078.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153417813-68f3e880-56c2-45d9-beb3-76a4d105ee7b.png">
+
+###### [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
 ###### [Top](#top)
 
 <br/>
