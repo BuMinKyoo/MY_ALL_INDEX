@@ -64,13 +64,13 @@
 
 <br/>
 
-- [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
-- [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
+- [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
+  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+  - [Workspace를 통한 UserControl끼리의 값 전달(ContentControl)](#workspace를-통한-usercontrol끼리의-값-전달contentcontrol)
     
 <br/>
 
-- [클래스 라이브러리](#클래스-라이브러리)
-- [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
+- [WPF의 다양한 프로젝트/프로젝트 참조하기](#wpf의-다양한-프로젝트/프로젝트-참조하기)
 
 <br/>
 
@@ -5732,6 +5732,22 @@ namespace WpfApp1
 
 ***
 
+# static class를 활용한 싱글톤 데이터 교환 구조
+  - 싱글톤 구조는 작은 프로그램을 만들때 유용하다
+  - 구조가 쉽고 간결하다
+  - 하지만 규모가 커지면, 속도가 느려지고 부하가 걸릴 수 있다
+
+<br/>
+
+  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+  - [Workspace를 통한 UserControl끼리의 값 전달(ContentControl)](#workspace를-통한-usercontrol끼리의-값-전달contentcontrol)
+
+###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 # Workspace를 통한 UserControl끼리의 값 전달
 
 #MainWindow.xaml
@@ -5958,7 +5974,7 @@ class Workspace : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/158002074-53c25c5e-e955-44b3-8f25-03c27f839310.gif" height="400" width="400">
 
-###### [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
 ###### [Top](#top)
 
 <br/>
@@ -5966,7 +5982,7 @@ class Workspace : INotifyPropertyChanged
 
 ***
 
-# ContentControl을 활용한 UserControl끼리의 값 전달
+# Workspace를 통한 UserControl끼리의 값 전달(ContentControl)
 
 #MainWindow.xaml
 ~~~c#
@@ -6139,7 +6155,7 @@ class Workspace : INotifyPropertyChanged
 
 <img src="https://user-images.githubusercontent.com/39178978/158002648-4572bcdb-a67c-4d57-b337-67e14c2d493b.gif" width="400" height="400">
 
-###### [ContentControl을 활용한 UserControl끼리의 값 전달](#contentcontrol을-활용한-usercontrol끼리의-값-전달)
+###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
 ###### [Top](#top)
 
 <br/>
@@ -6147,7 +6163,7 @@ class Workspace : INotifyPropertyChanged
 
 ***
 
-# 클래스 라이브러리
+# WPF의 다양한 프로젝트/프로젝트 참조하기
   - 현재는 WPF로 개발을 할때 작은 프로그램은 싱글톤으로 개발하기도 하지만, 규모가 커지만 싱글톤으로 개발되지 않는다.
   - 따라서, 프로젝트를 여러개 추가하여 참조하며 사용하게 된다
   - 사용자 정의 컨트롤 라이브러리 와 사용자 지정 컨트롤 라이브러리의 차이점
@@ -6171,17 +6187,11 @@ class Workspace : INotifyPropertyChanged
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9fdc2dd0-5993-4914-b3c1-6923dd4584f9)
 
-###### [클래스 라이브러리](#클래스-라이브러리)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-***
-
-# 다른 프로젝트의 네임스페이스 참조하기
-  - CLR네임 스페이스 참조
-  - XML네임 스페이스 참조
+  - 다른 프로젝트 참조하기
+    - CLR네임 스페이스 참조
+    - XML네임 스페이스 참조
  
  <br>
  
@@ -6246,7 +6256,7 @@ public class Car
 
 <img src="https://user-images.githubusercontent.com/39178978/153417813-68f3e880-56c2-45d9-beb3-76a4d105ee7b.png">
 
-###### [다른 프로젝트의 네임스페이스 참조하기](#다른-프로젝트의-네임스페이스-참조하기)
+###### [WPF의 다양한 프로젝트/프로젝트 참조하기](#wpf의-다양한-프로젝트/프로젝트-참조하기)
 ###### [Top](#top)
 
 <br/>
