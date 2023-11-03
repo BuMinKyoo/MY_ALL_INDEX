@@ -2108,6 +2108,2182 @@ namespace Sample.Data
 ###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
 
+# 자기 자신 class
+  - 현재 화면에, this(즉 자기 자신)의 데이터를 연결하겠다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 다른 class
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = new Bus();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus()
+        {
+
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
+###### [Top](#top)
+
+<br/>
+<br/>
+# xaml_Window.DataContext
+  - Window.DataContext 속성은 하나만 설정이 가능하다
+  - xaml에 딸려 오는 xaml.cs만 가능한 것이 아니라, 일반 cs파일안에 class라면 DataContext작업을 할 수 있다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.DataContext>
+        <local:Bus/>
+    </Window.DataContext>
+
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class Bus
+    {
+        public Bus()
+        {
+
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# xaml_Window.DataContext_다른프로젝트
+  - 참조 연결하기
+    - 현재 있는것 여기에 연결하기
+  - 네임스페이스 지정하기
+  - Window.DataContext 사용하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test1"
+        xmlns:Data="clr-namespace:Sample.Data;assembly=Sample.Data"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="426">
+
+    <Window.DataContext>
+        <Data:MainView/>
+    </Window.DataContext>
+
+    <Grid>
+        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace test1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Sample.Data프로젝트
+#MainView.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sample.Data
+{
+    public class MainView
+    {
+        public MainView()
+        {
+
+        }
+
+        private string m_tbValue = "testmodel";
+        public string tbValue
+        {
+            get { return m_tbValue; }
+            set
+            {
+                if (m_tbValue != value)
+                {
+                    m_tbValue = value;
+                }
+            }
+        }
+    }
+}
+~~~
+
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ContentControl,ItemsControl
+  - ContentControl과 ItemsControl은 매우 중요하고, 핵심이 되는 부분들이 있기 때문에 여기서 따로 상세히 설명하도록 한다
+  - ContentControl : 자신의 자식으로 Content 하나를 받을 수 있는 컨트롤
+  - ItemsControl : 리스트 또는 컬렉션처럼 데이터를 통해 다수의 반복되는 자식들을 가지는 컨트롤
+    - ControlTemplate : Control의 그 자체의 외형을 정의하는 요소
+    - ContentControl은 ContentPresenter
+    - ItemsControl은 ItemsPresenter
+  - DataTemplate : Content의 내용을 출력할 외형을 결정하는 방법
+    - 화면에 그려 줄 일종의 UI 템플릿을 미리 만들어 놓고, 적용 가능한 상황이 되면 기존 객체의 렌더링 대신 이 UI 템플릿의 렌더링을 사용한다는 것
+    - ItemsControl은 ItemsSource속성 사용
+  - ItemsPanelTemplate : DataTemplate에 의해 생성된 엘리먼트들이 ItemsPanelTemplate에 의해 생성된 Panel의 자식으로 배치된다
+
+<br/>
+
+  - [ContentControl](#contentcontrol)
+  - [ItemsControl](#itemscontrol)
+
+###### [ContentControl,ItemsControl](#contentcontrolitemscontrol)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ContentControl
+  - ItemsControl과 비교해서 사용도가 적을것 같다
+  - 다른 컨트롤을 감쌀 수 있기 때문에 DataContext를 지정할 수 없는 UI 객체에 바인딩 해주는 용도로 쓰거나 데이터 속성에 반응해 컨트롤의 외관(DataTemplate)을 변경시켜주는 용도로 활용할 수 있다.
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+
+    <ContentControl>
+        <ContentControl.Style>
+            <Style TargetType="{x:Type ContentControl}">
+                <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
+            </Style>
+        </ContentControl.Style>
+        <ContentControl.Template>
+            <!--템플릿 외형-->
+            <ControlTemplate TargetType="{x:Type ContentControl}">
+                <StackPanel>
+                    <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
+                        <ContentPresenter ContentSource="Content"/>
+                    </Border>
+                    <Button Content="버튼~" Width="100" Height="30"/>
+                </StackPanel>
+            </ControlTemplate>
+        </ContentControl.Template>
+
+        <ContentControl.ContentTemplate>
+            <!--데이터 외형-->
+            <DataTemplate>
+                <local:UserControl1/>
+            </DataTemplate>
+        </ContentControl.ContentTemplate>
+    </ContentControl>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp2
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        public MainWindowViewModel()
+        {
+            Str = "qweqweqwe";
+        }
+
+        private string _str;
+        public string Str
+        {
+            get { return _str; }
+            set
+            {
+                _str = value;
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+
+        private int _thkness = 10;
+        public int Thkness
+        {
+            get { return _thkness; }
+            set
+            {
+                _thkness = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Content>
+        <StackPanel>
+            <Button Content="버튼"/>
+            <TextBlock Text="텍스트 불럭"/>
+        </StackPanel>
+    </UserControl.Content>
+</UserControl>
+~~~
+
+  - 데이터 속성에 반응해 컨트롤의 외관(DataTemplate)을 변경시키기
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="200" Width="200">
+    <Window.Resources>
+        <local:Cust x:Key="aaa"/>
+        <DataTemplate x:Key="template1">
+            <StackPanel>
+                <StackPanel.DataContext>
+                    <local:Cust/>
+                </StackPanel.DataContext>
+                <Button Width="100" Height="30" Content="{Binding Name}"/>
+                <Button Width="100" Height="30" Content="{Binding Age}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="template2">
+            <StackPanel>
+                <StackPanel.DataContext>
+                    <local:Cust/>
+                </StackPanel.DataContext>
+                <TextBlock Width="100" Height="30" Text="{Binding Name}"/>
+                <TextBlock Width="100" Height="30" Text="{Binding Age}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="template3">
+            <StackPanel>
+                <StackPanel.DataContext>
+                    <local:Cust/>
+                </StackPanel.DataContext>
+                <Button Width="50" Height="30" Content="{Binding Name}"/>
+                <Button Width="50" Height="30" Content="{Binding Age}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    
+    
+    <StackPanel>
+        <Button Width="100" Height="30" Click="Button_Click" Content="템플릿 변경"/>
+
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="{x:Type ContentControl}">
+                    <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding num}" Value="0">
+                            <!--데이터외형변경-->
+                            <Setter Property="ContentTemplate" Value="{StaticResource template1}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding num}" Value="1">
+                            <!--데이터외형변경-->
+                            <Setter Property="ContentTemplate" Value="{StaticResource template2}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding num}" Value="2">
+                            <!--데이터외형변경-->
+                            <Setter Property="ContentTemplate" Value="{StaticResource template3}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+            <ContentControl.Template>
+                <!--템플릿 외형-->
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                    <StackPanel>
+                        <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
+                            <ContentPresenter ContentSource="Content"/>
+                        </Border>
+                        <Button Content="버튼~" Width="100" Height="30"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </ContentControl.Template>
+        </ContentControl>
+    </StackPanel>
+    
+    
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window, INotifyPropertyChanged
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private int _thkness = 10;
+        public int Thkness
+        {
+            get { return _thkness; }
+            set
+            {
+                _thkness = value;
+            }
+        }
+
+        private int _Num = 0;
+        public int num
+        {
+            get { return _Num; }
+            set
+            {
+                _Num = value;
+                Notify("num");
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            num++;
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+
+        private Cust _custData;
+        public Cust CustData
+        {
+            get { return _custData; }
+            set
+            {
+                _custData = value;
+                Notify("CustData");
+            }
+        }
+    }
+}
+~~~
+
+###### [ContentControl,ItemsControl](#contentcontrolitemscontrol)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ItemsControl
+  - ControlTemplate안에 있는 속성들을 바인딩 하기 위해서는 TemplateBinding을 사용하여야 하고 이것은 바로 위에 있는 style로 지정한 값을 가져오게 된다.
+  - 그리고 style안에서 외부에서 바인딩할 값을 가져 올 수 있다
+  - 또한 주석과 같이, style안에 property를 지정해 그 안에서 모드 값을 처리할 수도 있다
+  - 마지막으로, TargetType의 값은 해당하는 컨트롤의 이름으로 하는것이 제일 무방하다.(ControlTemplate의 TargetType에 따라서 사용 할 수 있는 기본 이벤트와 같은 것들이 달라지니 참고해야 한다)
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+
+    <ItemsControl ItemsSource="{Binding CustList}">
+        <ItemsControl.Style>
+            <Style TargetType="{x:Type ItemsControl}">
+                <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
+            </Style>
+        </ItemsControl.Style>
+        <ItemsControl.Template>  <!--템플릿 외형-->
+            <ControlTemplate TargetType="{x:Type ItemsControl}">
+                <StackPanel>
+                    <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
+                        <ItemsPresenter/>
+                    </Border>
+                    <Button Content="버튼~" Width="100" Height="30"/>
+                </StackPanel>
+            </ControlTemplate>
+        </ItemsControl.Template>
+
+        <ItemsControl.ItemTemplate> <!--데이터 외형-->
+            <DataTemplate>
+                <local:UserControl1/>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+
+        <ItemsControl.ItemsPanel> <!--패널 정렬-->
+            <ItemsPanelTemplate>
+                <StackPanel/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
+
+    <!--<ItemsControl ItemsSource="{Binding CustList}">
+        <ItemsControl.Style>
+            <Style TargetType="{x:Type ItemsControl}">
+                <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ItemsControl}">
+                            <StackPanel>
+                                <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
+                                    <ItemsPresenter/>
+                                </Border>
+                                <Button Content="버튼~" Width="100" Height="30"/>
+                            </StackPanel>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <local:UserControl1/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <StackPanel/>
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ItemsControl.Style>
+    </ItemsControl>-->
+
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp2
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        public MainWindowViewModel()
+        {
+            CustList = new ObservableCollection<Cust>();
+            CustList.Add(new Cust() { Name = "John", Age = "20" });
+            CustList.Add(new Cust() { Name = "Mary", Age = "30" });
+            CustList.Add(new Cust() { Name = "Peter", Age = "40" });
+        }
+
+        private ObservableCollection<Cust> _custList;
+        public ObservableCollection<Cust> CustList
+        {
+            get { return _custList; }
+            set
+            {
+                _custList = value;
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+
+        private int _thkness = 10;
+        public int Thkness
+        {
+            get { return _thkness; }
+            set
+            {
+                _thkness = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Content="{Binding Name}"/>
+        <TextBlock Text="{Binding Age}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp2
+{
+    public class Cust : INotifyPropertyChanged
+    {
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+            }
+        }
+
+        private string _age;
+        public string Age
+        {
+            get { return _age; }
+            set
+            {
+                _age = value;
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+###### [ContentControl,ItemsControl](#contentcontrolitemscontrol)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ObservableCollection
+  - ObservableCollection 과 List차이 : WPF에서는 ListBox와ListView같은 곳에서 바인딩 사용시(ItemSource) ObserableColletion을 대부분 사용하게 된다. ObserableColletion는 UI에서 실시간으로 반영을 해주기 때문이다, 그러나 일반적인 List 는 변경된 List의 내용을 UI 에서 실시간으로 반영하지 않는다
+
+  - List
+  
+#MainWindow.xaml
+~~~c#
+<StackPanel>
+    <ListBox ItemsSource="{Binding Apple_list}">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Price}"/>
+                </Grid>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+    <Button x:Name="btn" Width="100" Content="버튼" Click="btn_Click"/>
+</StackPanel>
+~~~
+
+<br/>
+  
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        Apple_list = new List<Apple>();
+
+    }
+
+    private List<Apple> m_Apple_list;
+    public List<Apple> Apple_list
+    {
+        get { return m_Apple_list; }
+        set
+        {
+            if (m_Apple_list != value)
+            {
+                m_Apple_list = value;
+                Norty("Apple_list");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+
+    private void btn_Click(object sender, RoutedEventArgs e)
+    {
+        Apple_list.Add(new Apple() { Name = "사과", Price = 1000 });
+    }
+}
+
+public class Apple : INotifyPropertyChanged
+{
+    private string m_Name = "0";
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if (m_Name != value)
+            {
+                m_Name = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    private int m_Price = 0;
+    public int Price
+    {
+        get { return m_Price; }
+        set
+        {
+            if (m_Price != value)
+            {
+                m_Price = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    public Apple()
+    {
+
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152622781-0aeb05bd-ffef-4ab3-a79c-a3df31d9b71d.png">
+  - 버튼 클릭시 List가 만들어 지고 있지만, UI에 실시간으로 반영되고 있지 않다.
+
+<br/><br/>
+
+  - ObservableCollection  
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        Apple_list = new ObservableCollection<Apple>();
+
+    }
+
+    private ObservableCollection<Apple> m_Apple_list;
+    public ObservableCollection<Apple> Apple_list
+    {
+        get { return m_Apple_list; }
+        set
+        {
+            if (m_Apple_list != value)
+            {
+                m_Apple_list = value;
+                Norty("Apple_list");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+
+    private void btn_Click(object sender, RoutedEventArgs e)
+    {
+        Apple_list.Add(new Apple() { Name = "사과", Price = 1000 });
+    }
+}
+
+public class Apple : INotifyPropertyChanged
+{
+    private string m_Name = "0";
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if (m_Name != value)
+            {
+                m_Name = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    private int m_Price = 0;
+    public int Price
+    {
+        get { return m_Price; }
+        set
+        {
+            if (m_Price != value)
+            {
+                m_Price = value;
+                Norty("Price");
+            }
+        }
+    }
+
+    public Apple()
+    {
+
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Norty(string name)
+    {
+        PropertyChangedEventHandler handler = PropertyChanged;
+        if (handler != null)
+        {
+            handler(this, new PropertyChangedEventArgs(name));
+        }
+    }
+    #endregion
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/152622892-24a626c9-c433-48a7-86e7-a229d61311ab.png">
+
+###### [ObservableCollection](#observablecollection)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# INotifyPropertyChanged
+  - 인터페이스로써, 속성 값이 변경 되었을 때 알림을 준다. 예를 들어 디자인 폼에서 속성을 변경 했을때 백단의 데이터까지 바뀌게 해준다.
+
+#.cs
+~~~
+public class Class1 : INotifyPropertyChanged
+{
+    private string m_Name;
+    public string Name
+    {
+        get { return m_Name; }
+        set
+        {
+            if(m_Name != value)
+            {
+                m_Name = value;
+                Notify("Name");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+###### [INotifyPropertyChanged](#inotifypropertychanged)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# DependencyProperty
+  - 인터페이스로써, 속성 값이 변경 되었을 때 알림을 준다. 예를 들어 디자인 폼에서 속성을 변경 했을때 백단의 데이터까지 바뀌게 해준다.
+    - 프로퍼티 값이 변경되었을 때 자동으로 어떤 일을 처리하게 할 수 있게 해주는 것
+    - 의존 프로퍼티를 사용하면 엘리먼트를 사용하는 시점에 프로퍼티 값이 결정되고, Static 변수이기 때문에 메모리 절약에 효과적이다
+
+// 의존 프로퍼티 등록
+~~~c#
+public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(MyClass), new PropertyMetadata("DefaultValue"));
+
+
+//public static readonly DependencyProperty MyPropertyProperty: 이 줄은 종속성 속성을 정의합니다. MyProperty라는 이름의 종속성 속성을 만듭니다. 이것은 정적(public static) 필드로 선언되므로 클래스 수준에서 사용할 수 있습니다.
+
+//"MyProperty": 종속성 속성의 이름을 지정합니다. 나중에 XAML에서 이 이름을 사용하여 해당 속성을 식별합니다.
+//typeof(string): 종속성 속성의 데이터 형식을 지정합니다. 이 예제에서는 문자열(string) 형식을 사용합니다.
+//typeof(MyClass): 종속성 속성을 소유하는 클래스를 지정합니다. 종속성 속성이 MyClass 클래스에 속하게 됩니다.
+//new PropertyMetadata("DefaultValue"): 종속성 속성의 메타데이터를 설정합니다. 여기에는 기본값("DefaultValue")을 설정하거나 속성 변경 시 호출할 콜백 메서드 등을 지정할 수 있습니다.
+~~~
+
+  - 아래는 MainWindow와 UserControl1에서 동시에 데이터가 바인딩되며 바뀌는 것을 볼 수 있다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="200" Width="200">
+    <StackPanel>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(MainWindow), new PropertyMetadata("qweqwe"));
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</UserControl>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/842a874f-3ea8-44bf-bbbf-eb09f62bf18d)
+
+<br/>
+
+  - DependencyProperty는 다른 Window로 넘어갈 수는 없는듯 하다..?
+    - 하지만 테스트 결과, 하나의 Window에서 그 안에 출력 할 수 있는 화면단에는 전부 넘어갈 수 있다고 추측할 수 있다
+
+<br/>
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/acb7a3d4-5449-4daf-80ec-675dd05fd990)
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="200" Width="200">
+    <StackPanel>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Content="Click" Click="Button_Click"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Window1 window1 = new Window1();
+            window1.Show();
+        }
+
+        public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(MainWindow), new PropertyMetadata("qweqwe"));
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#Window1.xaml
+~~~c#
+<Window x:Class="WpfApp1.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Window1" Height="450" Width="800">
+    <StackPanel>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#Window1.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class Window1 : Window
+    {
+        public Window1()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(Window1), new PropertyMetadata("123123"));
+    }
+}
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8dbeeaa6-ab96-4f26-9e83-3120cdb1735e)
+
+###### [DependencyProperty](#dependencyproperty)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Command
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Button Width="100" Height="100" Content="버튼" Click="Button_Click"/>
+</Grid>
+~~~
+
+#MainWindow.xaml.cs
+~~~c#
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("클릭");
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151135525-1bbd60ec-f756-408b-9a57-7476f15ee9cc.png">
+
+<br/>
+<br/>
+
+  - MVVM패턴을 위 Button에 Command로 Click이벤트를 사용하는 방법
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Button Width="100" Height="100" Content="버튼" Command="{Binding OneClick}"/>
+</Grid>
+~~~
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows.Input; <- ICommand실행시 참조필요
+
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    private Command m_OneClick;
+    public ICommand OneClick
+    {
+        get { return m_OneClick = new Command(OneClickEvent); }
+    }
+
+    private void OneClickEvent(object obj)
+    {
+        MessageBox.Show("클릭 이벤트 발생");
+    }
+}
+~~~
+
+#Command.cs
+~~~
+using System.Windows.Input;
+
+public class Command : ICommand
+{
+    Action<object> _execute;
+
+    public event EventHandler? CanExecuteChanged;
+
+    public Command(Action<object> execute)
+    {
+        _execute = execute;
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        _execute(parameter);
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/151136487-7cbf3db9-aa5e-41f8-aef9-1401baabe5af.png">
+
+<br/>
+<br/>
+
+  - #XAML.cs부분을 이렇게 따로 수정해서 사용하는것이 보기 편함
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows.Input;
+
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        OneClick = new Command(OneClickEvent);
+    }
+
+    public ICommand OneClick { get; set; }
+
+    private void OneClickEvent(object obj)
+    {
+        MessageBox.Show("클릭 이벤트 발생");
+    }
+}
+~~~
+
+###### [Command](#command)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Button + Command다른클래스에서 사용
+
+  - 다른 클래스 라이브러리에서 ICommand사용하기1
+    - 다른 클래스 라이브러리에서 command를 사용하기 위해서는, 어려운 속성들을 지정해 주어야 한다
+   
+<br/>
+
+  - Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"
+    - RelativeSource : 바인딩 소스를 지정하기 위해 사용되는 속성
+    - FindAncestor : 지정된 조상 타입을 검색하여 해당 조상을 바인딩 소스로 사용한다
+    - AncestorType={x:Type Window} : 조상의 타입을 Window로 지정합니다. 즉, 가장 가까운 Window 타입의 조상을 찾는다
+    - AncestorLevel=1 : 얼마나 많은 수준의 조상을 건너뛸지 지정합니다. 여기서는 첫 번째 Window 조상을 사용한다
+    - Path=DataContext.OneClick : 바인딩 소스의 OneClick 속성을 지정한다. DataContext는 일반적으로 뷰 모델의 인스턴스를 참조하는데 사용된다
+
+#Wpf프로젝트(클래스 라이브러리1 참조중)  
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
+        mc:Ignorable="d"
+        Title="MainWindow" SizeToContent="WidthAndHeight">
+
+    <Grid Width="300" Height="300">
+        <ctrl:UserControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("클릭 이벤트 발생");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#클래스라이브러리1  
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfLibrary1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfLibrary1"
+             mc:Ignorable="d" 
+             Height="50" Width="80">
+    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
+</UserControl>
+~~~
+
+<br/>
+
+  - 다른 클래스 라이브러리에서 ICommand사용하기2
+
+#Wpf프로젝트(클래스 라이브러리1 ,2  참조중)  
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:vm="clr-namespace:WpfLibrary2;assembly=WpfLibrary2"
+        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
+        mc:Ignorable="d"
+        Title="MainWindow" SizeToContent="WidthAndHeight">
+
+    <Window.DataContext>
+        <vm:MainView/>
+    </Window.DataContext>
+    
+    <Grid Width="300" Height="300">
+        <ctrl:UserControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#클래스라이브러리1  
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfLibrary1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfLibrary1"
+             mc:Ignorable="d" 
+             Height="50" Width="80">
+    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
+</UserControl>
+~~~
+
+<br/>
+
+#클래스라이브러리2  
+#MainView.cs
+~~~c#
+using System.Windows.Input;
+using System.Windows;
+using WpfApp1;
+
+namespace WpfLibrary2
+{
+    public class MainView
+    {
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("클릭 이벤트 발생");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
+
+###### [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# static class를 활용한 싱글톤 데이터 교환 구조
+  - 싱글톤 구조는 작은 프로그램을 만들때 유용하다
+  - 구조가 쉽고 간결하다
+  - 하지만 규모가 커지면, 속도가 느려지고 부하가 걸릴 수 있다
+
+<br/>
+
+  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
+  - [Workspace를 통한 UserControl끼리의 값 전달(ContentControl)](#workspace를-통한-usercontrol끼리의-값-전달contentcontrol)
+
+###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Workspace를 통한 UserControl끼리의 값 전달
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+
+    <local:UserControl1 Grid.Column="0" Grid.Row="0"></local:UserControl1>
+    <local:UserControl2 Grid.Column="1" Grid.Row="0"></local:UserControl2>
+</Grid>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock Text="UserControl1" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl1_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    <Button Width="100" Height="30" Content="1->2" Margin="5" Command="{Binding Oneclick}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl1.xaml.cs
+~~~c#
+public partial class UserControl1 : UserControl
+{
+    public UserControl1()
+    {
+        InitializeComponent();
+        this.DataContext = Workspace.Instance.userControl1_model;
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1_model.cs
+~~~c#
+public class UserControl1_model : INotifyPropertyChanged
+{
+
+    private string m_UserControl1_text;
+    public string UserControl1_text
+    {
+        get { return m_UserControl1_text; }
+        set
+        {
+            if (m_UserControl1_text != value)
+            {
+                m_UserControl1_text = value;
+                Notify("UserControl1_text");
+                Workspace.Instance.userControl2_model.UserControl2_text = value;
+            }
+        }
+    }
+
+    private Command m_Oneclick;
+    public ICommand Oneclick
+    {
+        get { return m_Oneclick = new Command(Oneclickevent); }
+    }
+
+    private void Oneclickevent(object obj)
+    {
+        Workspace.Instance.userControl2_model.UserControl2_textblock = UserControl1_text;
+    }
+
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock x:Name="tblock" Text="UserControl2" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    <TextBlock Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_textblock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl2.xaml.cs
+~~~c#
+public partial class UserControl2 : UserControl
+{
+    public UserControl2()
+    {
+        InitializeComponent();
+        this.DataContext = Workspace.Instance.userControl2_model;
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2_model.cs
+~~~c#
+public class UserControl2_model : INotifyPropertyChanged
+{
+    public UserControl2_model()
+    {
+
+    }
+
+    private string m_UserControl2_text;
+    public string UserControl2_text
+    {
+        get { return m_UserControl2_text; }
+        set
+        {
+            if (m_UserControl2_text != value)
+            {
+                m_UserControl2_text = value;
+                Notify("UserControl2_text");
+                Workspace.Instance.userControl1_model.UserControl1_text = value;
+            }
+        }
+    }
+
+    private string m_UserControl2_textblock;
+    public string UserControl2_textblock
+    {
+        get { return m_UserControl2_textblock; }
+        set
+        {
+            if (m_UserControl2_textblock != value)
+            {
+                m_UserControl2_textblock = value;
+                Notify("UserControl2_textblock");
+            }
+        }
+    }
+        
+
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Workspace.cs
+~~~c#
+class Workspace : INotifyPropertyChanged
+{
+    static Workspace m_Instance = new Workspace();
+
+    public static Workspace Instance
+    {
+        get { return m_Instance; }
+    }
+
+    private UserControl1_model m_userControl1_model = new UserControl1_model();
+    public UserControl1_model userControl1_model
+    {
+        get { return m_userControl1_model; }
+        set
+        {
+            if (m_userControl1_model != value)
+            {
+                m_userControl1_model = value;
+                Notify("userControl1_model");
+
+            }
+        }
+    }
+
+    private UserControl2_model m_userControl2_model = new UserControl2_model();
+    public UserControl2_model userControl2_model
+    {
+        get { return m_userControl2_model; }
+        set
+        {
+            if (m_userControl2_model != value)
+            {
+                m_userControl2_model = value;
+                Notify("userControl2_model");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158002074-53c25c5e-e955-44b3-8f25-03c27f839310.gif" height="400" width="400">
+
+###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Workspace를 통한 UserControl끼리의 값 전달(ContentControl)
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+
+    <ContentControl Content="{Binding View1Content}"></ContentControl>
+    <ContentControl Grid.Column="1" Content="{Binding View2Content}"></ContentControl>
+</Grid>
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock Text="UserControl1" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl1_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl1.xaml.cs
+~~~c#
+public partial class UserControl1 : UserControl, INotifyPropertyChanged
+{
+    public UserControl1()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    private string m_UserControl1_text;
+    public string UserControl1_text
+    {
+        get { return m_UserControl1_text; }
+        set
+        {
+            if (m_UserControl1_text != value)
+            {
+                m_UserControl1_text = value;
+                RaisePropertyChanged("UserControl1_text");
+                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>UserControl1_text 작동");
+                Workspace.Instance.View2Content.UserControl2_text = value;
+            }
+        }
+    }
+
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        if (PropertyChanged != null)
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<StackPanel Background="White" VerticalAlignment="Center">
+    <TextBlock x:Name="tblock" Text="UserControl2" FontSize="20" HorizontalAlignment="Center"/>
+    <TextBox x:Name="tbox" Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+</StackPanel>
+~~~
+
+<br/>
+
+#UserControl2.xaml.cs
+~~~c#
+public partial class UserControl2 : UserControl, INotifyPropertyChanged
+{
+    public UserControl2()
+    {
+        InitializeComponent();
+        this.DataContext = this;
+    }
+
+    private string m_UserControl2_text;
+    public string UserControl2_text
+    {
+        get { return m_UserControl2_text; }
+        set
+        {
+            if(m_UserControl2_text != value)
+            {
+                m_UserControl2_text = value;
+                RaisePropertyChanged("UserControl2_text");
+                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>UserControl2_text 작동");
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        if (PropertyChanged != null)
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+#Workspace.cs
+~~~c#
+class Workspace : INotifyPropertyChanged
+{
+    static Workspace m_Instance = new Workspace();
+
+    public static Workspace Instance
+    {
+        get { return m_Instance; }
+    }
+
+    private UserControl1 m_View1Content = new UserControl1();
+    public UserControl1 View1Content
+    {
+        get { return m_View1Content; }
+        set
+        {
+            if (m_View1Content != value)
+            {
+                m_View1Content = value;
+                Notify("View1Content");
+
+            }
+        }
+    }
+
+    private UserControl2 m_View2Content = new UserControl2();
+    public UserControl2 View2Content
+    {
+        get { return m_View2Content; }
+        set
+        {
+            if (m_View2Content != value)
+            {
+                m_View2Content = value;
+                Notify("View1Content");
+
+            }
+        }
+    }
+
+    #region INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Notify([CallerMemberName] string propertyName = null)
+    {
+        if (this.PropertyChanged != null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    #endregion
+}
+~~~
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/158002648-4572bcdb-a67c-4d57-b337-67e14c2d493b.gif" width="400" height="400">
+
+###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# WPF의 다양한 프로젝트/프로젝트 참조하기
+  - 현재는 WPF로 개발을 할때 작은 프로그램은 싱글톤으로 개발하기도 하지만, 규모가 커지만 싱글톤으로 개발되지 않는다.
+  - 따라서, 프로젝트를 여러개 추가하여 참조하며 사용하게 된다
+  - 사용자 정의 컨트롤 라이브러리 와 사용자 지정 컨트롤 라이브러리의 차이점
+    - 사용자 정의 컨트롤은 UserControl 객체를 상속받고, 사용자 지정 컨트롤은 Control 객체를 상속 받는다
+    - UserControl 객체는 ContentControl 객체를 상속받고 ContentControl 객체는 Control 객체와  IAddChild 인터페이스를 상속받는다.
+    - 사용자 지정 컨트롤이 사용자 정의 컨트롤 보다 더 상위에 있음
+    - 사용자 지정 컨트롤이 사용자 정의 컨트롤 보다 좀 더 커스텀한 구현이 가능하다
+    - xaml과 함께하는(좀 더 편하고,단순한) 사용자 컨트롤 제작을 한다면 사용자 정의 컨트롤을 사용하고,  좀 더 구체적이고 세부적인 사용자 컨트롤 제작을 한다면 사용자 지정 컨트롤을 사용하면 됨
+
+<br/>
+
+  - .NET Framework라면 아래의 라이브러리를 사용
+
+<br/>
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d69e8e7a-f012-4ae1-b698-84f89746774d)
+
+<br/>
+
+  - .NET 이라면, 아래의 클래스 라이브러리를 이용한다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9fdc2dd0-5993-4914-b3c1-6923dd4584f9)
+
+<br/>
+
+  - 다른 프로젝트 참조하기
+    - CLR네임 스페이스 참조
+    - XML네임 스페이스 참조
+ 
+ <br>
+ 
+   - 사전준비로 종속성, 참조 연결을 먼저 해준다.
+     - .NET 6.0에서는 '종속성'에서 마우스 우클릭 -> 프로젝트 참조 추가
+     - .NET Framework 4.7.2에서는 '참조'에서 마우스 우클릭 -> 참조 추가
+<img src="https://user-images.githubusercontent.com/39178978/153415481-826baaf5-1446-4596-a8cf-be1d3d81fca6.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153415583-7f5efdb4-3ce4-4a3a-8585-56646de09225.png">
+
+<br/>
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153415865-36d0e705-c45c-40fb-8fb8-5a7037140a5b.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153415903-f7ed0b43-d9ea-4e59-a1d5-5262ac3c1665.png">
+
+그 후에는 뒤를 따르면 된다.
+ 
+<br/>
+
+  - CLR네임 스페이스 참조
+    - xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project" 이용한다
+    - xmlns:(접두사)="clr-namespace:(참조namespace명.경로);assembly=(namespace명)"
+    - 가령, NewFolder라는 폴더 안에 .cs의 class를 불러오려면, xmlns:reference_project="clr-namespace:Reference_project.NewFolder;assembly=Reference_project" 를 사용해야함
+
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp16.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <reference_project:Car x:Key="reference_project_car"/>
+    </Window.Resources>
+    <Grid>
+        <Button Width="100" Height="30" Content="{StaticResource reference_project_car}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#Reference_project.xaml.cs
+~~~c#
+public class Car
+{
+
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/39178978/153417714-d042ca1b-9720-4e59-bac5-a613fc233078.png">
+
+<br/>
+
+<img src="https://user-images.githubusercontent.com/39178978/153417813-68f3e880-56c2-45d9-beb3-76a4d105ee7b.png">
+
+###### [WPF의 다양한 프로젝트/프로젝트 참조하기](#wpf의-다양한-프로젝트프로젝트-참조하기)
+###### [Top](#top)
+
 <br/>
 <br/>
 
@@ -5199,2201 +7375,6 @@ namespace WpfApp1
 ~~~
 
 ###### [Converter](#Converter)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# 데이터 연결하기
-  - [자기 자신 class](#자기-자신-class)
-  - [다른 class](#다른-class)
-  - [xaml_Window.DataContext](#xaml_windowdatacontext)
-  - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
-
-<br/>
-
-###### [데이터 연결하기](#데이터-연결하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 자기 자신 class
-  - 현재 화면에, this(즉 자기 자신)의 데이터를 연결하겠다
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-    <Grid>
-        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace test1
-{
-    /// <summary>
-    /// MainWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        private string m_tbValue = "testmodel";
-        public string tbValue
-        {
-            get { return m_tbValue; }
-            set
-            {
-                if (m_tbValue != value)
-                {
-                    m_tbValue = value;
-                }
-            }
-        }
-    }
-}
-~~~
-
-###### [데이터 연결하기](#데이터-연결하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 다른 class
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-    <Grid>
-        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace test1
-{
-    /// <summary>
-    /// MainWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = new Bus();
-        }
-    }
-
-    public class Bus
-    {
-        public Bus()
-        {
-
-        }
-
-        private string m_tbValue = "testmodel";
-        public string tbValue
-        {
-            get { return m_tbValue; }
-            set
-            {
-                if (m_tbValue != value)
-                {
-                    m_tbValue = value;
-                }
-            }
-        }
-    }
-}
-~~~
-
-###### [데이터 연결하기](#데이터-연결하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-# xaml_Window.DataContext
-  - Window.DataContext 속성은 하나만 설정이 가능하다
-  - xaml에 딸려 오는 xaml.cs만 가능한 것이 아니라, 일반 cs파일안에 class라면 DataContext작업을 할 수 있다
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-
-    <Window.DataContext>
-        <local:Bus/>
-    </Window.DataContext>
-
-    <Grid>
-        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace test1
-{
-    /// <summary>
-    /// MainWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
-    }
-
-    public class Bus
-    {
-        public Bus()
-        {
-
-        }
-
-        private string m_tbValue = "testmodel";
-        public string tbValue
-        {
-            get { return m_tbValue; }
-            set
-            {
-                if (m_tbValue != value)
-                {
-                    m_tbValue = value;
-                }
-            }
-        }
-    }
-}
-~~~
-
-###### [데이터 연결하기](#데이터-연결하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# xaml_Window.DataContext_다른프로젝트
-  - 참조 연결하기
-    - 현재 있는것 여기에 연결하기
-  - 네임스페이스 지정하기
-  - Window.DataContext 사용하기
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="test1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test1"
-        xmlns:Data="clr-namespace:Sample.Data;assembly=Sample.Data"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="426">
-
-    <Window.DataContext>
-        <Data:MainView/>
-    </Window.DataContext>
-
-    <Grid>
-        <TextBlock Width="100" Height="100" Text="{Binding tbValue}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace test1
-{
-    /// <summary>
-    /// MainWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
-    }
-}
-~~~
-
-<br/>
-
-#Sample.Data프로젝트
-#MainView.cs
-~~~c#
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sample.Data
-{
-    public class MainView
-    {
-        public MainView()
-        {
-
-        }
-
-        private string m_tbValue = "testmodel";
-        public string tbValue
-        {
-            get { return m_tbValue; }
-            set
-            {
-                if (m_tbValue != value)
-                {
-                    m_tbValue = value;
-                }
-            }
-        }
-    }
-}
-~~~
-
-###### [데이터 연결하기](#데이터-연결하기)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# ContentControl,ItemsControl
-  - ContentControl과 ItemsControl은 매우 중요하고, 핵심이 되는 부분들이 있기 때문에 여기서 따로 상세히 설명하도록 한다
-  - ContentControl : 자신의 자식으로 Content 하나를 받을 수 있는 컨트롤
-  - ItemsControl : 리스트 또는 컬렉션처럼 데이터를 통해 다수의 반복되는 자식들을 가지는 컨트롤
-    - ControlTemplate : Control의 그 자체의 외형을 정의하는 요소
-    - ContentControl은 ContentPresenter
-    - ItemsControl은 ItemsPresenter
-  - DataTemplate : Content의 내용을 출력할 외형을 결정하는 방법
-    - 화면에 그려 줄 일종의 UI 템플릿을 미리 만들어 놓고, 적용 가능한 상황이 되면 기존 객체의 렌더링 대신 이 UI 템플릿의 렌더링을 사용한다는 것
-    - ItemsControl은 ItemsSource속성 사용
-  - ItemsPanelTemplate : DataTemplate에 의해 생성된 엘리먼트들이 ItemsPanelTemplate에 의해 생성된 Panel의 자식으로 배치된다
-
-<br/>
-
-  - [ContentControl](#contentcontrol)
-  - [ItemsControl](#itemscontrol)
-
-###### [ContentControl,ItemsControl](#contentcontrolitemscontrol)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# ContentControl
-  - ItemsControl과 비교해서 사용도가 적을것 같다
-  - 다른 컨트롤을 감쌀 수 있기 때문에 DataContext를 지정할 수 없는 UI 객체에 바인딩 해주는 용도로 쓰거나 데이터 속성에 반응해 컨트롤의 외관(DataTemplate)을 변경시켜주는 용도로 활용할 수 있다.
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp2.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp2"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="300" Width="300">
-    <Window.DataContext>
-        <local:MainWindowViewModel/>
-    </Window.DataContext>
-
-
-    <ContentControl>
-        <ContentControl.Style>
-            <Style TargetType="{x:Type ContentControl}">
-                <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
-            </Style>
-        </ContentControl.Style>
-        <ContentControl.Template>
-            <!--템플릿 외형-->
-            <ControlTemplate TargetType="{x:Type ContentControl}">
-                <StackPanel>
-                    <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
-                        <ContentPresenter ContentSource="Content"/>
-                    </Border>
-                    <Button Content="버튼~" Width="100" Height="30"/>
-                </StackPanel>
-            </ControlTemplate>
-        </ContentControl.Template>
-
-        <ContentControl.ContentTemplate>
-            <!--데이터 외형-->
-            <DataTemplate>
-                <local:UserControl1/>
-            </DataTemplate>
-        </ContentControl.ContentTemplate>
-    </ContentControl>
-</Window>
-~~~
-
-<br/>
-
-#MainWindowViewModel.cs
-~~~c#
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace WpfApp2
-{
-    public class MainWindowViewModel : INotifyPropertyChanged
-    {
-        public MainWindowViewModel()
-        {
-            Str = "qweqweqwe";
-        }
-
-        private string _str;
-        public string Str
-        {
-            get { return _str; }
-            set
-            {
-                _str = value;
-            }
-        }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void Notify([CallerMemberName] string propertyName = null)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
-
-        private int _thkness = 10;
-        public int Thkness
-        {
-            get { return _thkness; }
-            set
-            {
-                _thkness = value;
-            }
-        }
-    }
-}
-~~~
-
-<br/>
-
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfApp2.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfApp2"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Content>
-        <StackPanel>
-            <Button Content="버튼"/>
-            <TextBlock Text="텍스트 불럭"/>
-        </StackPanel>
-    </UserControl.Content>
-</UserControl>
-~~~
-
-  - 데이터 속성에 반응해 컨트롤의 외관(DataTemplate)을 변경시키기
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="200" Width="200">
-    <Window.Resources>
-        <local:Cust x:Key="aaa"/>
-        <DataTemplate x:Key="template1">
-            <StackPanel>
-                <StackPanel.DataContext>
-                    <local:Cust/>
-                </StackPanel.DataContext>
-                <Button Width="100" Height="30" Content="{Binding Name}"/>
-                <Button Width="100" Height="30" Content="{Binding Age}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="template2">
-            <StackPanel>
-                <StackPanel.DataContext>
-                    <local:Cust/>
-                </StackPanel.DataContext>
-                <TextBlock Width="100" Height="30" Text="{Binding Name}"/>
-                <TextBlock Width="100" Height="30" Text="{Binding Age}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="template3">
-            <StackPanel>
-                <StackPanel.DataContext>
-                    <local:Cust/>
-                </StackPanel.DataContext>
-                <Button Width="50" Height="30" Content="{Binding Name}"/>
-                <Button Width="50" Height="30" Content="{Binding Age}"/>
-            </StackPanel>
-        </DataTemplate>
-    </Window.Resources>
-    
-    
-    <StackPanel>
-        <Button Width="100" Height="30" Click="Button_Click" Content="템플릿 변경"/>
-
-        <ContentControl>
-            <ContentControl.Style>
-                <Style TargetType="{x:Type ContentControl}">
-                    <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding num}" Value="0">
-                            <!--데이터외형변경-->
-                            <Setter Property="ContentTemplate" Value="{StaticResource template1}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding num}" Value="1">
-                            <!--데이터외형변경-->
-                            <Setter Property="ContentTemplate" Value="{StaticResource template2}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding num}" Value="2">
-                            <!--데이터외형변경-->
-                            <Setter Property="ContentTemplate" Value="{StaticResource template3}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ContentControl.Style>
-            <ContentControl.Template>
-                <!--템플릿 외형-->
-                <ControlTemplate TargetType="{x:Type ContentControl}">
-                    <StackPanel>
-                        <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
-                            <ContentPresenter ContentSource="Content"/>
-                        </Border>
-                        <Button Content="버튼~" Width="100" Height="30"/>
-                    </StackPanel>
-                </ControlTemplate>
-            </ContentControl.Template>
-        </ContentControl>
-    </StackPanel>
-    
-    
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows;
-
-namespace WpfApp1
-{
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        private int _thkness = 10;
-        public int Thkness
-        {
-            get { return _thkness; }
-            set
-            {
-                _thkness = value;
-            }
-        }
-
-        private int _Num = 0;
-        public int num
-        {
-            get { return _Num; }
-            set
-            {
-                _Num = value;
-                Notify("num");
-            }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            num++;
-        }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void Notify([CallerMemberName] string propertyName = null)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
-
-        private Cust _custData;
-        public Cust CustData
-        {
-            get { return _custData; }
-            set
-            {
-                _custData = value;
-                Notify("CustData");
-            }
-        }
-    }
-}
-~~~
-
-###### [ContentControl,ItemsControl](#contentcontrolitemscontrol)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# ItemsControl
-  - ControlTemplate안에 있는 속성들을 바인딩 하기 위해서는 TemplateBinding을 사용하여야 하고 이것은 바로 위에 있는 style로 지정한 값을 가져오게 된다.
-  - 그리고 style안에서 외부에서 바인딩할 값을 가져 올 수 있다
-  - 또한 주석과 같이, style안에 property를 지정해 그 안에서 모드 값을 처리할 수도 있다
-  - 마지막으로, TargetType의 값은 해당하는 컨트롤의 이름으로 하는것이 제일 무방하다.(ControlTemplate의 TargetType에 따라서 사용 할 수 있는 기본 이벤트와 같은 것들이 달라지니 참고해야 한다)
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp2.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp2"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="300" Width="300">
-    <Window.DataContext>
-        <local:MainWindowViewModel/>
-    </Window.DataContext>
-
-
-    <ItemsControl ItemsSource="{Binding CustList}">
-        <ItemsControl.Style>
-            <Style TargetType="{x:Type ItemsControl}">
-                <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
-            </Style>
-        </ItemsControl.Style>
-        <ItemsControl.Template>  <!--템플릿 외형-->
-            <ControlTemplate TargetType="{x:Type ItemsControl}">
-                <StackPanel>
-                    <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
-                        <ItemsPresenter/>
-                    </Border>
-                    <Button Content="버튼~" Width="100" Height="30"/>
-                </StackPanel>
-            </ControlTemplate>
-        </ItemsControl.Template>
-
-        <ItemsControl.ItemTemplate> <!--데이터 외형-->
-            <DataTemplate>
-                <local:UserControl1/>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-
-        <ItemsControl.ItemsPanel> <!--패널 정렬-->
-            <ItemsPanelTemplate>
-                <StackPanel/>
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-    </ItemsControl>
-
-    <!--<ItemsControl ItemsSource="{Binding CustList}">
-        <ItemsControl.Style>
-            <Style TargetType="{x:Type ItemsControl}">
-                <Setter Property="BorderThickness" Value="{Binding Thkness}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ItemsControl}">
-                            <StackPanel>
-                                <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Red">
-                                    <ItemsPresenter/>
-                                </Border>
-                                <Button Content="버튼~" Width="100" Height="30"/>
-                            </StackPanel>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="ItemTemplate">
-                    <Setter.Value>
-                        <DataTemplate>
-                            <local:UserControl1/>
-                        </DataTemplate>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="ItemsPanel">
-                    <Setter.Value>
-                        <ItemsPanelTemplate>
-                            <StackPanel/>
-                        </ItemsPanelTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </ItemsControl.Style>
-    </ItemsControl>-->
-
-</Window>
-~~~
-
-<br/>
-
-#MainWindowViewModel.cs
-~~~c#
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace WpfApp2
-{
-    public class MainWindowViewModel : INotifyPropertyChanged
-    {
-        public MainWindowViewModel()
-        {
-            CustList = new ObservableCollection<Cust>();
-            CustList.Add(new Cust() { Name = "John", Age = "20" });
-            CustList.Add(new Cust() { Name = "Mary", Age = "30" });
-            CustList.Add(new Cust() { Name = "Peter", Age = "40" });
-        }
-
-        private ObservableCollection<Cust> _custList;
-        public ObservableCollection<Cust> CustList
-        {
-            get { return _custList; }
-            set
-            {
-                _custList = value;
-            }
-        }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void Notify([CallerMemberName] string propertyName = null)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
-
-        private int _thkness = 10;
-        public int Thkness
-        {
-            get { return _thkness; }
-            set
-            {
-                _thkness = value;
-            }
-        }
-    }
-}
-~~~
-
-<br/>
-
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfApp2.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfApp2"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <Button Content="{Binding Name}"/>
-        <TextBlock Text="{Binding Age}"/>
-    </StackPanel>
-</UserControl>
-~~~
-
-<br/>
-
-#Cust.cs
-~~~c#
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace WpfApp2
-{
-    public class Cust : INotifyPropertyChanged
-    {
-        private string _name;
-        public string Name
-        {
-            get { return _name; }
-            set
-            {
-                _name = value;
-            }
-        }
-
-        private string _age;
-        public string Age
-        {
-            get { return _age; }
-            set
-            {
-                _age = value;
-            }
-        }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void Notify([CallerMemberName] string propertyName = null)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
-    }
-}
-~~~
-
-###### [ContentControl,ItemsControl](#contentcontrolitemscontrol)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# ObservableCollection
-  - ObservableCollection 과 List차이 : WPF에서는 ListBox와ListView같은 곳에서 바인딩 사용시(ItemSource) ObserableColletion을 대부분 사용하게 된다. ObserableColletion는 UI에서 실시간으로 반영을 해주기 때문이다, 그러나 일반적인 List 는 변경된 List의 내용을 UI 에서 실시간으로 반영하지 않는다
-
-  - List
-  
-#MainWindow.xaml
-~~~c#
-<StackPanel>
-    <ListBox ItemsSource="{Binding Apple_list}">
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Name}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Price}"/>
-                </Grid>
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
-    <Button x:Name="btn" Width="100" Content="버튼" Click="btn_Click"/>
-</StackPanel>
-~~~
-
-<br/>
-  
-#MainWindow.xaml.cs
-~~~c#
-public partial class MainWindow : Window, INotifyPropertyChanged
-{
-    public MainWindow()
-    {
-        InitializeComponent();
-        this.DataContext = this;
-        Apple_list = new List<Apple>();
-
-    }
-
-    private List<Apple> m_Apple_list;
-    public List<Apple> Apple_list
-    {
-        get { return m_Apple_list; }
-        set
-        {
-            if (m_Apple_list != value)
-            {
-                m_Apple_list = value;
-                Norty("Apple_list");
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Norty(string name)
-    {
-        PropertyChangedEventHandler handler = PropertyChanged;
-        if (handler != null)
-        {
-            handler(this, new PropertyChangedEventArgs(name));
-        }
-    }
-    #endregion
-
-    private void btn_Click(object sender, RoutedEventArgs e)
-    {
-        Apple_list.Add(new Apple() { Name = "사과", Price = 1000 });
-    }
-}
-
-public class Apple : INotifyPropertyChanged
-{
-    private string m_Name = "0";
-    public string Name
-    {
-        get { return m_Name; }
-        set
-        {
-            if (m_Name != value)
-            {
-                m_Name = value;
-                Norty("Price");
-            }
-        }
-    }
-
-    private int m_Price = 0;
-    public int Price
-    {
-        get { return m_Price; }
-        set
-        {
-            if (m_Price != value)
-            {
-                m_Price = value;
-                Norty("Price");
-            }
-        }
-    }
-
-    public Apple()
-    {
-
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Norty(string name)
-    {
-        PropertyChangedEventHandler handler = PropertyChanged;
-        if (handler != null)
-        {
-            handler(this, new PropertyChangedEventArgs(name));
-        }
-    }
-    #endregion
-}
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/152622781-0aeb05bd-ffef-4ab3-a79c-a3df31d9b71d.png">
-  - 버튼 클릭시 List가 만들어 지고 있지만, UI에 실시간으로 반영되고 있지 않다.
-
-<br/><br/>
-
-  - ObservableCollection  
-
-#MainWindow.xaml.cs
-~~~c#
-public partial class MainWindow : Window, INotifyPropertyChanged
-{
-    public MainWindow()
-    {
-        InitializeComponent();
-        this.DataContext = this;
-        Apple_list = new ObservableCollection<Apple>();
-
-    }
-
-    private ObservableCollection<Apple> m_Apple_list;
-    public ObservableCollection<Apple> Apple_list
-    {
-        get { return m_Apple_list; }
-        set
-        {
-            if (m_Apple_list != value)
-            {
-                m_Apple_list = value;
-                Norty("Apple_list");
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Norty(string name)
-    {
-        PropertyChangedEventHandler handler = PropertyChanged;
-        if (handler != null)
-        {
-            handler(this, new PropertyChangedEventArgs(name));
-        }
-    }
-    #endregion
-
-    private void btn_Click(object sender, RoutedEventArgs e)
-    {
-        Apple_list.Add(new Apple() { Name = "사과", Price = 1000 });
-    }
-}
-
-public class Apple : INotifyPropertyChanged
-{
-    private string m_Name = "0";
-    public string Name
-    {
-        get { return m_Name; }
-        set
-        {
-            if (m_Name != value)
-            {
-                m_Name = value;
-                Norty("Price");
-            }
-        }
-    }
-
-    private int m_Price = 0;
-    public int Price
-    {
-        get { return m_Price; }
-        set
-        {
-            if (m_Price != value)
-            {
-                m_Price = value;
-                Norty("Price");
-            }
-        }
-    }
-
-    public Apple()
-    {
-
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Norty(string name)
-    {
-        PropertyChangedEventHandler handler = PropertyChanged;
-        if (handler != null)
-        {
-            handler(this, new PropertyChangedEventArgs(name));
-        }
-    }
-    #endregion
-}
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/152622892-24a626c9-c433-48a7-86e7-a229d61311ab.png">
-
-###### [ObservableCollection](#observablecollection)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# INotifyPropertyChanged
-  - 인터페이스로써, 속성 값이 변경 되었을 때 알림을 준다. 예를 들어 디자인 폼에서 속성을 변경 했을때 백단의 데이터까지 바뀌게 해준다.
-
-#.cs
-~~~
-public class Class1 : INotifyPropertyChanged
-{
-    private string m_Name;
-    public string Name
-    {
-        get { return m_Name; }
-        set
-        {
-            if(m_Name != value)
-            {
-                m_Name = value;
-                Notify("Name");
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Notify([CallerMemberName] string propertyName = null)
-    {
-        if (this.PropertyChanged != null)
-        {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    #endregion
-}
-~~~
-
-###### [INotifyPropertyChanged](#inotifypropertychanged)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# DependencyProperty
-  - 인터페이스로써, 속성 값이 변경 되었을 때 알림을 준다. 예를 들어 디자인 폼에서 속성을 변경 했을때 백단의 데이터까지 바뀌게 해준다.
-    - 프로퍼티 값이 변경되었을 때 자동으로 어떤 일을 처리하게 할 수 있게 해주는 것
-    - 의존 프로퍼티를 사용하면 엘리먼트를 사용하는 시점에 프로퍼티 값이 결정되고, Static 변수이기 때문에 메모리 절약에 효과적이다
-
-// 의존 프로퍼티 등록
-~~~c#
-public static readonly DependencyProperty MyPropertyProperty =
-    DependencyProperty.Register("MyProperty", typeof(string), typeof(MyClass), new PropertyMetadata("DefaultValue"));
-
-
-//public static readonly DependencyProperty MyPropertyProperty: 이 줄은 종속성 속성을 정의합니다. MyProperty라는 이름의 종속성 속성을 만듭니다. 이것은 정적(public static) 필드로 선언되므로 클래스 수준에서 사용할 수 있습니다.
-
-//"MyProperty": 종속성 속성의 이름을 지정합니다. 나중에 XAML에서 이 이름을 사용하여 해당 속성을 식별합니다.
-//typeof(string): 종속성 속성의 데이터 형식을 지정합니다. 이 예제에서는 문자열(string) 형식을 사용합니다.
-//typeof(MyClass): 종속성 속성을 소유하는 클래스를 지정합니다. 종속성 속성이 MyClass 클래스에 속하게 됩니다.
-//new PropertyMetadata("DefaultValue"): 종속성 속성의 메타데이터를 설정합니다. 여기에는 기본값("DefaultValue")을 설정하거나 속성 변경 시 호출할 콜백 메서드 등을 지정할 수 있습니다.
-~~~
-
-  - 아래는 MainWindow와 UserControl1에서 동시에 데이터가 바인딩되며 바뀌는 것을 볼 수 있다
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="200" Width="200">
-    <StackPanel>
-        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:UserControl1/>
-    </StackPanel>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace WpfApp1
-{
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        public static readonly DependencyProperty MyPropertyProperty =
-    DependencyProperty.Register("MyProperty", typeof(string), typeof(MainWindow), new PropertyMetadata("qweqwe"));
-    }
-}
-~~~
-
-<br/>
-
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfApp1.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfApp1"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-    </Grid>
-</UserControl>
-~~~
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/842a874f-3ea8-44bf-bbbf-eb09f62bf18d)
-
-<br/>
-
-  - DependencyProperty는 다른 Window로 넘어갈 수는 없는듯 하다..?
-    - 하지만 테스트 결과, 하나의 Window에서 그 안에 출력 할 수 있는 화면단에는 전부 넘어갈 수 있다고 추측할 수 있다
-
-<br/>
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/acb7a3d4-5449-4daf-80ec-675dd05fd990)
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="200" Width="200">
-    <StackPanel>
-        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Content="Click" Click="Button_Click"/>
-        <local:UserControl1/>
-    </StackPanel>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace WpfApp1
-{
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Window1 window1 = new Window1();
-            window1.Show();
-        }
-
-        public static readonly DependencyProperty MyPropertyProperty =
-    DependencyProperty.Register("MyProperty", typeof(string), typeof(MainWindow), new PropertyMetadata("qweqwe"));
-    }
-}
-~~~
-
-<br/>
-
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfApp1.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfApp1"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-    </Grid>
-</UserControl>
-~~~
-
-<br/>
-
-#Window1.xaml
-~~~c#
-<Window x:Class="WpfApp1.Window1"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="Window1" Height="450" Width="800">
-    <StackPanel>
-        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:UserControl1/>
-    </StackPanel>
-</Window>
-~~~
-
-<br/>
-
-#Window1.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace WpfApp1
-{
-    public partial class Window1 : Window
-    {
-        public Window1()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        public static readonly DependencyProperty MyPropertyProperty =
-    DependencyProperty.Register("MyProperty", typeof(string), typeof(Window1), new PropertyMetadata("123123"));
-    }
-}
-~~~
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8dbeeaa6-ab96-4f26-9e83-3120cdb1735e)
-
-###### [DependencyProperty](#dependencyproperty)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Command
-
-#MainWindow.xaml
-~~~c#
-<Grid>
-    <Button Width="100" Height="100" Content="버튼" Click="Button_Click"/>
-</Grid>
-~~~
-
-#MainWindow.xaml.cs
-~~~c#
-public partial class MainWindow : Window
-{
-    public MainWindow()
-    {
-        InitializeComponent();
-    }
-
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-        MessageBox.Show("클릭");
-    }
-}
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/151135525-1bbd60ec-f756-408b-9a57-7476f15ee9cc.png">
-
-<br/>
-<br/>
-
-  - MVVM패턴을 위 Button에 Command로 Click이벤트를 사용하는 방법
-
-#MainWindow.xaml
-~~~c#
-<Grid>
-    <Button Width="100" Height="100" Content="버튼" Command="{Binding OneClick}"/>
-</Grid>
-~~~
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows.Input; <- ICommand실행시 참조필요
-
-public partial class MainWindow : Window
-{
-    public MainWindow()
-    {
-        InitializeComponent();
-        this.DataContext = this;
-    }
-
-    private Command m_OneClick;
-    public ICommand OneClick
-    {
-        get { return m_OneClick = new Command(OneClickEvent); }
-    }
-
-    private void OneClickEvent(object obj)
-    {
-        MessageBox.Show("클릭 이벤트 발생");
-    }
-}
-~~~
-
-#Command.cs
-~~~
-using System.Windows.Input;
-
-public class Command : ICommand
-{
-    Action<object> _execute;
-
-    public event EventHandler? CanExecuteChanged;
-
-    public Command(Action<object> execute)
-    {
-        _execute = execute;
-    }
-
-    public bool CanExecute(object? parameter)
-    {
-        return true;
-    }
-
-    public void Execute(object? parameter)
-    {
-        _execute(parameter);
-    }
-}
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/151136487-7cbf3db9-aa5e-41f8-aef9-1401baabe5af.png">
-
-<br/>
-<br/>
-
-  - #XAML.cs부분을 이렇게 따로 수정해서 사용하는것이 보기 편함
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows.Input;
-
-public partial class MainWindow : Window
-{
-    public MainWindow()
-    {
-        InitializeComponent();
-        this.DataContext = this;
-        OneClick = new Command(OneClickEvent);
-    }
-
-    public ICommand OneClick { get; set; }
-
-    private void OneClickEvent(object obj)
-    {
-        MessageBox.Show("클릭 이벤트 발생");
-    }
-}
-~~~
-
-###### [Command](#command)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Button + Command다른클래스에서 사용
-
-  - 다른 클래스 라이브러리에서 ICommand사용하기1
-    - 다른 클래스 라이브러리에서 command를 사용하기 위해서는, 어려운 속성들을 지정해 주어야 한다
-   
-<br/>
-
-  - Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"
-    - RelativeSource : 바인딩 소스를 지정하기 위해 사용되는 속성
-    - FindAncestor : 지정된 조상 타입을 검색하여 해당 조상을 바인딩 소스로 사용한다
-    - AncestorType={x:Type Window} : 조상의 타입을 Window로 지정합니다. 즉, 가장 가까운 Window 타입의 조상을 찾는다
-    - AncestorLevel=1 : 얼마나 많은 수준의 조상을 건너뛸지 지정합니다. 여기서는 첫 번째 Window 조상을 사용한다
-    - Path=DataContext.OneClick : 바인딩 소스의 OneClick 속성을 지정한다. DataContext는 일반적으로 뷰 모델의 인스턴스를 참조하는데 사용된다
-
-#Wpf프로젝트(클래스 라이브러리1 참조중)  
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
-        mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight">
-
-    <Grid Width="300" Height="300">
-        <ctrl:UserControl1/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-using System.Windows.Input;
-
-namespace WpfApp1
-{
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        private Command m_OneClick;
-        public ICommand OneClick
-        {
-            get { return m_OneClick = new Command(OneClickEvent); }
-        }
-
-        private void OneClickEvent(object obj)
-        {
-            MessageBox.Show("클릭 이벤트 발생");
-        }
-    }
-}
-~~~
-
-<br/>
-
-#Command.cs
-~~~c#
-using System;
-using System.Windows.Input;
-
-namespace WpfApp1
-{
-    public class Command : ICommand
-    {
-        Action<object> _execute;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public Command(Action<object> execute)
-        {
-            _execute = execute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _execute(parameter);
-        }
-    }
-}
-~~~
-
-<br/>
-
-#클래스라이브러리1  
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfLibrary1.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfLibrary1"
-             mc:Ignorable="d" 
-             Height="50" Width="80">
-    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
-</UserControl>
-~~~
-
-<br/>
-
-  - 다른 클래스 라이브러리에서 ICommand사용하기2
-
-#Wpf프로젝트(클래스 라이브러리1 ,2  참조중)  
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        xmlns:vm="clr-namespace:WpfLibrary2;assembly=WpfLibrary2"
-        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
-        mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight">
-
-    <Window.DataContext>
-        <vm:MainView/>
-    </Window.DataContext>
-    
-    <Grid Width="300" Height="300">
-        <ctrl:UserControl1/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#클래스라이브러리1  
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfLibrary1.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfLibrary1"
-             mc:Ignorable="d" 
-             Height="50" Width="80">
-    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
-</UserControl>
-~~~
-
-<br/>
-
-#클래스라이브러리2  
-#MainView.cs
-~~~c#
-using System.Windows.Input;
-using System.Windows;
-using WpfApp1;
-
-namespace WpfLibrary2
-{
-    public class MainView
-    {
-        private Command m_OneClick;
-        public ICommand OneClick
-        {
-            get { return m_OneClick = new Command(OneClickEvent); }
-        }
-
-        private void OneClickEvent(object obj)
-        {
-            MessageBox.Show("클릭 이벤트 발생");
-        }
-    }
-}
-~~~
-
-<br/>
-
-#Command.cs
-~~~c#
-using System;
-using System.Windows.Input;
-
-namespace WpfApp1
-{
-    public class Command : ICommand
-    {
-        Action<object> _execute;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public Command(Action<object> execute)
-        {
-            _execute = execute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _execute(parameter);
-        }
-    }
-}
-~~~
-
-###### [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# static class를 활용한 싱글톤 데이터 교환 구조
-  - 싱글톤 구조는 작은 프로그램을 만들때 유용하다
-  - 구조가 쉽고 간결하다
-  - 하지만 규모가 커지면, 속도가 느려지고 부하가 걸릴 수 있다
-
-<br/>
-
-  - [Workspace를 통한 UserControl끼리의 값 전달](#workspace를-통한-usercontrol끼리의-값-전달)
-  - [Workspace를 통한 UserControl끼리의 값 전달(ContentControl)](#workspace를-통한-usercontrol끼리의-값-전달contentcontrol)
-
-###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# Workspace를 통한 UserControl끼리의 값 전달
-
-#MainWindow.xaml
-~~~c#
-<Grid>
-    <Grid.ColumnDefinitions>
-        <ColumnDefinition/>
-        <ColumnDefinition/>
-    </Grid.ColumnDefinitions>
-
-    <local:UserControl1 Grid.Column="0" Grid.Row="0"></local:UserControl1>
-    <local:UserControl2 Grid.Column="1" Grid.Row="0"></local:UserControl2>
-</Grid>
-~~~
-
-<br/>
-
-#UserControl1.xaml
-~~~c#
-<StackPanel Background="White" VerticalAlignment="Center">
-    <TextBlock Text="UserControl1" FontSize="20" HorizontalAlignment="Center"/>
-    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl1_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-    <Button Width="100" Height="30" Content="1->2" Margin="5" Command="{Binding Oneclick}"/>
-</StackPanel>
-~~~
-
-<br/>
-
-#UserControl1.xaml.cs
-~~~c#
-public partial class UserControl1 : UserControl
-{
-    public UserControl1()
-    {
-        InitializeComponent();
-        this.DataContext = Workspace.Instance.userControl1_model;
-    }
-}
-~~~
-
-<br/>
-
-#UserControl1_model.cs
-~~~c#
-public class UserControl1_model : INotifyPropertyChanged
-{
-
-    private string m_UserControl1_text;
-    public string UserControl1_text
-    {
-        get { return m_UserControl1_text; }
-        set
-        {
-            if (m_UserControl1_text != value)
-            {
-                m_UserControl1_text = value;
-                Notify("UserControl1_text");
-                Workspace.Instance.userControl2_model.UserControl2_text = value;
-            }
-        }
-    }
-
-    private Command m_Oneclick;
-    public ICommand Oneclick
-    {
-        get { return m_Oneclick = new Command(Oneclickevent); }
-    }
-
-    private void Oneclickevent(object obj)
-    {
-        Workspace.Instance.userControl2_model.UserControl2_textblock = UserControl1_text;
-    }
-
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Notify([CallerMemberName] string propertyName = null)
-    {
-        if (this.PropertyChanged != null)
-        {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    #endregion
-}
-~~~
-
-<br/>
-
-#UserControl2.xaml
-~~~c#
-<StackPanel Background="White" VerticalAlignment="Center">
-    <TextBlock x:Name="tblock" Text="UserControl2" FontSize="20" HorizontalAlignment="Center"/>
-    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-    <TextBlock Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_textblock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-</StackPanel>
-~~~
-
-<br/>
-
-#UserControl2.xaml.cs
-~~~c#
-public partial class UserControl2 : UserControl
-{
-    public UserControl2()
-    {
-        InitializeComponent();
-        this.DataContext = Workspace.Instance.userControl2_model;
-    }
-}
-~~~
-
-<br/>
-
-#UserControl2_model.cs
-~~~c#
-public class UserControl2_model : INotifyPropertyChanged
-{
-    public UserControl2_model()
-    {
-
-    }
-
-    private string m_UserControl2_text;
-    public string UserControl2_text
-    {
-        get { return m_UserControl2_text; }
-        set
-        {
-            if (m_UserControl2_text != value)
-            {
-                m_UserControl2_text = value;
-                Notify("UserControl2_text");
-                Workspace.Instance.userControl1_model.UserControl1_text = value;
-            }
-        }
-    }
-
-    private string m_UserControl2_textblock;
-    public string UserControl2_textblock
-    {
-        get { return m_UserControl2_textblock; }
-        set
-        {
-            if (m_UserControl2_textblock != value)
-            {
-                m_UserControl2_textblock = value;
-                Notify("UserControl2_textblock");
-            }
-        }
-    }
-        
-
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Notify([CallerMemberName] string propertyName = null)
-    {
-        if (this.PropertyChanged != null)
-        {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    #endregion
-}
-~~~
-
-<br/>
-
-#Workspace.cs
-~~~c#
-class Workspace : INotifyPropertyChanged
-{
-    static Workspace m_Instance = new Workspace();
-
-    public static Workspace Instance
-    {
-        get { return m_Instance; }
-    }
-
-    private UserControl1_model m_userControl1_model = new UserControl1_model();
-    public UserControl1_model userControl1_model
-    {
-        get { return m_userControl1_model; }
-        set
-        {
-            if (m_userControl1_model != value)
-            {
-                m_userControl1_model = value;
-                Notify("userControl1_model");
-
-            }
-        }
-    }
-
-    private UserControl2_model m_userControl2_model = new UserControl2_model();
-    public UserControl2_model userControl2_model
-    {
-        get { return m_userControl2_model; }
-        set
-        {
-            if (m_userControl2_model != value)
-            {
-                m_userControl2_model = value;
-                Notify("userControl2_model");
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Notify([CallerMemberName] string propertyName = null)
-    {
-        if (this.PropertyChanged != null)
-        {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    #endregion
-}
-~~~
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/158002074-53c25c5e-e955-44b3-8f25-03c27f839310.gif" height="400" width="400">
-
-###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Workspace를 통한 UserControl끼리의 값 전달(ContentControl)
-
-#MainWindow.xaml
-~~~c#
-<Grid>
-    <Grid.ColumnDefinitions>
-        <ColumnDefinition/>
-        <ColumnDefinition/>
-    </Grid.ColumnDefinitions>
-
-    <ContentControl Content="{Binding View1Content}"></ContentControl>
-    <ContentControl Grid.Column="1" Content="{Binding View2Content}"></ContentControl>
-</Grid>
-~~~
-
-<br/>
-
-#UserControl1.xaml
-~~~c#
-<StackPanel Background="White" VerticalAlignment="Center">
-    <TextBlock Text="UserControl1" FontSize="20" HorizontalAlignment="Center"/>
-    <TextBox Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl1_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-</StackPanel>
-~~~
-
-<br/>
-
-#UserControl1.xaml.cs
-~~~c#
-public partial class UserControl1 : UserControl, INotifyPropertyChanged
-{
-    public UserControl1()
-    {
-        InitializeComponent();
-        this.DataContext = this;
-    }
-
-    private string m_UserControl1_text;
-    public string UserControl1_text
-    {
-        get { return m_UserControl1_text; }
-        set
-        {
-            if (m_UserControl1_text != value)
-            {
-                m_UserControl1_text = value;
-                RaisePropertyChanged("UserControl1_text");
-                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>UserControl1_text 작동");
-                Workspace.Instance.View2Content.UserControl2_text = value;
-            }
-        }
-    }
-
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        if (PropertyChanged != null)
-            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-    }
-    #endregion
-}
-~~~
-
-<br/>
-
-#UserControl2.xaml
-~~~c#
-<StackPanel Background="White" VerticalAlignment="Center">
-    <TextBlock x:Name="tblock" Text="UserControl2" FontSize="20" HorizontalAlignment="Center"/>
-    <TextBox x:Name="tbox" Width="100" HorizontalAlignment="Center" Margin="5" Text="{Binding UserControl2_text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-</StackPanel>
-~~~
-
-<br/>
-
-#UserControl2.xaml.cs
-~~~c#
-public partial class UserControl2 : UserControl, INotifyPropertyChanged
-{
-    public UserControl2()
-    {
-        InitializeComponent();
-        this.DataContext = this;
-    }
-
-    private string m_UserControl2_text;
-    public string UserControl2_text
-    {
-        get { return m_UserControl2_text; }
-        set
-        {
-            if(m_UserControl2_text != value)
-            {
-                m_UserControl2_text = value;
-                RaisePropertyChanged("UserControl2_text");
-                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>UserControl2_text 작동");
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        if (PropertyChanged != null)
-            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-    }
-    #endregion
-}
-~~~
-
-<br/>
-
-#Workspace.cs
-~~~c#
-class Workspace : INotifyPropertyChanged
-{
-    static Workspace m_Instance = new Workspace();
-
-    public static Workspace Instance
-    {
-        get { return m_Instance; }
-    }
-
-    private UserControl1 m_View1Content = new UserControl1();
-    public UserControl1 View1Content
-    {
-        get { return m_View1Content; }
-        set
-        {
-            if (m_View1Content != value)
-            {
-                m_View1Content = value;
-                Notify("View1Content");
-
-            }
-        }
-    }
-
-    private UserControl2 m_View2Content = new UserControl2();
-    public UserControl2 View2Content
-    {
-        get { return m_View2Content; }
-        set
-        {
-            if (m_View2Content != value)
-            {
-                m_View2Content = value;
-                Notify("View1Content");
-
-            }
-        }
-    }
-
-    #region INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void Notify([CallerMemberName] string propertyName = null)
-    {
-        if (this.PropertyChanged != null)
-        {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    #endregion
-}
-~~~
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/158002648-4572bcdb-a67c-4d57-b337-67e14c2d493b.gif" width="400" height="400">
-
-###### [static class를 활용한 싱글톤 데이터 교환 구조](static-class를-활용한-싱글톤-데이터-교환-구조)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# WPF의 다양한 프로젝트/프로젝트 참조하기
-  - 현재는 WPF로 개발을 할때 작은 프로그램은 싱글톤으로 개발하기도 하지만, 규모가 커지만 싱글톤으로 개발되지 않는다.
-  - 따라서, 프로젝트를 여러개 추가하여 참조하며 사용하게 된다
-  - 사용자 정의 컨트롤 라이브러리 와 사용자 지정 컨트롤 라이브러리의 차이점
-    - 사용자 정의 컨트롤은 UserControl 객체를 상속받고, 사용자 지정 컨트롤은 Control 객체를 상속 받는다
-    - UserControl 객체는 ContentControl 객체를 상속받고 ContentControl 객체는 Control 객체와  IAddChild 인터페이스를 상속받는다.
-    - 사용자 지정 컨트롤이 사용자 정의 컨트롤 보다 더 상위에 있음
-    - 사용자 지정 컨트롤이 사용자 정의 컨트롤 보다 좀 더 커스텀한 구현이 가능하다
-    - xaml과 함께하는(좀 더 편하고,단순한) 사용자 컨트롤 제작을 한다면 사용자 정의 컨트롤을 사용하고,  좀 더 구체적이고 세부적인 사용자 컨트롤 제작을 한다면 사용자 지정 컨트롤을 사용하면 됨
-
-<br/>
-
-  - .NET Framework라면 아래의 라이브러리를 사용
-
-<br/>
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d69e8e7a-f012-4ae1-b698-84f89746774d)
-
-<br/>
-
-  - .NET 이라면, 아래의 클래스 라이브러리를 이용한다
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/9fdc2dd0-5993-4914-b3c1-6923dd4584f9)
-
-<br/>
-
-  - 다른 프로젝트 참조하기
-    - CLR네임 스페이스 참조
-    - XML네임 스페이스 참조
- 
- <br>
- 
-   - 사전준비로 종속성, 참조 연결을 먼저 해준다.
-     - .NET 6.0에서는 '종속성'에서 마우스 우클릭 -> 프로젝트 참조 추가
-     - .NET Framework 4.7.2에서는 '참조'에서 마우스 우클릭 -> 참조 추가
-<img src="https://user-images.githubusercontent.com/39178978/153415481-826baaf5-1446-4596-a8cf-be1d3d81fca6.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153415583-7f5efdb4-3ce4-4a3a-8585-56646de09225.png">
-
-<br/>
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153415865-36d0e705-c45c-40fb-8fb8-5a7037140a5b.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153415903-f7ed0b43-d9ea-4e59-a1d5-5262ac3c1665.png">
-
-그 후에는 뒤를 따르면 된다.
- 
-<br/>
-
-  - CLR네임 스페이스 참조
-    - xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project" 이용한다
-    - xmlns:(접두사)="clr-namespace:(참조namespace명.경로);assembly=(namespace명)"
-    - 가령, NewFolder라는 폴더 안에 .cs의 class를 불러오려면, xmlns:reference_project="clr-namespace:Reference_project.NewFolder;assembly=Reference_project" 를 사용해야함
-
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp16.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:reference_project="clr-namespace:Reference_project;assembly=Reference_project"
-        Title="MainWindow" Height="300" Width="300">
-    <Window.Resources>
-        <reference_project:Car x:Key="reference_project_car"/>
-    </Window.Resources>
-    <Grid>
-        <Button Width="100" Height="30" Content="{StaticResource reference_project_car}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#Reference_project.xaml.cs
-~~~c#
-public class Car
-{
-
-}
-~~~
-
-<img src="https://user-images.githubusercontent.com/39178978/153417714-d042ca1b-9720-4e59-bac5-a613fc233078.png">
-
-<br/>
-
-<img src="https://user-images.githubusercontent.com/39178978/153417813-68f3e880-56c2-45d9-beb3-76a4d105ee7b.png">
-
-###### [WPF의 다양한 프로젝트/프로젝트 참조하기](#wpf의-다양한-프로젝트프로젝트-참조하기)
 ###### [Top](#top)
 
 <br/>
