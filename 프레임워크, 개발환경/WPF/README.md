@@ -45,11 +45,11 @@
 
 - [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
   - [DataTemplate 사용하기](#datatemplate사용하기)
-  - [다른 xaml파일을 DataContext로 출력하기](#다른-xaml파일을-datacontext로-출력하기)
+  - [xaml_Window.DataTemplate_DataType](#xaml_windowdatatemplate_datatype)
   - [ItemsControl의 ItemsSource로 DataTemplate출력하기](#itemscontrol의-itemssource로-datatemplate출력하기)
   - [ContentControl의 Content로 DataTemplate출력하기](#contentcontrol의-content로-datatemplate출력하기)
-  - [자기 자신 class](#자기-자신-class)
-  - [다른 class](#다른-class)
+  - [class behind DataContext](#class-behind-datacontext)
+  - [class behind DataContext 다른 class](#class-behind-datacontext-다른-class)
   - [xaml_Window.DataContext](#xaml_windowdatacontext)
   - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
 
@@ -1546,11 +1546,11 @@ namespace WpfApp1
 
 # DataTemplate,DataContext,Binding
   - [DataTemplate 사용하기](#datatemplate사용하기)
-  - [다른 xaml파일을 DataContext로 출력하기](#다른-xaml파일을-datacontext로-출력하기)
+  - [xaml_Window.DataTemplate_DataType](#xaml_windowdatatemplate_datatype)
   - [ItemsControl의 ItemsSource로 DataTemplate출력하기](#itemscontrol의-itemssource로-datatemplate출력하기)
   - [ContentControl의 Content로 DataTemplate출력하기](#contentcontrol의-content로-datatemplate출력하기)
-  - [자기 자신 class](#자기-자신-class)
-  - [다른 class](#다른-class)
+  - [class behind DataContext](#class-behind-datacontext)
+  - [class behind DataContext 다른 class](#class-behind-datacontext-다른-class)
   - [xaml_Window.DataContext](#xaml_windowdatacontext)
   - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
 
@@ -1763,7 +1763,7 @@ namespace test1
 <br/>
 <br/>
 
-# 다른 xaml파일을 DataContext로 출력하기
+# xaml_Window.DataTemplate_DataType
 
 #MainWindow.xaml
 ~~~c#
@@ -2108,7 +2108,7 @@ namespace Sample.Data
 ###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
 
-# 자기 자신 class
+# class behind DataContext
   - 현재 화면에, this(즉 자기 자신)의 데이터를 연결하겠다
 
 #MainWindow.xaml
@@ -2168,7 +2168,7 @@ namespace test1
 <br/>
 <br/>
 
-# 다른 class
+# class behind DataContext 다른 class
 
 #MainWindow.xaml
 ~~~c#
@@ -2234,7 +2234,7 @@ namespace test1
 
 <br/>
 <br/>
-# xaml_Window.DataContext
+# xaml_Window.DataContext  
   - Window.DataContext 속성은 하나만 설정이 가능하다
   - xaml에 딸려 오는 xaml.cs만 가능한 것이 아니라, 일반 cs파일안에 class라면 DataContext작업을 할 수 있다
 
