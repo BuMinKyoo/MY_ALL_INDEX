@@ -43,15 +43,11 @@
 
 <br/>
 
-- [Window.Resources](#windowresources)
+- [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
   - [DataTemplate 사용하기](#datatemplate사용하기)
   - [다른 xaml파일을 DataContext로 출력하기](#다른-xaml파일을-datacontext로-출력하기)
   - [ItemsControl의 ItemsSource로 DataTemplate출력하기](#itemscontrol의-itemssource로-datatemplate출력하기)
   - [ContentControl의 Content로 DataTemplate출력하기](#contentcontrol의-content로-datatemplate출력하기)
-
-<br/>
-
-- [데이터 연결하기](#데이터-연결하기)
   - [자기 자신 class](#자기-자신-class)
   - [다른 class](#다른-class)
   - [xaml_Window.DataContext](#xaml_windowdatacontext)
@@ -1548,13 +1544,17 @@ namespace WpfApp1
 
 ***
 
-# Window.Resources
+# DataTemplate,DataContext,Binding
   - [DataTemplate 사용하기](#datatemplate사용하기)
   - [다른 xaml파일을 DataContext로 출력하기](#다른-xaml파일을-datacontext로-출력하기)
   - [ItemsControl의 ItemsSource로 DataTemplate출력하기](#itemscontrol의-itemssource로-datatemplate출력하기)
   - [ContentControl의 Content로 DataTemplate출력하기](#contentcontrol의-content로-datatemplate출력하기)
+  - [자기 자신 class](#자기-자신-class)
+  - [다른 class](#다른-class)
+  - [xaml_Window.DataContext](#xaml_windowdatacontext)
+  - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
 
-###### [Window.Resources](#windowresources)
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
 
 <br/>
@@ -1757,7 +1757,7 @@ namespace test1
 
 ![20231008_010944](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/7f3f6df6-5add-4a90-a401-faad6faa7c31)
 
-###### [Window.Resources](#windowresources)
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
 
 <br/>
@@ -1840,7 +1840,7 @@ namespace test1
 
 ![20231008_011056](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/355be125-54c5-45f4-8cbf-4a0a4d865926)
 
-###### [Window.Resources](#windowresources)
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
 
 <br/>
@@ -1973,7 +1973,7 @@ namespace Sample.Data
 
 ![20231008_011234](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1e86a3df-be4f-407d-b6b9-bfb7352f9e43)
 
-###### [Window.Resources](#windowresources)
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
 
 <br/>
@@ -2105,7 +2105,7 @@ namespace Sample.Data
 
 ![20231008_011414](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c186a110-f493-40c5-b44c-bd6e4c2b9393)
 
-###### [Window.Resources](#windowresources)
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
 
 <br/>
