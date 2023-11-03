@@ -67,6 +67,7 @@
  
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
+- [DependencyProperty](#dependencyproperty)
 - [Command](#command)
 - [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
 
@@ -6302,6 +6303,210 @@ public class Class1 : INotifyPropertyChanged
 ~~~
 
 ###### [INotifyPropertyChanged](#inotifypropertychanged)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# DependencyProperty
+  - 인터페이스로써, 속성 값이 변경 되었을 때 알림을 준다. 예를 들어 디자인 폼에서 속성을 변경 했을때 백단의 데이터까지 바뀌게 해준다.
+    - 프로퍼티 값이 변경되었을 때 자동으로 어떤 일을 처리하게 할 수 있게 해주는 것
+    - 의존 프로퍼티를 사용하면 엘리먼트를 사용하는 시점에 프로퍼티 값이 결정되고, Static 변수이기 때문에 메모리 절약에 효과적이다
+
+// 의존 프로퍼티 등록
+~~~c#
+public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(MyClass), new PropertyMetadata("DefaultValue"));
+
+
+//public static readonly DependencyProperty MyPropertyProperty: 이 줄은 종속성 속성을 정의합니다. MyProperty라는 이름의 종속성 속성을 만듭니다. 이것은 정적(public static) 필드로 선언되므로 클래스 수준에서 사용할 수 있습니다.
+
+//"MyProperty": 종속성 속성의 이름을 지정합니다. 나중에 XAML에서 이 이름을 사용하여 해당 속성을 식별합니다.
+//typeof(string): 종속성 속성의 데이터 형식을 지정합니다. 이 예제에서는 문자열(string) 형식을 사용합니다.
+//typeof(MyClass): 종속성 속성을 소유하는 클래스를 지정합니다. 종속성 속성이 MyClass 클래스에 속하게 됩니다.
+//new PropertyMetadata("DefaultValue"): 종속성 속성의 메타데이터를 설정합니다. 여기에는 기본값("DefaultValue")을 설정하거나 속성 변경 시 호출할 콜백 메서드 등을 지정할 수 있습니다.
+~~~
+
+  - 아래는 MainWindow와 UserControl1에서 동시에 데이터가 바인딩되며 바뀌는 것을 볼 수 있다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="200" Width="200">
+    <StackPanel>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(MainWindow), new PropertyMetadata("qweqwe"));
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</UserControl>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/842a874f-3ea8-44bf-bbbf-eb09f62bf18d)
+
+<br/>
+
+  - DependencyProperty는 다른 Window로 넘어갈 수는 없는듯 하다..?
+    - 하지만 테스트 결과, 하나의 Window에서 그 안에 출력 할 수 있는 화면단에는 전부 넘어갈 수 있다고 추측할 수 있다
+
+<br/>
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/acb7a3d4-5449-4daf-80ec-675dd05fd990)
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="200" Width="200">
+    <StackPanel>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Content="Click" Click="Button_Click"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Window1 window1 = new Window1();
+            window1.Show();
+        }
+
+        public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(MainWindow), new PropertyMetadata("qweqwe"));
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#Window1.xaml
+~~~c#
+<Window x:Class="WpfApp1.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Window1" Height="450" Width="800">
+    <StackPanel>
+        <TextBox Text="{Binding MyProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#Window1.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class Window1 : Window
+    {
+        public Window1()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        public static readonly DependencyProperty MyPropertyProperty =
+    DependencyProperty.Register("MyProperty", typeof(string), typeof(Window1), new PropertyMetadata("123123"));
+    }
+}
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8dbeeaa6-ab96-4f26-9e83-3120cdb1735e)
+
+###### [DependencyProperty](#dependencyproperty)
 ###### [Top](#top)
 
 <br/>
