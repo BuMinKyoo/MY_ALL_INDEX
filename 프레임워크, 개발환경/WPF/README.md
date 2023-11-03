@@ -55,6 +55,12 @@
 
 <br/>
 
+  - [UserControl binding DataContext](#usercontrol-binding-datacontext)
+  - [Binding은 항상 DataContext기준으로 들어간다](#binding은-항상-datacontext기준으로-들어간다)
+  - [ElementName,Path,RelativeSource,FindAncestor](#elementnamepathrelativesourcefindancestor)
+
+<br/>
+
   - [ContentControl,ItemsControl](#contentcontrolitemscontrol)
     - [ContentControl](#contentcontrol)
     - [ItemsControl](#itemscontrol)
@@ -65,7 +71,6 @@
 - [INotifyPropertyChanged](#inotifypropertychanged)
 - [DependencyProperty](#dependencyproperty)
 - [Command](#command)
-- [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
 
 <br/>
 
@@ -1553,6 +1558,10 @@ namespace WpfApp1
   - [class behind DataContext 다른 class](#class-behind-datacontext-다른-class)
   - [xaml_Window.DataContext](#xaml_windowdatacontext)
   - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
+  - [UserControl binding DataContext](#usercontrol-binding-datacontext)
+  - [Binding은 항상 DataContext기준으로 들어간다](#binding은-항상-datacontext기준으로-들어간다)
+  - [ElementName,Path,RelativeSource,FindAncestor](#elementnamepathrelativesourcefindancestor)
+
 
 ###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
 ###### [Top](#top)
@@ -2390,6 +2399,431 @@ namespace Sample.Data
         }
     }
 }
+~~~
+
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+
+# UserControl binding DataContext
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp3"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <local:MainView/>
+    </Window.DataContext>
+
+    <local:UserControl1 DataContext="{Binding Texts}"/>
+
+</Window>
+~~~
+
+<br/>
+
+#MainView.cs
+~~~c#
+namespace WpfApp3
+{
+    public class MainView
+    {
+        private string _str1 = "Hello1";
+        public string Str1
+        {
+            get { return _str1; }
+            set { _str1 = value; }
+        }
+
+        private string _str2 = "Hello2";
+        public string Str2
+        {
+            get { return _str2; }
+            set { _str2 = value; }
+        }
+
+        private Texts _texts = new Texts();
+        public Texts Texts
+        {
+            get { return _texts; }
+            set { _texts = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp3.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp3"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="{Binding Str11}"/>
+        <Button Width="100" Height="30" Content="{Binding Str22}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+<br/>
+
+#Texts.cs
+~~~c#
+namespace WpfApp3
+{
+    public class Texts
+    {
+        private string _str11 = "Hello11";
+        public string Str11
+        {
+            get { return _str11; }
+            set { _str11 = value; }
+        }
+
+        private string _str22 = "Hello22";
+        public string Str22
+        {
+            get { return _str22; }
+            set { _str22 = value; }
+        }
+    }
+}
+~~~
+
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Binding은 항상 DataContext기준으로 들어간다
+
+  - DataTemplate 안에 선언된 Button의 경우 Command를 그냥 바인딩하면 바인딩이 안된다.
+  - Command가 부모의 DataContext에 존재하기 때문이다. 그래서 Command를 찾기 위한 대상을 변경해주어야 한다.
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp3"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <ItemsControl ItemsSource="{Binding CustList}">
+
+        <!--템플릿 외형-->
+        <ItemsControl.Template>
+            <ControlTemplate TargetType="{x:Type ItemsControl}">
+                <StackPanel>
+                    <ItemsPresenter/>
+                </StackPanel>
+            </ControlTemplate>
+        </ItemsControl.Template>
+
+        <!--데이터 외형-->
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel>
+                    <Button Width="100" Height="30" Content="{Binding Age}"/>
+                    <Button Width="100" Height="30" Content="{Binding Name}" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
+                </StackPanel>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+
+        <!--패널 정렬-->
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
+
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Collections.Generic;
+using System.Windows.Input;
+using System.Windows;
+
+namespace WpfApp3
+{
+    public class MainWindowViewModel
+    {
+        public MainWindowViewModel()
+        {
+            CustList = new List<Cust>();
+            CustList.Add(new Cust { Name = "John Doe", Age = "42" });
+            CustList.Add(new Cust { Name = "Jane Doe", Age = "39" });
+            CustList.Add(new Cust { Name = "Sammy Doe", Age = "13" });
+        }   
+
+        private List<Cust> _custList;
+        public List<Cust> CustList
+        {
+            get { return _custList; }
+            set
+            {
+                _custList = value;
+            }
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("클릭 이벤트 발생");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+namespace WpfApp3
+{
+    public class Cust
+    {
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+            }
+        }
+
+        private string _age;
+        public string Age
+        {
+            get { return _age; }
+            set
+            {
+                _age = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+public class Command : ICommand
+{
+    Action<object> _execute;
+
+    public event EventHandler? CanExecuteChanged;
+
+    public Command(Action<object> execute)
+    {
+        _execute = execute;
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        _execute(parameter);
+    }
+}
+~~~
+
+<br/>
+
+  - Button하나만 가지고 실험
+    - 위에서 첫번째와, 세번째는 작동이 된다
+    - Command는 바로 위의 DataContext로 binding이 되버리기 때문에 아래의 코드에서는 따로 지정해 주지 않으면 MainWindowViewModel에 있는 OneClick함수로 갈 수가 없다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp3"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <StackPanel>
+        <Button Width="100" Height="30" Content="123123" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}" DataContext="123"/>
+        <Button Width="100" Height="30" Content="123123" Command="{Binding OneClick}" DataContext="123"/>
+        <Button Width="100" Height="30" Content="123123" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
+    </StackPanel>
+
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Windows.Input;
+using System.Windows;
+
+namespace WpfApp3
+{
+    public class MainWindowViewModel
+    {
+        public MainWindowViewModel()
+        {
+
+        }   
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("클릭 이벤트 발생");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+public class Command : ICommand
+{
+    Action<object> _execute;
+
+    public event EventHandler? CanExecuteChanged;
+
+    public Command(Action<object> execute)
+    {
+        _execute = execute;
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        _execute(parameter);
+    }
+}
+~~~
+
+###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ElementName,Path,RelativeSource,FindAncestor
+
+  - ElementName : 해당되는 Name의 속성을 가져올 준비를 한다
+  - Path : 해당되는 Name을 가지고 있는 속성을 가져온다
+
+<br/>
+
+~~~c#
+<Rectangle Fill="Red" Name="aaa" 
+        Height="100" Width="{Binding ElementName=aaa,
+        Path=Height}"/>
+<Ellipse Fill="Blue" Name="bbb"
+            Height="20" Width="{Binding ElementName=aaa,
+        Path=Height}"/>
+~~~
+
+<br/>
+
+  - RelativeSource 를 이용하여 위와 같은 것을 똑같이 나타낼 수 있다
+
+~~~c#
+<Rectangle Fill="Red" Height="100" 
+        Stroke="Black" 
+        Width="{Binding RelativeSource={RelativeSource Self},
+        Path=Height}"/>
+<Ellipse Fill="Blue" Name="bbb"
+            Height="20" Width="{Binding RelativeSource={RelativeSource Self},
+        Path=Height}"/>
+~~~
+
+<br/>
+
+  - FindAncestor을 이용해 내 위의 부모의 값들을 가져올 수 있다
+
+~~~c#
+<Canvas Name="Parent0">
+    <Border Name="Parent1"
+            Width="{Binding RelativeSource={RelativeSource Self},
+            Path=Parent.ActualWidth}"
+            Height="{Binding RelativeSource={RelativeSource Self},
+            Path=Parent.ActualHeight}">
+        <Canvas Name="Parent2">
+            <Border Name="Parent3"
+        Width="{Binding RelativeSource={RelativeSource Self},
+        Path=Parent.ActualWidth}"
+        Height="{Binding RelativeSource={RelativeSource Self},
+            Path=Parent.ActualHeight}">
+                <Canvas Name="Parent4">
+                    <TextBlock FontSize="16" 
+            Margin="5" Text="Display the name of the ancestor"/>
+                    <TextBlock FontSize="16" 
+                Margin="50" 
+        Text="{Binding RelativeSource={RelativeSource  
+                    FindAncestor,
+                    AncestorType={x:Type Border}, 
+                    AncestorLevel=1},Path=Name}" 
+                    Width="200"/>
+                </Canvas>
+            </Border>
+        </Canvas>
+    </Border>
+</Canvas>
 ~~~
 
 ###### [DataTemplate,DataContext,Binding](#datatemplatedatacontextbinding)
@@ -3523,233 +3957,6 @@ public partial class MainWindow : Window
 ~~~
 
 ###### [Command](#command)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Button + Command다른클래스에서 사용
-
-  - 다른 클래스 라이브러리에서 ICommand사용하기1
-    - 다른 클래스 라이브러리에서 command를 사용하기 위해서는, 어려운 속성들을 지정해 주어야 한다
-   
-<br/>
-
-  - Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"
-    - RelativeSource : 바인딩 소스를 지정하기 위해 사용되는 속성
-    - FindAncestor : 지정된 조상 타입을 검색하여 해당 조상을 바인딩 소스로 사용한다
-    - AncestorType={x:Type Window} : 조상의 타입을 Window로 지정합니다. 즉, 가장 가까운 Window 타입의 조상을 찾는다
-    - AncestorLevel=1 : 얼마나 많은 수준의 조상을 건너뛸지 지정합니다. 여기서는 첫 번째 Window 조상을 사용한다
-    - Path=DataContext.OneClick : 바인딩 소스의 OneClick 속성을 지정한다. DataContext는 일반적으로 뷰 모델의 인스턴스를 참조하는데 사용된다
-
-#Wpf프로젝트(클래스 라이브러리1 참조중)  
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
-        mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight">
-
-    <Grid Width="300" Height="300">
-        <ctrl:UserControl1/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-using System.Windows.Input;
-
-namespace WpfApp1
-{
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        private Command m_OneClick;
-        public ICommand OneClick
-        {
-            get { return m_OneClick = new Command(OneClickEvent); }
-        }
-
-        private void OneClickEvent(object obj)
-        {
-            MessageBox.Show("클릭 이벤트 발생");
-        }
-    }
-}
-~~~
-
-<br/>
-
-#Command.cs
-~~~c#
-using System;
-using System.Windows.Input;
-
-namespace WpfApp1
-{
-    public class Command : ICommand
-    {
-        Action<object> _execute;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public Command(Action<object> execute)
-        {
-            _execute = execute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _execute(parameter);
-        }
-    }
-}
-~~~
-
-<br/>
-
-#클래스라이브러리1  
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfLibrary1.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfLibrary1"
-             mc:Ignorable="d" 
-             Height="50" Width="80">
-    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
-</UserControl>
-~~~
-
-<br/>
-
-  - 다른 클래스 라이브러리에서 ICommand사용하기2
-
-#Wpf프로젝트(클래스 라이브러리1 ,2  참조중)  
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        xmlns:vm="clr-namespace:WpfLibrary2;assembly=WpfLibrary2"
-        xmlns:ctrl="clr-namespace:WpfLibrary1;assembly=WpfLibrary1"
-        mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight">
-
-    <Window.DataContext>
-        <vm:MainView/>
-    </Window.DataContext>
-    
-    <Grid Width="300" Height="300">
-        <ctrl:UserControl1/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#클래스라이브러리1  
-#UserControl1.xaml
-~~~c#
-<UserControl x:Class="WpfLibrary1.UserControl1"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfLibrary1"
-             mc:Ignorable="d" 
-             Height="50" Width="80">
-    <Button Content="버튼" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneClick}"/>
-</UserControl>
-~~~
-
-<br/>
-
-#클래스라이브러리2  
-#MainView.cs
-~~~c#
-using System.Windows.Input;
-using System.Windows;
-using WpfApp1;
-
-namespace WpfLibrary2
-{
-    public class MainView
-    {
-        private Command m_OneClick;
-        public ICommand OneClick
-        {
-            get { return m_OneClick = new Command(OneClickEvent); }
-        }
-
-        private void OneClickEvent(object obj)
-        {
-            MessageBox.Show("클릭 이벤트 발생");
-        }
-    }
-}
-~~~
-
-<br/>
-
-#Command.cs
-~~~c#
-using System;
-using System.Windows.Input;
-
-namespace WpfApp1
-{
-    public class Command : ICommand
-    {
-        Action<object> _execute;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public Command(Action<object> execute)
-        {
-            _execute = execute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _execute(parameter);
-        }
-    }
-}
-~~~
-
-###### [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
 ###### [Top](#top)
 
 <br/>
