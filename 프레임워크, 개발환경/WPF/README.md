@@ -52,9 +52,6 @@
   - [class behind DataContext 다른 class](#class-behind-datacontext-다른-class)
   - [xaml_Window.DataContext](#xaml_windowdatacontext)
   - [xaml_Window.DataContext_다른프로젝트](#xaml_windowdatacontext_다른프로젝트)
-
-<br/>
-
   - [UserControl binding DataContext](#usercontrol-binding-datacontext)
   - [Binding은 항상 DataContext기준으로 들어간다](#binding은-항상-datacontext기준으로-들어간다)
   - [ElementName,Path,RelativeSource,FindAncestor](#elementnamepathrelativesourcefindancestor)
