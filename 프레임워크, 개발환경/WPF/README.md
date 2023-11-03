@@ -59,7 +59,7 @@
  
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
-- [Button + Command](#button--command)
+- [Command](#command)
 - [Button + Command다른클래스에서 사용](#button--command다른클래스에서-사용)
 
 <br/>
@@ -5377,7 +5377,7 @@ public class Class1 : INotifyPropertyChanged
 
 ***
 
-# Button + Command
+# Command
 
 #MainWindow.xaml
 ~~~c#
@@ -5497,7 +5497,7 @@ public partial class MainWindow : Window
 }
 ~~~
 
-###### [Button + Command](#button--command)
+###### [Command](#command)
 ###### [Top](#top)
 
 <br/>
