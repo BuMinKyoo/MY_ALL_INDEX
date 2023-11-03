@@ -33,11 +33,12 @@
 
 <br/>
 
-- [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
+- [UserControl,CustomControl,리소스,Page](#usercontrolcustomcontrol리소스page)
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
   - [리소스 사전 참조하기](#리소스-사전-참조하기)
   - ['리소스사전' 활용하기(ContentPresenter,ItemsPresenter)](#리소스사전-활용하기contentpresenteritemspresenter)
+  - [Page](#page)
 
 <br/>
 
@@ -750,14 +751,14 @@ public partial class MainWindow : Window
 
 ***
 
-# UserControl,CustomControl,리소스
+# UserControl,CustomControl,리소스,Page
   - [사용자 정의 컨트롤(UserControl)](#사용자-정의-컨트롤usercontrol)
   - [사용자 지정 컨트롤(CustomControl)](#사용자-지정-컨트롤customcontrol)
   - [리소스 사전 참조하기](#리소스-사전-참조하기)
   - ['리소스사전' 활용하기(ContentPresenter,ItemsPresenter)](#리소스사전-활용하기contentpresenteritemspresenter)
+  - [Page](#page)
 
-
-###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
+###### [UserControl,CustomControl,리소스,Page](#usercontrolcustomcontrol리소스page)
 ###### [Top](#top)
 
 <br/>
@@ -800,7 +801,7 @@ public partial class MainWindow : Window
 </UserControl>
 ~~~
 
-###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
+###### [UserControl,CustomControl,리소스,Page](#usercontrolcustomcontrol리소스page)
 ###### [Top](#top)
 
 <br/>
@@ -895,7 +896,7 @@ namespace WpfApp1
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0594fe73-ea53-4518-a9a7-804005516dca)
 
 
-###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
+###### [UserControl,CustomControl,리소스,Page](#usercontrolcustomcontrol리소스page)
 ###### [Top](#top)
 
 <br/>
@@ -1034,7 +1035,7 @@ namespace WpfApp1
 
 <img src="https://user-images.githubusercontent.com/39178978/153421558-3042dbb3-c101-4a40-b134-7c8852b86186.png">
 
-###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
+###### [UserControl,CustomControl,리소스,Page](#usercontrolcustomcontrol리소스page)
 ###### [Top](#top)
 
 <br/>
@@ -1323,7 +1324,103 @@ namespace WpfApp1
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4c148b53-5e0f-4718-a4f0-2b03e565fec4)
 
-###### [UserControl,CustomControl,리소스](#usercontrolcustomcontrol리소스)
+###### [UserControl,CustomControl,리소스,Page](#usercontrolcustomcontrol리소스page)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Page
+  - 창을 이동하는것과 같지만, 일반적으로 많이 쓰이지는 않을것 같다
+  - Frame이라는것을 활용해서 이동한다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp3"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+
+    <Frame Source="/Page1.xaml" NavigationUIVisibility="Hidden"/>
+
+</Window>
+~~~
+
+<br/>
+
+#Page1.xaml
+~~~c#
+<Page x:Class="WpfApp3.Page1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp3"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Page1">
+
+    <Grid>
+        <Button Width="100" Height="30" Content="Page1" Click="Button_Click"/>
+    </Grid>
+</Page>
+~~~
+
+<br/>
+
+#Page1.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Navigation;
+
+namespace WpfApp3
+{
+    /// <summary>
+    /// Page1.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class Page1 : Page
+    {
+        public Page1()
+        {
+            InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Page2 page2 = new Page2();
+            NavigationService.Navigate(page2);
+
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Page2.xaml
+~~~c#
+<Page x:Class="WpfApp3.Page2"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp3"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Page2">
+
+    <Grid>
+        <Button Width="100" Height="30" Content="Page2"/>
+    </Grid>
+</Page>
+~~~
+
+###### [UserControl,CustomControl,리소스,Page](#usercontrolcustomcontrol리소스page)
 ###### [Top](#top)
 
 <br/>
