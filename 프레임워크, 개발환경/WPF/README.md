@@ -7346,7 +7346,6 @@ namespace WpfApp1
 # EventTrigger
   - 특정한 이벤트에 따라서 ui를 변경한다
   - RoutedEvent 에 특정한 이벤트를 작성한다
-  - Microsoft.Xaml.Behaviors.Wpf라는 라이브러리를 이용하면 더 편하게 작성할 수 있다
 
 <br/>
 
