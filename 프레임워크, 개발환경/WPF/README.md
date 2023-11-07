@@ -3018,6 +3018,115 @@ namespace WpfApp2
 
 ***
 
+# MVVM패턴
+    - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
+    - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
+    - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
+    - [ItemsControl 형태로 만들어 캐시하기](#itemscontrol-형태로-만들어-캐시하기)
+    - [View의 Event를 ViewModel에서 핸들링하기(InvokeCommandAction)](#view의-event를-viewmodel에서-핸들링하기invokecommandaction)
+    - [View의 Event를 ViewModel에서 핸들링하기(CallMethodAction)](#view의-event를-viewmodel에서-핸들링하기callmethodaction)
+    - [View의 Event를 ViewModel에서 핸들링하기(AttachedProperty)](#view의-event를-viewmodel에서-핸들링하기attachedproperty)
+    - [View의 사용자 AttachedProperty 추가하기(+binding불가한 것)](#view의-사용자-attachedproperty-추가하기binding불가한-것)
+    - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MainView.xaml에 ViewModel 고정문제
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ViewCache를 만들어 캐시하기
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ItemsControl 형태로 만들어 캐시하기
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# View의 Event를 ViewModel에서 핸들링하기(InvokeCommandAction)
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# View의 Event를 ViewModel에서 핸들링하기(CallMethodAction)
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# View의 Event를 ViewModel에서 핸들링하기(AttachedProperty)
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# View의 사용자 AttachedProperty 추가하기(+binding불가한 것)
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)
+    - 
+
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # ObservableCollection
   - ObservableCollection 과 List차이 : WPF에서는 ListBox와ListView같은 곳에서 바인딩 사용시(ItemSource) ObserableColletion을 대부분 사용하게 된다. ObserableColletion는 UI에서 실시간으로 반영을 해주기 때문이다, 그러나 일반적인 List 는 변경된 List의 내용을 UI 에서 실시간으로 반영하지 않는다
 
