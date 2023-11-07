@@ -5244,34 +5244,49 @@ namespace WpfApp1
 
 #PasswordBoxBehavior.cs
 ~~~c#
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using Microsoft.Xaml.Behaviors;
+using System.Windows.Controls;
+using System.Windows;
 
 namespace WpfApp1
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class PasswordBoxBehavior : Behavior<PasswordBox>
     {
-        private string _passwordStr;
-        public string PasswordStr
+        public static DependencyProperty PasswordProperty = DependencyProperty.Register(
+            "Password",
+            typeof(string),
+            typeof(PasswordBoxBehavior),
+            new FrameworkPropertyMetadata(
+            string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public string Password
         {
-            get { return _passwordStr; }
-            set
-            {
-                _passwordStr = value;
-                Notify("PasswordStr");
-            }
+            get { return this.GetValue(PasswordProperty) as string; }
+            set { this.SetValue(PasswordProperty, value); }
         }
 
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void Notify([CallerMemberName] string propertyName = null)
+        protected override void OnAttached()
         {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            base.OnAttached();
+            this.AssociatedObject.PasswordChanged += this.OnPasswordChanged;
         }
-        #endregion
+
+        void OnPasswordChanged(object sender, RoutedEventArgs e)
+        {
+            var passwordBox = sender as PasswordBox;
+            if (passwordBox == null)
+            {
+                return;
+            }
+
+            this.Password = passwordBox.Password;
+        }
+
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            this.AssociatedObject.PasswordChanged -= this.OnPasswordChanged;
+        }
     }
 }
 ~~~
