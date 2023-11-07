@@ -3019,16 +3019,22 @@ namespace WpfApp2
 ***
 
 # MVVM패턴
-    - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
-    - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
-    - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
-    - [ItemsControl 형태로 만들어 캐시하기](#itemscontrol-형태로-만들어-캐시하기)
-    - [View의 Event를 ViewModel에서 핸들링하기(InvokeCommandAction)](#view의-event를-viewmodel에서-핸들링하기invokecommandaction)
-    - [View의 Event를 ViewModel에서 핸들링하기(CallMethodAction)](#view의-event를-viewmodel에서-핸들링하기callmethodaction)
-    - [View의 Event를 ViewModel에서 핸들링하기(AttachedProperty)](#view의-event를-viewmodel에서-핸들링하기attachedproperty)
-    - [View의 사용자 AttachedProperty 추가하기(+binding불가한 것)](#view의-사용자-attachedproperty-추가하기binding불가한-것)
-    - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
-    - [DependencyProperty](#dependencyproperty)
+  - View 의 추상화를 통해 View 를 독립적으로 만듦으로써, View 와 Model 간의 의존성을 분리하는 방법을 사용하는 것
+  - 추상화 했다는 것은 명확한 타입을 지정하지 않겠다는 말과 같기 때문에 View에서 직접적으로 Model을 참조하거나 알지 못하게 하기 위해서 View를 추상화한 객체, 즉 ViewModel에 그 행위를 위임 한것
+  - 따라서, ViewModel이 어떤 것이든, 그게 View에 들어와 속성과 행위만 맞으면 어떤 타입이라도 쓸 수 있도록 하게 된다
+
+<br/>
+
+  - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
+  - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
+  - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
+  - [ItemsControl 형태로 만들어 캐시하기](#itemscontrol-형태로-만들어-캐시하기)
+  - [View의 Event를 ViewModel에서 핸들링하기(InvokeCommandAction)](#view의-event를-viewmodel에서-핸들링하기invokecommandaction)
+  - [View의 Event를 ViewModel에서 핸들링하기(CallMethodAction)](#view의-event를-viewmodel에서-핸들링하기callmethodaction)
+  - [View의 Event를 ViewModel에서 핸들링하기(AttachedProperty)](#view의-event를-viewmodel에서-핸들링하기attachedproperty)
+  - [View의 사용자 AttachedProperty 추가하기(+binding불가한 것)](#view의-사용자-attachedproperty-추가하기binding불가한-것)
+  - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
+  - [DependencyProperty](#dependencyproperty)
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3037,8 +3043,77 @@ namespace WpfApp2
 <br/>
 
 # MainView.xaml에 ViewModel 고정문제
-    - 
+    - 아래와 같이 MainWindow.xaml 에서 자신이 사용할 ViewModel을 고정해서 박아 두게 되면, 이것만으로 벌써 View와 ViewModel은 끈끈한 의존성이 생기게 된다. MainWindow 라는 View는 일단 로딩이 되면 무조건 MainWindowViewModel 라는 ViewModel을 무조건 함께 생성하여 달고 다녀야만 하기 때문에 이렇게 하면 안된다
+    - 아래와 같이 하면 UserControl1 항상 달고 다녀야 한다
 
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <local:UserControl1/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+namespace WpfApp1
+{
+    public class MainWindowViewModel
+    {
+        private string _name = "John Doe";
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age = 42;
+        public int Age
+        {
+            get { return _age; }
+            set { _age = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl1"/>
+        <TextBlock Text="{Binding Name}"/>
+        <TextBlock Text="{Binding Age}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b93ce7b8-2416-4003-9ac4-99e02c4b4baa)
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3047,8 +3122,390 @@ namespace WpfApp2
 <br/>
 
 # MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제
-    - 
+    - MainViewModel을 제외한 다른 화면에 대한 것은 MainWindowViewModel에서 각자 화면의 Class를 받아서 그것을 불러와 DataTemplate에 대한 DataType을 지정해서 ResourceDictionary안에서 처리 하도록 한다.
+    - 아래의 코드는 ResourceDictionary를 MainWindow.xaml에서 처리하였지만, 편리하게 하기 위해서는 최상위인 App.xaml에서 처리할 수도 있다
+    - DataTemplate은 기본적으로 xaml 이 지원하는 x:Key 라는 속성을 필수요소로 이용하여 Key 를 사용하는 Template에 적용되는 구조를 가지고 있지만, DataTemplate의 x:Key를 비우고 DataType 에만 값을 할당한 경우 할당한 DataType을 x:Key로 사용하도록 구성되어 있다.
+    - 하지만 이 방법은 Window창을 다루지는 못한다
 
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <ContentControl Content="{Binding Display1}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        public MainWindowViewModel()
+        {
+            Display1 = new UserControl1ViewModel();
+        }
+
+        private object _Display1;
+        public object Display1
+        {
+            get { return _Display1; }
+            set
+            {
+                _Display1 = value;
+                Notify("Display1");
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl1"/>
+        <TextBlock Text="{Binding Name}"/>
+        <TextBlock Text="{Binding Age}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+namespace WpfApp1
+{
+    public class UserControl1ViewModel
+    {
+        private string _name = "John Doe";
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age = 42;
+        public int Age
+        {
+            get { return _age; }
+            set { _age = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp1">
+    <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+        <local:UserControl1/>
+    </DataTemplate>
+</ResourceDictionary>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8932571d-98ef-49ea-8ebd-dd25f4f1526a)
+
+<br/>
+
+  - 위처럼 하게 되면,  화면을 여러개 만들때 문제가 된다
+  - UserControl1ViewModel은 캐싱이 되지만, 화면을 틀때마다 UserControl1.xaml은 새롭게 다시 만들어 지게 된다(DisplayChange버튼을 누르면 UserControl1ViewModel, UserControl2ViewModel이 서로 교체 되면서 UserControl1.xaml,
+  - UserControl2.xaml의 생성자가 계속 실행되게 된다)
+  - 이것은 화면을 2개 만들고 그것을 번갈아 만들면서, bp를 찍어보면 확인 할 수 있다
+  - 아래는 그것을 테스트 하는 코드
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <StackPanel>
+        <Button Width="100" Height="30" Content="DisplayChange" Command="{Binding OneClick}"/>
+        <ContentControl Content="{Binding Display}"/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        public MainWindowViewModel()
+        {
+            _userControl1ViewModel = new UserControl1ViewModel();
+            _userControl2ViewModel = new UserControl2ViewModel();
+
+            Display = _userControl1ViewModel;
+        }
+
+        private UserControl1ViewModel _userControl1ViewModel;
+        private UserControl2ViewModel _userControl2ViewModel;
+
+        private object _display;
+        public object Display
+        {
+            get { return _display; }
+            set
+            {
+                _display = value;
+                Notify("Display");
+            }
+        }
+
+        private bool _bFlag = true;
+
+        private Command _OneClick;
+        public ICommand OneClick
+        {
+            get { return _OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            _bFlag = !(_bFlag);
+
+            if (_bFlag == true)
+            {
+                Display = _userControl1ViewModel;
+            }
+            else
+            {
+                Display = _userControl2ViewModel;
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl1"/>
+        <TextBlock Text="{Binding Name}"/>
+        <TextBlock Text="{Binding Age}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+namespace WpfApp1
+{
+    public class UserControl1ViewModel
+    {
+        private string _name = "John Doe";
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age = 42;
+        public int Age
+        {
+            get { return _age; }
+            set { _age = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl1"/>
+        <TextBlock Text="{Binding Name}"/>
+        <TextBlock Text="{Binding Age}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl2ViewModel.cs
+~~~c#
+namespace WpfApp1
+{
+    public class UserControl2ViewModel
+    {
+        private string _name = "zxczxc";
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age = 11;
+        public int Age
+        {
+            get { return _age; }
+            set { _age = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp1">
+    <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+        <local:UserControl1/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:UserControl2ViewModel}">
+        <local:UserControl2/>
+    </DataTemplate>
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3057,8 +3514,101 @@ namespace WpfApp2
 <br/>
 
 # ViewCache를 만들어 캐시하기
-    - 
+    - ViewCache만들어서, UserControl을 다시 만들지 않도록 할 수 있다
+    - 이 구조는 일종의 컨테이너 역할을 하는 빈 UserControl을 ViewCache 클래스가 기본으로 반환하기 때문에(상속에 의한 반환) 사실 View 를 전혀 재생성 하지 않는 구조라고는 볼 수 없다.(빈 UserControl은 매번 생성하기 때문에.) 다만 실질적인 View 의 재생성을 막는 차원에서 추가적인 View 생성을 최소화 할 수 있다
+    - 하나의 컨트롤을 만들때 사용하면 효율적인 방법이 된다
+    - Window가 Close 될 때 GC의 수집 대상이 될 것이므로, 이 때 하위 View 를 보이는 방식으로 ViewCache를 사용하게 되면 내부 View 는 재사용할 수 있고, 컨테이너인 빈 UserControl은 Window가 수집될 때, 함께 제거될 것이므로 큰 문제가 되지 않는다. (ViewCache의 빈 UserControl이 Unload 될 때 Content = null 처리를 한다)
 
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp1">
+    <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+        <local:ViewCache aaaaa="{x:Type local:UserControl1}"/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:UserControl2ViewModel}">
+        <local:ViewCache aaaaa="{x:Type local:UserControl2}"/>
+    </DataTemplate>
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#ViewCache.cs
+~~~c#
+using System;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace WpfApp1
+{
+    public class ViewCache : UserControl
+    {
+        public ViewCache()
+        {
+            Unloaded += ViewCache_Unloaded;
+        }
+
+        void ViewCache_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Unloaded -= ViewCache_Unloaded;
+            Content = null;
+        }
+
+        private Type _contentType;
+        public Type aaaaa
+        {
+            get { return _contentType; }
+            set
+            {
+                if (_contentType == value)
+                {
+                    return;
+                }
+
+                _contentType = value;
+                Content = ViewFactory.GetView(_contentType);
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#ViewFactory.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.Windows.Controls;
+
+namespace WpfApp1
+{
+    public static class ViewFactory
+    {
+        private static Dictionary<Type, UserControl> _viewCache = new Dictionary<Type, UserControl>();
+
+        public static UserControl GetView(Type type)
+        {
+            if (_viewCache.ContainsKey(type) == false)
+            {
+                var userControl = Activator.CreateInstance(type) as UserControl;
+                if (userControl == null)
+                {
+                    throw new InvalidOperationException("Couldn't create user control" + type);
+                }
+
+                _viewCache.Add(type, userControl);
+            }
+            return _viewCache[type];
+        }
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3067,8 +3617,304 @@ namespace WpfApp2
 <br/>
 
 # ItemsControl 형태로 만들어 캐시하기
-    - 
+    - <ContentControl Content="{Binding}"/>에 의해 ItemsSource 의 요소들이 그려질 때 ContentControl의 Content가 대신 그려지게 되며, 이 때 미리 선언해 놓은 DataTemplate이 다시 채워서 그려지게 된다
+    - 여러 화면을 보일때 유용한 방법이 된다
+    - 하나의 화면만을 출력하게 될 경우에는, Item만 들어가야할 자리에 Collection을 사용하는 꼴이라 불필요한 코드가 많이 들어갈 수밖에 없으며, Window가 GC의 수집대상이 될 때 ItemsControl로 함께 수집대상이 되므로 GC의 효율을 떨어뜨리게 된다.
 
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <StackPanel>
+        <Button Width="100" Height="30" Content="DisplayChange" Command="{Binding OneClick}"/>
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding ViewModels}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemContainerStyle>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                            <Setter Property="FrameworkElement.Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class MainWindowViewModel
+    {
+        public MainWindowViewModel()
+        {
+            ViewModels.Add(new UserControl1ViewModel());
+            ViewModels.Add(new UserControl2ViewModel());
+
+            ViewModels[0].IsSelected = true;
+        }
+
+        private object _display;
+        public object Display
+        {
+            get { return _display; }
+            set
+            {
+                _display = value;
+            }
+        }
+
+        private bool _bFlag = false;
+
+        private Command _OneClick;
+        public ICommand OneClick
+        {
+            get { return _OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            foreach (var viewModel in ViewModels)
+            {
+                viewModel.IsSelected = false;
+            }
+
+            if (_bFlag == true)
+            {
+                ViewModels[0].IsSelected = true;
+            }
+            else
+            {
+                ViewModels[1].IsSelected = true;
+            }
+
+            _bFlag = !(_bFlag);
+        }
+
+        private ObservableCollection<BaseViewModel> _viewModels = new ObservableCollection<BaseViewModel>();
+
+        public ObservableCollection<BaseViewModel> ViewModels
+        {
+            get { return _viewModels; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl1"/>
+        <TextBlock Text="{Binding Name}"/>
+        <TextBlock Text="{Binding Age}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+namespace WpfApp1
+{
+    public class UserControl1ViewModel : BaseViewModel
+    {
+        private string _name = "John Doe";
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age = 42;
+        public int Age
+        {
+            get { return _age; }
+            set { _age = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl1"/>
+        <TextBlock Text="{Binding Name}"/>
+        <TextBlock Text="{Binding Age}"/>
+    </StackPanel>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl2ViewModel.cs
+~~~c#
+namespace WpfApp1
+{
+    public class UserControl2ViewModel : BaseViewModel
+    {
+        private string _name = "zxczxc";
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age = 11;
+        public int Age
+        {
+            get { return _age; }
+            set { _age = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp1">
+    <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+        <local:UserControl1/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:UserControl2ViewModel}">
+        <local:UserControl2/>
+    </DataTemplate>
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#BaseViewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class BaseViewModel : INotifyPropertyChanged
+    {
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                _isSelected = value;
+                Notify("IsSelected");
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3077,8 +3923,258 @@ namespace WpfApp2
 <br/>
 
 # View의 Event를 ViewModel에서 핸들링하기(InvokeCommandAction)
-    - 
+    - InvokeCommandAction 사용한 방법소개
+    - CommandParameter 속성을 넣으면 이벤트를 발생시켰을때 특정한 데이터 값을 보내줄 수 있다
+    - PassEventArgsToCommand="True" 을 사용하면, MouseWheel같은 이벤트시 Delta값도 받아 올 수 있다
+    - 하지만 현재는 CommandParameter 와 PassEventArgsToCommand을 동시에 사용하면 CommandParameter 의 값만 들어오게 된다.. 따라서 아래의 코드는 따로 따로 이벤트가 2번 전달 되고 있다
 
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0d71366a-d76b-4837-bdc2-a38f74ec1a44)
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <StackPanel>
+        <ContentControl Content="{Binding Display}"/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Windows.Input;
+using System.Windows;
+
+namespace WpfApp2
+{
+    public class MainWindowViewModel
+    {
+        public MainWindowViewModel()
+        {
+            UserControl1ViewModel = new UserControl1ViewModel();
+            Display = UserControl1ViewModel;
+        }
+
+        private UserControl1ViewModel _userControl1ViewModel;
+        public UserControl1ViewModel UserControl1ViewModel
+        {
+            get { return _userControl1ViewModel; }
+            set
+            {
+                _userControl1ViewModel = value;
+            }
+        }
+
+        private object _display;
+        public object Display
+        {
+            get { return _display; }
+            set
+            {
+                _display = value;
+            }
+        }
+
+        private Command _oneEvent;
+        public ICommand OneEvent
+        {
+            get { return _oneEvent = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("One Event");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel>
+            <ItemsControl ItemsSource="{Binding Custs}">
+
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <StackPanel>
+                            <ItemsPresenter/>
+                        </StackPanel>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Height="100" Width="100" HorizontalAlignment="Center" Name="xButton">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseWheel" SourceObject="{Binding ElementName=xButton}">
+                                    <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneEvent}"
+                 CommandParameter="{Binding}"/>
+                                </i:EventTrigger>
+                                
+                                <i:EventTrigger EventName="MouseWheel" SourceObject="{Binding ElementName=xButton}">
+                                    <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneEvent}"                  PassEventArgsToCommand="True"/>
+                                </i:EventTrigger>
+                                
+                            </i:Interaction.Triggers>
+                            <StackPanel>
+                                <TextBox Text="{Binding Name}"/>
+                                <TextBox Text="{Binding Age}"/>
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+using System.Collections.ObjectModel;
+
+namespace WpfApp2
+{
+    public class UserControl1ViewModel
+    {
+        public UserControl1ViewModel()
+        {
+            Custs.Add(new Cust() { Name = "John Doe", Age = 42 });
+            Custs.Add(new Cust() { Name = "Jane Doe", Age = 39 });
+            Custs.Add(new Cust() { Name = "Sammy Doe", Age = 13 });
+        }
+
+        private ObservableCollection<Cust> _custs = new ObservableCollection<Cust>();
+        public ObservableCollection<Cust> Custs
+        {
+            get { return _custs; }
+            set { _custs = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp2">
+    <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+        <local:UserControl1/>
+    </DataTemplate>
+
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+namespace WpfApp2
+{
+    public class Cust
+    {
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age;
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
+                if (value < 0)
+                    _age = 0;
+                else
+                    _age = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp2
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3087,8 +4183,223 @@ namespace WpfApp2
 <br/>
 
 # View의 Event를 ViewModel에서 핸들링하기(CallMethodAction)
-    - 
+    - CallMethodAction사용한 방법소개
+    - MouseWheel같은 이벤트시 Delta값을 받아 올 수 있다
+    - TargetObject으로 해당하는 ViewModel을 지정해주고, MethodName으로 함수이름을 지정한다.
+    - OnMouseWheel함수에 인자 없는 함수로 만들어 호출할 수도 있다.
+    - 하지만 인자가 없거나 시그니처를 맞춘 형태가 아닌 다른 형태의 메서드를 정의하면 디자인 타임이아니라 런타임에서 Event발생시 예외가 떨어진다
+    - object sender를 통해서 var button = sender as Button를 이용해서 UI객체를 얻어 올 수 있으니 사용상 주의 해야 한다
 
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/dba04233-75c6-4d75-b040-7d3bcb34c058)
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <StackPanel>
+        <ContentControl Content="{Binding Display}"/>
+        <Button Width="200" Height="50" Content="버튼">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseWheel" >
+                    <i:CallMethodAction MethodName="OnMouseWheel" TargetObject="{Binding}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Button>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Windows.Input;
+using System.Windows;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace WpfApp2
+{
+    public class MainWindowViewModel
+    {
+        public MainWindowViewModel()
+        {
+            UserControl1ViewModel = new UserControl1ViewModel();
+            Display = UserControl1ViewModel;
+        }
+
+        private UserControl1ViewModel _userControl1ViewModel;
+        public UserControl1ViewModel UserControl1ViewModel
+        {
+            get { return _userControl1ViewModel; }
+            set
+            {
+                _userControl1ViewModel = value;
+            }
+        }
+
+        private object _display;
+        public object Display
+        {
+            get { return _display; }
+            set
+            {
+                _display = value;
+            }
+        }
+
+        public void OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            Debug.WriteLine("Mouse wheel!!!!!!!!!!!! delta : " + e.Delta);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel>
+            <ItemsControl ItemsSource="{Binding Custs}">
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <StackPanel>
+                            <ItemsPresenter/>
+                        </StackPanel>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Height="100" Width="100" HorizontalAlignment="Center" Name="xButton">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseWheel" >
+                                    <i:CallMethodAction MethodName="OnMouseWheel" TargetObject="{Binding DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <StackPanel>
+                                <TextBox Text="{Binding Name}"/>
+                                <TextBox Text="{Binding Age}"/>
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+using System.Collections.ObjectModel;
+
+namespace WpfApp2
+{
+    public class UserControl1ViewModel
+    {
+        public UserControl1ViewModel()
+        {
+            Custs.Add(new Cust() { Name = "John Doe", Age = 42 });
+            Custs.Add(new Cust() { Name = "Jane Doe", Age = 39 });
+            Custs.Add(new Cust() { Name = "Sammy Doe", Age = 13 });
+        }
+
+        private ObservableCollection<Cust> _custs = new ObservableCollection<Cust>();
+        public ObservableCollection<Cust> Custs
+        {
+            get { return _custs; }
+            set { _custs = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp2">
+    <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+        <local:UserControl1/>
+    </DataTemplate>
+
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+namespace WpfApp2
+{
+    public class Cust
+    {
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age;
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
+                if (value < 0)
+                    _age = 0;
+                else
+                    _age = value;
+            }
+        }
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3097,8 +4408,410 @@ namespace WpfApp2
 <br/>
 
 # View의 Event를 ViewModel에서 핸들링하기(AttachedProperty)
-    - 
+    - AttachedProperty를 활용함
 
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Dictionary1.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <StackPanel>
+        <ContentControl Content="{Binding Display}"/>
+        <Button Width="100" Height="30" Content="버튼" local:CommandBehavior.Event="MouseWheel"
+  local:CommandBehavior.Command="{Binding OneEvent}"/>
+        <Button Width="100" Height="30" Content="버튼" local:CommandBehavior.Event="Click"
+local:CommandBehavior.Command="{Binding OneEvent}"/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Windows.Input;
+using System.Windows;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace WpfApp2
+{
+    public class MainWindowViewModel
+    {
+        public MainWindowViewModel()
+        {
+            UserControl1ViewModel = new UserControl1ViewModel();
+            Display = UserControl1ViewModel;
+        }
+
+        private UserControl1ViewModel _userControl1ViewModel;
+        public UserControl1ViewModel UserControl1ViewModel
+        {
+            get { return _userControl1ViewModel; }
+            set
+            {
+                _userControl1ViewModel = value;
+            }
+        }
+
+        private object _display;
+        public object Display
+        {
+            get { return _display; }
+            set
+            {
+                _display = value;
+            }
+        }
+
+        private Command _oneEvent;
+        public ICommand OneEvent
+        {
+            get { return _oneEvent = new Command(OneEventFuntion); }
+        }
+
+        private void OneEventFuntion(object obj)
+        {
+            var arg = obj as MouseWheelEventArgs;
+            if (arg == null)
+            {
+                return;
+            }
+            Debug.WriteLine("delta : " + arg.Delta);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel>
+            <ItemsControl ItemsSource="{Binding Custs}">
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <StackPanel>
+                            <ItemsPresenter/>
+                        </StackPanel>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Height="100" Width="100" HorizontalAlignment="Center" Name="xButton"
+                                local:CommandBehavior.Event="MouseWheel"
+                                local:CommandBehavior.Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}, Path=DataContext.OneEvent}">
+                            <StackPanel>
+                                <TextBox Text="{Binding Name}"/>
+                                <TextBox Text="{Binding Age}"/>
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+using System.Collections.ObjectModel;
+
+namespace WpfApp2
+{
+    public class UserControl1ViewModel
+    {
+        public UserControl1ViewModel()
+        {
+            Custs.Add(new Cust() { Name = "John Doe", Age = 42 });
+            Custs.Add(new Cust() { Name = "Jane Doe", Age = 39 });
+            Custs.Add(new Cust() { Name = "Sammy Doe", Age = 13 });
+        }
+
+        private ObservableCollection<Cust> _custs = new ObservableCollection<Cust>();
+        public ObservableCollection<Cust> Custs
+        {
+            get { return _custs; }
+            set { _custs = value; }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Dictionary1.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp2">
+    <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+        <local:UserControl1/>
+    </DataTemplate>
+
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+namespace WpfApp2
+{
+    public class Cust
+    {
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        private int _age;
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
+                if (value < 0)
+                    _age = 0;
+                else
+                    _age = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp2
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#CommandBehavior.cs
+~~~c#
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Input;
+using System.Windows;
+
+namespace WpfApp2
+{
+    public class CommandBehavior
+    {
+        private class EventRaiseAttribute : Attribute
+        {
+
+        }
+
+        #region Command 
+
+        public static readonly DependencyProperty CommandProperty =
+        DependencyProperty.RegisterAttached(
+        "Command",
+        typeof(ICommand),
+        typeof(CommandBehavior),
+        new PropertyMetadata(OnCommandChanged));
+
+        public static ICommand GetCommand(DependencyObject d)
+        {
+            return d.GetValue(CommandProperty) as ICommand;
+        }
+
+        public static void SetCommand(DependencyObject d, ICommand value)
+        {
+            d.SetValue(CommandProperty, value);
+        }
+
+        private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
+
+        #endregion
+
+        #region Event 
+
+        public static readonly DependencyProperty EventProperty =
+        DependencyProperty.RegisterAttached(
+        "Event",
+        typeof(string),
+        typeof(CommandBehavior),
+        new PropertyMetadata(OnEventChanged));
+
+        private static void OnEventChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            BindEvent(d, e.NewValue as string);
+        }
+
+        public static string GetEvent(DependencyObject d)
+        {
+            return d.GetValue(EventProperty) as string;
+        }
+
+        public static void SetEvent(DependencyObject d, string value)
+        {
+            d.SetValue(EventProperty, value);
+        }
+
+        private static void BindEvent(DependencyObject owner, string eventName)
+        {
+            if (string.IsNullOrWhiteSpace(eventName))
+            {
+                return;
+            }
+
+            var eventInfo = owner.GetType().GetEvent(eventName, BindingFlags.Public | BindingFlags.Instance);
+            if (eventInfo == null)
+            {
+                throw new InvalidOperationException(String.Format("Could not resolve event name {0}", eventName));
+            }
+
+            var types = typeof(CommandBehavior).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo method = null;
+            foreach (var type in types)
+            {
+                var attributes = type.GetCustomAttributes(true);
+                if (attributes.OfType<EventRaiseAttribute>().Any())
+                {
+                    method = type;
+                    break;
+                }
+            }
+
+            if (method == null)
+            {
+                Debug.Assert(false, string.Format("invalid method type. type = {0}", eventName));
+                return;
+            }
+
+            var eventHandler = Delegate.CreateDelegate(eventInfo.EventHandlerType, null, method);
+
+            owner.SetValue(EventHandlerProperty, eventHandler);
+
+            //Register the handler to the Event 
+            eventInfo.AddEventHandler(owner, eventHandler);
+        }
+
+        [EventRaise]
+        private void OnEventRaised(object sender, EventArgs e)
+        {
+            var dependencyObject = sender as DependencyObject;
+            if (dependencyObject == null)
+            {
+                return;
+            }
+
+            var command = dependencyObject.GetValue(CommandProperty) as ICommand;
+            if (command == null)
+            {
+                return;
+            }
+
+            if (command.CanExecute(null) == false)
+            {
+                return;
+            }
+
+            command.Execute(e);
+        }
+
+        #endregion
+
+        #region EventHandler 
+
+        public static readonly DependencyProperty EventHandlerProperty =
+        DependencyProperty.RegisterAttached(
+        "EventHandler",
+        typeof(Delegate),
+        typeof(CommandBehavior));
+
+        public static Delegate GetEventHandler(DependencyObject d)
+        {
+            return d.GetValue(EventHandlerProperty) as Delegate;
+        }
+
+        public static void SetEventHandler(DependencyObject d, Delegate value)
+        {
+            d.SetValue(EventHandlerProperty, value);
+        }
+
+        #endregion
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3107,8 +4820,347 @@ namespace WpfApp2
 <br/>
 
 # View의 사용자 AttachedProperty 추가하기(+binding불가한 것)
-    - 
+    - 기존에 없는 사용자 정의 속성을 추가해서 사용하는 것이 목표이다
+    - 이값을 ViewModel에서 어떻게 가져올지는 찾지 못했다..일단 UI에서만 사용하도록 한다
+    - 바인딩으로 사용할 경우에는 프로퍼티 "{Binding (local:ExPropertys.BindablePassword)” 이런식으로 사용한다
 
+<br/>
+
+  - 윈도우 종료하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300"
+        local:WindowCloseBehavior.Close="{Binding CloseWindowFlage}">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    
+    <Grid>
+        <Button Width="100" Height="30" Content="종료" Command="{Binding OneClick}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        private bool _closeWindowFlage;
+        public bool CloseWindowFlage
+        {
+            get { return _closeWindowFlage; }
+            set
+            {
+                _closeWindowFlage = value;
+                Notify("CloseWindowFlage");
+            }
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            CloseWindowFlage = true;
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#WindowCloseBehavior.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    public static class WindowCloseBehavior
+    {
+        public static readonly DependencyProperty CloseProperty =
+            DependencyProperty.RegisterAttached(
+            "Close",
+            typeof(bool),
+            typeof(WindowCloseBehavior),
+            new UIPropertyMetadata(false, OnClose));
+
+        public static void SetClose(DependencyObject target, bool value)
+        {
+            target.SetValue(CloseProperty, value);
+        }
+
+        private static void OnClose(
+            DependencyObject sender,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is bool && (bool)e.NewValue)
+            {
+                var window = GetWindow(sender);
+                if (window != null)
+                {
+                    window.Close();
+                }
+            }
+        }
+
+        private static Window GetWindow(DependencyObject sender)
+        {
+            Window window = null;
+
+            if (sender is Window)
+            {
+                window = sender as Window;
+            }
+
+            return window ?? Window.GetWindow(sender);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+public class Command : ICommand
+{
+    Action<object> _execute;
+
+    public event EventHandler? CanExecuteChanged;
+
+    public Command(Action<object> execute)
+    {
+        _execute = execute;
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        _execute(parameter);
+    }
+}
+~~~
+
+<br/>
+
+  - ListBox 입력제한
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Grid>
+        <ListBox SelectionMode="Multiple"
+                 local:SimpleHelper.MaxSelectionCount="5">
+            <ListBoxItem>1</ListBoxItem>
+            <ListBoxItem>2</ListBoxItem>
+            <ListBoxItem>3</ListBoxItem>
+            <ListBoxItem>4</ListBoxItem>
+            <ListBoxItem>5</ListBoxItem>
+            <ListBoxItem>6</ListBoxItem>
+            <ListBoxItem>7</ListBoxItem>
+        </ListBox>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#SimpleHelper.cs
+~~~c#
+using System.Windows;
+using System.Windows.Controls;
+
+namespace WpfApp1
+{
+    public static class SimpleHelper
+    {
+        public static int GetMaxSelectionCount(DependencyObject obj)
+        {
+            return (int)obj.GetValue(MaxSelectionCountProperty);
+        }
+
+        public static void SetMaxSelectionCount(DependencyObject obj, int value)
+        {
+            obj.SetValue(MaxSelectionCountProperty, value);
+        }
+
+        public static readonly DependencyProperty MaxSelectionCountProperty =
+        DependencyProperty.RegisterAttached(
+        "MaxSelectionCount",
+        typeof(int),
+        typeof(SimpleHelper),
+        new UIPropertyMetadata(int.MaxValue, OnMaxSelectionCountChanged));
+
+        private static void OnMaxSelectionCountChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            ListBox MultiSelector = sender as ListBox;
+            if ((int)e.OldValue == int.MaxValue) // 이벤트 할당을 딱 한번만 하기 위해서 사용
+            {
+                // 여기서 이벤트를 할당함 //람다 표현식
+                MultiSelector.SelectionChanged += (ss, ee) =>
+                {
+                    CoerceSelectionCount(MultiSelector);
+                };
+            }
+
+            CoerceSelectionCount(MultiSelector);
+        }
+
+        private static void CoerceSelectionCount(ListBox multiSelector)
+        {
+            int MaxSelectionCount = GetMaxSelectionCount(multiSelector);
+            if (multiSelector.SelectedItems.Count > MaxSelectionCount)
+            {
+                for (int i = multiSelector.SelectedItems.Count; i > MaxSelectionCount - 1; i--)
+                {
+                    if (multiSelector.SelectedItems.Count <= i)
+                        continue;
+
+                    multiSelector.SelectedItems.Remove(multiSelector.SelectedItems[i]);
+                }
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 비밀번호 박스 바인딩
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Grid>
+        <StackPanel>
+            <PasswordBox x:Name="passwordBox"
+                         local:ExPropertys.IsPasswordBindable="True"/>
+            <TextBlock Text="Password you entered"/>
+
+            <!--xaml에 RegisterAttached 바인딩 하기-->
+            <TextBlock Text="{Binding (local:ExPropertys.BindablePassword), ElementName=passwordBox}"/>
+        </StackPanel>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#ExPropertys.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace WpfApp1
+{
+    public class ExPropertys
+    {
+        public static string GetBindablePassword(DependencyObject obj)
+        {
+            return (string)obj.GetValue(BindablePasswordProperty);
+        }
+        public static void SetBindablePassword(DependencyObject obj, string value)
+        {
+            obj.SetValue(BindablePasswordProperty, value);
+        }
+
+        public static readonly DependencyProperty BindablePasswordProperty = 
+            DependencyProperty.RegisterAttached("BindablePassword", typeof(string), typeof(ExPropertys), new PropertyMetadata(null));
+
+        public static bool GetIsPasswordBindable(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(IsPasswordBindableProperty);
+        }
+        public static void SetIsPasswordBindable(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsPasswordBindableProperty, value);
+        }
+
+        public static readonly DependencyProperty IsPasswordBindableProperty = 
+            DependencyProperty.RegisterAttached("IsPasswordBindable", typeof(bool), typeof(ExPropertys), new PropertyMetadata(false, IsPasswordBindableChanged));
+
+        private static void IsPasswordBindableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            PasswordBox passwordBox = d as PasswordBox;
+            if (passwordBox == null)
+                return;
+            if ((bool) e.NewValue)
+            {
+                passwordBox.PasswordChanged += PasswordBox_PasswordChanged;
+            }
+            else
+            {
+                passwordBox.PasswordChanged -= PasswordBox_PasswordChanged;
+            }
+        }        
+        private static void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            var passwordBox = (PasswordBox)sender;
+            SetBindablePassword(passwordBox, passwordBox.Password);
+        }
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -3117,8 +5169,112 @@ namespace WpfApp2
 <br/>
 
 # Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)
-    - 
+    - 개인적으로 이 방법이 더 편리한 방법인것 같다…
+    - ViewModel에서 컨트롤 할 수 있다
 
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/05f269d2-2f71-498a-becc-475991793639)
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    
+    <Grid>
+        <StackPanel>
+            <PasswordBox Height="30">
+                <i:Interaction.Behaviors>
+                    <local:PasswordBoxBehavior Password="{Binding PasswordStr, UpdateSourceTrigger=PropertyChanged}"/>
+                </i:Interaction.Behaviors>
+            </PasswordBox>
+            <TextBlock Text="{Binding PasswordStr}"/>
+        </StackPanel>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        private string _passwordStr;
+        public string PasswordStr
+        {
+            get { return _passwordStr; }
+            set
+            {
+                _passwordStr = value;
+                Notify("PasswordStr");
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#PasswordBoxBehavior.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        private string _passwordStr;
+        public string PasswordStr
+        {
+            get { return _passwordStr; }
+            set
+            {
+                _passwordStr = value;
+                Notify("PasswordStr");
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
