@@ -60,6 +60,19 @@
     - [ItemsControl](#itemscontrol)
 
 <br/>
+
+  - [MVVM패턴](#mvvm패턴)
+    - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
+    - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
+    - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
+    - [ItemsControl 형태로 만들어 캐시하기](#itemscontrol-형태로-만들어-캐시하기)
+    - [View의 Event를 ViewModel에서 핸들링하기(InvokeCommandAction)](#view의-event를-viewmodel에서-핸들링하기invokecommandaction)
+    - [View의 Event를 ViewModel에서 핸들링하기(CallMethodAction)](#view의-event를-viewmodel에서-핸들링하기callmethodaction)
+    - [View의 Event를 ViewModel에서 핸들링하기(AttachedProperty)](#view의-event를-viewmodel에서-핸들링하기attachedproperty)
+    - [View의 사용자 AttachedProperty 추가하기(+binding불가한 것)](#view의-사용자-attachedproperty-추가하기binding불가한-것)
+    - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
+
+<br/>
  
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
