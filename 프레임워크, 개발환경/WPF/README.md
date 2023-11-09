@@ -78,6 +78,7 @@
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
 - [Command](#command)
+- [Converter](#Converter)
 
 <br/>
 
@@ -171,7 +172,6 @@
     - [EventTrigger](#eventtrigger)
   - [ControlTemplate](#controltemplate)
     - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
-  - [Converter](#Converter)
 
 <br/>
 
@@ -5501,6 +5501,123 @@ namespace WpfApp1
 
 ***
 
+# Converter
+
+#MainWindow.xaml
+~~~c#
+ <Window.Resources>
+        <local:IntToColorConverter x:Key="IntToColorConverter"/>
+        <local:DoubleNumConverter x:Key="DoubleNumConverter"/>
+    </Window.Resources>
+    <Grid Background="{Binding PersonCount, Converter={StaticResource IntToColorConverter}}">
+        <TextBox HorizontalAlignment="Center" VerticalAlignment="Center" Width="80" Height="50" FontSize="25" Text="{Binding PersonCount, Converter={StaticResource DoubleNumConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Media;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window, INotifyPropertyChanged
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private int _personCount;
+        public int PersonCount
+        {
+            get => _personCount;
+            set
+            {
+                _personCount = value;
+                Notify();
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+
+    public class IntToColorConverter : IValueConverter
+    {
+        // ViewModel -> View
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            SolidColorBrush color = new SolidColorBrush(Colors.Transparent);
+            if (value == null)
+            {
+                return color;
+            }
+            int personCount = (int)value;
+
+            // 5인 이상 집합 금지!
+            if (personCount >= 5)
+            {
+                color = new SolidColorBrush(Colors.Red);
+            }
+
+            return color;
+        }
+
+        // View -> ViewModel
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class DoubleNumConverter : IValueConverter
+    {
+        // ViewModel -> View
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+
+        // View -> ViewModel
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int DoubleNum = int.Parse((string)value);
+            return DoubleNum * 2;
+        }
+    }
+}
+
+~~~
+
+###### [Converter](#Converter)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # ObservableCollection
   - ObservableCollection 과 List차이 : WPF에서는 ListBox와ListView같은 곳에서 바인딩 사용시(ItemSource) ObserableColletion을 대부분 사용하게 된다. ObserableColletion는 UI에서 실시간으로 반영을 해주기 때문이다, 그러나 일반적인 List 는 변경된 List의 내용을 UI 에서 실시간으로 반영하지 않는다
 
@@ -9402,123 +9519,6 @@ namespace WpfApp1
 ![20231009_155125](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/faa31a73-1127-4c06-a99c-6bbce5e6f03d)
 
 ###### [ControlTemplate](#controltemplate)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# Converter
-
-#MainWindow.xaml
-~~~c#
- <Window.Resources>
-        <local:IntToColorConverter x:Key="IntToColorConverter"/>
-        <local:DoubleNumConverter x:Key="DoubleNumConverter"/>
-    </Window.Resources>
-    <Grid Background="{Binding PersonCount, Converter={StaticResource IntToColorConverter}}">
-        <TextBox HorizontalAlignment="Center" VerticalAlignment="Center" Width="80" Height="50" FontSize="25" Text="{Binding PersonCount, Converter={StaticResource DoubleNumConverter}, UpdateSourceTrigger=PropertyChanged}"/>
-    </Grid>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Media;
-
-namespace WpfApp1
-{
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.DataContext = this;
-        }
-
-        private int _personCount;
-        public int PersonCount
-        {
-            get => _personCount;
-            set
-            {
-                _personCount = value;
-                Notify();
-            }
-        }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void Notify([CallerMemberName] string propertyName = null)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
-    }
-
-    public class IntToColorConverter : IValueConverter
-    {
-        // ViewModel -> View
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            SolidColorBrush color = new SolidColorBrush(Colors.Transparent);
-            if (value == null)
-            {
-                return color;
-            }
-            int personCount = (int)value;
-
-            // 5인 이상 집합 금지!
-            if (personCount >= 5)
-            {
-                color = new SolidColorBrush(Colors.Red);
-            }
-
-            return color;
-        }
-
-        // View -> ViewModel
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class DoubleNumConverter : IValueConverter
-    {
-        // ViewModel -> View
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value;
-        }
-
-        // View -> ViewModel
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            int DoubleNum = int.Parse((string)value);
-            return DoubleNum * 2;
-        }
-    }
-}
-
-~~~
-
-###### [Converter](#Converter)
 ###### [Top](#top)
 
 <br/>
