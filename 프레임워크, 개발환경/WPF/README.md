@@ -74,11 +74,11 @@
     - [DependencyProperty](#dependencyproperty)
 
 <br/>
- 
+
+- [Converter](#Converter)
 - [ObservableCollection](#observablecollection)
 - [INotifyPropertyChanged](#inotifypropertychanged)
 - [Command](#command)
-- [Converter](#Converter)
 
 <br/>
 
