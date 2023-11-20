@@ -198,6 +198,7 @@
     - [캡쳐하기](#캡쳐하기)
     - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
     - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
+    - [Bitmap을 활용한 png 컬러 변경](#bitmap을-활용한-png-컬러-변경)
       
   </div>
   </details>
@@ -5070,6 +5071,7 @@ void CClientDlg::OnBnClickedSenddata()
     - [캡쳐하기](#캡쳐하기)
     - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
     - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
+    - [Bitmap을 활용한 png 컬러 변경](#bitmap을-활용한-png-컬러-변경)
 
 ###### [기능별 정리](#기능별-정리)
 ###### [Top](#top)
@@ -5218,6 +5220,147 @@ char* CKioskOrderHisryDetail::CstringLeft(char* sz, int len)
 
 	return sz;
 };
+~~~
+
+###### [기능별 정리](#기능별-정리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Bitmap을 활용한 png 컬러 변경
+  - MFC프로젝트를 만들면 최상단에 디버그 모드 일때는 new생성자를 사용할 수 없도록 세팅 되어 있으니 확인하기..이것 때문에 1시간을 소모함..
+
+~~~c++
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+#include <gdiplus.h> // GDI+를 사용하기 위한 헤더 파일
+#pragma comment(lib, "gdiplus") // GDI+를 사용하기 위한 라이브러리 파일
+using namespace Gdiplus; // GDI+는 클래스 개념과 네임스페이스 개념을 사용하기 때문에, 편하게 쓰기 위함
+
+public:
+	void SetImageColorChange(CString csFileNameOutPut, int inRorignal, int inGorignal, int inBorignal, int inRchange, int inGchange, int inBchange);
+
+	ULONG_PTR m_gpToken;
+	GdiplusStartupInput m_gpsi; // GDI+의 처리 방식에 추가적인 옵션을 설정하는 변수
+	afx_msg void OnDestroy();
+~~~
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+
+	if (GdiplusStartup(&m_gpToken, &m_gpsi, NULL) != Ok)
+	{
+		AfxMessageBox(_T("GDI+ 사용 실패"));
+	}
+
+	CString csDir = _T("");
+	csDir.Format(_T("%s"), _T("C:\\AstemsKiosks\\Img\\Kiosk_test1.png"));
+	SetImageColorChange(csDir, 0, 255, 0, 125, 125, 125);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+...
+
+void CMFCApplication1Dlg::SetImageColorChange(CString csFileNameOutPut, int inRorignal, int inGorignal, int inBorignal, int inRchange, int inGchange, int inBchange)
+{
+	/////////////////
+	USES_CONVERSION;
+	WCHAR* wszFileNameOutPut = T2W(csFileNameOutPut.GetBuffer());
+	Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(wszFileNameOutPut);
+
+	Status loadStatus = bitmap->GetLastStatus();
+	if (loadStatus != Ok)
+	{
+		AfxMessageBox(_T("변환할 이미지를 로드하지 못했습니다"));
+	}
+
+	COLORREF PixColor = 0;
+	Color color;
+
+	int inWidth = bitmap->GetWidth();
+	int inHeigh = bitmap->GetHeight();
+	int R = 0, G = 0, B = 0, A = 0;
+
+	for (int i = 0; i < inWidth; i++)
+		for (int j = 0; j < inHeigh; j++)
+		{
+			bitmap->GetPixel(i, j, &color);
+			A = color.GetA();
+			R = color.GetR();
+			G = color.GetG();
+			B = color.GetB();
+
+			if (R == inRorignal && G == inGorignal && B == inBorignal)
+			{
+				R = inRchange;
+				G = inGchange;
+				B = inBchange;
+				A = 255;
+			}
+			else
+			{
+				A = 0;
+			}
+
+			color = RGB(R, G, B) | ((DWORD)A << 24);
+
+			bitmap->SetPixel(i, j, color);
+		}
+
+	CLSID pngClsid;
+	CLSIDFromString(L"{557CF406-1A04-11D3-9A73-0000F81EF32E}", &pngClsid);
+
+	CString csDir = _T("");
+	csDir.Format(_T("%s"), _T("C:\\AstemsKiosks\\Img\\99999999.png"));
+	WCHAR* tempOutPut = T2W(csDir.GetBuffer());
+	bitmap->Save(tempOutPut, &pngClsid, NULL);
+	delete bitmap;
+
+	if (!DeleteFile(csFileNameOutPut))
+	{
+		AfxMessageBox(_T("사진 삭제에 실패하였습니다"));
+	}
+
+	
+
+#ifdef _UNICODE
+	if (MoveFile(tempOutPut, wszFileNameOutPut) == FALSE) {
+		AfxMessageBox(_T("이미지 파일 이름을 변경하지 못했습니다"));
+	}
+
+#else
+	// 임시 파일을 원본 파일 이름으로 변경
+	CW2A sztempOutPut(tempOutPut, CP_ACP);
+	CW2A szfilePathOutPut(wszFileNameOutPut, CP_ACP);
+
+	if (MoveFile(sztempOutPut, szfilePathOutPut) == FALSE) {
+		AfxMessageBox(_T("이미지 파일 이름을 변경하지 못했습니다"));
+	}
+#endif
+	
+}
+
+...
+
+void CMFCApplication1Dlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	::GdiplusShutdown(m_gpToken);
+}
 ~~~
 
 ###### [기능별 정리](#기능별-정리)
