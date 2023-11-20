@@ -226,6 +226,7 @@
     - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
     - [여러가지 그리기](#여러가지-그리기)
     - [이미지 원하는 모양으로 출력하기](#이미지-원하는-모양으로-출력하기)
+    - [PNG A(알파)값 포함 이미지 출력하기](#png-a알파값-포함-이미지-출력하기)
       
   </div>
   </details>
@@ -5528,6 +5529,7 @@ dc.BitBlt(0, 0, w, h, &mem_dc, 0, 0, SRCCOPY); // 장치 dc에 메모리 dc를 �
   - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
   - [여러가지 그리기](#여러가지-그리기)
   - [이미지 원하는 모양으로 출력하기](#이미지-원하는-모양으로-출력하기)
+  - [PNG A(알파)값 포함 이미지 출력하기](#png-a알파값-포함-이미지-출력하기)
 
 ###### [GDI Plus(+)](#gdi-plus)
 ###### [Top](#top)
@@ -5794,6 +5796,29 @@ void GetCapsule(GraphicsPath* pPath, RectF baseRect)
 	END_CATCH
 		pPath->CloseFigure(); 
 }
+~~~
+
+###### [GDI Plus(+)](#gdi-plus)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# PNG A(알파)값 포함 이미지 출력하기
+  - GDI+의 Bitmap으로 출력하면 출력할 수 있다
+  - DrawImage를 할때 Bitmap을 집어 넣기만 하면 끝
+
+#AppDlg.cpp
+~~~C++
+//GDI+ 로 PNG출력하기 TEST
+	csDir = _T("");
+	csDir.Format("%s\\%s",g_csInstallDir + FILE_DATABASE_IMG_DIR, "wait-bottom1.png");
+
+	USES_CONVERSION;
+	WCHAR *wszFileNameOutPut = T2W(csDir.GetBuffer());
+	Bitmap* bitmap = new Bitmap(wszFileNameOutPut);
+	Graphics graphics(dc->GetSafeHdc());
+	graphics.DrawImage(bitmap, m_rdisplay3.left, m_rdisplay3.top); // m_rdisplay3는 그릴 위치 및 크기입니다.
 ~~~
 
 ###### [GDI Plus(+)](#gdi-plus)
