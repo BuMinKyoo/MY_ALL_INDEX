@@ -122,7 +122,7 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
     - [CPU와GPU](#cpu와gpu)
     - [Virtual Memory](#virtual-memory)
     - [Process와 Thread](#process와-thread)
-    - [Process간 통신 IPC](#process간-통신-ipc)
+    - [Process간 통신 IPC, SOKET, MESSAGE PASSING](#process간-통신-ipc-soket-message-passing)
     - [메모리관리](#메모리관리)
     
   </div>
@@ -1735,7 +1735,7 @@ a : 8, b : 3
   - [CPU와GPU](#cpu와gpu)
   - [Virtual Memory](#virtual-memory)
   - [Process와 Thread](#process와-thread)
-  - [Process간 통신 IPC](#process간-통신-ipc)
+  - [Process간 통신 IPC, SOKET, MESSAGE PASSING](#process간-통신-ipc-soket-message-passing)
   - [메모리관리](#메모리관리)
 
 ###### [운영체제](#운영체제)
@@ -1948,10 +1948,10 @@ a : 8, b : 3
 <br/>
 <br/>
 
-# Process간 통신 IPC
-  - Process별로 할당된 Virtual Memory는 OS가 보장해 주고 있으며, 서로간에 메모리를 침범할 수 없다. 따라서, IPC방법을 통해서, 어떤 Process에 공유 메모리를 할당해서 그것을 어떤 Process도 접근할 수 있도록 한다
-  - Process가 사용하는 자원
-    - RAM(=고정길이) + File(2차 메모리)(=Stream, 길이 제한 없음)
+# Process간 통신 IPC, SOKET, MESSAGE PASSING
+  - 프로세스 끼리 통신하는 것은 IPC(공유메모리), SOKET, MESSAGE PASSING이렇게 3가지가 있다
+    - 공유메모리는, 시스템 호출을 통해서 메모리를 할당하기 때문에, 컴퓨터를 끄거나, 할당을 직접 해제 하지 않는이상 프로그램의 종료에 의해서 없어지지 않는다. 속도가 빠르며, 다량의 데이터를 교환할때 유리하다
+    - MESSAGE PASSING은 속도가 매우 느리며, 적은 양의 데이터를 전달할때 사용한다
 
 ###### [운영체제](#운영체제)
 ###### [Top](#top)
