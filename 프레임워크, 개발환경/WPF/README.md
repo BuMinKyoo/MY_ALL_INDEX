@@ -62,7 +62,7 @@
 <br/>
 
   - [MVVM패턴](#mvvm패턴)
-    - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
+    - [](#mainViewxaml에-viewmodel-고정문제)
     - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
     - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
     - [ItemsControl 형태로 만들어 캐시하기](#itemscontrol-형태로-만들어-캐시하기)
@@ -3043,8 +3043,8 @@ namespace WpfApp2
 <br/>
 
 # MainView.xaml에 ViewModel 고정문제
-    - 아래와 같이 MainWindow.xaml 에서 자신이 사용할 ViewModel을 고정해서 박아 두게 되면, 이것만으로 벌써 View와 ViewModel은 끈끈한 의존성이 생기게 된다. MainWindow 라는 View는 일단 로딩이 되면 무조건 MainWindowViewModel 라는 ViewModel을 무조건 함께 생성하여 달고 다녀야만 하기 때문에 이렇게 하면 안된다
-    - 아래와 같이 하면 UserControl1 항상 달고 다녀야 한다
+  - 아래와 같이 MainWindow.xaml 에서 자신이 사용할 ViewModel을 고정해서 박아 두게 되면, 이것만으로 벌써 View와 ViewModel은 끈끈한 의존성이 생기게 된다. MainWindow 라는 View는 일단 로딩이 되면 무조건 MainWindowViewModel 라는 ViewModel을 무조건 함께 생성하여 달고 다녀야만 하기 때문에 이렇게 하면 안된다
+  - 아래와 같이 하면 UserControl1 항상 달고 다녀야 한다
 
 <br/>
 
@@ -3122,10 +3122,10 @@ namespace WpfApp1
 <br/>
 
 # MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제
-    - MainViewModel을 제외한 다른 화면에 대한 것은 MainWindowViewModel에서 각자 화면의 Class를 받아서 그것을 불러와 DataTemplate에 대한 DataType을 지정해서 ResourceDictionary안에서 처리 하도록 한다.
-    - 아래의 코드는 ResourceDictionary를 MainWindow.xaml에서 처리하였지만, 편리하게 하기 위해서는 최상위인 App.xaml에서 처리할 수도 있다
-    - DataTemplate은 기본적으로 xaml 이 지원하는 x:Key 라는 속성을 필수요소로 이용하여 Key 를 사용하는 Template에 적용되는 구조를 가지고 있지만, DataTemplate의 x:Key를 비우고 DataType 에만 값을 할당한 경우 할당한 DataType을 x:Key로 사용하도록 구성되어 있다.
-    - 하지만 이 방법은 Window창을 다루지는 못한다
+  - MainViewModel을 제외한 다른 화면에 대한 것은 MainWindowViewModel에서 각자 화면의 Class를 받아서 그것을 불러와 DataTemplate에 대한 DataType을 지정해서 ResourceDictionary안에서 처리 하도록 한다.
+  - 아래의 코드는 ResourceDictionary를 MainWindow.xaml에서 처리하였지만, 편리하게 하기 위해서는 최상위인 App.xaml에서 처리할 수도 있다
+  - DataTemplate은 기본적으로 xaml 이 지원하는 x:Key 라는 속성을 필수요소로 이용하여 Key 를 사용하는 Template에 적용되는 구조를 가지고 있지만, DataTemplate의 x:Key를 비우고 DataType 에만 값을 할당한 경우 할당한 DataType을 x:Key로 사용하도록 구성되어 있다.
+  - 하지만 이 방법은 Window창을 다루지는 못한다
 
 <br/>
 
@@ -3514,10 +3514,10 @@ namespace WpfApp1
 <br/>
 
 # ViewCache를 만들어 캐시하기
-    - ViewCache만들어서, UserControl을 다시 만들지 않도록 할 수 있다
-    - 이 구조는 일종의 컨테이너 역할을 하는 빈 UserControl을 ViewCache 클래스가 기본으로 반환하기 때문에(상속에 의한 반환) 사실 View 를 전혀 재생성 하지 않는 구조라고는 볼 수 없다.(빈 UserControl은 매번 생성하기 때문에.) 다만 실질적인 View 의 재생성을 막는 차원에서 추가적인 View 생성을 최소화 할 수 있다
-    - 하나의 컨트롤을 만들때 사용하면 효율적인 방법이 된다
-    - Window가 Close 될 때 GC의 수집 대상이 될 것이므로, 이 때 하위 View 를 보이는 방식으로 ViewCache를 사용하게 되면 내부 View 는 재사용할 수 있고, 컨테이너인 빈 UserControl은 Window가 수집될 때, 함께 제거될 것이므로 큰 문제가 되지 않는다. (ViewCache의 빈 UserControl이 Unload 될 때 Content = null 처리를 한다)
+  - ViewCache만들어서, UserControl을 다시 만들지 않도록 할 수 있다
+  - 이 구조는 일종의 컨테이너 역할을 하는 빈 UserControl을 ViewCache 클래스가 기본으로 반환하기 때문에(상속에 의한 반환) 사실 View 를 전혀 재생성 하지 않는 구조라고는 볼 수 없다.(빈 UserControl은 매번 생성하기 때문에.) 다만 실질적인 View 의 재생성을 막는 차원에서 추가적인 View 생성을 최소화 할 수 있다
+  - 하나의 컨트롤을 만들때 사용하면 효율적인 방법이 된다
+  - Window가 Close 될 때 GC의 수집 대상이 될 것이므로, 이 때 하위 View 를 보이는 방식으로 ViewCache를 사용하게 되면 내부 View 는 재사용할 수 있고, 컨테이너인 빈 UserControl은 Window가 수집될 때, 함께 제거될 것이므로 큰 문제가 되지 않는다. (ViewCache의 빈 UserControl이 Unload 될 때 Content = null 처리를 한다)
 
 <br/>
 
@@ -3617,9 +3617,9 @@ namespace WpfApp1
 <br/>
 
 # ItemsControl 형태로 만들어 캐시하기
-    - <ContentControl Content="{Binding}"/>에 의해 ItemsSource 의 요소들이 그려질 때 ContentControl의 Content가 대신 그려지게 되며, 이 때 미리 선언해 놓은 DataTemplate이 다시 채워서 그려지게 된다
-    - 여러 화면을 보일때 유용한 방법이 된다
-    - 하나의 화면만을 출력하게 될 경우에는, Item만 들어가야할 자리에 Collection을 사용하는 꼴이라 불필요한 코드가 많이 들어갈 수밖에 없으며, Window가 GC의 수집대상이 될 때 ItemsControl로 함께 수집대상이 되므로 GC의 효율을 떨어뜨리게 된다.
+  - <ContentControl Content="{Binding}"/>에 의해 ItemsSource 의 요소들이 그려질 때 ContentControl의 Content가 대신 그려지게 되며, 이 때 미리 선언해 놓은 DataTemplate이 다시 채워서 그려지게 된다
+  - 여러 화면을 보일때 유용한 방법이 된다
+  - 하나의 화면만을 출력하게 될 경우에는, Item만 들어가야할 자리에 Collection을 사용하는 꼴이라 불필요한 코드가 많이 들어갈 수밖에 없으며, Window가 GC의 수집대상이 될 때 ItemsControl로 함께 수집대상이 되므로 GC의 효율을 떨어뜨리게 된다.
 
 <br/>
 
@@ -3923,10 +3923,10 @@ namespace WpfApp1
 <br/>
 
 # View의 Event를 ViewModel에서 핸들링하기(InvokeCommandAction)
-    - InvokeCommandAction 사용한 방법소개
-    - CommandParameter 속성을 넣으면 이벤트를 발생시켰을때 특정한 데이터 값을 보내줄 수 있다
-    - PassEventArgsToCommand="True" 을 사용하면, MouseWheel같은 이벤트시 Delta값도 받아 올 수 있다
-    - 하지만 현재는 CommandParameter 와 PassEventArgsToCommand을 동시에 사용하면 CommandParameter 의 값만 들어오게 된다.. 따라서 아래의 코드는 따로 따로 이벤트가 2번 전달 되고 있다
+  - InvokeCommandAction 사용한 방법소개
+  - CommandParameter 속성을 넣으면 이벤트를 발생시켰을때 특정한 데이터 값을 보내줄 수 있다
+  - PassEventArgsToCommand="True" 을 사용하면, MouseWheel같은 이벤트시 Delta값도 받아 올 수 있다
+  - 하지만 현재는 CommandParameter 와 PassEventArgsToCommand을 동시에 사용하면 CommandParameter 의 값만 들어오게 된다.. 따라서 아래의 코드는 따로 따로 이벤트가 2번 전달 되고 있다
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0d71366a-d76b-4837-bdc2-a38f74ec1a44)
 
@@ -4183,12 +4183,12 @@ namespace WpfApp2
 <br/>
 
 # View의 Event를 ViewModel에서 핸들링하기(CallMethodAction)
-    - CallMethodAction사용한 방법소개
-    - MouseWheel같은 이벤트시 Delta값을 받아 올 수 있다
-    - TargetObject으로 해당하는 ViewModel을 지정해주고, MethodName으로 함수이름을 지정한다.
-    - OnMouseWheel함수에 인자 없는 함수로 만들어 호출할 수도 있다.
-    - 하지만 인자가 없거나 시그니처를 맞춘 형태가 아닌 다른 형태의 메서드를 정의하면 디자인 타임이아니라 런타임에서 Event발생시 예외가 떨어진다
-    - object sender를 통해서 var button = sender as Button를 이용해서 UI객체를 얻어 올 수 있으니 사용상 주의 해야 한다
+  - CallMethodAction사용한 방법소개
+  - MouseWheel같은 이벤트시 Delta값을 받아 올 수 있다
+  - TargetObject으로 해당하는 ViewModel을 지정해주고, MethodName으로 함수이름을 지정한다.
+  - OnMouseWheel함수에 인자 없는 함수로 만들어 호출할 수도 있다.
+  - 하지만 인자가 없거나 시그니처를 맞춘 형태가 아닌 다른 형태의 메서드를 정의하면 디자인 타임이아니라 런타임에서 Event발생시 예외가 떨어진다
+  - object sender를 통해서 var button = sender as Button를 이용해서 UI객체를 얻어 올 수 있으니 사용상 주의 해야 한다
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/dba04233-75c6-4d75-b040-7d3bcb34c058)
 
@@ -4408,7 +4408,7 @@ namespace WpfApp2
 <br/>
 
 # View의 Event를 ViewModel에서 핸들링하기(AttachedProperty)
-    - AttachedProperty를 활용함
+  - AttachedProperty를 활용함
 
 <br/>
 
@@ -4820,9 +4820,9 @@ namespace WpfApp2
 <br/>
 
 # View의 사용자 AttachedProperty 추가하기(+binding불가한 것)
-    - 기존에 없는 사용자 정의 속성을 추가해서 사용하는 것이 목표이다
-    - 이값을 ViewModel에서 어떻게 가져올지는 찾지 못했다..일단 UI에서만 사용하도록 한다
-    - 바인딩으로 사용할 경우에는 프로퍼티 "{Binding (local:ExPropertys.BindablePassword)” 이런식으로 사용한다
+  - 기존에 없는 사용자 정의 속성을 추가해서 사용하는 것이 목표이다
+  - 이값을 ViewModel에서 어떻게 가져올지는 찾지 못했다..일단 UI에서만 사용하도록 한다
+  - 바인딩으로 사용할 경우에는 프로퍼티 "{Binding (local:ExPropertys.BindablePassword)” 이런식으로 사용한다
 
 <br/>
 
@@ -5169,8 +5169,8 @@ namespace WpfApp1
 <br/>
 
 # Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)
-    - 개인적으로 이 방법이 더 편리한 방법인것 같다…
-    - ViewModel에서 컨트롤 할 수 있다
+  - 개인적으로 이 방법이 더 편리한 방법인것 같다…
+  - ViewModel에서 컨트롤 할 수 있다
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/05f269d2-2f71-498a-becc-475991793639)
 
