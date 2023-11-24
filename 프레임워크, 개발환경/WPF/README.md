@@ -62,7 +62,7 @@
 <br/>
 
   - [MVVM패턴](#mvvm패턴)
-    - [](#mainViewxaml에-viewmodel-고정문제)
+    - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
     - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
     - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
     - [ItemsControl 형태로 만들어 캐시하기](#itemscontrol-형태로-만들어-캐시하기)
@@ -72,6 +72,21 @@
     - [View의 사용자 AttachedProperty 추가하기(+binding불가한 것)](#view의-사용자-attachedproperty-추가하기binding불가한-것)
     - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
     - [DependencyProperty](#dependencyproperty)
+
+<br/>
+
+- [트리거](#트리거)
+  - [Trigger](#trigger)
+  - [애니메이션](#애니메이션)
+  - [MultiTrigger](#multitrigger)
+  - [DataTrigger](#datatrigger)
+  - [DataTrigger안에 DoubleAnimation적용하기](#datatrigger안에-doubleanimation적용하기)
+  - [EventTrigger](#eventtrigger)
+
+ <br/>
+
+- [ControlTemplate](#controltemplate)
+  - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
 
 <br/>
 
@@ -164,14 +179,6 @@
     - SelectedIndex
     - ListView헤더 크기를 비율로 조절하기(Binding활용)
     - DisplayMemberBinding
-  - [트리거](#트리거)
-    - [Trigger](#trigger)
-    - [애니메이션](#애니메이션)
-    - [MultiTrigger](#multitrigger)
-    - [DataTrigger](#datatrigger)
-    - [EventTrigger](#eventtrigger)
-  - [ControlTemplate](#controltemplate)
-    - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
 
 <br/>
 
@@ -5501,6 +5508,436 @@ namespace WpfApp1
 
 ***
 
+# 트리거
+  - 어떤 속성이 만족했을 경우에 작동하게 된다
+  - 트리거 종류
+    - EventTrigger
+    - MultiDataTrigger
+    - MultiTrigger
+    - Trigger
+  - 애니메이션 만들기
+    - Trigger.EnterActions
+    - Trigger.ExitActions
+      - To : 최종값
+      - Duration : 지속시간
+      - Stroyboard.TargetProperty : 애니메이션을 적용할 속성
+
+<br/>
+
+  - [Trigger](#trigger)
+  - [애니메이션](#애니메이션)
+  - [MultiTrigger](#multitrigger)
+  - [DataTrigger](#datatrigger)
+  - [DataTrigger안에 DoubleAnimation적용하기](#datatrigger안에-doubleanimation적용하기)
+  - [EventTrigger](#eventtrigger)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Trigger
+  - 아래의 Trigger는 Text가 없다면 빨간색으로 표시하라는것
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="NameBox" TargetType="TextBox">
+            <Setter Property="Background" Value="Aquamarine"/>
+            <Setter Property="Margin"  Value="5,0,5,5"/>
+
+            <Style.Triggers>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Background" Value="red"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel>
+        <Label Content="이름"/>
+        <TextBox Style="{StaticResource NameBox}"/>
+        <Label Content="아이디"/>
+        <TextBox Style="{StaticResource NameBox}"/>
+    </StackPanel>
+</Window>
+~~~
+
+![20231009_140631](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0944ad96-7202-4624-b8c2-f633fec73d32)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 애니메이션
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,20,0,0"/>
+            <Setter Property="Opacity" Value="0.5"/>
+            <Setter Property="Width" Value="100"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation To="1" Duration="0:0:1"
+                                                Storyboard.TargetProperty="Opacity"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation To="0.5" Duration="0:0:1"
+                                                Storyboard.TargetProperty="Opacity"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button Style="{StaticResource ButtonStyle}">확인</Button>
+        <Button Style="{StaticResource ButtonStyle}">취소</Button>
+    </StackPanel>
+</Window>
+~~~
+
+![20231009_140710](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/a230c25a-8477-423d-bc48-95f79336aff7)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MultiTrigger
+  -  정의 된 모든 트리거가 작동이 되면 작동된다.
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Aqua"/>
+
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                        <Condition Property="Content" Value="목록3"/>
+                    </MultiTrigger.Conditions>
+                    <MultiTrigger.Setters>
+                        <Setter Property="Foreground" Value="red"/>
+                        <Setter Property="FontSize" Value="15"/>
+                    </MultiTrigger.Setters>
+                </MultiTrigger>
+
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <ListBox>
+        <ListBoxItem>목록1</ListBoxItem>
+        <ListBoxItem>목록2</ListBoxItem>
+        <ListBoxItem>목록3</ListBoxItem>
+        <ListBoxItem>목록4</ListBoxItem>
+        <ListBoxItem>목록5</ListBoxItem>
+        <ListBoxItem>목록6</ListBoxItem>
+        <ListBoxItem>목록7</ListBoxItem>
+        <ListBoxItem>목록8</ListBoxItem>
+        <ListBoxItem>목록9</ListBoxItem>
+        <ListBoxItem>목록10</ListBoxItem>
+    </ListBox>
+</Window>
+~~~
+
+![20231009_140748](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d867daab-03ef-4441-9afc-9785a2fa074d)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DataTrigger
+  - Binding한 변수의 데이터가 Value값을 가졌을 경우 작동 된다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="300">
+    <Window.Resources>
+        <Style TargetType="ProgressBar">
+            <Setter Property="Foreground" Value="Aqua"/>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TheValue}" Value="100">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Slider Name="slider" Margin="5" Minimum="0" Maximum="100" Value="{Binding TheValue}"/>
+        <ProgressBar Grid.Row="1" Value="{Binding TheValue}"/>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = new MyObject();
+        }
+    }
+
+    public class MyObject
+    {
+        public int TheValue { get; set; }
+    }
+}
+~~~
+
+![20231009_140850](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6897431e-f084-43d0-af29-1378a0bd97a1)
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DataTrigger안에 DoubleAnimation적용하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+
+    <!--<Window.Resources>
+        <Storyboard x:Key="AnimateOpacity">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                         From="1.0" To="0.0" Duration="0:0:1"/>
+        </Storyboard>
+    </Window.Resources>-->
+
+    <Button Content="Click Me">
+        <Button.Style>
+            <Style TargetType="Button">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True">
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation 
+                                        Storyboard.TargetProperty="Opacity"
+                                        From="1.0" To="0.0" Duration="0:0:1"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Button.Style>
+    </Button>
+</Window>
+~~~
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# EventTrigger
+  - 특정한 이벤트에 따라서 ui를 변경한다
+  - RoutedEvent 에 특정한 이벤트를 작성한다
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="NameBox" TargetType="TextBox">
+            <Setter Property="Background" Value="Aquamarine"/>
+            <Setter Property="Margin" Value="5,0,5,5"/>
+
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="GotFocus">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="Background.Color" To="Red"
+                                        Duration="0:0:0.5"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+
+                <EventTrigger RoutedEvent="LostFocus">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="Background.Color" To="Aquamarine" 
+                                        Duration="0:0:0.5"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <StackPanel>
+        <Label Content="이름" Margin="5,5,5,0"/>
+        <TextBox Margin="5,0,5,5" Style="{StaticResource NameBox}"/>
+        <Label Content="아이디" Margin="5,5,5,0"/>
+        <TextBox Margin="5,0,5,5" Style="{StaticResource NameBox}"/>
+    </StackPanel>
+</Window>
+~~~
+
+###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ControlTemplate
+  - 기본 컨트롤 모양 바꾸기(Template)(ControlTemplate)
+    - 기본 컨트롤의 모양을 바꿀 수 있음
+    - ControlTemplate 개체 내의 새로운 템플릿을 만든다.
+    - Template 속성을 이용해서 적용을 한다.
+  - ControlTemplate속성을 사용하고 있다면 Button 내부에 직접 속성을 바꿔도 바뀌지가 않는다.
+
+#MainWindow.xaml
+~~~c#
+ <Window.Resources>
+       <ControlTemplate x:Key="UserButton" TargetType="Button">
+           <Grid>
+               <Border Background="DarkGreen" Margin="5,5,0,0"/>
+               <Border BorderBrush="Black" BorderThickness="1"
+                   Background="Aquamarine" Margin="0,0,5,5">
+                   <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">확인</TextBlock>
+               </Border>
+           </Grid>
+       </ControlTemplate>
+   </Window.Resources>
+
+   <Grid>
+       <Button Width="100" Height="50" Template="{StaticResource UserButton}">확인</Button>
+   </Grid>
+~~~
+
+![20231009_155021](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/788875db-3a0c-4b5e-8360-92c5225a0338)
+
+<br/>
+
+  - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
+
+###### [ControlTemplate](#controltemplate)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 버튼 모양 바꾸기
+
+#MainWindow.xaml
+~~~c#
+<Grid>
+        <Button Width="100" Height="30" Content="버튼" Click="Button_Click">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Ellipse Width="100" Height="30" Fill="Yellow" Stroke="Black"/>
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Grid>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+~~~
+
+![20231009_155125](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/faa31a73-1127-4c06-a99c-6bbce5e6f03d)
+
+###### [ControlTemplate](#controltemplate)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
 # Converter
 
 #MainWindow.xaml
@@ -9139,386 +9576,6 @@ public class RGB_HEX : INotifyPropertyChanged
 <img src="https://user-images.githubusercontent.com/39178978/151805276-717892ef-8192-4150-9118-fd928e956dd2.png">
 
 ###### [Selector](#selector)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# 트리거
-  - 어떤 속성이 만족했을 경우에 작동하게 된다
-  - 트리거 종류
-    - EventTrigger
-    - MultiDataTrigger
-    - MultiTrigger
-    - Trigger
-  - 애니메이션 만들기
-    - Trigger.EnterActions
-    - Trigger.ExitActions
-      - To : 최종값
-      - Duration : 지속시간
-      - Stroyboard.TargetProperty : 애니메이션을 적용할 속성
-
-<br/>
-
-  - [Trigger](#trigger)
-  - [애니메이션](#애니메이션)
-  - [MultiTrigger](#multitrigger)
-  - [DataTrigger](#datatrigger)
-
-###### [트리거](#트리거)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# Trigger
-  - 아래의 Trigger는 Text가 없다면 빨간색으로 표시하라는것
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        <Style x:Key="NameBox" TargetType="TextBox">
-            <Setter Property="Background" Value="Aquamarine"/>
-            <Setter Property="Margin"  Value="5,0,5,5"/>
-
-            <Style.Triggers>
-                <Trigger Property="Text" Value="">
-                    <Setter Property="Background" Value="red"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
-    <StackPanel>
-        <Label Content="이름"/>
-        <TextBox Style="{StaticResource NameBox}"/>
-        <Label Content="아이디"/>
-        <TextBox Style="{StaticResource NameBox}"/>
-    </StackPanel>
-</Window>
-~~~
-
-![20231009_140631](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/0944ad96-7202-4624-b8c2-f633fec73d32)
-
-###### [트리거](#트리거)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 애니메이션
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        <Style x:Key="ButtonStyle" TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Margin" Value="0,20,0,0"/>
-            <Setter Property="Opacity" Value="0.5"/>
-            <Setter Property="Width" Value="100"/>
-
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Trigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation To="1" Duration="0:0:1"
-                                                Storyboard.TargetProperty="Opacity"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.EnterActions>
-                    <Trigger.ExitActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation To="0.5" Duration="0:0:1"
-                                                Storyboard.TargetProperty="Opacity"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.ExitActions>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-        <Button Style="{StaticResource ButtonStyle}">확인</Button>
-        <Button Style="{StaticResource ButtonStyle}">취소</Button>
-    </StackPanel>
-</Window>
-~~~
-
-![20231009_140710](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/a230c25a-8477-423d-bc48-95f79336aff7)
-
-###### [트리거](#트리거)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# MultiTrigger
-  -  정의 된 모든 트리거가 작동이 되면 작동된다.
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        <Style TargetType="ListBoxItem">
-            <Setter Property="Background" Value="Aqua"/>
-
-            <Style.Triggers>
-                <MultiTrigger>
-                    <MultiTrigger.Conditions>
-                        <Condition Property="IsMouseOver" Value="True"/>
-                        <Condition Property="Content" Value="목록3"/>
-                    </MultiTrigger.Conditions>
-                    <MultiTrigger.Setters>
-                        <Setter Property="Foreground" Value="red"/>
-                        <Setter Property="FontSize" Value="15"/>
-                    </MultiTrigger.Setters>
-                </MultiTrigger>
-
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
-    <ListBox>
-        <ListBoxItem>목록1</ListBoxItem>
-        <ListBoxItem>목록2</ListBoxItem>
-        <ListBoxItem>목록3</ListBoxItem>
-        <ListBoxItem>목록4</ListBoxItem>
-        <ListBoxItem>목록5</ListBoxItem>
-        <ListBoxItem>목록6</ListBoxItem>
-        <ListBoxItem>목록7</ListBoxItem>
-        <ListBoxItem>목록8</ListBoxItem>
-        <ListBoxItem>목록9</ListBoxItem>
-        <ListBoxItem>목록10</ListBoxItem>
-    </ListBox>
-</Window>
-~~~
-
-![20231009_140748](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d867daab-03ef-4441-9afc-9785a2fa074d)
-
-###### [트리거](#트리거)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# DataTrigger
-  - Binding한 변수의 데이터가 Value값을 가졌을 경우 작동 된다
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="300">
-    <Window.Resources>
-        <Style TargetType="ProgressBar">
-            <Setter Property="Foreground" Value="Aqua"/>
-
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding TheValue}" Value="100">
-                    <Setter Property="Foreground" Value="Red"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-
-        <Slider Name="slider" Margin="5" Minimum="0" Maximum="100" Value="{Binding TheValue}"/>
-        <ProgressBar Grid.Row="1" Value="{Binding TheValue}"/>
-    </Grid>
-</Window>
-~~~
-
-<br/>
-
-#MainWindow.xaml.cs
-~~~c#
-using System.Windows;
-
-namespace WpfApp1
-{
-    /// <summary>
-    /// MainWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            DataContext = new MyObject();
-        }
-    }
-
-    public class MyObject
-    {
-        public int TheValue { get; set; }
-    }
-}
-~~~
-
-![20231009_140850](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6897431e-f084-43d0-af29-1378a0bd97a1)
-
-###### [트리거](#트리거)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# EventTrigger
-  - 특정한 이벤트에 따라서 ui를 변경한다
-  - RoutedEvent 에 특정한 이벤트를 작성한다
-
-<br/>
-
-#MainWindow.xaml
-~~~c#
-<Window x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        <Style x:Key="NameBox" TargetType="TextBox">
-            <Setter Property="Background" Value="Aquamarine"/>
-            <Setter Property="Margin" Value="5,0,5,5"/>
-
-            <Style.Triggers>
-                <EventTrigger RoutedEvent="GotFocus">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <ColorAnimation Storyboard.TargetProperty="Background.Color" To="Red"
-                                        Duration="0:0:0.5"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-
-                <EventTrigger RoutedEvent="LostFocus">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <ColorAnimation Storyboard.TargetProperty="Background.Color" To="Aquamarine" 
-                                        Duration="0:0:0.5"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-    <StackPanel>
-        <Label Content="이름" Margin="5,5,5,0"/>
-        <TextBox Margin="5,0,5,5" Style="{StaticResource NameBox}"/>
-        <Label Content="아이디" Margin="5,5,5,0"/>
-        <TextBox Margin="5,0,5,5" Style="{StaticResource NameBox}"/>
-    </StackPanel>
-</Window>
-~~~
-
-###### [트리거](#트리거)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-***
-
-# ControlTemplate
-  - 기본 컨트롤 모양 바꾸기(Template)(ControlTemplate)
-    - 기본 컨트롤의 모양을 바꿀 수 있음
-    - ControlTemplate 개체 내의 새로운 템플릿을 만든다.
-    - Template 속성을 이용해서 적용을 한다.
-  - ControlTemplate속성을 사용하고 있다면 Button 내부에 직접 속성을 바꿔도 바뀌지가 않는다.
-
-#MainWindow.xaml
-~~~c#
- <Window.Resources>
-       <ControlTemplate x:Key="UserButton" TargetType="Button">
-           <Grid>
-               <Border Background="DarkGreen" Margin="5,5,0,0"/>
-               <Border BorderBrush="Black" BorderThickness="1"
-                   Background="Aquamarine" Margin="0,0,5,5">
-                   <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">확인</TextBlock>
-               </Border>
-           </Grid>
-       </ControlTemplate>
-   </Window.Resources>
-
-   <Grid>
-       <Button Width="100" Height="50" Template="{StaticResource UserButton}">확인</Button>
-   </Grid>
-~~~
-
-![20231009_155021](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/788875db-3a0c-4b5e-8360-92c5225a0338)
-
-<br/>
-
-  - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
-
-###### [ControlTemplate](#controltemplate)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 버튼 모양 바꾸기
-
-#MainWindow.xaml
-~~~c#
-<Grid>
-        <Button Width="100" Height="30" Content="버튼" Click="Button_Click">
-            <Button.Template>
-                <ControlTemplate TargetType="{x:Type Button}">
-                    <Grid>
-                        <Ellipse Width="100" Height="30" Fill="Yellow" Stroke="Black"/>
-                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Grid>
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
-    </Grid>
-~~~
-
-![20231009_155125](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/faa31a73-1127-4c06-a99c-6bbce5e6f03d)
-
-###### [ControlTemplate](#controltemplate)
 ###### [Top](#top)
 
 <br/>
