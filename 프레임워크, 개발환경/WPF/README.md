@@ -83,7 +83,21 @@
   - [DataTrigger안에 DoubleAnimation적용하기](#datatrigger안에-doubleanimation적용하기)
   - [EventTrigger](#eventtrigger)
 
- <br/>
+<br/>
+
+- [이벤트의 버블링(bubbling),터널링(tunneling)](#이벤트의-버블링bubbling터널링tunneling)
+  - [최상위 grid에 RoutedEvent 적용하기](#최상위-grid에-routedevent-적용하기)
+  - [Preview이벤트](#preview이벤트)
+
+<br/>
+
+- [RenderTransform](#rendertransform)
+  - [TranslateTransform](#translatetransform)
+  - [여러 Transform을 적용하기](#여러-transform을-적용하기)
+  - [EventTrigger를 통해 적용하기](#eventtrigger를-통해-적용하기)
+  - [Swipe기능](#swipe기능)
+
+<br/>
 
 - [ControlTemplate](#controltemplate)
   - [버튼 모양 바꾸기](#버튼-모양-바꾸기)
@@ -5865,6 +5879,888 @@ namespace WpfApp1
 ~~~
 
 ###### [트리거](#트리거)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 이벤트의 버블링(bubbling),터널링(tunneling)
+  - WPF에서 이벤트는 버블링(bubbling) 또는 터널링(tunneling) 방식으로 라우팅됨. MouseLeftButtonDown과 같은 버블링 이벤트는 가장 먼저 자식 요소에서 발생하고, 부모 요소 방향으로 상향 전파된다. 따라서, 버튼 자체가 이 이벤트를 처리하고 상위 요소인 Grid로 전파되지 않는다. 이럴때는 PreviewMouseLeftButtonDown를 사용한다. 이것은 Grid 수준에서 먼저 발생하고, 그 다음으로 자식 요소로 내려간다.
+
+<br/>
+
+  - [최상위 grid에 RoutedEvent 적용하기](#최상위-grid에-routedevent-적용하기)
+  - [Preview이벤트](#preview이벤트)
+
+<br/>
+<br/>
+
+# 최상위 grid에 RoutedEvent 적용하기
+  - 최상위 Grid에, 버튼 클릭이 일어나면 Grid 전체가 이동
+  - RoutedEvent="MouseLeftButtonDown"로 하게 되면 아무곳에나 클릭시 이 이벤트가 들어가게 됨(이때는 버튼을 클릭시에는 이벤트가 안들어가 가게됨)
+  - MouseLeftButtonDown 이벤트가 버튼 클릭시 Grid의 EventTrigger에 의해 포착되지 않는 이유는 WPF의 이벤트 라우팅 메커니즘 때문 
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid Background="Coral">
+        
+        <Grid.Triggers>
+            <EventTrigger RoutedEvent="Button.Click">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                By="130" Duration="0:0:0.3"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Grid.Triggers>
+
+        <Grid.RenderTransform>
+            <TranslateTransform />
+        </Grid.RenderTransform>
+
+        <Button Margin="130,0,0,0" Height="40" Width="120"
+            Content="Show Image"
+            HorizontalAlignment="Left">
+        </Button>
+    </Grid>
+</Window>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/e5126b88-01d3-41ee-9893-b13617de2f55)
+
+###### [이벤트의 버블링(bubbling),터널링(tunneling)](#이벤트의-버블링bubbling터널링tunneling)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Preview이벤트
+  - Preview가 아닌 이벤트들은 자식 이벤트 부터 올라가기 때문에 부모 이벤트에는 도달 하지 않는 경우가 있다. 이럴때 Preview이벤트를 사용한다. Preview이벤트를 부모 부터 이벤트가 시작 된다
+
+<br/>
+
+  - 아래의 코드는, Grid를 누르면 Grid에 달려 있는 PreviewMouseLeftButtonDown가 발생하며, 또한 버튼을 누르면 PreviewMouseLeftButtonDown가 발생하고 버튼 command또한 발생 한다  
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <local:MainWindowVIewModel/>
+    </Window.DataContext>
+    
+    
+<Grid Background="Coral">
+            
+        <Grid.Triggers>
+            <EventTrigger RoutedEvent="PreviewMouseLeftButtonDown">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                By="130" Duration="0:0:0.3"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Grid.Triggers>
+
+        <Grid.RenderTransform>
+            <TranslateTransform />
+        </Grid.RenderTransform>
+
+        <Button Margin="130,0,0,0" Height="40" Width="120"
+            Content="Show Image"
+            HorizontalAlignment="Left"
+                Command="{Binding OneClick}">
+        </Button>
+    </Grid>
+</Window>
+~~~
+
+###### [이벤트의 버블링(bubbling),터널링(tunneling)](#이벤트의-버블링bubbling터널링tunneling)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# RenderTransform
+  - 특정 객체를 움직이거나, 좌표를 변경하거나 모양을 x,y축 단위로 변경할 때 사용한다
+
+~~~c#
+TranslateTransform
+RotateTransform
+ScaleTransform
+SkewTransform
+MatrixTransform
+~~~
+
+  - 다른것 또한 변수만 다르고 사용 방법이 같기 때문에 TranslateTransform하나만 설명 하도록 한다
+    - x,y축 위치 이동
+
+<br/>
+
+  - [TranslateTransform](#translatetransform)
+  - [여러 Transform을 적용하기](#여러-transform을-적용하기)
+  - [EventTrigger를 통해 적용하기](#eventtrigger를-통해-적용하기)
+  - [Swipe기능](#swipe기능)
+
+###### [RenderTransform](#rendertransform)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# TranslateTransform
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="400">
+    <StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+ 
+        <Rectangle Grid.Column="0" Fill="DarkBlue" Width="50" Height="50" HorizontalAlignment="Left">
+            <Rectangle.RenderTransform>
+                <TranslateTransform X="300" Y="20"/>
+            </Rectangle.RenderTransform>
+        </Rectangle>
+
+        </Grid>
+    </StackPanel>
+</Window>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/56acba92-8797-4b85-beae-f7a1143aeceb)
+
+<br/>
+
+  - 바인딩을 통해서도 값을 바꿀 수 있다.
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="400">
+    <StackPanel>
+        <Slider Name="tx" Width="100" Minimum="0" Maximum="50" Value="0" />
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+ 
+        <Rectangle Grid.Column="1" Fill="DarkBlue" Width="50" Height="50" HorizontalAlignment="Left">
+            <Rectangle.RenderTransform>
+                <TranslateTransform X="{Binding ElementName=tx, Path=Value}" Y="20"/>
+            </Rectangle.RenderTransform>
+        </Rectangle>
+
+        </Grid>
+    </StackPanel>
+</Window>
+~~~
+
+###### [RenderTransform](#rendertransform)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 여러 Transform을 적용하기
+  - TransformGroup을 사용한다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="400">
+    <StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+ 
+        <Rectangle Grid.Column="1" Fill="DarkBlue" Width="50" Height="50" HorizontalAlignment="Left">
+            <Rectangle.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform X="20" Y="20" />
+                    <ScaleTransform ScaleX="1" ScaleY="1" CenterX="10" CenterY="10"/>
+                    <RotateTransform Angle="30"/>
+                    <SkewTransform AngleX="45" AngleY="10" CenterX="10" CenterY="20"/>
+                </TransformGroup>
+            </Rectangle.RenderTransform>
+        </Rectangle>
+
+        </Grid>
+    </StackPanel>
+</Window>
+~~~
+
+###### [RenderTransform](#rendertransform)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# EventTrigger를 통해 적용하기
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Margin="130,0,0,0" Height="40" Width="120"
+            Content="Show Image"
+            HorizontalAlignment="Left">
+            
+            <Button.RenderTransform>
+                <TranslateTransform />
+            </Button.RenderTransform>
+
+            <Button.Triggers>
+                <EventTrigger RoutedEvent="Button.Click">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                            By="130" Duration="0:0:0.3"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Button.Triggers>
+        </Button>
+    </Grid>
+</Window>
+~~~
+
+###### [RenderTransform](#rendertransform)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Swipe기능
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/561cd086-d435-41df-93f0-da9c4522432c)
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+    <Window.DataContext>
+        <local:MainWindowVIewModel/>
+    </Window.DataContext>
+
+    <Grid x:Name="FirstGrid" Background="Coral">
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="PreviewMouseLeftButtonDown" SourceObject="{Binding ElementName=FirstGrid}">
+                <i:InvokeCommandAction Command="{Binding Grid_PreviewMouseLeftButtonDown}" PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+
+            <i:EventTrigger EventName="PreviewMouseMove" SourceObject="{Binding ElementName=FirstGrid}">
+                <i:InvokeCommandAction Command="{Binding Grid_MouseMove}"
+                 PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+
+            <i:EventTrigger EventName="PreviewMouseLeftButtonUp" SourceObject="{Binding ElementName=FirstGrid}">
+                <i:InvokeCommandAction Command="{Binding Grid_PreviewMouseLeftButtonUp}"
+     PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Background" Value="Green"/>
+                </Style>
+            </Grid.Style>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Margin="0,0,0,0" Height="40" Width="120"
+            Content="Show Image"
+            HorizontalAlignment="Left"
+            Command="{Binding OneClick}">
+                    <Button.RenderTransform>
+                        <TranslateTransform X="{Binding ValueMovePointX}"/>
+                    </Button.RenderTransform>
+                </Button>
+
+                <Button Margin="180,0,0,0" Height="40" Width="120"
+            Content="Show Image"
+            HorizontalAlignment="Left"
+            Command="{Binding OneClick}">
+                    <Button.RenderTransform>
+                        <TranslateTransform X="{Binding ValueMovePointX}"/>
+                    </Button.RenderTransform>
+                </Button>
+            </StackPanel>
+            
+        </Grid>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowVIewModel.cs
+~~~c#
+using System;
+using System.Windows.Input;
+using System.Windows;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Threading;
+
+namespace WpfApp1
+{
+    public class MainWindowVIewModel : INotifyPropertyChanged
+    {
+        // 타이머 생성
+        DispatcherTimer timer = new DispatcherTimer();
+        private DateTime startTime;
+
+        DispatcherTimer timerThread = new DispatcherTimer();
+        public MainWindowVIewModel()
+        {
+            // 타이머 이벤트 핸들러 설정
+            timerThread.Tick += new EventHandler(timerThread_Tick);
+
+            // 타이머 간격 설정 (예: 1초)
+            timerThread.Interval = TimeSpan.FromSeconds(0);
+
+            timerThread.Start();
+        }
+
+        private void timerThread_Tick(object sender, EventArgs e)
+        {
+            if (IsChecked == false)
+            {
+                if (ValueMovePointX > -120)
+                {
+                    // 끝점
+                    EndValue = 0;
+
+                    // 시작점
+                    StartValueX = ValueMovePointX;
+                    ChangeInValue = EndValue - StartValueX; // 값의 변화량
+
+                    // 타이머 이벤트 핸들러 설정
+                    timer.Tick += new EventHandler(Timer_Tick);
+
+                    // 타이머 간격 설정 (예: 1초)
+                    timer.Interval = TimeSpan.FromSeconds(0);
+
+                    startTime = DateTime.Now;
+
+                    // 타이머 시작
+                    timer.Start();
+                }
+                else
+                {
+                    // 끝점
+                    EndValue = -300;
+
+                    // 시작점
+                    StartValueX = ValueMovePointX;
+                    ChangeInValue = EndValue - StartValueX; // 값의 변화량
+
+                    // 타이머 이벤트 핸들러 설정
+                    timer.Tick += new EventHandler(Timer_Tick);
+
+                    // 타이머 간격 설정 (예: 1초)
+                    timer.Interval = TimeSpan.FromSeconds(0);
+
+                    startTime = DateTime.Now;
+
+                    // 타이머 시작
+                    timer.Start();
+                }
+            }
+            else
+            {
+                timer.Stop();
+            }
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            double duration = 0.1; // 1초 동안 지속되는 애니메이션
+
+            double currentTime = (DateTime.Now - startTime).TotalSeconds;
+            if (currentTime > duration)
+            {
+                // 애니메이션이 종료된 경우
+                timer.Stop();
+            }
+            else
+            {
+                // 애니메이션 중인 경우
+                ValueMovePointX = EaseOut(currentTime, StartValueX, ChangeInValue, duration);
+            }
+        }
+
+        private double EaseOut(double time, double startValue, double changeInValue, double duration)
+        {
+            time /= duration;
+            return -changeInValue * time * (time - 2) + startValue;
+        }
+
+        private double _startValueX;
+        public double StartValueX
+        {
+            get { return _startValueX; }
+            set
+            {
+                _startValueX = value;
+                Notify("StartValueX");
+            }
+        }
+
+        private double _changeInValue;
+        public double ChangeInValue
+        {
+            get { return _changeInValue; }
+            set
+            {
+                _changeInValue = value;
+                Notify("ChangeInValue");
+            }
+        }
+
+        private double _endValue = 0;
+        public double EndValue
+        {
+            get { return _endValue; }
+            set
+            {
+                _endValue = value;
+                Notify("endValue");
+            }
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            if (MouseUpPointX < MouseDownCheckPointX + 10 && MouseUpPointX > MouseDownCheckPointX - 10)
+            {
+                MessageBox.Show("Click");
+            }
+        }
+
+        private Command _grid_MouseMove;
+        public ICommand Grid_MouseMove
+        {
+            get { return _grid_MouseMove = new Command(OnGrid_MouseMove); }
+        }
+
+        private void OnGrid_MouseMove(object obj)
+        {
+            var arg = obj as MouseEventArgs;
+
+            if (arg.LeftButton == MouseButtonState.Pressed)
+            {
+                // 이동한 거리를 더해줌
+                var position = arg.GetPosition(null);
+
+                // 이동한 거리를 더 빠르게 하거나 더 느리게함
+                //if (position.X - MouseDownPointX > 0)
+                //{
+                //    ValueMovePointX += position.X - MouseDownPointX + 0.3;
+                //}
+                //else
+                //{
+                //    ValueMovePointX += position.X - MouseDownPointX - 0.3;
+                //}
+
+                ValueMovePointX += position.X - MouseDownPointX;
+
+                Debug.WriteLine(ValueMovePointX);
+
+                // 마지막에 이동한 위치를 저장
+                MouseDownPointX = position.X;
+
+            }
+        }
+
+        private Command _grid_PreviewMouseLeftButtonDown;
+        public ICommand Grid_PreviewMouseLeftButtonDown
+        {
+            get { return _grid_PreviewMouseLeftButtonDown = new Command(OnGrid_PreviewMouseLeftButtonDown); }
+        }
+
+        // 클릭한 위치 저장
+        private void OnGrid_PreviewMouseLeftButtonDown(object obj)
+        {
+            IsChecked = true;
+
+            var arg = obj as MouseButtonEventArgs;
+
+            var position = arg.GetPosition(null);
+            MouseDownPointX = position.X;
+
+            // 처음 클릭한 위치를 저장해, Up전까지 어느정도 움직였는지 확인후, 클릭이벤트를 하기 위함
+            MouseDownCheckPointX = position.X; 
+        }
+
+
+        private Command _grid_PreviewMouseLeftButtonUp;
+        public ICommand Grid_PreviewMouseLeftButtonUp
+        {
+            get { return _grid_PreviewMouseLeftButtonUp = new Command(OnGrid_PreviewMouseLeftButtonUp); }
+        }
+
+        private void OnGrid_PreviewMouseLeftButtonUp(object obj)
+        {
+            IsChecked = false;
+
+            var arg = obj as MouseButtonEventArgs;
+
+            var position = arg.GetPosition(null);
+
+            // 클릭후, 움직인 거리가 10px이하면 이벤트를 발생시키기 위함
+            MouseUpPointX = position.X;
+        }
+
+        private bool _isChecked = false;
+        public bool IsChecked
+        {
+            get { return _isChecked; }
+            set
+            {
+                _isChecked = value;
+                Notify("IsChecked");
+            }
+        }
+
+        private double _valueMovePointX = 0;
+        public double ValueMovePointX
+        {
+            get { return _valueMovePointX; }
+            set
+            {
+                _valueMovePointX = value;
+                Notify("ValueMovePointX");
+            }
+        }
+
+        private double _mouseDownPointX = 0;
+        public double MouseDownPointX
+        {
+            get { return _mouseDownPointX; }
+            set
+            {
+                _mouseDownPointX = value;
+                Notify("MouseDownPointX");
+            }
+        }
+
+        private double _mouseUpPointX = 0;
+        public double MouseUpPointX
+        {
+            get { return _mouseUpPointX; }
+            set
+            {
+                _mouseUpPointX = value;
+                Notify("MouseUpPointX");
+            }
+        }
+
+        private double _mouseDownCheckPointX = 0;
+        public double MouseDownCheckPointX
+        {
+            get { return _mouseDownCheckPointX; }
+            set
+            {
+                _mouseDownCheckPointX = value;
+                Notify("MouseDownCheckPointX");
+            }
+        }
+
+        private bool _shouldAnimateToZero = false;
+        public bool ShouldAnimateToZero
+        {
+            get { return _shouldAnimateToZero; }
+            set
+            {
+                _shouldAnimateToZero = value;
+                Notify("ShouldAnimateToZero");
+            }
+        }
+        
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+public class Command : ICommand
+{
+    Action<object> _execute;
+
+    public event EventHandler? CanExecuteChanged;
+
+    public Command(Action<object> execute)
+    {
+        _execute = execute;
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        _execute(parameter);
+    }
+}
+~~~
+
+<br/>
+
+#CommandBehavior.cs
+~~~c#
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Input;
+using System.Windows;
+
+namespace WpfApp1
+{
+    public class CommandBehavior
+    {
+        private class EventRaiseAttribute : Attribute
+        {
+
+        }
+
+        #region Command 
+
+        public static readonly DependencyProperty CommandProperty =
+        DependencyProperty.RegisterAttached(
+        "Command",
+        typeof(ICommand),
+        typeof(CommandBehavior),
+        new PropertyMetadata(OnCommandChanged));
+
+        public static ICommand GetCommand(DependencyObject d)
+        {
+            return d.GetValue(CommandProperty) as ICommand;
+        }
+
+        public static void SetCommand(DependencyObject d, ICommand value)
+        {
+            d.SetValue(CommandProperty, value);
+        }
+
+        private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
+
+        #endregion
+
+        #region Event 
+
+        public static readonly DependencyProperty EventProperty =
+        DependencyProperty.RegisterAttached(
+        "Event",
+        typeof(string),
+        typeof(CommandBehavior),
+        new PropertyMetadata(OnEventChanged));
+
+        private static void OnEventChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            BindEvent(d, e.NewValue as string);
+        }
+
+        public static string GetEvent(DependencyObject d)
+        {
+            return d.GetValue(EventProperty) as string;
+        }
+
+        public static void SetEvent(DependencyObject d, string value)
+        {
+            d.SetValue(EventProperty, value);
+        }
+
+        private static void BindEvent(DependencyObject owner, string eventName)
+        {
+            if (string.IsNullOrWhiteSpace(eventName))
+            {
+                return;
+            }
+
+            var eventInfo = owner.GetType().GetEvent(eventName, BindingFlags.Public | BindingFlags.Instance);
+            if (eventInfo == null)
+            {
+                throw new InvalidOperationException(String.Format("Could not resolve event name {0}", eventName));
+            }
+
+            var types = typeof(CommandBehavior).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo method = null;
+            foreach (var type in types)
+            {
+                var attributes = type.GetCustomAttributes(true);
+                if (attributes.OfType<EventRaiseAttribute>().Any())
+                {
+                    method = type;
+                    break;
+                }
+            }
+
+            if (method == null)
+            {
+                Debug.Assert(false, string.Format("invalid method type. type = {0}", eventName));
+                return;
+            }
+
+            var eventHandler = Delegate.CreateDelegate(eventInfo.EventHandlerType, null, method);
+
+            owner.SetValue(EventHandlerProperty, eventHandler);
+
+            //Register the handler to the Event 
+            eventInfo.AddEventHandler(owner, eventHandler);
+        }
+
+        [EventRaise]
+        private void OnEventRaised(object sender, EventArgs e)
+        {
+            var dependencyObject = sender as DependencyObject;
+            if (dependencyObject == null)
+            {
+                return;
+            }
+
+            var command = dependencyObject.GetValue(CommandProperty) as ICommand;
+            if (command == null)
+            {
+                return;
+            }
+
+            if (command.CanExecute(null) == false)
+            {
+                return;
+            }
+
+            command.Execute(e);
+        }
+
+        #endregion
+
+        #region EventHandler 
+
+        public static readonly DependencyProperty EventHandlerProperty =
+        DependencyProperty.RegisterAttached(
+        "EventHandler",
+        typeof(Delegate),
+        typeof(CommandBehavior));
+
+        public static Delegate GetEventHandler(DependencyObject d)
+        {
+            return d.GetValue(EventHandlerProperty) as Delegate;
+        }
+
+        public static void SetEventHandler(DependencyObject d, Delegate value)
+        {
+            d.SetValue(EventHandlerProperty, value);
+        }
+
+        #endregion
+    }
+}
+~~~
+
+###### [RenderTransform](#rendertransform)
 ###### [Top](#top)
 
 <br/>
