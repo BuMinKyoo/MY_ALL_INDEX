@@ -5192,6 +5192,9 @@ namespace WpfApp1
 # Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)
   - 개인적으로 이 방법이 더 편리한 방법인것 같다…
   - ViewModel에서 컨트롤 할 수 있다
+  - binding을 하기 위해서는 DP여야 함으로, passwordBox같은 경우, 키보드 입력을 받는 값을 나타내는 Password property는 DP가 아니기때문에, 일반적으로 binding을 할 수 없을때, dp를 만들어 낼때도 사용 된다.
+  - 의존속성(DependencyProperty)은 ViewModel에서는 사용할 수 없으며 해당하는 Class의 codeBehind 사용가능하다. 그렇기 때문에 아래와 같은 경우에서는 class하나를 전체 적으로 사용한다
+
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/05f269d2-2f71-498a-becc-475991793639)
 
