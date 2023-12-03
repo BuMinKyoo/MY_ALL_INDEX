@@ -199,6 +199,7 @@
 <br/>
 
 - [Http,Https통신](#httphttps통신)
+- [Http,Https통신 서버(에러)](#httphttps통신-서버에러)
 - [JsonParsing](#jsonparsing)
   - [JsonParsing하기](#jsonparsing하기)
   - [Json직렬화하기](#json직렬화하기)
@@ -11627,6 +11628,135 @@ public partial class MainWindow : Window
 ~~~
 
 ###### [Http,Https통신](#httphttps통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Http,Https통신 서버(에러)
+  - http, https프로토콜을 받아서 reponse를 보내는 서버를 만들어 보고 싶어서, TcpListener를 사용해서 데이터를 보내려고 했는데, 웹브라우저에서는 데이터를 송신받기 성공하지만, 나머지 클라이언트 에서는 송신이 받아지지 않는다..이유를 알 수 가 없다. 그냥 Socket통신으로 제작하기로 생각했다..
+
+#MainWindow.xaml.cs
+~~~c#
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace WPFHttp
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            Run();
+        }
+
+        async private void Run()
+        {
+            // 포트 지정
+            int port = 8080;
+
+            // tcp생성
+            TcpListener listener = new TcpListener(IPAddress.Any, port);
+            listener.Start();
+
+            while (true)
+            {
+                // 클라이언트 접속 대기
+                TcpClient client = await listener.AcceptTcpClientAsync();
+                _ = HandleClientAsync(client);
+            }
+        }
+
+        static async Task HandleClientAsync(TcpClient client)
+        {
+            // 클라이언트와 연결된 소켓에서 스트림을 얻어옵니다.
+            using (NetworkStream stream = client.GetStream())
+            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+            using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+            {
+
+                // 클라이언트로부터 요청을 받아옵니다.
+                string? requestLine = await reader.ReadLineAsync();
+                if (!string.IsNullOrEmpty(requestLine))
+                {
+                    string[] requestParts = requestLine.Split(' ');
+                    if (requestParts.Length == 3)
+                    {
+                        // "GET, POST" 가져오기
+                        string method = requestParts[0];
+
+                        // 경로 가져오기
+                        string path = requestParts[1];
+
+                        if (method == "GET")
+                        {
+                            string response1 = $"HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n";
+                            string response2 = $"안녕";
+                            await writer.WriteAsync(response1 + response2);
+                        }
+                        else if (method == "POST")
+                        {
+                            int contentLength = 0;
+                            string? line;
+
+                            // 헤더 읽기 (Content-Length 찾기)
+                            while (!string.IsNullOrEmpty(line = await reader.ReadLineAsync()))
+                            {
+                                if (line.StartsWith("Content-Length:", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    string lengthValue = line.Split(':')[1].Trim();
+                                    contentLength = int.Parse(lengthValue);
+                                }
+                            }
+
+                            // contentLength 바이트 만큼 읽기
+                            char[] buffer = new char[contentLength];
+                            await reader.ReadAsync(buffer, 0, contentLength);
+                            string responseData2 = new string(buffer);
+
+
+                            // requestBody에 POST 본문 데이터가 포함됩니다.
+                            string responseData1 = $"HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n";
+                            //string responseData2 = $"{requestBody}";
+                            await writer.WriteAsync(responseData1 + responseData2);
+                        }
+                        else
+                        {
+                            string response = $"HTTP/1.1 405 Method Not Allowed\r\n\r\nMethod not supported.";
+                            await writer.WriteAsync(response);
+                        }
+                    }
+                }
+            }
+
+            client.Close();
+        }
+    }
+}
+~~~
+
+######  [Http,Https통신 서버(에러)](#httphttps통신-서버에러)
 ###### [Top](#top)
 
 <br/>
