@@ -73,6 +73,7 @@
     - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
     - [DependencyProperty](#dependencyproperty)
     - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
+    - [ViewModel To ViewModel 데이터교환(IOC,DI)](#viewmodel-to-viewmodel-데이터교환iocdi)
 
 <br/>
 
@@ -3058,6 +3059,7 @@ namespace WpfApp2
   - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
   - [DependencyProperty](#dependencyproperty)
   - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
+  - [ViewModel To ViewModel 데이터교환(IOC,DI)](#viewmodel-to-viewmodel-데이터교환iocdi)
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -5631,6 +5633,563 @@ namespace WpfApp2
                 Notify();
             }
         }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Orientation="Horizontal">
+            <Button Width="100" Height="30" Content="버튼1"/>
+            <TextBox Text="{Binding Name}"/>
+            <TextBox Text="{Binding Age}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1VIewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp2
+{
+    public class UserControl1VIewModel : INotifyPropertyChanged
+    {
+        private readonly CustStore _custStore;
+        private Cust _cust => _custStore.CustCurrent!;
+        public UserControl1VIewModel(CustStore custStore)
+        {
+            _custStore = custStore;
+            _custStore.CurrentAccountChanged += CurrentAccountChanged;
+            init();
+        }
+
+        private void CurrentAccountChanged(Cust cust)
+        {
+            Name = cust.Name;
+            Age = cust.Age;
+        }
+
+        private void init()
+        {
+            Name = _cust.Name;
+            Age = _cust.Age;
+        }
+
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                Notify();
+            }
+        }
+
+        private int _age;
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
+                _age = value;
+                Notify();
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Orientation="Horizontal">
+            <Button Width="100" Height="30" Content="버튼2" Command="{Binding UserControl2Event}"/>
+            <TextBox Text="{Binding Name}"/>
+            <TextBox Text="{Binding Age}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl2VIewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+namespace WpfApp2
+{
+    public class UserControl2VIewModel : INotifyPropertyChanged
+    {
+        private readonly CustStore _custStore;
+        private Cust _cust => _custStore.CustCurrent!;
+        public UserControl2VIewModel(CustStore custStore)
+        {
+            _custStore = custStore;
+            init();
+        }
+
+        private void init()
+        {
+            Name = _cust.Name;
+            Age = _cust.Age;
+        }
+
+
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                Notify();
+            }
+        }
+
+        private int _age;
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
+                _age = value;
+                Notify();
+            }
+        }
+
+        private Command _userControl2Event;
+        public ICommand UserControl2Event
+        {
+            get { return _userControl2Event = new Command(OnUserControl2Event); }
+        }
+
+        private void OnUserControl2Event(object obj)
+        {
+            _custStore.CustCurrent = new Cust() { Age = Age, Name = Name };
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#UserControl3.xaml
+~~~c#
+<UserControl x:Class="WpfApp2.UserControl3"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Orientation="Horizontal">
+            <Button Width="100" Height="30" Content="버튼2"/>
+            <TextBox Text="{Binding Name}"/>
+            <TextBox Text="{Binding Age}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl3VIewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp2
+{
+    public class UserControl3VIewModel : INotifyPropertyChanged
+    {
+        private readonly CustStore _custStore;
+        private Cust _cust => _custStore.CustCurrent!;
+        public UserControl3VIewModel(CustStore custStore)
+        {
+            _custStore = custStore;
+            _custStore.CurrentAccountChanged += CurrentAccountChanged;
+        }
+
+        private void CurrentAccountChanged(Cust cust)
+        {
+            Name = cust.Name;
+            Age = cust.Age;
+        }
+
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                Notify();
+            }
+        }
+
+        private int _age;
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
+                _age = value;
+                Notify();
+            }
+        }
+
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+namespace WpfApp2
+{
+    public class Cust
+    {
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+            }
+        }
+
+        private int _age;
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
+                _age = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#CustStore.cs
+~~~c#
+using System;
+
+namespace WpfApp2
+{
+    public class CustStore
+    {
+        private Cust _custCurrent;
+        public Cust CustCurrent
+        {
+            get { return _custCurrent; }
+            set
+            {
+                _custCurrent = value;
+                if (CurrentAccountChanged != null)
+                {
+                    CurrentAccountChanged?.Invoke(_custCurrent!);
+                    _custCurrent = null;
+                }
+            }
+        }
+
+        public Action<Cust>? CurrentAccountChanged { get; set; }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+using System;
+using System.Windows.Input;
+
+namespace WpfApp2
+{
+    public class Command : ICommand
+    {
+        Action<object> _execute;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public Command(Action<object> execute)
+        {
+            _execute = execute;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+~~~
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ViewModel To ViewModel 데이터교환(IOC,DI)
+  - MVVM패턴에서 ViewModel끼리의 데이터 교환
+  - model을 가지고 있는 store어 class의 이벤트를 통해서, 다른 뷰모델에 해당하는 모델 데이터를 전송한다
+  - 제어의역전(IOC), 의존성주입(Dependency Injection,DI)
+    - 제어의 역전(제어의 반전, Inversion of Control; IoC) : 프로그래머가 직접 프로그램의 흐름을 제어하는 코드를 작성하지 않고, 그 대신 외부 프레임워크의 흐름 제어를 받도록 하는 소프트웨어 개발 원칙. IoC를 따라 소프트웨어를 개발하면 인스턴스의 생성이나 이벤트 처리기 등의 호출을 프레임워크가 알아서 해 줌
+    - IOC컨테이너 : 개체 간의 의존성 정보를 등록하고 어떤 클래스의 인스턴스 또는 어떤 인터페이스를 구현하는 인스턴스를 요청하면 알아서 의존성이 해결된(resolved) 인스턴스를 만들어 주는 것
+ - 위의 코드에서 App.xaml, App.xaml.cs, MainWindowViewModel이렇게 3개만 코드가 변경 되었다
+ - 만약 서비스를, services.AddSingleton<INavigationService, NavigationService>(); 이렇게 등록한다면, 이 뜻은 다음과 같다.
+   - INavigationService는 서비스의 인터페이스이며, NavigationService는 이 인터페이스를 구현하는 구체적인 클래스. 의존성 주입에서는 인터페이스를 통해 서비스를 요청하고, 구현 클래스의 인스턴스가 제공된다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/383554d2-d12c-4eb7-ba06-df5f8e8ffdf3)
+
+<br/>
+
+~~~c#
+//서비스 등록: App.xaml.cs의 ConfigureServices 메서드에서 services.AddSingleton<INavigationService, NavigationService>(); 코드는 INavigationService 인터페이스에 대한 구현으로 NavigationService를 등록합니다. 이것은 의존성 주입 컨테이너에 NavigationService의 싱글턴 인스턴스를 사용하도록 지시합니다.
+
+//자동 의존성 해결: App.Current.Services.GetService(typeof(LoginViewModel))가 호출될 때, 의존성 주입 컨테이너는 LoginViewModel의 생성자에 필요한 의존성들을 확인합니다. LoginViewModel의 생성자는 INavigationService 타입의 객체를 요구합니다.
+
+//주입 과정: 의존성 주입 컨테이너는 INavigationService 타입의 요청을 감지하고, 이전에 등록된 서비스 목록에서 적절한 서비스 구현체(여기서는 NavigationService)를 찾습니다. 컨테이너는 NavigationService의 인스턴스를 생성(또는 이미 생성된 인스턴스를 재사용)하고, 이를 LoginViewModel의 생성자에 전달합니다.
+
+//결과: 결과적으로 LoginViewModel의 인스턴스가 생성될 때, 그 생성자에 필요한 INavigationService의 구현체가 자동으로 주입됩니다. 이로써 LoginViewModel은 NavigationService를 사용하여 필요한 네비게이션 작업을 수행할 수 있게 됩니다.
+~~~
+
+<br/>
+
+#App.xaml
+~~~c#
+// StartupUri 제거하기
+
+<Application x:Class="WpfApp1.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WpfApp1">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
+~~~
+
+<br/>
+
+#App.xaml.cs
+~~~c#
+using System;
+using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace WpfApp2
+{
+    public partial class App : Application
+    {
+        public IServiceProvider Services { get; }
+
+        public new static App Current => (App)Application.Current;
+        public App()
+        {
+            Services = ConfigureServices();
+
+            var mainView = Services.GetRequiredService<MainWindow>();
+            mainView.Show();
+        }
+
+        private IServiceProvider ConfigureServices()
+        {
+            // ServiceCollection
+            // 의존성을 등록하기 위한 컨테이너. 이 컨테이너는 응용 프로그램이 실행되는 동안 사용될 서비스와 그 구현을 저장한다
+            var services = new ServiceCollection();
+
+            // AddSingleton
+            // 해당 서비스가 싱글턴으로 동작하도록 지정한다.
+            // 애플리케이션이 실행되는 동안 한 번만 생성되고, 이후 모든 요청에 대해 동일한 인스턴스가 사용되도록 한다
+
+            // Stores
+            services.AddSingleton<CustStore>();
+
+            // ViewModels
+            services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<UserControl1VIewModel>();
+            services.AddSingleton<UserControl2VIewModel>();
+            services.AddSingleton<UserControl3VIewModel>();
+
+            // Views
+            services.AddSingleton(s => new MainWindow()
+            {
+                DataContext = s.GetRequiredService<MainWindowViewModel>()
+            });
+
+            return services.BuildServiceProvider();
+        }
+    }
+}
+~~~
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="300">
+
+    <Grid>
+        <StackPanel Orientation="Horizontal">
+            <local:UserControl1 DataContext="{Binding UserControl_DataContext}"/>
+            <local:UserControl2 DataContext="{Binding UserContro2_DataContext}"/>
+            <local:UserControl3 DataContext="{Binding UserContro3_DataContext}"/>
+        </StackPanel>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp2
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        private readonly CustStore _custStore;
+        private Cust _cust => _custStore.CustCurrent!;
+        public MainWindowViewModel(CustStore custStore)
+        {
+            _custStore = custStore;
+            _custStore.CustCurrent = new Cust() { Age = 300, Name = "1234" };
+
+            _userControl_DataContext = App.Current.Services.GetService(typeof(UserControl1VIewModel))!;
+            _userContro2_DataContext = App.Current.Services.GetService(typeof(UserControl2VIewModel))!;
+            _userContro3_DataContext = App.Current.Services.GetService(typeof(UserControl3VIewModel))!;
+        }
+
+        public object _userControl_DataContext;
+        public object UserControl_DataContext
+        {
+            get { return _userControl_DataContext; }
+            set
+            {
+                _userControl_DataContext = value;
+                Notify();
+            }
+        }
+
+        public object _userContro2_DataContext;
+        public object UserContro2_DataContext
+        {
+            get { return _userContro2_DataContext; }
+            set
+            {
+                _userContro2_DataContext = value;
+                Notify();
+            }
+        }
+
+        public object _userContro3_DataContext;
+        public object UserContro3_DataContext
+        {
+            get { return _userContro3_DataContext; }
+            set
+            {
+                _userContro3_DataContext = value;
+                Notify();
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
     }
 }
 ~~~
