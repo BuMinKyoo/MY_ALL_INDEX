@@ -1,5 +1,7 @@
 ###### Top
 
+- [코딩표준](#코딩표준)
+
 - [WPF class hierarchy](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/WPF/WPF%20class%20hierarchy.png)
 
 <br/>
@@ -224,6 +226,27 @@
   - [WPFSerialPort]_Repository링크(https://github.com/BuMinKyoo/WPFSerialPort)
   - [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
   - [WPFHttp]__Repository링크([https://github.com/BuMinKyoo/BingGoGame](https://github.com/BuMinKyoo/WPFHttp))
+
+<br/>
+<br/>
+
+***
+
+# 코딩표준
+  - 자료형
+    - int = In
+    - double = Dbl
+    - string = Str
+    - bool = Bl
+    - ObservableCollection = Obc
+  - 접근형태
+    - 일반 private = _ 앞에 붙이기
+    - static = Stc_
+      - 만약 static int형이면
+        - Stc_In
+
+###### [코딩표준](#코딩표준)
+###### [Top](#top)
     
 <br/>
 <br/>
