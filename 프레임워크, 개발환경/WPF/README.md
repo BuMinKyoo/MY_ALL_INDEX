@@ -198,6 +198,7 @@
 
 <br/>
 
+- [통신Class](#통신class)
 - [Http,Https통신](#httphttps통신)
 - [Http,Https통신 서버(에러)](#httphttps통신-서버에러)
 - [JsonParsing](#jsonparsing)
@@ -11517,6 +11518,29 @@ public class RGB_HEX : INotifyPropertyChanged
 <img src="https://user-images.githubusercontent.com/39178978/151805276-717892ef-8192-4150-9118-fd928e956dd2.png">
 
 ###### [Selector](#selector)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 통신Class
+  - Socket
+  - UdpClient
+    - UDP (User Datagram Protocol)를 사용하는 네트워크 통신을 위한 클래스로 System.Net.Sockets 네임스페이스에서 제공됩니다. UDP는 신뢰성이 낮지만 빠른 데이터 전송에 사용됩니다.
+  - TcpListener, TcpClient
+    - System.Net.Sockets 네임스페이스에서 제공됩니다. TCP/IP 기반의 네트워크 통신을 위해 사용됩니다. 클라이언트 및 서버 어플리케이션을 개발하는 데 사용됩니다.
+  - HttpClient
+    - System.Net.Http 네임스페이스에서 제공되며, HTTP 프로토콜을 사용하여 웹 서버와 통신하는 데 사용됩니다. RESTful API 호출 및 웹 리소스 다운로드 등에 유용합니다.
+  - HttpWebRequest, HttpWebResponse
+    - System.Net 네임스페이스에서 제공되며, HTTP 요청을 수동으로 작성하고 처리하는 데 사용됩니다. HttpClient와 유사한 기능을 제공하지만 더 낮은 수준의 제어가 가능합니다.
+  - WebClient
+    - System.Net 네임스페이스에서 제공되며, 웹 리소스를 다운로드하고 업로드하는 데 사용됩니다. 간단한 웹 요청 및 파일 다운로드에 유용합니다.
+  - WebSocket
+    - System.Net.WebSockets 네임스페이스에서 제공되며, 양방향 실시간 통신을 위한 WebSocket 프로토콜을 지원합니다. 웹 소켓 서버 및 클라이언트를 개발하는 데 사용됩니다.
+
+###### [통신Class](#통신class)
 ###### [Top](#top)
 
 <br/>
