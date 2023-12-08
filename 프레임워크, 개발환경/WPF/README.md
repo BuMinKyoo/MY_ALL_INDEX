@@ -205,6 +205,10 @@
   - [JsonParsing하기](#jsonparsing하기)
   - [Json직렬화하기](#json직렬화하기)
 - [DB연결](#db연결)
+- [디자인패턴](#디자인패턴)
+  - [MVC](#MVC)
+  - [MVP](#MVP)
+  - [MVVM](#MVVM)
 
 <br/>
 
@@ -12239,6 +12243,272 @@ namespace WpfApp1
 ~~~
 
 ###### [DB연결](#db연결)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 디자인패턴
+  - 개발할 때, 기본적으로 프레임워크에서 제공한대로 개발할 수 있지만, View와 뒷단에 대한 의존성이나, 확장성을 고려하고, 또한 디자인과 개발자의 분리를 위해 디자인 패턴으로 많은 프로그램이 개발 된다
+
+<br/>
+
+  - [MVC](#MVC)
+  - [MVP](#MVP)
+  - [MVVM](#MVVM)
+
+###### [디자인패턴](#디자인패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MVC
+  - Model, View, Controller
+  - Model: 데이터와 비즈니스 로직을 관리한다
+  - View: 사용자 인터페이스를 표시하고 사용자 입력을 받는다.
+  - Controller: 사용자 입력을 처리하고 Model 및 View 간의 통신을 관리한다
+
+<br/>
+
+  - Controller안에 View와 Model이 정의 되어 있고,View의 이벤트가 Controller로 들어온다. 그리고 그 이벤트 안에서, Model의 데이터를 갱신하고 Model데이터로 View를 갱신한다
+  - Controller안에 는 View가 여러개 있을 수 있기 때문에 Model에 적합한 View를 선택해 갱신한다
+  - Controller가 여러 개의 View를 선택하여 Model을 나타낼 수 있다
+  - View와 Model 서로간의 의존성이 높다는 단점이 있다
+
+<br/>
+
+  - 모든 Input은 Controller로 전달된다
+  - Controller는 Input을 확인하고 Model을 업데이트한다
+  - 업데이트 결과에 따라 View를 선택한다.(하나의 Controller는 View를 선택할 수 있기 때문에 1:n 관계로, 여러 개의 View를 관리할 수 있다.)
+  - Controller는 Model을 나타내 줄 View를 선택만 할 뿐, 직접 업데이트하지는 않는다.(View는 Controller를 알지 못한다.)
+  - View는 Model을 이용하여 화면을 나타낸다
+
+<br/>
+
+// Model
+#TextModel.cs
+~~~C#
+namespace WpfApp1
+{
+    public class TextModel
+    {
+        public string Text { get; set; } = "Hello World";
+    }
+}
+~~~
+
+<br/>
+
+// View
+#MainWindow.xaml
+~~~C#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <Button x:Name="TextChangeBtn" Width="100" Height="30" Content="버튼"/>
+        <TextBlock x:Name="InputText"/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~C#
+using System.Windows;
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        private TextController controller;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+	// View 와 Controller연결
+            controller = new TextController(this);
+        }
+    }
+}
+~~~
+
+<br/>
+
+// Controller
+#TextController.cs
+~~~C#
+using System;
+
+namespace WpfApp1
+{
+    public class TextController
+    {
+        private TextModel model;
+        private MainWindow view;
+
+        public TextController(MainWindow view)
+        {
+            this.view = view;
+            model = new TextModel();
+            this.view.TextChangeBtn.Click += UpdateText;
+        }
+
+        private void UpdateText(object sender, EventArgs e)
+        {
+            view.InputText.Text = model.Text;
+        }
+    }
+}
+~~~
+
+###### [디자인패턴](#디자인패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MVP
+  - Model, View, Presenter
+  - Model: 데이터와 비즈니스 로직을 관리한다
+  - View: 사용자 인터페이스를 표시하고 사용자 입력을 받는다.
+  - Presenter: View에서 요청한 정보를 Model로부터 가공하여 View로 전달한다. Model과 View의 다리 같은 역할
+  - Presenter는 View를 간접 참조한다
+
+<br/>
+
+  - Presenter를 통해 Model과 View를 완벽히 분리해 주기 때문에, MVC 패턴에 있던 Model과 View 사이의 의존성을 해결하였다.
+  - Presenter와 View는 1:1 관계이기 때문에 View와 Presenter 사이의 의존성이 매우 강하다.
+
+<br/>
+
+  - 사용자의 Action을 View로 받는다
+  - View에서 받은 이벤트를 Presenter에게 전달한다
+  - Presenter에서 Model로 데이터를 요청한다
+  - Model에서 Presenter로 요청에 따른 응답을 한다
+  - Presenter에서 결과를 바인딩하여 View로 통보한다
+  - 받은 정보를 토대로 View를 업데이트한다
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <Button x:Name="TextChangeBtn" Width="100" Height="30" Content="버튼"/>
+        <TextBlock x:Name="InputText"/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System;
+using System.Windows;
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window, ITextView
+    {
+        public event EventHandler TextChangeClicked;
+
+        private TextPresenter presenter;
+        public MainWindow()
+        {
+            InitializeComponent();
+            presenter = new TextPresenter(this);
+            TextChangeBtn.Click += (s, e) => TextChangeClicked?.Invoke(this, e);
+        }
+
+        public void SetText(string text)
+        {
+            InputText.Text = text;
+        }
+    }
+
+    public interface ITextView
+    {
+        event EventHandler TextChangeClicked;
+        void SetText(string text);
+    }
+}
+~~~
+
+<br/>
+
+#TextModel.cs
+~~~c#
+namespace WpfApp1
+{
+    public class TextModel
+    {
+        public string Text { get; set; } = "Hello World";
+    }
+}
+~~~
+
+<br/>
+
+#TextPresenter.cs
+~~~c#
+using System;
+
+namespace WpfApp1
+{
+    public class TextPresenter
+    {
+        private TextModel model;
+        private ITextView view;
+
+        public TextPresenter(ITextView view)
+        {
+            this.view = view;
+            this.view.TextChangeClicked += UpdateText;
+            model = new TextModel();
+        }
+
+        private void UpdateText(object sender, EventArgs e)
+        {
+            view.SetText(model.Text);
+        }
+    }
+}
+~~~
+
+###### [디자인패턴](#디자인패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MVVM
+  - Model, View, ViewModel
+  - View를 추상화한 ViewModel을 사용하기 때문에 View에 대한 참조가 없다.
+  - DataContext를 사용하여 MVP의 문제 였던 View와 ViewModel의 의존성을 느슨하게 만들었다, 또한 Binding을 사용하여, 그 어떤것도 직접적인 참조없이 가능하게 되었다
+
+###### [디자인패턴](#디자인패턴)
 ###### [Top](#top)
 
 <br/>
