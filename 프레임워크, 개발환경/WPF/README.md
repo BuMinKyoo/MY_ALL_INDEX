@@ -6045,6 +6045,7 @@ namespace WpfApp2
  - 위의 코드에서 App.xaml, App.xaml.cs, MainWindowViewModel이렇게 3개만 코드가 변경 되었다
  - 만약 서비스를, services.AddSingleton<INavigationService, NavigationService>(); 이렇게 등록한다면, 이 뜻은 다음과 같다.
    - INavigationService는 서비스의 인터페이스이며, NavigationService는 이 인터페이스를 구현하는 구체적인 클래스. 의존성 주입에서는 인터페이스를 통해 서비스를 요청하고, 구현 클래스의 인스턴스가 제공된다
+   - 리소스가 App.xaml에서 전체 등록이 되지 않아, 각 유저 컨트롤마다 등록하고 있다..아직 이유를 찾지 못했음
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/383554d2-d12c-4eb7-ba06-df5f8e8ffdf3)
 
