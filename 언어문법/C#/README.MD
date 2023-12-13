@@ -16,6 +16,7 @@
   - [함수](#함수)
   - [가비지 컬렉터](#가비지-컬렉터)
   - [클래스](#클래스)
+  - [Generic 형식함수,클래스](#generic-형식함수클래스)
   - [범위](#범위)
   - [열거형](#열거형)
   - [어서트](#어서트)
@@ -1165,6 +1166,173 @@ namespace ConsoleApp1
 }
 
 // 10
+~~~
+
+###### [클래스](#클래스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Generic 형식함수,클래스
+  - 동일한 기능을 하지만 파라미터의 타입만 다른 함수가 필요할때 사용한다.
+  - 보통은 오버로딩을 통해서, 매개변수의 타입을 바꿔서 같은 이름의 함수를 다시 선언하지만, Generic 형식 매개변수을 사용하면 그럴 필요가 없다 
+
+// Generic 아닌 함수
+~~~c#
+namespace ConsoleApp1
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Program program = new Program();
+            program.Print(1);
+            program.Print("qwe");
+            program.Print(3.4f);
+        }
+
+        public void Print(int value)
+        {
+            Console.WriteLine(value);
+        }
+
+        public void Print(string value)
+        {
+            Console.WriteLine(value);
+        }
+
+        public void Print(float value)
+        {
+            Console.WriteLine(value);
+        }
+    }
+}
+~~~
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Program program = new Program();
+            int[] array = { 1, 2, 3, 4, 5 };
+
+            program.Print(array);
+        }
+
+        public void Print<T>(T[] value)
+        {
+            foreach (var item in value)
+            {
+                Console.WriteLine(item);
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 위와 같이 써야할 오버로딩을 아래와 같이 할 수 있다
+
+// Generic 함수
+~~~c#
+namespace ConsoleApp1
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Program program = new Program();
+            program.Print<int>(1);
+            program.Print<string>("qwe");
+            program.Print<float>(3.4f);
+
+            // 아래와 같이 생략 가능
+            program.Print(1);
+            program.Print("qwe");
+            program.Print(3.4f);
+        }
+
+        public void Print<T>(T value)
+        {
+            Console.WriteLine(value);
+        }
+    }
+}
+~~~
+
+<br/>
+
+Generic Class
+~~~c#
+namespace ConsoleApp1
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Abc<int> abc = new Abc<int>();
+            abc.value = 1;
+            abc.array = new int[] { 1, 2, 3, 4, 5 };
+
+            Abc<string> abc2 = new Abc<string>();
+            abc2.value = "Hello";
+            abc2.array = new string[] { "Hello", "World" };
+        }
+    }
+
+    public class Abc<T>
+    {
+        public T value;
+        public T[] array;
+    }
+}
+~~~
+
+<br/>
+
+  - Generic  type제약 조건
+    - 특정 type만 받도록 제약을 걸수 있다 “where T : 제약조건”
+
+<br/>
+
+  - where T : struct : T는 값 형식만 받습니다.
+  - where T : class : T는 참조 형식만 받습니다.
+  - where T : new() : T는 반드시 매게 변수가 없는 생성자가 있어야 합니다.
+  - where T : 기반 클래스명 : T는 명시한 기반 클래스의 파생 클래스여야 합니다.
+  - where T : 인터페이스명 : T는 명시한 인터페이스를 반드시 구현해야합니다. 여러개의 인터페이스 명시가 가능합니다.
+  - where T : U : T는 또 다른 형식 매개 변수 U로부터 상속받은 클래스입니다.
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Program program = new Program();
+            program.Print(1); // 값형식
+            program.Print("Hello"); // 참조형식 에러
+
+        }
+
+        public void Print<T>(T value)
+            where T : struct
+        {
+            Console.WriteLine(value);
+        }
+    }
+}
 ~~~
 
 ###### [클래스](#클래스)
