@@ -7,6 +7,8 @@
   - [예제](#예제)
     - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
     - [Placeholder](#placeholder)
+    - [MultiBinding,IMultiValueConverter](#multibindingimultivalueconverter)
+
   </div>
   </details>
 
@@ -246,6 +248,7 @@
 # 예제
   - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
   - [Placeholder](#placeholder)
+  - [MultiBinding,IMultiValueConverter](#multibindingimultivalueconverter)
 
 ###### [예제](#예제)
 ###### [Top](#top)
@@ -326,6 +329,81 @@
 ~~~
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4d1fa31a-96e4-4dfd-9397-e79679956e4f)
+
+###### [예제](#예제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MultiBinding,IMultiValueConverter
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        xmlns:local="clr-namespace:WpfApp2"
+        Title="MainWindow" Height="200" Width="300">
+
+    <Window.Resources>
+        <local:MultiValueConverter x:Key="MultiValueConverter"/>
+    </Window.Resources>
+    <Grid>
+        <TextBox Name="txtInput1" Text="20" Visibility="Collapsed"/>
+        <TextBox Name="txtInput2" Text="30" Visibility="Collapsed"/>
+        <TextBlock>
+            <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource MultiValueConverter}" Mode="TwoWay">
+                    <Binding ElementName="txtInput1" Path="Text"/>
+                    <Binding ElementName="txtInput2" Path="Text"/>
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MultiValueConverter.cs
+~~~c#
+using System;
+using System.Globalization;
+using System.Windows.Data;
+
+namespace WpfApp2
+{
+    public class MultiValueConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            // values 배열에서 필요한 값 가져오기
+            if (values == null || values.Length < 2)
+            {
+                return Binding.DoNothing;
+            }
+
+            // 두 개의 값 가져오기 (여기서는 간단한 덧셈을 수행합니다)
+            double value1 = System.Convert.ToDouble(values[0]);
+            double value2 = System.Convert.ToDouble(values[1]);
+
+            double result = value1 + value2;
+
+            // 두 숫자의 합 반환
+            return result.ToString();
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+~~~
 
 ###### [예제](#예제)
 ###### [Top](#top)
