@@ -64,6 +64,7 @@
     - int? a = null; //Null선언
     - float? b = null; //Null선언
 
+###### [기본자료형](#기본자료형)
 ###### [Top](#top)
 
 <br/>
@@ -128,6 +129,7 @@ Console.WriteLine($"{name}는 사과를 {str}");   // 철수는 사과를 좋아
     - 큰 따옴표 안에 있는 것이 스트링으로 그대로 출력됨
       - (@"Hi {name}")
 
+###### [문자열 포맷팅](#문자열-포맷팅)
 ###### [Top](#top)
 
 <br/>
@@ -138,6 +140,12 @@ Console.WriteLine($"{name}는 사과를 {str}");   // 철수는 사과를 좋아
 # 조건문
   - 조건식은 참이나 거짓을 반환해야 함
 
+<br/>
+
+  - [If(표현식)](#if표현식)
+  - [Switch(표현식)](#switch표현식)
+
+###### [조건문](#조건문)
 ###### [Top](#top)
 
 <br/>
@@ -166,7 +174,8 @@ if (조건식)
   - 우선순위, 평가순서
     - If(2+2==4 || 4+2 == 6 && 1+2 == 2) 일때 우선순위로 괄호를 먼저 치면 (2+2==4 || (4+2 == 6 && 1+2 == 2))이렇게 계산하게 된다. 하지만 평가 순서로써는 맨 왼쪽에 있는 것부터 평가 되므로 '2+2==4'가 참이 되면 || 합 연산으로 인해 뒤에 어떤 것이 오던 참이 되기 때문에 뒤쪽의 연산은 하지 않게 된다 
 
-###### [조건문](#조건문)
+###### [If(표현식)](#if표현식)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -203,7 +212,8 @@ switch(input)
 	}
 ~~~
 
-###### [조건문](#조건문)
+###### [Switch(표현식)](#switch표현식)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -248,6 +258,7 @@ foreach (string 변수명 in list)
 }
 ~~~
 
+###### [반복문](#반복문)
 ###### [Top](#top)
 
 <br/>
@@ -260,6 +271,7 @@ foreach (string 변수명 in list)
   - 참일경우 왼쪽 값이 반환되, 거짓일 경우 오른쪽 값이 반환 된다.
   - (불리언 표현식) ? 반환값 : 반환값
 
+###### [삼항연산자](#삼항연산자)
 ###### [Top](#top)
 
 <br/>
@@ -272,6 +284,7 @@ foreach (string 변수명 in list)
   - 배열을 선언할때 요소의 수를 결정하게 되고, 그것은 바꿀 수 없음
   - 배열의 색인은 0 부터 시작한다.
 
+###### [배열](#배열)
 ###### [Top](#top)
 
 <br/>
@@ -284,7 +297,8 @@ foreach (string 변수명 in list)
     - int[ ] (변수) = { 20,21,22 } -> 배열 생성과 대입 단축형
     - int[ 3 ] -> 배열 접근법
 
-###### [배열](#배열)
+###### [1차원 배열](#1차원-배열)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -324,7 +338,8 @@ static void Main(string[] args)
 }
 ~~~
 
-###### [배열](#배열)
+###### [배열의 배열](#배열의-배열)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -335,7 +350,8 @@ static void Main(string[] args)
   - int[ , ] <변수> = { { 1, 2, 3 }, { 2, 4, 6 } } -> 배열 생성과 대입 단축형
   - int[1,2] -> 베열 접근법
 
-###### [배열](#배열)
+###### [다차원 배열](#다차원-배열)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -607,6 +623,7 @@ namespace ConsoleApp9
 야호~
 ~~~
 
+###### [함수](#함수)
 ###### [Top](#top)
 
 <br/>
@@ -617,6 +634,7 @@ namespace ConsoleApp9
 # 가비지 컬렉터
     - 힙에 할당된 데이터는 자신을 사용하는 참조가 더 이상 존재하지 않게 되면 메모리를 감시하고 있던 가비지 컬렉터가 힙에 할당된 메모리를 해체 한다.
 
+###### [가비지 컬렉터](#가비지-컬렉터)
 ###### [Top](#top)
 
 <br/>
@@ -1149,6 +1167,7 @@ namespace ConsoleApp1
 // 10
 ~~~
 
+###### [클래스](#클래스)
 ###### [Top](#top)
 
 <br/>
@@ -1220,6 +1239,7 @@ public class Program
 }
 ~~~
 
+###### [범위](#범위)
 ###### [Top](#top)
 
 <br/>
@@ -1273,6 +1293,7 @@ Enumber : 7
 Estr : kiki
 ~~~
 
+###### [열거형](#열거형)
 ###### [Top](#top)
 
 <br/>
@@ -1288,6 +1309,7 @@ Estr : kiki
     - "난 이렇게 코드를 짰는데, 이게 아니면 메세지를 출력해라"는 의미
   - Debug.Assert(<표현식>, <메세지>)
 
+###### [어서트](#어서트)
 ###### [Top](#top)
 
 <br/>
@@ -1312,6 +1334,7 @@ Estr : kiki
     - 불필요한 공백 없애
   - 여러가지 String의 속성 : https://docs.microsoft.com/ko-kr/dotnet/api/system.string?view=net-6.0
 
+###### [문자열 토크나이저](#문자열-토크나이저)
 ###### [Top](#top)
 
 <br/>
@@ -1330,6 +1353,7 @@ Estr : kiki
     - <변수명>.ToString()
     - ...etc...
 
+###### [문자열 빌더](#문자열-빌더)
 ###### [Top](#top)
 
 <br/>
@@ -1366,6 +1390,7 @@ Estr : kiki
     - bool bResul1 = 변수명.TryGetValue(“keyi”, out value)
     - <변수명>[key] -> 접근하기
 
+###### [컬렉션](#컬렉션)
 ###### [Top](#top)
 
 <br/>
@@ -1411,6 +1436,7 @@ namespace ConsoleApp9
 }
 ~~~
 
+###### [partial클래스](#partial클래스)
 ###### [Top](#top)
 
 <br/>
@@ -1513,6 +1539,7 @@ class Car
 
 <img src="https://user-images.githubusercontent.com/39178978/155740297-b88a2be9-707d-4e17-b5ae-819a9a9cff9a.png">
 
+###### [구조체](#구조체)
 ###### [Top](#top)
 
 <br/>
@@ -1528,6 +1555,7 @@ class Car
   - 값형에 null을 쓸 수 있게 해주는 것이 Nullable이다.
     - ec) Nullable<자료형> age;
 
+###### [Nullable](#nullable)
 ###### [Top](#top)
 
 <br/>
@@ -1670,6 +1698,7 @@ ID : 2번, Price : 40
   - MS Docs문서 참고
     - https://docs.microsoft.com/ko-kr/dotnet/csharp/programming-guide/concepts/linq/sorting-data
 
+###### [LINQ](#linq)
 ###### [Top](#top)
 
 <br/>
@@ -1725,6 +1754,7 @@ static void Main(string[] args)
     - ReadAllBytes
     - ReadAllBytes
 
+###### [파일입출력](#파일입출력)
 ###### [Top](#top)
 
 <br/>
@@ -1934,6 +1964,7 @@ static void Main(string[] args)
     - BinaryReader
     - MemoryStream
 
+###### [파일스트림](#파일스트림)
 ###### [Top](#top)
 
 <br/>
@@ -1970,3 +2001,6 @@ static void Main(string[] args)
 
 }
 ~~~
+
+###### [예외](#예외)
+###### [Top](#top)
