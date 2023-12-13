@@ -6,7 +6,7 @@
   
   - [예제](#예제)
     - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
-      
+    - [Placeholder](#placeholder)
   </div>
   </details>
 
@@ -245,6 +245,7 @@
 
 # 예제
   - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
+  - [Placeholder](#placeholder)
 
 ###### [예제](#예제)
 ###### [Top](#top)
@@ -284,6 +285,47 @@
     </StackPanel>
 </Window>
 ~~~
+
+###### [예제](#예제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Placeholder
+  - 폰트와 같이 전역으로 똑같이 지정하고 싶을때, 각 style에 따로 지정하는 것이 아니라, BasedOn속성으로 이어 받는것이 좋은데, 이때, FrameworkElement속성으로 하게 되면 어떠한 type의 style도 전부 BasedOn으로 이어 받을 수 있다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="200" Width="300">
+
+    <Grid>
+        <TextBlock Text="sdfsdf">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Foreground" Value="#88000000"/>
+                    <Setter Property="FontSize" Value="100"/>
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                         <DataTrigger Binding="{Binding ElementName=txt, Path=Text}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBox x:Name="txt" Text="" Background="Transparent" FontSize="100"/>
+    </Grid>
+</Window>
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4d1fa31a-96e4-4dfd-9397-e79679956e4f)
 
 ###### [예제](#예제)
 ###### [Top](#top)
