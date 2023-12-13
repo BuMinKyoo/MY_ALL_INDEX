@@ -1,5 +1,16 @@
 ###### Top
 
+- <details markdown="1">
+  <summary>예제</summary>
+  <div markdown="1">
+  
+  - [예제](#예제)
+    - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
+      
+  </div>
+  </details>
+
+
 - [코딩표준](#코딩표준)
 
 - [WPF class hierarchy](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/WPF/WPF%20class%20hierarchy.png)
@@ -226,6 +237,56 @@
   - [WPFSerialPort]_Repository링크(https://github.com/BuMinKyoo/WPFSerialPort)
   - [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
   - [WPFHttp]__Repository링크([https://github.com/BuMinKyoo/BingGoGame](https://github.com/BuMinKyoo/WPFHttp))
+
+<br/>
+<br/>
+
+***
+
+# 예제
+  - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
+
+###### [예제](#예제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# FontFamily, FontSize지정할시,FrameworkElement
+  - 폰트와 같이 전역으로 똑같이 지정하고 싶을때, 각 style에 따로 지정하는 것이 아니라, BasedOn속성으로 이어 받는것이 좋은데, 이때, FrameworkElement속성으로 하게 되면 어떠한 type의 style도 전부 BasedOn으로 이어 받을 수 있다
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+
+    <Window.Resources>
+        <Style x:Key="BaseControl" TargetType="{x:Type FrameworkElement}">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="100"/>
+        </Style>
+
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource BaseControl}">
+        </Style>
+
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource BaseControl}">
+        </Style>
+    </Window.Resources>
+    
+    <StackPanel>
+        <TextBlock Text="sdfsdf"/>
+        <TextBox Text="sdfsdf"/>
+    </StackPanel>
+</Window>
+~~~
+
+###### [예제](#예제)
+###### [Top](#top)
 
 <br/>
 <br/>
