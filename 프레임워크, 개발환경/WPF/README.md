@@ -6774,6 +6774,152 @@ namespace WpfApp2
 }
 ~~~
 
+<br/>
+
+  - ObservableCollection을 Store를 통한 데이터 교환
+
+#CustListStore.cs
+~~~c#
+using System;
+using System.Collections.ObjectModel;
+
+namespace WpfApp1
+{
+    public class CustListStore
+    {
+        private ObservableCollection<Cust> _custList;
+        public ObservableCollection<Cust> CustList
+        {
+            get { return _custList; }
+            set
+            {
+                _custList = value;
+                if (CustListChangeEvent != null)
+                {
+                    CustListChangeEvent?.Invoke();
+                }
+            }
+        }
+
+        public Action? CustListChangeEvent { get; set; }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+using System;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+
+namespace WpfApp1
+{
+    public class UserControl1ViewModel
+    {
+        private CustListStore _custListStore;
+        public UserControl1ViewModel(CustListStore custListStore)
+        {
+            _custListStore = custListStore;
+            _custListStore.CustList = new ObservableCollection<Cust>();
+        }
+
+        private int _inAge;
+        public int InAge
+        {
+            get { return _inAge; }
+            set
+            {
+                _inAge = value;
+            }
+        }
+
+        private String _strName;
+        public String StrName
+        {
+            get { return _strName; }
+            set
+            {
+                _strName = value;
+            }
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private ObservableCollection<Cust> _obcCustList = new ObservableCollection<Cust>();
+        public ObservableCollection<Cust> ObcCustList
+        {
+            get { return _obcCustList; }
+            set
+            {
+                _obcCustList = value;
+            }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            ObcCustList.Add(new Cust() { InAge = InAge, StrName = StrName });
+            _custListStore.CustList = ObcCustList;
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2ViewModel.cs
+~~~c#
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class UserControl2ViewModel : INotifyPropertyChanged
+    {
+        private CustListStore _custListStore;
+        public UserControl2ViewModel(CustListStore custListStore)
+        {
+            _custListStore = custListStore;
+            _custListStore.CustListChangeEvent += CustListStore_CustListChangeEvent;
+        }
+
+        private void CustListStore_CustListChangeEvent()
+        {
+            ObcCustList = _custListStore.CustList;
+        }
+
+        private ObservableCollection<Cust> _obcCustList;
+        public ObservableCollection<Cust> ObcCustList
+        {
+            get { return _obcCustList; }
+            set
+            {
+                _obcCustList = value;
+                Notify();
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
 
