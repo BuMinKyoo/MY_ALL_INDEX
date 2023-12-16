@@ -89,6 +89,7 @@
     - [DependencyProperty](#dependencyproperty)
     - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
     - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
+    - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 단순이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-단순이벤트)
 
 <br/>
 
@@ -3270,6 +3271,7 @@ namespace WpfApp2
   - [DependencyProperty](#dependencyproperty)
   - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
   - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
+  - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 단순이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-단순이벤트)
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -6919,6 +6921,405 @@ namespace WpfApp1
     }
 }
 ~~~
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 단순이벤트
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b7997fd3-ae33-4b20-8632-a79e1e625234)
+
+#App.xaml
+~~~c#
+생략//
+~~~
+
+<br/>
+
+#App.xaml.cs
+~~~c#
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Windows;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
+    {
+        public IServiceProvider Services { get; }
+
+        public new static App Current => (App)Application.Current;
+        public App()
+        {
+            Services = ConfigureServices();
+        }
+
+        private IServiceProvider ConfigureServices()
+        {
+            // ServiceCollection
+            // 의존성을 등록하기 위한 컨테이너. 이 컨테이너는 응용 프로그램이 실행되는 동안 사용될 서비스와 그 구현을 저장한다
+            var services = new ServiceCollection();
+
+            // Events
+            services.AddSingleton<EventPublisher>();
+
+            // ViewModels
+            services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<UserControl1ViewModel>();
+            services.AddSingleton<UserControl2ViewModel>();
+
+            // Views
+            services.AddSingleton(s => new MainWindow()
+            {
+                DataContext = s.GetRequiredService<MainWindowViewModel>()
+            });
+
+            return services.BuildServiceProvider();
+        }
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            var mainView = Services.GetRequiredService<MainWindow>();
+            mainView.Show();
+        }
+    }
+}
+~~~
+
+<br/>
+
+#BoolToVisibilityConverter.cs
+~~~c#
+생략
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+생략
+~~~
+
+<br/>
+
+#EventPublisher.cs
+~~~c#
+using System;
+
+namespace WpfApp1
+{
+    public class EventPublisher
+    {
+        // EventHandler 델리게이트를 사용하여 이벤트를 정의합니다.
+        public event EventHandler CustomEvent;
+        public event EventHandler CustomEvent2;
+
+        // 이벤트를 발생시키는 메서드를 만듭니다.
+        public void RaiseCustomEvent()
+        {
+            Console.WriteLine("CustomEvent 발생");
+
+            // CustomEvent가 null이 아닌 경우에만 이벤트를 발생시킵니다.
+            CustomEvent?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void RaiseCustomEvent2()
+        {
+            Console.WriteLine("CustomEvent2 발생");
+
+            // CustomEvent가 null이 아닌 경우에만 이벤트를 발생시킵니다.
+            CustomEvent2?.Invoke(this, EventArgs.Empty);
+        }
+    }
+}
+~~~
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="400">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type local:UserControl1ViewModel}">
+            <local:UserControl1/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:UserControl2ViewModel}">
+            <local:UserControl2/>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <StackPanel Orientation="Horizontal">
+            <ContentControl Content="{Binding UserControl1_DataContext}"/>
+            <ContentControl Content="{Binding UserControl2_DataContext}"/>
+        </StackPanel>
+    </Grid>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        public MainWindowViewModel()
+        {
+            UserControl1_DataContext = App.Current.Services.GetService(typeof(UserControl1ViewModel))!;
+            UserControl2_DataContext = App.Current.Services.GetService(typeof(UserControl2ViewModel))!;
+        }
+
+        private object _userControl1_DataContext;
+        public object UserControl1_DataContext
+        {
+            get { return _userControl1_DataContext; }
+            set
+            {
+                _userControl1_DataContext = value;
+                Notify();
+            }
+        }
+
+        private object _userControl2_DataContext;
+        public object UserControl2_DataContext
+        {
+            get { return _userControl2_DataContext; }
+            set
+            {
+                _userControl2_DataContext = value;
+                Notify();
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" >
+    <Grid Width="200" Height="300" Background="Red">
+        <StackPanel>
+            <TextBox Margin="5" Height="100" Text="{Binding InAge}"/>
+            <TextBox Margin="5" Height="100" Text="{Binding StrName}"/>
+            <Button Margin="5" Content="전송" Command="{Binding OneClick}"/>
+            <Button Margin="5" Content="투명화" Command="{Binding OneClick2}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+using System;
+using System.Windows.Input;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class UserControl1ViewModel : INotifyPropertyChanged
+    {
+        private EventPublisher _eventPublisher;
+        public UserControl1ViewModel(EventPublisher eventPublisher)
+        {
+            _eventPublisher = eventPublisher;
+            Subscribe(_eventPublisher);
+        }
+
+        private int _inAge;
+        public int InAge
+        {
+            get { return _inAge; }
+            set
+            {
+                _inAge = value;
+                Notify();
+            }
+        }
+
+        private String _strName;
+        public String StrName
+        {
+            get { return _strName; }
+            set
+            {
+                _strName = value;
+                Notify();
+            }
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            _eventPublisher.RaiseCustomEvent();
+        }
+
+        private Command m_OneClick2;
+        public ICommand OneClick2
+        {
+            get { return m_OneClick2 = new Command(OneClickEvent2); }
+        }
+
+        private void OneClickEvent2(object obj)
+        {
+            _eventPublisher.RaiseCustomEvent2();
+        }
+
+        public void Subscribe(EventPublisher publisher)
+        {
+            // 이벤트 핸들러를 추가합니다.
+            publisher.CustomEvent += HandleCustomEvent;
+        }
+
+        // 이벤트를 처리하는 메서드를 정의합니다.
+        private void HandleCustomEvent(object sender, EventArgs e)
+        {
+            StrName = "Hello World";
+            InAge = 10;
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid Width="200" Height="200" Background="Blue" Visibility="{Binding BlVis, Converter={StaticResource BoolToVisibilityConverter}}">
+        <StackPanel>
+            <TextBox Margin="5" Height="100" Text="qweqweqwe"/>
+            <TextBox Margin="5" Height="100" Text="123123123"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl2ViewModel.cs
+~~~c#
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class UserControl2ViewModel : INotifyPropertyChanged
+    {
+        private EventPublisher _eventPublisher;
+        public UserControl2ViewModel(EventPublisher eventPublisher)
+        {
+            _eventPublisher = eventPublisher;
+            Subscribe(_eventPublisher);
+        }
+
+
+        private bool _blVis = true;
+        public bool BlVis
+        {
+            get { return _blVis; }
+            set
+            {
+                _blVis = value;
+                Notify();
+            }
+        }
+
+        public void Subscribe(EventPublisher publisher)
+        {
+            // 이벤트 핸들러를 추가합니다.
+            publisher.CustomEvent2 += HandleCustomEvent;
+        }
+
+        // 이벤트를 처리하는 메서드를 정의합니다.
+        private void HandleCustomEvent(object sender, EventArgs e)
+        {
+            BlVis = !BlVis;
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
+
+<br/>
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
