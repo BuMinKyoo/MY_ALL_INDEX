@@ -88,7 +88,7 @@
     - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
     - [DependencyProperty](#dependencyproperty)
     - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
-    - [ViewModel To ViewModel 데이터교환(IOC,DI)](#viewmodel-to-viewmodel-데이터교환iocdi)
+    - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
 
 <br/>
 
@@ -3269,7 +3269,7 @@ namespace WpfApp2
   - [Behavior을 활용한 DependencyProperty추가하기 (+binding불가한 것)](#behavior을-활용한-dependencyproperty추가하기-binding불가한-것)
   - [DependencyProperty](#dependencyproperty)
   - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
-  - [ViewModel To ViewModel 데이터교환(IOC,DI)](#viewmodel-to-viewmodel-데이터교환iocdi)
+  - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -6217,7 +6217,7 @@ namespace WpfApp2
 <br/>
 <br/>
 
-# ViewModel To ViewModel 데이터교환(IOC,DI)
+# ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트
   - MVVM패턴에서 ViewModel끼리의 데이터 교환
   - model을 가지고 있는 store어 class의 이벤트를 통해서, 다른 뷰모델에 해당하는 모델 데이터를 전송한다
   - 제어의역전(IOC), 의존성주입(Dependency Injection,DI)
