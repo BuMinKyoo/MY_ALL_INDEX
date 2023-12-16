@@ -89,7 +89,7 @@
     - [DependencyProperty](#dependencyproperty)
     - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
     - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
-    - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 단순이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-단순이벤트)
+    - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-이벤트)
 
 <br/>
 
@@ -3271,7 +3271,7 @@ namespace WpfApp2
   - [DependencyProperty](#dependencyproperty)
   - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
   - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
-  - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 단순이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-단순이벤트)
+  - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-이벤트)
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -6928,13 +6928,21 @@ namespace WpfApp1
 <br/>
 <br/>
 
-# ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 단순이벤트
+# ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 이벤트
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b7997fd3-ae33-4b20-8632-a79e1e625234)
 
 #App.xaml
 ~~~c#
-생략//
+<Application x:Class="WpfApp1.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WpfApp1"
+             Startup="Application_Startup">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
 ~~~
 
 <br/>
@@ -7018,6 +7026,7 @@ namespace WpfApp1
         // EventHandler 델리게이트를 사용하여 이벤트를 정의합니다.
         public event EventHandler CustomEvent;
         public event EventHandler CustomEvent2;
+        public event EventHandler<StringEventArgs> BoolEvent;
 
         // 이벤트를 발생시키는 메서드를 만듭니다.
         public void RaiseCustomEvent()
@@ -7034,6 +7043,29 @@ namespace WpfApp1
 
             // CustomEvent가 null이 아닌 경우에만 이벤트를 발생시킵니다.
             CustomEvent2?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void RaiseCustomEvent3(string strMessage)
+        {
+            BoolEvent?.Invoke(this, new StringEventArgs(strMessage));
+        }
+    }
+}
+~~~
+
+<br/>
+
+#StringEventArgs.cs
+~~~c#
+namespace WpfApp1
+{
+    public class StringEventArgs
+    {
+        public string StrMessage { get; private set; }
+
+        public StringEventArgs(string strMessage)
+        {
+            StrMessage = strMessage;
         }
     }
 }
@@ -7139,8 +7171,9 @@ namespace WpfApp1
         <StackPanel>
             <TextBox Margin="5" Height="100" Text="{Binding InAge}"/>
             <TextBox Margin="5" Height="100" Text="{Binding StrName}"/>
-            <Button Margin="5" Content="전송" Command="{Binding OneClick}"/>
+            <Button Margin="5" Content="데이터셋" Command="{Binding OneClick}"/>
             <Button Margin="5" Content="투명화" Command="{Binding OneClick2}"/>
+            <Button Margin="5" Content="Message" Command="{Binding OneClick3}"/>
         </StackPanel>
     </Grid>
 </UserControl>
@@ -7188,6 +7221,19 @@ namespace WpfApp1
             }
         }
 
+        public void Subscribe(EventPublisher publisher)
+        {
+            // 이벤트 핸들러를 추가합니다.
+            publisher.CustomEvent += HandleCustomEvent;
+        }
+
+        // 이벤트를 처리하는 메서드를 정의합니다.
+        private void HandleCustomEvent(object sender, EventArgs e)
+        {
+            StrName = "Hello World";
+            InAge = 10;
+        }
+
         private Command m_OneClick;
         public ICommand OneClick
         {
@@ -7210,17 +7256,15 @@ namespace WpfApp1
             _eventPublisher.RaiseCustomEvent2();
         }
 
-        public void Subscribe(EventPublisher publisher)
+        private Command m_OneClick3;
+        public ICommand OneClick3
         {
-            // 이벤트 핸들러를 추가합니다.
-            publisher.CustomEvent += HandleCustomEvent;
+            get { return m_OneClick3 = new Command(OneClickEvent3); }
         }
 
-        // 이벤트를 처리하는 메서드를 정의합니다.
-        private void HandleCustomEvent(object sender, EventArgs e)
+        private void OneClickEvent3(object obj)
         {
-            StrName = "Hello World";
-            InAge = 10;
+            _eventPublisher.RaiseCustomEvent3(StrName);
         }
 
         #region INotifyPropertyChanged
@@ -7255,7 +7299,7 @@ namespace WpfApp1
 
     <Grid Width="200" Height="200" Background="Blue" Visibility="{Binding BlVis, Converter={StaticResource BoolToVisibilityConverter}}">
         <StackPanel>
-            <TextBox Margin="5" Height="100" Text="qweqweqwe"/>
+            <TextBox Margin="5" Height="100" Text="{Binding StrName}"/>
             <TextBox Margin="5" Height="100" Text="123123123"/>
         </StackPanel>
     </Grid>
@@ -7277,6 +7321,7 @@ namespace WpfApp1
         private EventPublisher _eventPublisher;
         public UserControl2ViewModel(EventPublisher eventPublisher)
         {
+            // 이벤트 등록
             _eventPublisher = eventPublisher;
             Subscribe(_eventPublisher);
         }
@@ -7293,16 +7338,33 @@ namespace WpfApp1
             }
         }
 
+        private string _strName;
+        public string StrName
+        {
+            get { return _strName; }
+            set
+            {
+                _strName = value;
+                Notify();
+            }
+        }
+
         public void Subscribe(EventPublisher publisher)
         {
             // 이벤트 핸들러를 추가합니다.
             publisher.CustomEvent2 += HandleCustomEvent;
+            publisher.BoolEvent += CustomBoolEvent;
         }
 
         // 이벤트를 처리하는 메서드를 정의합니다.
         private void HandleCustomEvent(object sender, EventArgs e)
         {
             BlVis = !BlVis;
+        }
+
+        private void CustomBoolEvent(object? sender, StringEventArgs e)
+        {
+            StrName = e.StrMessage;
         }
 
         #region INotifyPropertyChanged
