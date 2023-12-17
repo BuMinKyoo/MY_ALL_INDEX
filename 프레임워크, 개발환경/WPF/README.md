@@ -90,6 +90,7 @@
     - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
     - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
     - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-이벤트)
+    - [ViewModel To ViewModel 데이터교환(IOC,DI)_WeakReferenceMessenger](#viewmodel-to-viewmodel-데이터교환iocdi_weakreferencemessenger)
 
 <br/>
 
@@ -3272,6 +3273,7 @@ namespace WpfApp2
   - [ViewModel To ViewModel 데이터교환](#viewmodel-to-viewmodel-데이터교환)
   - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
   - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-이벤트)
+  - [ViewModel To ViewModel 데이터교환(IOC,DI)_WeakReferenceMessenger](#viewmodel-to-viewmodel-데이터교환iocdi_weakreferencemessenger)
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
@@ -7381,7 +7383,340 @@ namespace WpfApp1
 }
 ~~~
 
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
 <br/>
+<br/>
+
+# ViewModel To ViewModel 데이터교환(IOC,DI)_WeakReferenceMessenger
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/bb47de65-c8b5-4581-b5a0-e82b16175b24)
+
+<br/>
+
+  - 라이브러리를 이용한, WeakReferenceMessenger또한 내부적으로는 event방식으로 이루어진다.
+
+#BoolToVisibilityConverter.cs
+~~~c#
+using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+
+namespace WpfApp1
+{
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue && boolValue)
+            {
+                return Visibility.Visible;
+            }
+            else
+            {
+                return Visibility.Collapsed; // 또는 Visibility.Hidden을 사용할 수도 있습니다.
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+~~~
+
+<br/>
+
+#Command.cs
+~~~c#
+생략
+~~~
+
+<br/>
+
+#Cust.cs
+~~~c#
+namespace WpfApp1
+{
+    public class Cust
+    {
+        private string _strName;
+        public string StrName
+        {
+            get { return _strName; }
+            set
+            {
+                _strName = value;
+            }
+        }
+
+        private int _inAge;
+        public int InAge
+        {
+            get { return _inAge; }
+            set
+            {
+                _inAge = value;
+            }
+        }
+    }
+}
+~~~
+
+<br/>
+
+#CustomMessage.cs
+~~~c#
+namespace WpfApp1
+{
+    public class CustomMessage
+    {
+        public string EventName { get; set; }
+        public object Message { get; set; }
+
+        public CustomMessage(string eventName, object message)
+        {
+            EventName = eventName;
+            Message = message;
+        }
+    }
+}
+~~~
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+위와 동일
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+위와 동일
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" >
+    <Grid Width="200" Height="300" Background="Red">
+        <StackPanel>
+            <TextBox Margin="5" Height="100" Text="1111"/>
+            <TextBox Margin="5" Height="100" Text="aaaa"/>
+            <Button Margin="5" Content="이벤트1" Command="{Binding OneClick}"/>
+            <Button Margin="5" Content="이벤트2" Command="{Binding OneClick2}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1ViewModel.cs
+~~~c#
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.ObjectModel;
+
+namespace WpfApp1
+{
+    public class UserControl1ViewModel
+    {
+        public UserControl1ViewModel()
+        {
+            WeakReferenceMessenger.Default.Register<CustomMessage>(this, ReceiveMessage);
+        }
+
+        private void ReceiveMessage(object recipient, CustomMessage message)
+        {
+            if (message.EventName == "Event1")
+            {
+                //MessageBox.Show("UserControl1ViewModel_Event1");
+            }
+            else if (message.EventName == "Event2")
+            {
+                //MessageBox.Show("UserControl1ViewModel_Event2");
+            }
+        }
+
+        private ObservableCollection<Cust> _obcCustList = new ObservableCollection<Cust>();
+        public ObservableCollection<Cust> ObcCustList
+        {
+            get { return _obcCustList; }
+            set
+            {
+                if (_obcCustList != value)
+                {
+                    _obcCustList = value;
+                }
+            }
+        }
+
+        private Command m_OneClick;
+        public ICommand OneClick
+        {
+            get { return m_OneClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            ObcCustList.Add(new Cust() { StrName = "홍길동", InAge = 20 });
+            ObcCustList.Add(new Cust() { StrName = "이길동2", InAge = 50 });
+
+            // 첫 번째 이벤트를 발생시키는 뷰모델
+            WeakReferenceMessenger.Default.Send(new CustomMessage("Event1", ObcCustList));
+        }
+
+        private Command m_OneClick2;
+        public ICommand OneClick2
+        {
+            get { return m_OneClick2 = new Command(OneClickEvent2); }
+        }
+
+        private void OneClickEvent2(object obj)
+        {
+            // 두 번째 이벤트를 발생시키는 뷰모델
+            WeakReferenceMessenger.Default.Send(new CustomMessage("Event2", false));
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid Width="200" Height="200" Background="Aqua" Visibility="{Binding BlVis, Converter={StaticResource BoolToVisibilityConverter}}">
+        <ItemsControl ItemsSource="{Binding ObcCustList}">
+
+            <ItemsControl.Template>
+                <!--템플릿 외형-->
+                <ControlTemplate TargetType="{x:Type ItemsControl}">
+                    <StackPanel>
+                        <ItemsPresenter/>
+                        <Button Width="100" Height="20" Content="버튼"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
+            <ItemsControl.ItemTemplate>
+                <!--데이터 외형-->
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding StrName}"/>
+                        <TextBlock Text="{Binding InAge}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemsPanel>
+                <!--패널 정렬-->
+                <ItemsPanelTemplate>
+                    <StackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl2ViewModel.cs
+~~~c#
+using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WpfApp1
+{
+    public class UserControl2ViewModel : INotifyPropertyChanged
+    {
+        public UserControl2ViewModel()
+        {
+            // CustomMessage에 대한 수신을 ReceiveMessage으로 받는다
+            WeakReferenceMessenger.Default.Register<CustomMessage>(this, ReceiveMessage);
+        }
+
+        private void ReceiveMessage(object recipient, CustomMessage message)
+        {
+            if (message.EventName == "Event1")
+            {
+                ObcCustList = (ObservableCollection<Cust>)message.Message;
+            }
+            else if (message.EventName == "Event2")
+            {
+                BlVis = !BlVis;
+
+                // this객체가 CustomMessage 타입의 메세지를 더이상 수신하지 않도록 한다
+                WeakReferenceMessenger.Default.Unregister<CustomMessage>(this);
+            }
+        }
+
+        private bool _blVis = true;
+        public bool BlVis
+        {
+            get { return _blVis; }
+            set
+            {
+                _blVis = value;
+                Notify();
+            }
+        }
+
+        private ObservableCollection<Cust> _obcCustList = new ObservableCollection<Cust>();
+        public ObservableCollection<Cust> ObcCustList
+        {
+            get { return _obcCustList; }
+            set
+            {
+                if (_obcCustList != value)
+                {
+                    _obcCustList = value;
+                    Notify();
+                }
+            }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void Notify([CallerMemberName] string propertyName = null)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+    }
+}
+~~~
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
