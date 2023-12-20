@@ -199,6 +199,7 @@
     - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
     - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
     - [Bitmap을 활용한 png 컬러 변경](#bitmap을-활용한-png-컬러-변경)
+    - [원하는 캡션가진 윈도우 잡기](#원하는-캡션가진-윈도우-잡기)
       
   </div>
   </details>
@@ -5075,6 +5076,7 @@ void CClientDlg::OnBnClickedSenddata()
     - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
     - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
     - [Bitmap을 활용한 png 컬러 변경](#bitmap을-활용한-png-컬러-변경)
+    - [원하는 캡션가진 윈도우 잡기](#원하는-캡션가진-윈도우-잡기)
 
 ###### [기능별 정리](#기능별-정리)
 ###### [Top](#top)
@@ -5365,6 +5367,47 @@ void CMFCApplication1Dlg::OnDestroy()
 	::GdiplusShutdown(m_gpToken);
 }
 ~~~
+
+###### [기능별 정리](#기능별-정리)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 원하는 캡션가진 윈도우 잡기
+
+#AppDlg.cpp
+~~~c++
+	CStringArray strarray;
+	strarray.InsertAt(0,_T("CKioskAuth"));
+	strarray.InsertAt(0,_T("CKioskCustList"));
+
+
+	CString strall = _T("");
+
+	for(int i = 0; i < strarray.GetCount(); i++)
+	{
+		HWND h_wnd = NULL, h_edit_wnd = NULL;
+		while(h_wnd = ::FindWindowEx(NULL, h_wnd, _T("#32770"), strarray.GetAt(i))) // 윈도우 클래스 이름이 #32770인 것을 다 찾음
+		{
+			if (h_wnd != NULL)
+			{
+				TCHAR buffer[255];
+				::GetWindowText(h_wnd, buffer, 255);
+				CString str = _T("");
+				str.Format(_T("\n%s"), buffer);
+
+				strall = strall + str;
+			}
+		}
+	}
+
+	if (strall != "")
+	{
+		AfxMessageBox(strall);
+	}
+~~~
+
 
 ###### [기능별 정리](#기능별-정리)
 ###### [Top](#top)
