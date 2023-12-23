@@ -17,8 +17,8 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ***
 
 ### DB
-  - [Mysql](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Mysql)
-  - [Oracle](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Oracle)
+  - [Mysql](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/DB/Mysql)
+  - [Oracle](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/DB/Oracle)
 
 <br/>
 
