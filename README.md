@@ -31,11 +31,11 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ***
 
 ### FrameWork
-  - [Win32](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/Win32)
-    - [MFC](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/MFC)
-  - [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/WPF)
-  - [NodeJs](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/NodeJs)
-  - [Svelte Kit](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%2C%20%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD/Svelte%20Kit)
+  - [Win32](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/FrameWork/Win32)
+    - [MFC](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/FrameWork/MFC)
+  - [WPF](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/FrameWork/WPF)
+  - [NodeJs](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/FrameWork/NodeJs)
+  - [Svelte Kit](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/FrameWork/Svelte%20Kit)
 <br/>
 
 ***
