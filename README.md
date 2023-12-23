@@ -14,8 +14,8 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 
 ***
 
-### CS지식
-  - [Computer science](https://github.com/BuMinKyoo/TIL/tree/main/Computer%20science)
+### ComputerScience
+  - [Basic](https://github.com/BuMinKyoo/TIL/tree/main/Computer%20science)
   - [Network](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC)
 
 <br/>
