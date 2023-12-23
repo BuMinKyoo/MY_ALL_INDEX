@@ -239,8 +239,9 @@
   - [공공API 내용을 xml파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_XML)
   - [공공API 내용을 json파일로 불러와서 ComboBox와 List로 뿌려주기(Public-API)]_Repository링크(https://github.com/BuMinKyoo/Public-API_JSON)
   - [WPFSerialPort]_Repository링크(https://github.com/BuMinKyoo/WPFSerialPort)
-  - [소켓 통신 빙고 게임_개발중]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
-  - [WPFHttp]__Repository링크([https://github.com/BuMinKyoo/BingGoGame](https://github.com/BuMinKyoo/WPFHttp))
+  - [소켓 통신 빙고 게임_미완성]__Repository링크(https://github.com/BuMinKyoo/BingGoGame)
+  - [WPFHttp]__Repository링크(https://github.com/BuMinKyoo/WPFHttp)
+  - [WPFKiosk_개발중]__Repository링크(https://github.com/BuMinKyoo/WPF_Kiosk)
 
 <br/>
 <br/>
