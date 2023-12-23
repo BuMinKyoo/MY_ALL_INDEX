@@ -41,12 +41,12 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ***
 
 ### Language
-  - [C 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C)
-  - [C++ 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%2B%2B)
-  - [C# 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/C%23)
-  - [JavaScript 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/JavaScript)
-  - [HTML,CSS 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/HTML,CSS)
-  - [Assembly](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/%EC%96%B8%EC%96%B4%EB%AC%B8%EB%B2%95/Assembly)
+  - [C 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/C)
+  - [C++ 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/C%2B%2B)
+  - [C# 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/C%23)
+  - [JavaScript 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/JavaScript)
+  - [HTML,CSS 문법](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/HTML%2CCSS)
+  - [Assembly](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/Assembly)
 <br/>
 
 ***
