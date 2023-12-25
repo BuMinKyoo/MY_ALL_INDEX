@@ -3,8 +3,7 @@
 ###### Top
 
 
-Network기초 부분은 유투브에서 ‘널널한 개발자’로 활동중이신, 최호성님의 강의를 보고. 많은 부분에서 정리와, 캡쳐한 내용임으로 출처를 밝힙니다!
-https://www.youtube.com/watch?v=k1gyh9BlOT8 
+Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신, 최호성님의 강의를 보고. 많은 부분에서 정리와, 캡쳐한 내용임으로 출처를 밝힙니다!
 
   - [Network기초](#network기초)
     - [컴퓨터구조, 네트워크 계층](#컴퓨터구조-네트워크-계층)
@@ -32,7 +31,7 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
     - [부하분산(Load Balancer)](#부하분산load-balancer)
     - [VPN작동원리(L3, IPSec)](#vpn작동원리l3-ipsec)
     - [네트워크 보안 종류](#네트워크-보안-종류)
-    - [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
+  - [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
   - [Ping테스트](#ping테스트)
   - [네트워크 경로 추적(tracert)](#네트워크-경로-추적tracert)
   - [내부 서버 만들기](#내부-서버-만들기)
@@ -68,7 +67,6 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
   - [부하분산(Load Balancer)](#부하분산load-balancer)
   - [VPN작동원리(L3, IPSec)](#vpn작동원리l3-ipsec)
   - [네트워크 보안 종류](#네트워크-보안-종류)
-  - [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
 
 ###### [Network기초](#network기초)
 ###### [Top](#top)
@@ -765,6 +763,8 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
 <br/>
 <br/>
 
+***
+
 # wireshark(패킷 분석 프로그램)
   - Outbound : 데이터가 나가는것
   - Inbound : 데이터가 들어오는것
@@ -777,7 +777,19 @@ https://www.youtube.com/watch?v=k1gyh9BlOT8
 
 ![image](https://user-images.githubusercontent.com/39178978/209434291-a00a78ca-1240-4934-bc2e-d60d0e15ea1b.png)
 
-###### [Network기초](#network기초)
+<br/>
+
+  - Frame단위의 데이터들을 확인할 수 있다
+  - wireshark에 있는 목록을 file로 만들면 Trace File이라고 불린다
+
+<br/>
+
+  - 구성/설명
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8c7e192c-80d9-4089-ae54-f93e0a6bd958)
+
+
+###### [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
 ###### [Top](#top)
 
 <br/>
