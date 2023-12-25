@@ -2,7 +2,6 @@
 
 ###### Top
 
-
 Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신, 최호성님의 강의를 보고. 많은 부분에서 정리와, 캡쳐한 내용임으로 출처를 밝힙니다!
 
   - [Network기초](#network기초)
@@ -788,6 +787,93 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8c7e192c-80d9-4089-ae54-f93e0a6bd958)
 
+  - 1. 필터 검색을 통해서 원하는 패킷을 찾는다
+  - 2. 패킷 데이터들 목록(실제로는 Frame값 들이 들어있다)
+  - 3. 텍스트로 나오는것
+  - 4. 16진수로 나오는것
+
+<br/>
+
+  - 레이아웃 변경도 가능하다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1ff74eda-91f4-4b0e-9458-d042530481f9)
+
+<br/>
+
+  - 라이브 캡쳐에 사용할 것을 더블클릭으로 들어간다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/5e1c3781-a3e3-4989-a9ae-0bf983dd01a1)
+
+<br/>
+
+  - 특정한 것을 열로써 적용해서 편하게 볼 수 있다
+  - 이런 칼럼이 많아지면 느려질 수 있다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/55470207-e2ef-44d9-8014-02de24df14b5)
+
+<br/>
+
+  - 각각목록에 따라서 컬러를 바꿀 수도 있다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/811fcfc8-2695-4144-9800-de25b9737b4d)
+
+<br/>
+
+  - 특정 패킷을 따라가기를 하면, 전부 재조립해서 보여준다
+    - 조립한 이후에 리스트에 조립할 데이터만 보여준다
+    - 정말 편리한 기능중 하나!
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f5979e0c-6c4c-4ffe-b3af-5c2956205b19)
+
+<br/>
+
+  - 리스트를 클릭후, Ctrl + 1 ~ 9를 통해서, 조립될 리스트의 컬러만을 바꿔준다
+  - TCP는 순서가 있지만 UDP는 순서가 없기 때문에 조립할때도 UDP는 오는 순서대로 조립을 하게 된다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/ddb85437-6883-4681-8eaa-fa88675c3be4)
+
+<br/>
+
+  - 객체 내보내기를 통해서, 파일을 검색하고, 재조립해서 볼 수가 있다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c5bda765-6af9-459d-aff0-ee39ba1c56c2)
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f2bf7c70-fe3f-4a74-b523-1bc11fdd4091)
+
+<br/>
+
+  - 통계의 종단점, 즉 앤드포인트로 가면 통계치를 볼 수 있음
+    - 각각이 패킷을 얼마나 많이 유도 했는지 볼 수 있고, 필터로 적용을 하게 되면 그것만 필터해서 보여줌
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c4e2b25a-264e-4224-ac8c-8bcf76af94bb)
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fe4fdaad-b7d5-4a90-8439-7de3740655eb)
+
+<br/>
+
+  - 네트워크 장애 4가지
+    - H/W
+      - 잃어버림
+      - 순서가 잘못들어옴
+    - K
+      - 재전송 요구
+    - U
+      - Window Size 문제, 어플리케이션 I/O버퍼가 가득찼다
+
+<br/>
+
+  - HTTPS통신
+    - SSL =  TLS
+    - 서버의 인증서에, public키와 private키가 있고, 그것을 통해  브라우저의 Session key를 암호와 한다.  Session key는 브라우저가 만드는 것이며 이것을 알 수 있다면 복호화를 할 수 있다
+    - 브라우저가 Session key를만들때 log를 남기게 할 수 있다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/185f569a-3a70-4e14-99a6-5ef512bc5734)
+
+<br/>
+
+  - 아래에 해당 파일을 찾아 넣으면 복호화가 된다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/64d1f32b-38db-44cc-8490-f1fa87133f0d)
 
 ###### [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
 ###### [Top](#top)
