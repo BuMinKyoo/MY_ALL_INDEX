@@ -22,7 +22,7 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
     - [TCP/IP통신시 MAC주소 변화](#tcpip통신시-mac주소-변화)
     - [L2스위치 작동원리, ARP](#l2스위치-작동원리-arp)
     - [TTL](#ttl)
-    - [3 way handshake](#3-way-handshake)
+    - [3 way handshake, 4 way Handshaking](#3-way-handshake-4-way-Handshaking)
     - [MTU, Packet 단편화](#mtu-packet-단편화)
     - [Unicast, Broadcast, Multicast](#unicast-broadcast-multicast)
     - [서브넷팅](#서브넷팅)
@@ -60,7 +60,7 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
   - [TCP/IP통신시 MAC주소 변화](#tcpip통신시-mac주소-변화)
   - [L2스위치 작동원리, ARP](#l2스위치-작동원리-arp)
   - [TTL](#ttl)
-  - [3 way handshake](#3-way-handshake)
+  - [3 way handshake, 4 way Handshaking](#3-way-handshake-4-way-Handshaking)
   - [MTU, Packet 단편화](#mtu-packet-단편화)
   - [Unicast, Broadcast, Multicast](#unicast-broadcast-multicast)
   - [서브넷팅](#서브넷팅)
@@ -566,18 +566,37 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
 <br/>
 <br/>
 
-# 3 way handshake
-  - 주고 받는 단위 :  Segment
-  - Server는 Client의 Seq번호를 받고, 응답해줌
-    - MSS사이즈 및 정책을 교환한다
-    - 가장 작은 MSS로 하향 평준화 하여 맞춘다
-    - 정책 : 혼잡제어
-      - 네트워크가 문제가 있어서 수신이 안되거나, 데이터를 받지 못하는 상황
-  - 3 way handshake을 한다는것
-    - Seq교환, MSS교환, 정책 교환
-    - 보안이 전혀 되어 있지 않다
+# 3 way handshake, 4 way Handshaking
+  - 3 way handshake는 4계층인 TCP전송 프로토콜에서 이루어진다.
+    - TCP 3 Way Handshake는 TCP/IP프로토콜을 이용해서 통신을 하는 응용프로그램이 데이터를 전송하기 전에 먼저 정확한 전송을 보장하기 위해 상대방 컴퓨터와 사전에 세션을 수립하는 과정이다.
+      - Client > Server : TCP SYN
+      - Server > Client : TCP SYN ACK
+      - Client > Server : TCP ACK
+    - 주고 받는 단위 :  Segment
+    - Server는 Client의 Seq번호를 받고, 응답해줌
+      - MSS사이즈 및 정책을 교환한다
+      - 가장 작은 MSS로 하향 평준화 하여 맞춘다
+      - 정책 : 혼잡제어
+        - 네트워크가 문제가 있어서 수신이 안되거나, 데이터를 받지 못하는 상황
+    - 3 way handshake을 한다는것
+      - Seq교환, MSS교환, 정책 교환
+      - 보안이 전혀 되어 있지 않다
+  - STEP1 : 클라이언트는 서버에 접속을 요청하는 SYN 패킷을 보낸다. 이때 A클라이언트는 SYN 을 보내고 SYN/ACK 응답을 기다리는SYN_SENT 상태가 된다.
+  - STEP2 : 서버는 SYN요청을 받고 클라이언트에게 요청을 수락한다는 ACK 와 SYN flag 가 설정된 패킷을 발송하고 클라이언트가 다시 ACK으로 응답하기를 기다린다. 이때 서버는 SYN_RECEIVED 상태가 된다
+  - STEP3 : 클라이언트는 서버에게 ACK을 보내고 연결된다
 
 ![image](https://user-images.githubusercontent.com/39178978/209433642-03d0d76c-a5be-4aad-98d9-706d279b2393.png)
+
+<br/>
+
+  - 4 way handshake는 세션을 종료하기 위해 수행된다
+    - STEP1 : 클라이언트가 연결을 종료하겠다는 FIN플래그를 전송
+    - STEP2 : 서버는 일단 확인메시지를 보내고 자신의 통신이 끝날때까지 기다린다, 이 상태가 TIME_WAIT상태이다
+    - STEP3 : 서버가 통신이 끝났으면 연결이 종료되었다고 클라이언트에게 FIN플래그를 전송
+    - STEP4 : 클라이언트는 확인했다는 메시지를 전송
+      - 클라이언트의 마지막 TIME_WAIT는 Server에서 FIN을 전송하기 전에 전송한 패킷이 Routing 지연이나 패킷 유실로 인한 재전송 등으로 인해 FIN패킷보다 늦게 도착하는 상황이 발생했을경우를 대비해서 Client는 Server로부터 FIN을 수신하더라도 일정시간(디폴트 240초)동안 세션을 남겨놓고 잉여 패킷을 기다리는 과정을 거치는 것을 말한다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/a300f7cb-5f8a-4e35-8ffb-5ee5eacdb2f8)
 
 ###### [Network기초](#network기초)
 ###### [Top](#top)
