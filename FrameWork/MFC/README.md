@@ -6888,13 +6888,13 @@ CString csfullPathA(csBkDirA); // CString은 TCHAR
     - SetThreadAffinityMask()
 
 <br/>
-
-  - Thread MFC API
-    - AfxBeginThread() : Thread 생성
-    - CreateEvent() : 이벤트 생성
-    - SetEvent() : 생성된 이벤트를 활성화 시켜줌
-    - ResetEvent() : 생성된 이벤트를 비활성화 시켜줌
-    - CloseHandle() : 이벤트 종료
+  - MFC함수 활용 예제
+    - Thread MFC API
+      - AfxBeginThread() : Thread 생성
+      - CreateEvent() : 이벤트 생성
+      - SetEvent() : 생성된 이벤트를 활성화 시켜줌
+      - ResetEvent() : 생성된 이벤트를 비활성화 시켜줌
+      - CloseHandle() : 이벤트 종료
 
 <br/>
 
