@@ -30,6 +30,13 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
     - [부하분산(Load Balancer)](#부하분산load-balancer)
     - [VPN작동원리(L3, IPSec)](#vpn작동원리l3-ipsec)
     - [네트워크 보안 종류](#네트워크-보안-종류)
+
+<br/>
+
+  - [http와 Socket통신과 TCP](#http와-socket통신과-tcp)
+
+<br/>
+  
   - [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
   - [Ping테스트](#ping테스트)
   - [네트워크 경로 추적(tracert)](#네트워크-경로-추적tracert)
@@ -781,6 +788,19 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
 ![image](https://user-images.githubusercontent.com/39178978/209434191-098a4286-e83b-4ced-879d-8780a973788d.png)
 
 ###### [Network기초](#network기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# http와 Socket통신과 TCP
+  - TCP는 4계층인 전송계층이며, http는 7계층인 응용계층으로써 TCP를 기반으로 하게 된다. 소켓(Socket)은 OS커널에 구현되어 있는 프로토콜 요소에 대한 추상화된 인터페이스이다, 예를 들어 블루투스 장치라면, 블루투스 소켓이라고 하고, IRDA라는 적외선 장치라는 IRDA 소켓 이라고 한다.
+  - TCP통신은 3-way-handshake라는 과정을 거치고 연결이 이루어진다. 그리고 연결을 종료할때는 4-way-handshake를 거치게 된다. 또한 양방향 통신이 된다. 양방향 통신이란, 클라이언트단과 서버단이 서로 연결되어 있을때 양방향(클라이언트 -> 서버, 서버 -> 클라이언트) 으로 요청을 보내 통신을 할 수 있게 해주는 것이다. 또한, 클라이언트단과 서버단의 연결이 끊어지지않고 계속 연결을 유지해주어 실시간 소통이 가능하다.
+  - http통신을 할때도, 연결할 때, 연결을 끊을때 TCP계층을 이용하지만, 데이터를 전송하는 부분은 HTTP로 이루어지게 된다. 한마디로, HTTP 통신을 하기위해서는 OSI 계층에서 TCP 기반인 4계층에서 3-way-handshake로 연결과정을 거치고 7계층에서 HTTP 기반으로 데이터 전송을 하고 다시 4계층에서 4-way-handshake로 연결을 끊는 과정을 거쳐야 한다. 또한 http 프로토콜은 단방향으로 설계되었다.
+
+###### [http와 Socket통신과 TCP](#http와-socket통신과-tcp)
 ###### [Top](#top)
 
 <br/>
