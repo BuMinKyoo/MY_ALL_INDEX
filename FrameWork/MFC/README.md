@@ -4555,8 +4555,8 @@ BOOL CServerDlg::OnInitDialog()
 	addr_data.sin_addr.s_addr = inet_addr("192.168.0.3");  // IP 주소 설정
 
 	// 클라이언트 접속에 사용할 Listen 소켓 생성!!
-	// AF_INET : ip주소를 어떤 형식으로 사용 할 것인지
-	// SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지
+	// AF_INET : ip주소를 어떤 형식으로 사용 할 것인지, L3에 관련된것
+	// SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지, L4에 관련된것
 	// 0 : 소켓 방식에 맞는 프로토콜을 자동으로 써줌
 	mh_listen_socket = socket(AF_INET, SOCK_STREAM, 0);
 
