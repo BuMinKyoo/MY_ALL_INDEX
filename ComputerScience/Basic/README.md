@@ -7,18 +7,12 @@
 - [컴퓨터는 왜 이진법을 사용하는가?](#컴퓨터는-왜-이진법을-사용하는가)
 - [컴퓨터의 기본 구조3가지](#컴퓨터의-기본-구조3가지)
 
-- <details markdown="1">
-  <summary>언어분류</summary>
-  <div markdown="1">
-  
-  - [언어분류](#언어분류)
-    - [언어수준(저수준언어, 고수준언어)](#언어수준저수준언어--고수준언어)
-    - [타입별(강한타입, 약한타입)](#타입별강한타입-약한타입)
-    - [처리수준(컴파일언어, JIT컴파일언어, 인터프리터)](#처리수준컴파일언어--jit컴파일언어--인터프리터)
-    - [메모리관리(매니지드, 언매니지드)](#메모리관리매니지드-언매니지드)
-    - [프로그래밍 패러다임(절차적언어, 개체지향 언어[OOP])](#프로그래밍-패러다임절차적언어-개체지향-언어oop))
-  </div>
-  </details>
+- [언어분류](#언어분류)
+  - [언어수준(저수준언어, 고수준언어)](#언어수준저수준언어--고수준언어)
+  - [타입별(강한타입, 약한타입)](#타입별강한타입-약한타입)
+  - [처리수준(컴파일언어, JIT컴파일언어, 인터프리터)](#처리수준컴파일언어--jit컴파일언어--인터프리터)
+  - [메모리관리(매니지드, 언매니지드)](#메모리관리매니지드-언매니지드)
+  - [프로그래밍 패러다임(절차적언어, 개체지향 언어[OOP])](#프로그래밍-패러다임절차적언어-개체지향-언어oop))
 
 - [Garbage Collection(GC), Automatic Reference Counting(ARC)](#garbage-collectiongc-automatic-reference-countingarc)
 - [스택, 힙, 코드, 데이터영역](#스택-힙-코드-데이터영역)
@@ -43,72 +37,42 @@
 - [장치통신](#장치통신)
 - [기타, 도움링크](#기타-도움링크)
 
-- <details markdown="1">
-  <summary>진수</summary>
-  <div markdown="1">
+- [진수](#진수)
+  - [진법](#진법)
+  - [8진법, 16진법, 32진법](#8진법-16진법-32진법)
+  - [진수변환](#진수변환)
+  - [비트,바이트](#비트바이트)
+  - [비트, 음수와 양수의 관계 및 수의표현, 및 최하위 비트로 짝수 홀 수 판단](#비트-음수와-양수의-관계-및-수의표현-및-최하위-비트로-짝수-홀-수-판단)
+  - [비트마스킹(bit masking)](#비트마스킹bit-masking)
   
-  - [진수](#진수)
-    - [진법](#진법)
-    - [8진법, 16진법, 32진법](#8진법-16진법-32진법)
-    - [진수변환](#진수변환)
-    - [비트,바이트](#비트바이트)
-    - [비트, 음수와 양수의 관계 및 수의표현, 및 최하위 비트로 짝수 홀 수 판단](#비트-음수와-양수의-관계-및-수의표현-및-최하위-비트로-짝수-홀-수-판단)
-    - [비트마스킹(bit masking)](#비트마스킹bit-masking)
-  </div>
-  </details>
+- [연산자](#연산자)
+  - [증감 연산자](#증감-연산자)
+  - [비트이동연산자](#비트이동연산자)
+  - [비트연산자](#비트연산자)
 
-
-- <details markdown="1">
-  <summary>연산자</summary>
-  <div markdown="1">
-  
-  - [연산자](#연산자)
-    - [증감 연산자](#증감-연산자)
-    - [비트이동연산자](#비트이동연산자)
-    - [비트연산자](#비트연산자)
-  </div>
-  </details>
-
-
-
-
-- <details markdown="1">
-  <summary>운영체제</summary>
-  <div markdown="1">
-  
-  - [운영체제](#운영체제)
-    - [32비트와 64비트](#32비트와-64비트)
-    - [기억 장치의 종류](#기억-장치의-종류)
-    - [HDD의 논리적 구조와 SSD](#hdd의-논리적-구조와-ssd)
-    - [API, Kernel, System Call, Interrupt](#api-kernel-system-call-interrupt)
-    - [DMA(Direct Memory Access)](#dmadirect-memory-access)
-    - [CPU와GPU](#cpu와gpu)
-    - [Virtual Memory](#virtual-memory)
-    - [Process와 Thread](#process와-thread)
-    - [Process간 통신 IPC, SOKET, MESSAGE PASSING](#process간-통신-ipc-soket-message-passing)
-    - [메모리관리](#메모리관리)
+- [운영체제](#운영체제)
+  - [32비트와 64비트](#32비트와-64비트)
+  - [기억 장치의 종류](#기억-장치의-종류)
+  - [HDD의 논리적 구조와 SSD](#hdd의-논리적-구조와-ssd)
+  - [API, Kernel, System Call, Interrupt](#api-kernel-system-call-interrupt)
+  - [DMA(Direct Memory Access)](#dmadirect-memory-access)
+  - [CPU와GPU](#cpu와gpu)
+  - [Virtual Memory](#virtual-memory)
+  - [Process와 Thread](#process와-thread)
+  - [Process간 통신 IPC, SOKET, MESSAGE PASSING](#process간-통신-ipc-soket-message-passing)
+  - [메모리관리](#메모리관리)
     
-  </div>
-  </details>
-
-
-- <details markdown="1">
-  <summary>Web</summary>
-  <div markdown="1">
-  
-  - [Web](#web)
-    - [CSR,SSR,TTV,TTI](#csr,ssr,ttv,tti)
-    - [웹 어셈블리(WebAssembly 혹은 WASM)](#웹-어셈블리webassembly-혹은-wasm)
+- [Web](#web)
+  - [CSR,SSR,TTV,TTI](#csr,ssr,ttv,tti)
+  - [웹 어셈블리(WebAssembly 혹은 WASM)](#웹-어셈블리webassembly-혹은-wasm)
     
-  </div>
-  </details>
 
-  - [암호기술](#암호기술)
-    - [Hash](#hash)
-    - [대칭키(Symmetric key)](#대칭키symmetric-key)
-    - [비대칭키 체계(SSL)](#비대칭키-체계ssl)
+- [암호기술](#암호기술)
+  - [Hash](#hash)
+  - [대칭키(Symmetric key)](#대칭키symmetric-key)
+  - [비대칭키 체계(SSL)](#비대칭키-체계ssl)
 
-  - [리버싱](#리버싱)
+- [리버싱](#리버싱)
 
 <br/>
 <br/>
