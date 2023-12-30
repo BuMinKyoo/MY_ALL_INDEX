@@ -18,6 +18,7 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
     - [Router의 구조, Inline, Out of path](#router의-구조-inline-out-of-path)
     - [Proxy](#proxy)
     - [TCP/IP 송수신 원리](#tcpip-송수신-원리)
+    - [소켓(Socket) 입/출력 버퍼](#소켓socket-입/출력-버퍼)
     - [L2스위치](#l2스위치)
     - [TCP/IP통신시 MAC주소 변화](#tcpip통신시-mac주소-변화)
     - [L2스위치 작동원리, ARP](#l2스위치-작동원리-arp)
@@ -63,6 +64,7 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
   - [Router의 구조, Inline, Out of path](#router의-구조-inline-out-of-path)
   - [Proxy](#proxy)
   - [TCP/IP 송수신 원리](#tcpip-송수신-원리)
+  - [소켓(Socket) 입/출력 버퍼](#소켓socket-입/출력-버퍼)
   - [L2스위치](#l2스위치)
   - [TCP/IP통신시 MAC주소 변화](#tcpip통신시-mac주소-변화)
   - [L2스위치 작동원리, ARP](#l2스위치-작동원리-arp)
@@ -503,6 +505,43 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
     - 무조건 네트워크 에서 장애를 찾을 것이 아니라, 프로그램이나 CPU속도, 점유율이 높을경우 이런것이 늦어져서 수신이 늦을 수가 있다.
 
 ![image](https://user-images.githubusercontent.com/39178978/209433321-58b7103a-cdb8-4e0b-8e77-cad9c1d0a4d8.png)
+
+###### [Network기초](#network기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓(Socket) 입/출력 버퍼
+  - Socket에는 buffer가 있으며, 입력,출력 buffer가 따로 존재한다
+  - send함수로 인해서, 그 데이터가 Socket 출력 buffer로 복사해 들어간다
+  - 윈도우 같은 경우는, getsockopt라는 함수를 통해서 Socket입/출력 buffer를 확인할 수 있다
+    - 하지만 윈도우의 같은 경우는 OS가 알아서 해주는 부분이 충분히 있어서 getsockopt으로 나오는 buffer가 큰 의미가 없을 수도 있으며, 다를 수도 있다
+  - Socket 마다 고유의 입/출력 buffer의 크기를 다르게 설정할 수 있다
+  - Socket에는 기본적으로 네이글 알고리즘(Nagle Algoritm)이 적용된다
+    - Nagle Algoritm은 송신에 있어서 버퍼를 둔 뒤 상대방 Host 의 Window 사이즈를 고려한 후, 어느정도 길이만큼의 패킷을 한번에 전송하는 기술이다
+  - send와 recv는 1:1로 매핑되지 않는다(Nagle Algoritm)
+    - send가 1회 호출될때, recv도 1회 호출 될 것이라는 생각을 하면 안된다!
+    - send의 인터벌이 중요하며, 빠르게 3번을 보내면, 그것을 전부 담아낼 수 있는 크기의 recv는 1번 호출로 다 담아내게 된다.
+      - Socket에 있는 출력 buffer에 쌓이게 되고, 이것이 한번에 전송되게 된다(여러가지 지연 문제로 인해서)
+
+<br/>
+
+  - 1 bit씩 send를 했지만, 여러가지 지연원인 때문에 출력 buffer에 쌓이게 되면게 8bit가 전송된 것들도 보인다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/edbe2cda-b803-42da-9ef9-ac0de387210e)
+
+<br/>
+
+  - 게임같은 경우는, 버튼 하나만 클릭해도 반응을 해야 하기 때문에, send로 한것이 Socket 출력 buffer에 쌓이지 않고, 무조건 갈 수 있도록 세팅해줘야 한다
+    - 윈도우 같은 경우는 setsockopt함수로 옵션을 TCP_NODELAY로 지정해 줘야 한다
+  - 양방향 연결을 할시에는, 서버는 클라이언트가 살아 있는지 주기적으로 신호를 보내서 좀비세션인지 아닌지 확인하는 하트비트를 보내주어야한다
+
+<br/>
+
+  - bps : 초당 bit 수
+  - pps : 초당 packet의 수
+  - pps보다 bps가 높은 것이 좋다
 
 ###### [Network기초](#network기초)
 ###### [Top](#top)
