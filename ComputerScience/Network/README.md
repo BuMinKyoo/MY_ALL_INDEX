@@ -35,9 +35,7 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
 <br/>
 
   - [http와 Socket통신과 TCP](#http와-socket통신과-tcp)
-
-<br/>
-  
+  - [서버 상태 확인하기](#서버-상태-확인하기)
   - [wireshark(패킷 분석 프로그램)](#wireshark패킷-분석-프로그램)
   - [Ping테스트](#ping테스트)
   - [네트워크 경로 추적(tracert)](#네트워크-경로-추적tracert)
@@ -850,6 +848,38 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
   - http통신을 할때도, 연결할 때, 연결을 끊을때 TCP계층을 이용하지만, 데이터를 전송하는 부분은 HTTP로 이루어지게 된다. 한마디로, HTTP 통신을 하기위해서는 OSI 계층에서 TCP 기반인 4계층에서 3-way-handshake로 연결과정을 거치고 7계층에서 HTTP 기반으로 데이터 전송을 하고 다시 4계층에서 4-way-handshake로 연결을 끊는 과정을 거쳐야 한다. 또한 http 프로토콜은 단방향으로 설계되었다.
 
 ###### [http와 Socket통신과 TCP](#http와-socket통신과-tcp)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 서버 상태 확인하기
+  - 와이어 샤크로 패킷 확인시, 컴퓨터 1대에서 서버와 클라이언트 모두를 사용할때는 루프백 인터넷으로 학인한다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c3e24dc7-4929-485f-8e45-690601b5f2a4)
+
+<br/>
+
+  - netstat -ano | find “25000”
+  - 서버가 실행되지 않았을 경우아무것도 나오지 않음
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d61a07c6-7bd7-400c-ae0c-c2377f14b196)
+
+<br/>
+
+  - 서버가 실행됬을 경우
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/4956f19e-194c-4ba8-a86d-509dfeee1de1)
+
+<br/>
+
+  - 클라이언트가 실행되고, 서버에 접속해서 3핸드 쉐이크를 통해 연결
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/615b6f6e-5512-4d5c-bedd-b33c25e973c8)
+
+###### [서버 상태 확인하기](#서버-상태-확인하기)
 ###### [Top](#top)
 
 <br/>
