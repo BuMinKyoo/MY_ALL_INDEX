@@ -1113,6 +1113,12 @@ a : 8, b : 3
 <br/>
 
 # Process와 Thread
+  - 한 Process는 최소 1개 이상의 Thread를 갖는다
+  - Thread는 개별화된 흐름과 전용 스택을 갖는 실행의 단위
+    - 스택은 보통 1MB정도의 크기이고, 재귀함수를 만들때 일반적으로 저 크기를 넘어가면 오버플로우를 내밷는다
+  - 모든 Thread는 자신이 속한 Process의 가상 메모리 공간을 공유한다
+  - Thread생성시 가장 중요한것은 동기화 하는 것이다
+    - 동기화를 잘 하지 못하면 레이스컨디션이 발생한다(=두 개 이상의 프로세스 혹은 스레드가 공유 자원을 서로 사용하려고 경합(Race)하는 현상)
   - Process에 속한 모든 Thread는 Process의 Virtual Memory로 메모리 공간이 제약 된다
 
   - PCB(Process Control Block), TCB(Thread Control Block)
@@ -1126,7 +1132,8 @@ a : 8, b : 3
       - Thread라이브러리에의해 Context Switching되는 Thread의 정보 단위
   - Thread 는 Queue구조에서 무언가를 퍼와서 작업하게 된다!!
 
-개발 툴 추천 : MS사의 프로세스 탐색기
+개발 툴 추천 : MS사의 프로세스 탐색기(https://learn.microsoft.com/ko-kr/sysinternals/downloads/process-explorer)
+
 
 ###### [운영체제](#운영체제)
 ###### [Top](#top)
