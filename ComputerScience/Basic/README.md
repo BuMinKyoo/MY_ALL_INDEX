@@ -61,6 +61,7 @@
   - [Process와 Thread](#process와-thread)
   - [Process간 통신 IPC, SOKET, MESSAGE PASSING](#process간-통신-ipc-soket-message-passing)
   - [메모리관리](#메모리관리)
+  - [동기/비동기](#동기/비동기)
 
 - [암호기술](#암호기술)
   - [Hash](#hash)
@@ -923,6 +924,7 @@ a : 8, b : 3
   - [Process와 Thread](#process와-thread)
   - [Process간 통신 IPC, SOKET, MESSAGE PASSING](#process간-통신-ipc-soket-message-passing)
   - [메모리관리](#메모리관리)
+  - [동기/비동기](#동기/비동기)
 
 ###### [운영체제](#운영체제)
 ###### [Top](#top)
@@ -1156,6 +1158,19 @@ a : 8, b : 3
   - 많은 프로세스가 RAM을 사용하려고 하지만, RAM은 제한적 이기 때문에, CPU가 판단하여 연산이 많이 필요 없는 Process를 Page단위로 하여 2차 메모리로 보내거나 하는 식으로 관리하게 된다
     - Swap In : HDD -> RAM
     - Swap Out : RAM -> HDD
+
+###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 동기/비동기
+  - 동기, 비동기는 User mode어플리케이션 입장에서 일어난다
+  - 동기
+    - 프로세스가 OS에게 뭔가를 해주라는 요청을 보낸다. 그것이 Kernel영역으로 가서 OS가 작업을 하면 프로세스가 던지 함수를 리턴해 주기 때문에 프로세스는 현재 쓰레드가 거기서 기다리게 된다
+  - 비동기
+    - 프로세스가 OS에게 뭔가를 해주라는 요청을 보낸다. 그것이 Kernel영역으로 가서 Kernel영역에 있는 큐에 할일을 메모리에 복사해두고, 함수가 리턴된다. OS는 그것이 차례대로 처리되고, 완료가 되면, 콜백함수를 호출하거나, 이벤트를 보내거나 하게 된다.
 
 ###### [운영체제](#운영체제)
 ###### [Top](#top)
