@@ -6889,6 +6889,19 @@ CString csfullPathA(csBkDirA); // CString은 TCHAR
 
 <br/>
 
+~~~c++
+	DWORD dwThreadID = 0;
+	HANDLE hThread = ::CreateThread(
+		NULL,  // 보안속성 상속, NULL이면 상속 받는다, 이 Thread를 만든 부모의 보안 속성을 상속받는다.
+		0,   // 스택 메모리는 기본 크기, 컴파일러 옵션 마다 다르다
+		ThreadProc,  // 스래드로 실행할 함수 이름
+		NULL,  // 함수에 전달한 매개변수
+		0,  // 생성 플래그는 기본값 사용
+		&dwThreadID); // 생성된 스레드ID 저장
+~~~
+
+<br/>
+
   - Thread MFC API(MFC함수와, 활용 예제)
     - AfxBeginThread() : Thread 생성
     - CreateEvent() : 이벤트 생성
