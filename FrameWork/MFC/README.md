@@ -185,6 +185,10 @@
     - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
     - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
     - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
+    - [소켓통신 함수별](#소켓통신-함수별)
+    - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입/출력-버퍼-확인)
+    - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
+    - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
       
   </div>
   </details>
@@ -4444,6 +4448,10 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
   - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
   - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
   - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
+  - [소켓통신 함수별](#소켓통신-함수별)
+  - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입/출력-버퍼-확인)
+  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
+  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
 
 ###### [소켓통신](#소켓통신)
 ###### [Top](#top)
@@ -5058,6 +5066,267 @@ void CClientDlg::OnBnClickedSenddata()
 		str2.Format(L"서버로 텍스트( %s )을 전송했습니다!", str);
 		m_event_list.InsertString(-1, str2);
 	}
+}
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 소켓통신 함수별
+  - 소켓 순서(서버코드)
+
+<br/>
+
+  - 1. 접속대기 소켓 생성
+    - AF_INET : ip주소를 어떤 형식으로 사용 할 것인지, L3에 관련된것
+    - SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지, L4에 관련된것
+
+#AppDlg.cpp(서버)
+~~~c++
+SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+if (hSocket == INVALID_SOCKET)
+{
+	AfxMessageBox(_T("socket() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 2. 포트 바인딩
+    - INADDR_ANY : NIC은 여러개가 존재할 수 있기 때문에, INADDR_ANY 라고 한다면, 모든 NIC으로 들어오는 클라이언트를 승락 하겠다 라는 의미가 된다. 특정 IP주소에만 들어오는 클라이언트를 승락하려면, 특정 IP를 작성해 주면 된다
+    - 이때, 특정 ip를 쓰게 되면, 127.0.0.1은 그것과를 다른 주소이기 때문에 접속할 수 없으며, 특정 ip에 127.0.0.1까지 같이 넣어줘야, 루프백(Loopback) 주소로 클라이언트가 접속 할 수 있게 된다.
+    - Socket같은 경우는 대부분 빅엔디안으로 개발 되었기 때문에 htons, htonl함수는 리틀엔디안을 빅엔디안으로 바꿔주는 함수가 됨
+
+#AppDlg.cpp(서버)
+~~~c++
+SOCKADDR_IN servAddr = { 0 };
+servAddr.sin_family = AF_INET;
+servAddr.sin_port = htons(25000);
+servAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+if (::bind(hSocket, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+{
+	AfxMessageBox(_T("bind() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 3. 접속대기
+    - SOMAXCONN 이것은 옛날에 썼던 옵션으로 지금은 OS가 전부 처리해 주기 때문에 SOMAXCONN 으로 사용하면 된다
+
+#AppDlg.cpp(서버)
+~~~c++
+if (::listen(hSocket, SOMAXCONN) == SOCKET_ERROR) {
+	AfxMessageBox(_T("Listen Error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 4. 클라이언트 접속 처리 및 대응
+    - SOMAXCONN 이것은 옛날에 썼던 옵션으로 지금은 OS가 전부 처리해 주기 때문에 SOMAXCONN 으로 사용하면 된다
+
+#AppDlg.cpp(서버)
+~~~c++
+SOCKADDR_IN clientaddr = { 0 };
+int nAddrLen = sizeof(clientaddr);
+SOCKET hClient = 0;
+char szBuffer[128] = { 0 };
+int nReceive = 0;
+~~~
+
+<br/>
+
+  - 4-1. 클라이언트 연결을 받아들이고 새로운 소켓 생성
+    - hClient : Remote Client통신 소켓
+    - clientaddr : 여기에 접속한 Client정보가 담김
+
+#AppDlg.cpp(서버)
+~~~c++
+while ((hClient = ::accept(hSocket, (SOCKADDR*)&clientaddr, &nAddrLen)) != INVALID_SOCKET)
+{
+	AfxMessageBox(_T("클라이언트 접속"));
+}
+~~~
+
+<br/>
+
+  - 4-2. 클라이언트로부터 문자열을 수신함
+    - hClient : Remote Client통신 소켓
+    - clientaddr : 여기에 접속한 Client정보가 담김
+    - recv함수에서 어떤 데이터가 올 때까지 서버는 대기 하고있다
+    - recv함수가 0을 반환하면 while문이 종료 되는 것이고, 이것은 즉, 클라이언트가 자기의 Socket을 끊었을때 0을 반환하게 된다.
+
+#AppDlg.cpp(서버)
+~~~c++
+while ((nReceive = ::recv(hClient, szBuffer, sizeof(szBuffer), 0))
+{
+	// 4-3 수신한 문자열을 그대로 반향 전송
+	::send(hClient, szBuffer, sizeof(szBuffer), 0);
+	AfxMessageBox(szBuffer);
+	memset(szBuffer, 0, sizeof(szBuffer));
+}
+~~~
+
+<br/>
+
+  - 4-3. 클라이언트가 연결을 종료함
+
+#AppDlg.cpp(서버)
+~~~c++
+::shutdown(hClient, SD_BOTH);
+::closesocket(hClient);
+AfxMessageBox(_T("서버와의 연결이 끊어졌습니다."));
+
+// 5. 리슨 소켓 닫기
+::closesocket(hSocket);
+~~~
+
+<br/>
+
+  - 소켓 순서(클라이언트코드)
+
+<br/>
+
+  - 1. 클라이언트 소켓 생성
+    - AF_INET : ip주소를 어떤 형식으로 사용 할 것인지, L3에 관련된것
+    - SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지, L4에 관련된것
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+if (hSocket == INVALID_SOCKET)
+{
+	AfxMessageBox(_T("socket() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 2. 포트 바인딩 및 연결
+    - 서버의 ip및 포트번호를 써야함
+    - inet_addr : 문자열로 쓰면, S_addr에 알맞는 숫자로 바꿔줌
+    - 클라이언트는 OS가 임의로 포트를 열어서 지정해준다.
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+SOCKADDR_IN svraddr = { 0 };
+svraddr.sin_family = AF_INET;
+svraddr.sin_port = htons(25000);
+svraddr.sin_addr.S_un.S_addr = inet_addr("192.168.0.10");
+if (::connect(hSocket, (SOCKADDR*)&svraddr, sizeof(svraddr)) == SOCKET_ERROR)
+{
+	AfxMessageBox(_T("connect() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 3. 채팅 메시지 송/수신
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+char szBuffer[128] = { 0 };
+while (1)
+{
+	// 사용자로부터 문자열을 입력받는다
+	gets_s(szBuffer);
+	if (strcmp(szBuffer, "EXIT") == 0)
+	{
+		break;
+	}
+
+	// 사용자가 입력한 문자열을 서버에 전송
+	::send(hSocket, szBuffer, strlen(szBuffer) + 1, 0);
+
+	// 서버로부터 방금 보낸 문자열에 대한 에코 메시지를 수신한다
+	memset(szBuffer, 0, sizeof(szBuffer));
+	::recv(hSocket, szBuffer, sizeof(szBuffer), 0);
+
+	CString str;
+	str.Format(_T("%s"), szBuffer);
+	AfxMessageBox(str);
+}
+~~~
+
+<br/>
+
+  - 4. 소켓을 닫고 종료
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+::shutdown(hSocket, SD_BOTH);
+::closesocket(hSocket);
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓(Socket) 입/출력 버퍼 확인
+
+#AppDlg.cpp
+~~~c++
+int nBufSize = 0, nLen = sizeof(nBufSize);
+if (::getsockopt(mh_client_socket, SOL_SOCKET, SO_SNDBUF, (char*)&nBufSize, &nLen) == 0)
+{
+	CString str;
+	str.Format(_T("SO_SNDBUF : %d"), nBufSize);
+	AfxMessageBox(str);
+}
+
+if (::getsockopt(mh_client_socket, SOL_SOCKET, SO_RCVBUF, (char*)&nBufSize, &nLen) == 0)
+{
+	CString str;
+	str.Format(_T("SO_SNDBUF : %d"), nBufSize);
+	AfxMessageBox(str);
+}
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓(Socket) 입/출력 TCP_NODELAT
+  - Socket 입/출력 buffer에 쌓이지 않고 데이터를 바로 보낼 수있게 옵션을 지정할 수 있다
+  - 보통 서버가 아닌 클라이언트에 적용한다고 생각하면 된다
+
+#AppDlg.cpp
+~~~c++
+int nOpt = 1;
+::setsockopt(mh_client_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&nOpt, sizeof(nOpt));
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓(Socket) 입/출력 SO_REUSEADDR
+  - 서버에 특정 포트가 bind되어 있다면, 같은 포트를 또 열수가 없지만, SO_REUSEADDR옵션을 사용하면 열수가 있게 된다
+  - bind전에 옵션을 줘야 한다
+  - SO_REUSEADDR옵션을 사용하면, 첫번째 열린 서버로 들어가게 되고, 첫번째 서버가 죽으면 클라이언트가 두번째 서버로 재접속을 하게 된다
+
+#AppDlg.cpp
+~~~c++
+BOOL bOption = TRUE;
+if (::setsockopt(mh_listen_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&bOption, sizeof(bOption)) == SOCKET_ERROR) {
+	AfxMessageBox(L"소켓 옵션 설정 실패");
 }
 ~~~
 
