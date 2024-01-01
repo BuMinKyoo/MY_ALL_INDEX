@@ -1266,7 +1266,7 @@ a : 8, b : 3
       - 임계구간은 보통Critical section으로 구현한다
     - 연산 시점감지(스레드 종료전, 중간에 시점을 알리고 싶을때)
       - 연산 시점감지는 보통 Mutex, Semaphore, Event 로 구현한다
-      - Event 를 대부분 쓴다고 보면 된다
+      - Event를 대부분 쓴다고 보면 된다
     - 동기화 객체를 이용해 구현
       - Critical section : 스레드 동기화 하는데에만 사용가능(비용 낮음)
       - Mutex, Semaphore
@@ -1289,8 +1289,8 @@ a : 8, b : 3
 
 <br/>
 
-#Critical section,_beginthreadex사용예제
-#MFC
+#Critical section,_beginthreadex사용예제  
+#MFC  
 #AppDlg.h
 ~~~c++
 public:
@@ -1426,8 +1426,8 @@ BOOL CMFCApplication1Dlg::GetString(char* pszData)
 <br/>
 
 #세마포어(Semaphore)예시
-  - 함수 인자 두번째, 세번째에 임계지점에 몇개까지 접근할 수 있게 할지 결정 할 수 있다
-#MFC
+  - 함수 인자 두번째, 세번째에 임계지점에 몇개까지 접근할 수 있게 할지 결정 할 수 있다  
+#MFC  
 #AppDlg.h
 ~~~c++
 public:
@@ -1509,8 +1509,8 @@ UINT CMFCApplication1Dlg::ThreadSemaphore(LPVOID lpParam)
 
 <br/>
 
-#스레드(Thread)친화력 조절 예제
-#MFC
+#스레드(Thread)친화력 조절 예제  
+#MFC  
 #AppDlg.h
 ~~~c++
 public:
@@ -1573,8 +1573,8 @@ UINT CMFCApplication1Dlg::ThreadFunction(LPVOID lpParam)
 <br/>
 
 #WaitForSingleObject사용예제
-  - WaitForSingleObject에 쓰레드(Thread)핸들을 넘겨주면 그 쓰레드(Thread)가 종료될때 반환하게 된다
-#MFC
+  - WaitForSingleObject에 쓰레드(Thread)핸들을 넘겨주면 그 쓰레드(Thread)가 종료될때 반환하게 된다  
+#MFC  
 #AppDlg.h
 ~~~c++
 public:
@@ -1664,7 +1664,7 @@ DWORD WINAPI CMFCApplication1Dlg::ThreadFunction(LPVOID lpParam)
       - Kernel의 2GB는 모든 어플리케이션에서 사실은 같은 곳을 가리키게 된다(즉 OS의 같은 영역을 가리킨다)
       - VMS는 전부 Page단위로 관리된다.
       - 어떤 VMS의 하나의 Page에 접근했을때 그것이 실제로는, RAM에 있을수도 있고 SSD,HDD의 하드 디스크 영역에 있을 수도 있다
-      - Process는 각각 VMS를 할당받고, VMS의 같은 위치에도 실제적으로는 각각 다른 위치의 RAM,SSD,HDD를 가리키게 된다.
+      - Process는 각각 VMS를 할당받고, 각 Process가 가지고 있는VMS의 같은 주소 위치에도 실제적으로는 각각 다른 위치의 RAM,SSD,HDD를 가리키게 된다.
       - OS는 최대한 RAM영역을 사용하려 하지만 부족하면 SSD,HDD을 사용할수도 있으며, RAM->SSD,HDD : Page-out, RAM<-SSD,HDD : Page-in이 일어나기도 한다(이것을 스왑이 일어난다고 한다)
       - VMS장점
         - 특정 Process가 죽었을때 그 VMS에 할당된것을 전부 없애기 용이하다.
@@ -1732,7 +1732,7 @@ DWORD WINAPI CMFCApplication1Dlg::ThreadFunction(LPVOID lpParam)
   - 1MB -> 1024KB이고, 이것을 Page로 관리하게 됨, 비어 있는 힙 공간을 채우는 식으로 할당됨, 할당된 공간을 Block혹은 Chunk라고 불린다
   - API
     - GetProcessHeap
-      - 프로새스스가 생성될때 만들어지는 기본힙을 가져옴
+      - 프로세스가 생성될때 만들어지는 기본힙을 가져옴
     - HeapCreate/Destroy
     - HeapAlloc/Free
     - HeapReAlloc
