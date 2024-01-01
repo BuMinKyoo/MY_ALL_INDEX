@@ -63,11 +63,11 @@
   - [스택, 힙, 코드, 데이터영역](#스택-힙-코드-데이터영역)
 - [Window시스템기초](#window시스템기초)
   - [보안DACL](#보안dacl)
-  - [Process, Thread, _beginthreadex, 동기화](#Process, Thread, _beginthreadex, 동기화)
-  - [Context Switch](#Context Switch)
-  - [Sleep()](#Sleep())
-  - [Windows시스템 메모리 운용 방법](#Windows시스템 메모리 운용 방법)
-  - [Window 프로세스 기본 힙할당](#Window 프로세스 기본 힙할당)
+  - [Process, Thread, _beginthreadex, 동기화](#process-thread-_beginthreadex-동기화)
+  - [Context Switch](#context-switch)
+  - [Sleep()](#sleep)
+  - [Windows시스템 메모리 운용 방법](#windows시스템-메모리-운용-방법)
+  - [Window 프로세스 기본 힙할당](#window-프로세스-기본-힙할당)
   - [보호모드](#보호모드)
 
 <br/>
@@ -1185,11 +1185,11 @@ a : 8, b : 3
 
 # Window시스템기초
   - [보안DACL](#보안dacl)
-  - [Process, Thread, _beginthreadex, 동기화](#Process, Thread, _beginthreadex, 동기화)
-  - [Context Switch](#Context Switch)
-  - [Sleep()](#Sleep())
-  - [Windows시스템 메모리 운용 방법](#Windows시스템 메모리 운용 방법)
-  - [Window 프로세스 기본 힙할당](#Window 프로세스 기본 힙할당)
+  - [Process, Thread, _beginthreadex, 동기화](#process-thread-_beginthreadex-동기화)
+  - [Context Switch](#context-switch)
+  - [Sleep()](#sleep)
+  - [Windows시스템 메모리 운용 방법](#windows시스템-메모리-운용-방법)
+  - [Window 프로세스 기본 힙할당](#window-프로세스-기본-힙할당)
   - [보호모드](#보호모드)
 
 ###### [Window시스템기초](#window시스템기초)
