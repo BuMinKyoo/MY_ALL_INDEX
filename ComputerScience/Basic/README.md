@@ -61,6 +61,14 @@
   - [동기/비동기](#동기/비동기)
   - [Garbage Collection(GC), Automatic Reference Counting(ARC)](#garbage-collectiongc-automatic-reference-countingarc)
   - [스택, 힙, 코드, 데이터영역](#스택-힙-코드-데이터영역)
+- [Window시스템기초](#window시스템기초)
+  - [보안DACL](#보안dacl)
+  - [Process, Thread, _beginthreadex, 동기화](#Process, Thread, _beginthreadex, 동기화)
+  - [Context Switch](#Context Switch)
+  - [Sleep()](#Sleep())
+  - [Windows시스템 메모리 운용 방법](#Windows시스템 메모리 운용 방법)
+  - [Window 프로세스 기본 힙할당](#Window 프로세스 기본 힙할당)
+  - [보호모드](#보호모드)
 
 <br/>
 <br/>
@@ -1168,6 +1176,617 @@ a : 8, b : 3
     - 메모리 영역을 접근해야 하기 때문에 다른 자료구조에 비해서 데이터를 읽고 쓰는게 느리다
 
 ###### [운영체제](#운영체제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Window시스템기초
+  - [보안DACL](#보안dacl)
+  - [Process, Thread, _beginthreadex, 동기화](#Process, Thread, _beginthreadex, 동기화)
+  - [Context Switch](#Context Switch)
+  - [Sleep()](#Sleep())
+  - [Windows시스템 메모리 운용 방법](#Windows시스템 메모리 운용 방법)
+  - [Window 프로세스 기본 힙할당](#Window 프로세스 기본 힙할당)
+  - [보호모드](#보호모드)
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 보안DACL
+  - ID : 식별자
+  - Handle : 제어
+  - 보안수준
+    - SYSTEM > Admin > User
+
+<br/>
+
+  - DACL(DiscretionaryAccessControlList) : 보안 객체에 대한 접근 허용/차단 정보를 가진 데이터 구조
+    - 대표적인 보안객체
+      - 파일과 폴더
+      - 프로세스와 스레드
+      - 파일 매핑 객체
+      - 파이프
+      - 토큰
+      - 윈도우 스테이션 및 데스크톱
+    - ACL의 리스트이다
+    - ACL(AccessControlList)은 ACE의 리스트 이다
+    - ACE(AccessControlEntry)
+      - 윈도우 시스템에서 접근제어를 위한 기본 정보
+      - 권한에 따라 접근을 제한다는 것은 ACE를 수정 편집한다는 의미
+      - ACE의 핵심 정보는 SID(SecurityIDentifier)이며 사용자나 그룹을 식별한다
+  - SACL(SystemAccessControlList)
+    - (파일 같은)보안 객체에 대한 접근 로그를 남기를 근거 정보
+    - Write권한이 없는 사용자의 쓰기 시도발생 시 로그 저장(감사 자료)
+  - 프로세스 수준 접근 통제
+    - 보안 객체 접근 시 대상 객체와 접근주체(즉, Process)에 대한 권한 비교
+    - 객체에 대한 DACL과 프로세스가 가진 Access token을 비교한 것(token안에 SID가 들어 있다)
+    - 가진 권한과 허용된 접근에 따라 OS가 통제
+    - 로그인을 하면 OS가 그 계정에 권한을 부여해 주는데, 프로세스나 스레드를 만들때 보안 객체를 상속 받는다는 의미가 이러한 접근 부분이다
+  - Access token
+    - 구조체
+    - 프로세스나 스레드가 갖는 보안 수준에 대한 정보와 의미를 포괄
+    - 사용자 계정 특권
+    - 대표적으로 SID정보
+    - CreateProcess함수를 통해서 Process를 생성하고, 보안 객체를 상속받던지, 따로 주던지 하는 과정을 거치게 된다
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Process, Thread, _beginthreadex, 동기화
+  - 스레드 생성
+    - 한 Process는 최소 1개이상의 Thread를 갖는다(메인 스레드)
+    - Thread는 개별화된 흐름과 전용 스택(기본적으로 컴파일 할때 1MB를 할당받는다)을 갖는 실행의단위이다
+    - 모든 Thread는 자신이 속한 Process의 가상 메모리 공간을 공유한다
+    - 개별 ID와 핸들을 가진다
+  - 스레드 속성
+    - ID와 핸들
+    - 우선순위(Highest, Above normal) : CPU의 연산 자원을 어떤 스레드가 우선적으로 가져가는가
+    - 상태(Run, Suspended, Terminated)
+    - 친화력 : 현재 스레드는 코어 몇번 몇번을 사용해서 연산을 할것인지?
+  - _beginthreadex
+    - CreateThread와 사용법이 완전히 같다
+    - 윈도우에서는 CreateThread보다, _beginthreadex함수를 사용해서 쓰레드를 생성하자
+    - C-Runtime library가 제공하는 함수 중 정적변수 혹은 전역변수를 사용하는 함수를 멀티스레드 환경에서 문제를 야기한다, 내가 만든 함수가 아니라, 제공되는 함수이고, 그 함수안에서 멀티 스레드로 동시에 돌아가면 문제가 야기될 수 있다는것.  TLS를 적용해서 해결해야 한다
+    - strtok 같은것
+    - 하지만 _beginthreadex으로 돌아가는 스레드는 TLS가 적용되어 있기 때문에 신경쓰지 않아도 된다
+
+<br/>
+
+  - 스레드(Thread) 동기화
+    - 임계구간 코드가 여러 스레드에서 동시에 실행되는 일을 막는 것
+      - 임계구간은 보통Critical section으로 구현한다
+    - 연산 시점감지(스레드 종료전, 중간에 시점을 알리고 싶을때)
+      - 연산 시점감지는 보통 Mutex, Semaphore, Event 로 구현한다
+      - Event 를 대부분 쓴다고 보면 된다
+    - 동기화 객체를 이용해 구현
+      - Critical section : 스레드 동기화 하는데에만 사용가능(비용 낮음)
+      - Mutex, Semaphore
+      - Event(Set/Reset 상태)
+    - WaitForSingleObject
+      - 어떤 핸들에 Set되는 시점을 확인한다
+    - 임계영역 기반 동기화
+      - 어떤 하나의 데이터에 동시에 두개의 스레드(Thread)가 접근하여 데이터를 쓸때 임계영역을 설정해서, 하나의 스레드(Thread)만 들어가도록 해야 한다
+      - 임계 영역을 넓게 잡게 되면, 비효율이 발생한다.
+    - 스레드 친화력 조절
+      - SetThreadAffinityMask라는 함수로 조절한다
+
+<br/>
+
+  - 세마포어(Semaphore)
+    - Kernel오브젝트 이며, 비싼 자원이다(Critical section은 Kernel오브젝트가 아니다)
+    - Critical section과 다른점은 임계 영역 지점에 1개가 아닌 n개가 접근해야 할때 Semaphore를 사용한다
+    - 특정 영역(실행 코드 구간)에 대해 2개이상 n개 이하 스레드가 동시 접근 할 수 있도록 제어
+    - 서버 개발 시 안정적인 서비스가 이루어지도록 동시처리 사용자 세션 개수를 제한할때 많이 사용
+
+<br/>
+
+#Critical section,_beginthreadex사용예제
+#MFC
+#AppDlg.h
+~~~c++
+public:
+	char* g_pszBuffer;
+	CRITICAL_SECTION g_cs;
+	static UINT WINAPI ThreadFunc1(LPVOID lpParam);
+	static UINT WINAPI ThreadFunc2(LPVOID lpParam);
+	void SetString(const char* pszData);
+	BOOL GetString(char* pszData);
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	g_pszBuffer = NULL;
+
+	// Critical section생성
+	::InitializeCriticalSection(&g_cs);
+
+	UINT dwThreadId = 0;
+	HANDLE hThread = (HANDLE)::_beginthreadex(
+		NULL, 
+		0, 
+		ThreadFunc1, 
+		this,
+		0, 
+		&dwThreadId);
+
+	if (hThread == NULL) {
+		AfxMessageBox(_T("Thread 생성 실패"));
+		return FALSE;
+	}
+
+	::CloseHandle(hThread);
+
+	hThread = (HANDLE)::_beginthreadex(
+		NULL,
+		0,
+		ThreadFunc2,
+		this,
+		0,
+		&dwThreadId);
+
+	if (hThread == NULL) {
+		AfxMessageBox(_T("Thread 생성 실패"));
+		return FALSE;
+	}
+
+	char szBuffer[64] = { 0, };
+	for (int i = 0; i < 5; i++)
+	{
+		::Sleep(500);
+		GetString(szBuffer);
+		OutputDebugStringA(szBuffer);
+	}
+
+	::WaitForSingleObject(hThread, INFINITE);
+	::CloseHandle(hThread);
+
+	// Critical section반납
+	::DeleteCriticalSection(&g_cs);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . . 
+
+UINT CMFCApplication1Dlg::ThreadFunc1(LPVOID lpParam)
+{
+	CMFCApplication1Dlg* pDlg = static_cast<CMFCApplication1Dlg*>(lpParam);
+
+	while (TRUE)
+	{
+		::Sleep(1);
+		pDlg->SetString("ThreadFunc1\n");
+	}
+	return 0;
+}
+
+UINT CMFCApplication1Dlg::ThreadFunc2(LPVOID lpParam)
+{
+	CMFCApplication1Dlg* pDlg = static_cast<CMFCApplication1Dlg*>(lpParam);
+
+	while (TRUE)
+	{
+		::Sleep(1);
+		pDlg->SetString("ThreadFunc2\n");
+	}
+	return 0;
+}
+
+void CMFCApplication1Dlg::SetString(const char* pszData)
+{
+	::EnterCriticalSection(&g_cs);
+	if (g_pszBuffer != NULL)
+	{
+		free(g_pszBuffer);
+		g_pszBuffer = (char*)malloc(64);
+		sprintf_s(g_pszBuffer, 64, "%s", pszData);
+	}
+	else
+	{
+		g_pszBuffer = (char*)malloc(64);
+		sprintf_s(g_pszBuffer, 64, "%s", pszData);
+	}
+	::LeaveCriticalSection(&g_cs);
+}
+
+BOOL CMFCApplication1Dlg::GetString(char* pszData)
+{
+	// 자식스레드가 하나라도 통과되어 있으면 부모 스레드는 여기서 대기하게 된다
+	::EnterCriticalSection(&g_cs);
+	if (g_pszBuffer != NULL)
+	{
+		sprintf_s(pszData, 64, "%s", g_pszBuffer);
+		free(g_pszBuffer);
+		g_pszBuffer = NULL;
+
+		::LeaveCriticalSection(&g_cs);
+		return TRUE;
+	}
+
+	::LeaveCriticalSection(&g_cs);
+	return FALSE;
+}
+~~~
+
+<br/>
+
+#세마포어(Semaphore)예시
+  - 함수 인자 두번째, 세번째에 임계지점에 몇개까지 접근할 수 있게 할지 결정 할 수 있다
+#MFC
+#AppDlg.h
+~~~c++
+public:
+	static UINT ThreadSemaphore(LPVOID pParam);
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// 디버그 콘솔을 출력하기 위한 설정
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+
+static HANDLE g_hSema;
+static TCHAR g_StringList[10][64];
+
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	g_StringList[10][64] = { 0, };
+
+	g_hSema = ::CreateSemaphore(NULL, 3, 3, NULL);
+
+	UINT nThreadId = 0;
+	HANDLE hThread = NULL;
+
+	for (int i = 0; i < 10; i++)
+	{
+		hThread = (HANDLE)::_beginthreadex(
+			NULL,
+			0,
+			ThreadSemaphore,
+			(LPVOID)i,
+			0,
+			&nThreadId);
+
+		if (hThread == NULL) {
+			AfxMessageBox(_T("Thread 생성 실패"));
+			return FALSE;
+		}
+	}
+	
+	::CloseHandle(hThread);
+
+	while (1)
+	{
+		system("cls");
+
+		for (int i = 0; i < 10; i++)
+		{
+			_putws(g_StringList[i]);
+			//OutputDebugString(g_StringList[i]);
+		}
+
+		::Sleep(1000);
+	}
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+UINT CMFCApplication1Dlg::ThreadSemaphore(LPVOID lpParam)
+{
+	while (TRUE)
+	{
+		::wsprintf(g_StringList[(int)lpParam], _T("%d thread is waiting!\n"), (int)lpParam);
+		::Sleep(500);
+
+		DWORD dwWaitResult = ::WaitForSingleObject(g_hSema, INFINITE);
+		::wsprintf(g_StringList[(int)lpParam], _T("%d running!!!!!!!!!!!!!!\n"), (int)lpParam);
+		::Sleep(500);
+		::ReleaseSemaphore(g_hSema, 1, NULL);
+	}
+	return 0;
+}
+~~~
+
+<br/>
+
+#스레드(Thread)친화력 조절 예제
+#MFC
+#AppDlg.h
+~~~c++
+public:
+	static UINT ThreadFunction(LPVOID pParam);
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+
+	UINT nThreadId = 0;
+	HANDLE hThread = NULL;
+
+	hThread = (HANDLE)::_beginthreadex(
+		NULL,
+		0,
+		ThreadFunction,
+		NULL,
+		0,
+		&nThreadId);
+
+	if (hThread == NULL) {
+		AfxMessageBox(_T("Thread 생성 실패"));
+		return FALSE;
+	}
+
+	for (int i = 0; i < 8; i++)
+	{
+		// 코어를 선택할때는 0000 0000 라는 비트 Mask를 사용한다
+		// 0000 0001 : 1번 코어
+		// 0000 0010 : 2번 코어
+		// 0000 0100 : 3번 코어
+		// 0000 1001 : 1번, 4번 코어 context switch
+		::SetThreadAffinityMask(hThread, 0b00000001 << i);
+		::Sleep(5000);
+	}
+
+	::CloseHandle(hThread);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+UINT CMFCApplication1Dlg::ThreadFunction(LPVOID lpParam)
+{
+	int nTemp = 0;
+	while (1)
+	{
+		++nTemp;
+	}
+	
+	return 0;
+}
+~~~
+
+<br/>
+
+#WaitForSingleObject사용예제
+  - WaitForSingleObject에 쓰레드(Thread)핸들을 넘겨주면 그 쓰레드(Thread)가 종료될때 반환하게 된다
+#MFC
+#AppDlg.h
+~~~c++
+public:
+	static DWORD WINAPI ThreadFunction(LPVOID lpParam);
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication1Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+
+	DWORD dwThreadId = 0;
+	HANDLE hThread = CreateThread(
+		NULL, 
+		0, 
+		ThreadFunction, 
+		(LPVOID)"PATAM",
+		0, 
+		&dwThreadId);
+	if (hThread == NULL) {
+		AfxMessageBox(_T("Thread 생성 실패"));
+		return FALSE;
+	}
+
+	::WaitForSingleObject(hThread, INFINITE);
+	::CloseHandle(hThread);
+
+	OutputDebugString(_T("메인쓰레드 끝\n"));
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+. . .
+
+DWORD WINAPI CMFCApplication1Dlg::ThreadFunction(LPVOID lpParam)
+{
+	OutputDebugString(_T("쓰레드 시작\n"));
+	Sleep(1000);
+	OutputDebugString(_T("쓰레드 끝\n"));
+	return 0;
+}
+~~~
+
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Context Switch
+  - 2개 이상의 Thread가 존재하고, 각각의 Thread가 CPU연산 자원을 할당 받아서 사용하게 될때, 현재 까지의 상태정보를 저장하고, 상태를 변환하는 과정을 왔다 갔다 하는것
+  - Thread의 문맥정보를 백업하는 곳은 레지스터 이다
+  - Context Switch는 문맥정보, 상태정보를 저장한 레지스터를 참조해서 복귀하게 되고, 이러한 과정에서 오버해드(overhead)가 발생하게 된다
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Sleep()
+  - 스레드를 일정 시간 동안 Suspend시켰다가 시간이 지나면 자동으로 Resume되어 Run상태로 전환
+  - 보통 설정한 시간 보다 더 많은 시간이 흐르며 정확성이 떨어짐
+  - 우연에 맡기는 코드가 만들어짐
+  - WaitForSingleObject에서의 대기하는 시간도 정확히 그 시간보다는 같지 않다
+  - QueryPerformanceCounter라는 함수를 이용해서, 실제 프로그램 실행 시간을 측정 할 수 있다, 즉 Sleep을 했을때 실제 시간이 얼마나 흘렀는지 확인 할 수 있다
+  - 정밀한 동기화에는 사용할 수 없다
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Windows시스템 메모리 운용 방법
+  - 가상 메모리 시스템 직접 활용
+    - 가상 메모리 : Process가 시작되면 OS는 그 Process에 VMS를 할당한다.
+    - 32bit라면 4GB를 할당한다(2GB : USER, 2GB : Kernel)
+      - USER에 stack, heap, static등 전부 들어간다
+        - USER에서 첫번째 null과 기본적으로 사용하지 못하게 하는 부분들이 있기 때문에 실제적으로는 2GB보다 조금 작은 부분이된다
+      - 실제적인 4GB를 할당하는것이 아니라 논리적으로 할당한다
+      - Kernel의 2GB는 모든 어플리케이션에서 사실은 같은 곳을 가리키게 된다(즉 OS의 같은 영역을 가리킨다)
+      - VMS는 전부 Page단위로 관리된다.
+      - 어떤 VMS의 하나의 Page에 접근했을때 그것이 실제로는, RAM에 있을수도 있고 SSD,HDD의 하드 디스크 영역에 있을 수도 있다
+      - Process는 각각 VMS를 할당받고, VMS의 같은 위치에도 실제적으로는 각각 다른 위치의 RAM,SSD,HDD를 가리키게 된다.
+      - OS는 최대한 RAM영역을 사용하려 하지만 부족하면 SSD,HDD을 사용할수도 있으며, RAM->SSD,HDD : Page-out, RAM<-SSD,HDD : Page-in이 일어나기도 한다(이것을 스왑이 일어난다고 한다)
+      - VMS장점
+        - 특정 Process가 죽었을때 그 VMS에 할당된것을 전부 없애기 용이하다.
+        - 입출력을 할때 각각의 VMS에서 하기 때문에 안전하다.
+        - 특정 Process가 임의로 다른 Process의 VMS에 접근할 수 없도록 막는다
+      - VMS단점
+        - 관리 오버헤드가 발생한다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b7962e10-9db5-4c9e-b19c-3da50e555a98)
+
+  - 메모리 맵
+  - 힙
+    - 크기가 작은 데이터(4KB 이하) 할당 시 매우 유용
+    - 할당 단위나 페이지 경계를 고려하지 않음
+
+<br/>
+
+  - 메모리는 페이지단위(Page)로써 4kb단위로 관리된다. 즉 메모장을 열어서 4kb미만의 데이터를 넣어서 저장하게 되면, 용량이 작은것은 그대로 이지만 관리적 측면에서 4kb만큼은 다른것을 사용할 수 없게 된다
+
+<br/>
+
+  - Windows환경 메모리 할당 함수
+    - malloc(), new
+      - C/C++에서 사용하며 프로세스 기본 Heap영역(1MB)사용
+    - Local/GlobalAlloc()
+      - Heap영역 내부에서 다시 Local, Global영역을 사용
+      - Win16 호환성을 위해 존재하는 구형
+      - Clipboard, OLE에서 여전히 사용 중
+    - HeapAlloc()
+      - 가상 메모리 공간 중 일부를 할당 받아 빠르게 사용
+        - 데이터 크기가 1MB가 아니여도, malloc호출즉시 1MB를 이미 할당하기 때문에, 1MB미만을 Heap영역에 할당하고 다시 할당하면 처음에 1MB의 영역안에서 할당 되게 된다, 그래서 빠르다
+      - malloc을 호출하면 내부적으로 호출하는 함수
+    - VirtualAlloc()
+      - 대용량 메모리(1MB이상) 사용시 활용
+        - HeapAlloc() 함수가 내부적으로 호출
+
+<br/>
+
+  - Window 메모리 시스템
+    - 모든 프로세스는 Private address space를 가진다(VMS)
+    - 가상 주소 공간은 분할되어 있으며 이를 (메모리) 파티션 이라 한다
+    - 가상 메모리 공간을 사용하기 위해서는 예약해야함
+    - 대부분의 CPU는 보통 64KB단위(Allocation size)로 관리
+      - 하드웨어 끼리는 64KB단위로 왔다 갔다 한다는것
+    - 할당하는 메모리 영역의 시작 주소는 64KB로 나누어 떨어지는 위치 에서 시작
+    - 예약된 메모리 공간을 사용하려면 반드시 실제 물리 메모리 영역을 매핑해야 하며 이를 ‘물리 메모리를 Commit한다’라고 표현함
+      - Commit하지 않고 미리 할당받아 놓는 식으로 빠르게 나중에 Commit하여 사용할 수 있다
+    - Commit된 물리 메모리를 사용할 필요가 없다면 Decommit하여 해제
+      - Decommit하게 되면, 실제 메모리와 연결이 끊어지고 예약만 되어 있는 공간으로 남게 된다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d8e840c4-a5a3-428b-8d04-9623515a570d)
+
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Window 프로세스 기본 힙할당
+  - 프로세스 실행 시 OS는 프로세스 주소 공간에 기본 힙을 생성(1MB)
+  - 여러 스레드가 동시에 메모리 할당/해제시 기본 힙의 처리 대기열을 활용해 요청을 순차 처리(동기화가 되어 있다는것)
+    - 여러 스레드가 동시에 malloc을 호출해도 Queue의 대기열에 들어가서 순차적으로 할당된다는 뜻
+  - 한 프로세스에 여러 힙을 만들 수 있음
+  - 1MB -> 1024KB이고, 이것을 Page로 관리하게 됨, 비어 있는 힙 공간을 채우는 식으로 할당됨, 할당된 공간을 Block혹은 Chunk라고 불린다
+  - API
+    - GetProcessHeap
+      - 프로새스스가 생성될때 만들어지는 기본힙을 가져옴
+    - HeapCreate/Destroy
+    - HeapAlloc/Free
+    - HeapReAlloc
+    - HeapSize
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/8c86b585-828d-4ff0-afcf-69b25d1e3eb5)
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 보호모드
+  - USER쪽 메모리에서 static은 R만 되는 부분, RW만 되는 부분으로 나누어진다
+    - Page단위에는 + R, RW라는 부분도 같이 포함되게 된다
+    - 문자열 상수 같은 경우는 Static에 R모드로 들어가게 된다
+  - 메모리를 예약하는 행위, COMMIT하는 행위, 내 Process, 남의 Process의 Page의 보호모드(R, RW)를 바꾸기 위해서는 VirtualAlloc, VirtualAllocEx를 사용해야 한다
+  - 실행코드, 즉 기계어또한 쓰기(W) 할 수 있게 바꿔서 다른 코드를 집어 넣을 수 있다
+  - 함수에 Ex가 들어가면 첫번째 매개 변수에 HANDLE이 들어가게 되고 남의 Process에도 사용할 수 있다
+  - VirtualAlloc : 메모리 할당
+    - 3번째 인자 : 예약인지, COMMIT인지 조절
+    - 4번째 인자 : RWX조절
+  - Stack, heap등 데이터 영역은 보안모드에서 실행(X)이 되면 안된다
+    - DEP라는 것이 OS수준에서 데이터 영역이  실행(X)되지 못하게 막는다
+  - 실행코드인 기계어와 같은 곳에서는 R-X만 가능하게 된다
+  - VirtualProtect : 할당된 메모리에 RWX를 바꿔준다
+  - VirtualQuery : 가능/불가능한 페이지를 구분할 수 있다
+  - VirtualLock/Unlock
+    - 가상 메모리 상에서 어떤 공간을 Lock을 건다, 이 메모리에 대해서 Lock이 걸려 있는 동안 다른 Process가 접근하거나, 다른곳에서 사용하는 것이 불가능해 진다
+
+<br/>
+
+#MFC
+#AppDlg.cpp
+~~~c++
+BOOL CMFCApplication2Dlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	const char* pszHello = "Hello World!\n";
+	OutputDebugStringA(pszHello);
+
+	DWORD dwOldProtect = 0;
+	::VirtualProtect((LPVOID)pszHello, 16, PAGE_READWRITE, &dwOldProtect);
+
+	strcpy_s((char*)pszHello, 16, "qweqweqweqwe\n");
+	OutputDebugStringA(pszHello);
+
+	return TRUE;
+}
+~~~
+
+###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
 
 <br/>
