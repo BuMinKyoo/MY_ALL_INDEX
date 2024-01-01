@@ -16,7 +16,6 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 
 ### ComputerScience
   - [Basic](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/ComputerScience/Basic)
-  - [Network](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/ComputerScience/Network)
 
 <br/>
 
