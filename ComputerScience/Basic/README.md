@@ -1267,10 +1267,10 @@ a : 8, b : 3
     - 연산 시점감지(스레드 종료전, 중간에 시점을 알리고 싶을때)
       - 연산 시점감지는 보통 Mutex, Semaphore, Event 로 구현한다
       - Event를 대부분 쓴다고 보면 된다
-    - 동기화 객체를 이용해 구현
-      - Critical section : 스레드 동기화 하는데에만 사용가능(비용 낮음)
-      - Mutex, Semaphore
-      - Event(Set/Reset 상태)
+    - 동기화 객체를 이용해 구현(유저모드동기화, 커널모드 동기화 총 2가지가 있다)
+      - Critical section : 스레드 동기화 하는데에만 사용가능(비용 낮음), 커널기능x, 유저모드 동기화
+        - 한 프로세스 내의 Thread사이에서만 동기화 가능
+      - Mutex, Semaphore, Event(Set/Reset 상태) : 커널객체들, 커널로 전환후 행함(비용 높음), 커널모드 동기화
     - WaitForSingleObject
       - 어떤 핸들에 Set되는 시점을 확인한다
     - 임계영역 기반 동기화
@@ -1281,9 +1281,16 @@ a : 8, b : 3
 
 <br/>
 
+  - Mutex
+    - Critical section보다 무겁다, 여러 Process의 Thread 사이에서 동기화가 가능
+    - Critical Section의 동기화 기법으로는 불가능한 Process 다중 실행 방지에 사용된다고 보면 된다
+    - 세마포어(Semaphore)는 Mutex가 될 수 있다
+
+<br/>
+
   - 세마포어(Semaphore)
     - Kernel오브젝트 이며, 비싼 자원이다(Critical section은 Kernel오브젝트가 아니다)
-    - Critical section과 다른점은 임계 영역 지점에 1개가 아닌 n개가 접근해야 할때 Semaphore를 사용한다
+    - Critical section이나, Mutex와 다른점은 임계 영역 지점에 1개가 아닌 n개가 접근해야 할때 Semaphore를 사용한다
     - 특정 영역(실행 코드 구간)에 대해 2개이상 n개 이하 스레드가 동시 접근 할 수 있도록 제어
     - 서버 개발 시 안정적인 서비스가 이루어지도록 동시처리 사용자 세션 개수를 제한할때 많이 사용
 
