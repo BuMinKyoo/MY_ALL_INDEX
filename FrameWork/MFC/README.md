@@ -464,7 +464,8 @@ void CAlarm_talk::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
   - (AppDlg.h, AppDlg.cpp에 함수해더,BEGIN_MESSAGE_MAP 자동으로 추가됨)
   - 자식이 ‘10000’메시지를 보내면 부모의 ‘10000’메시지를 받는 함수가 호출된다.
   - KEYDOWN같은 것을 할때는 PostMessage메세지를 써야 하는데 그 이유는 SendMessage는 메시지 큐에 들어가지 않고, 메시지를 처리하고 반환 할때 까지 기다리기 때문에 각각이 따로 따로 처리 되어 진다. KEYDOWN같은 경우는 조합된 메시지를 줬을때 처리되는 경우가 있기 때문에 PostMessage메세지를 사용하여야 한다
-  - SendMessage는 큐에 들어가지 않기 때문에 PostMessage보다 빠르며, 큐에 안들어 가기 때문에 PreTranslateMessage에서 감지 할 수 없다
+  - SendMessage는 큐에 들어가지 않기 때문에 PostMessage보다 빠르며, 큐에 안들어 가기 때문에 PreTranslateMessage에서 감지 할 수 없다.
+  - 사용자 지정 메세지를 보낼때, 예약되어 있는 메세지 번호는 사용할 수 없기 때문에 WM_USER라는 미리 정의되어 있는 값에 더해주면서 사용하게 된다
 
 <br/>
 
