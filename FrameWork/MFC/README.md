@@ -3,252 +3,165 @@
 - [MFC메모리 누수 확인](#mfc메모리-누수-확인)
 - [ifdef DEBUG (디버그 모드 일때만 실행하기)](#ifdef-debug-디버그-모드-일때만-실행하기)
 
-- <details markdown="1">
-  <summary>메세지</summary>
-  <div markdown="1">
+<br/>
+
+- [Message](#message)
+  - [ON_COMMAND_RANGE](#on_command_range)
+  - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
+  - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
+  - [PostMessage (사용자 지정 메시지) + MAKEWPARAM](#postmessage-사용자-지정-메시지--makewparam)
+  - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
+  - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
+  - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
+  - [EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)](#en_update-en_change-edit-control-문자열-변경시)
+
+<br/>
+
+- [Virtual Function](#virtual-function)
+  - [WindowProc](#windowproc)
+  - [OnCommand](#oncommand)
+  - [PreTranslateMessage](#pretranslatemessage)
+  - [DrawItem](#drawitem)
+
+<br/>
   
-  - [Message](#message)
-    - [ON_COMMAND_RANGE](#on_command_range)
-    - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
-    - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
-    - [PostMessage (사용자 지정 메시지) + MAKEWPARAM](#postmessage-사용자-지정-메시지--makewparam)
-    - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
-    - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
-    - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
-    - [EN_UPDATE, EN_CHANGE (Edit Control 문자열 변경시)](#en_update-en_change-edit-control-문자열-변경시)
+- [모달,모달리스](#모달모달리스)
+  - [모달(modal)](#모달modal)
+  - [모달리스(modeless)](#모달리스modeless)
+  - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
+  - [모달, 모달리스 만들때 다른 dialog호출하기](#모달-모달리스-만들때-다른-dialog호출하기)
+
+<br/>
+
+- [다양한 함수](#다양한-함수)
+  - [MoveWindows](#movewindows)
+  - [SetWindowPos](#setwindowpos)
+  - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
+  - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
+  - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+  - [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
+  - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
+  - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
+  - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
+  - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
+  - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
+  - [GetTickCount](#gettickcount)
+  - [ShellExecute](#shellexecute)
+  - [AnimateWindow](#animatewindow)
+  - [FindWindow, FindWindowEx](#findwindow-findwindowex)
+  - [AfxExtractSubString](#afxextractsubstring)
+  - [GetLastError](#getlasterror)
+
+<br/>
+
+- [문자 다루기](#문자-다루기)
+  - [문자 크기 바꾸기 (CFont)](#문자-크기-바꾸기-cfont)
+  - [문자 크기 바꾸기 (LOGFONT)](#문자-크기-바꾸기-logfont)
+  - [DrawText (텍스트를 도형 안에 출력하기)](#drawtext-텍스트를-도형-안에-출력하기)
+  - [TextOut (텍스트를 원하는 위치에 출력)](#textout-텍스트를-원하는-위치에-출력)
+  - [출력시 폰트 컬러변경하기](#출력시-폰트-컬러변경하기)
       
-  </div>
-  </details>
+<br/>
 
-- <details markdown="1">
-  <summary>가상함수</summary>
-  <div markdown="1">
-  
-  - [Virtual Function](#virtual-function)
-    - [WindowProc](#windowproc)
-    - [OnCommand](#oncommand)
-    - [PreTranslateMessage](#pretranslatemessage)
-    - [DrawItem](#drawitem)
+- [CImage (사진출력)](#cimage-사진출력)
+  - [확대, 축소, 부분 출력](#확대-축소-부분-출력)
+  - [AlphaBlend](#alphablend)
+  - [Dialog크기로 출력하기](#dialog크기로-출력하기)
+  - [사진 크기로 Dialog크기 변경하기](#사진-크기로-dialog크기-변경하기)
       
-  </div>
-  </details>
+<br/>
 
+- [ListBox (리스트박스)](#listbox-리스트박스)
+  - [변수추가](#변수추가)
+  - [AddString](#addstring)
+  - [InsertString](#insertstring)
+  - [GetText](#gettext)
+  - [다양한 데이터 구조체로 보관해서 활용하기](#다양한-데이터-구조체로-보관해서-활용하기)
+    - SetItemDataPtr
+    - GetCurSel()
+    - LBN_SELCHANGE
+  - [SetItemHeight](#setitemheight)
+  - [OwnerDraw 사용하기](#ownerdraw-사용하기)
+    - 배경 컬러 바꾸기
+    - 텍스트 출력하기
+    - itemAction을 이용해 상황에 따른 그리기
+    - ODS_SELECTED, ODA_DRAWENTIRE...Etc
+    - List Box 배경색 지정
+    - Owner Draw : Variable을 사용해서 각각의 데이터의 height를 조절하기
 
-- <details markdown="1">
-  <summary>모달,모달리스</summary>
-  <div markdown="1">
-  
-  - [모달,모달리스](#모달모달리스)
-    - [모달(modal)](#모달modal)
-    - [모달리스(modeless)](#모달리스modeless)
-    - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
-    - [모달, 모달리스 만들때 다른 dialog호출하기](#모달-모달리스-만들때-다른-dialog호출하기)
+<br/>
+
+- [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
+  - [칼럼 초기 설정](#칼럼-초기-설정)
+  - [LVCF_FMT 및 기타 속성들](#lvcf_fmt-및-기타-속성들)
+  - [칼럼에 데이터 추가하기](#칼럼에-데이터-추가하기)
+  - [SetExtendedStyle (열 전체를 선택하기)](#setextendedstyle-열-전체를-선택하기)
+  - [LVN_ITEMCHANGED 메시지](#lvn_itemchanged-메시지)
+  - [SetTextColor,SetTextBkColor](#settextcolorsettextbkcolor)
+  - [Owner Draw,GetItemText,MeasureItem](#owner-drawgetitemtextmeasureitem)
+  - [추가 작업 진행](#추가-작업-진행)
+
+<br/>
+
+- [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
+  - [Bitmap 리소스를 패턴 CBrush로 출력](#bitmap-리소스를-패턴-cbrush로-출력)
+  - [CBrush중심점 이동하여 출력](#cbrush중심점-이동하여-출력)
+  - [외부그림을 패턴 CBrush로 출력](#외부그림을-패턴-cbrush로-출력)
       
-  </div>
-  </details>
+<br/>
 
-
-- <details markdown="1">
-  <summary>다양한 함수</summary>
-  <div markdown="1">
-  
-  - [다양한 함수](#다양한-함수)
-    - [MoveWindows](#movewindows)
-    - [SetWindowPos](#setwindowpos)
-    - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
-    - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
-    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
-    - [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
-    - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
-    - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
-    - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
-    - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
-    - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
-    - [GetTickCount](#gettickcount)
-    - [ShellExecute](#shellexecute)
-    - [AnimateWindow](#animatewindow)
-    - [FindWindow, FindWindowEx](#findwindow-findwindowex)
-    - [AfxExtractSubString](#afxextractsubstring)
-    - [GetLastError](#getlasterror)
-
-  </div>
-  </details>
-
-
-- <details markdown="1">
-  <summary>문자 다루기</summary>
-  <div markdown="1">
-  
-  - [문자 다루기](#문자-다루기)
-    - [문자 크기 바꾸기 (CFont)](#문자-크기-바꾸기-cfont)
-    - [문자 크기 바꾸기 (LOGFONT)](#문자-크기-바꾸기-logfont)
-    - [DrawText (텍스트를 도형 안에 출력하기)](#drawtext-텍스트를-도형-안에-출력하기)
-    - [TextOut (텍스트를 원하는 위치에 출력)](#textout-텍스트를-원하는-위치에-출력)
-    - [출력시 폰트 컬러변경하기](#출력시-폰트-컬러변경하기)
+- [http,https통신](#httphttps통신)
+  - [http,https Get통신](#httphttps-get통신)
+  - [http,https Post통신](#httphttps-post통신)
+  - [https Put통신](#https-put통신)
+  - [파일 다운받기](#파일-다운받기)
       
-  </div>
-  </details>
+<br/>
 
-
-- <details markdown="1">
-  <summary>CImage (사진출력)</summary>
-  <div markdown="1">
-  
-  - [CImage (사진출력)](#cimage-사진출력)
-    - [확대, 축소, 부분 출력](#확대-축소-부분-출력)
-    - [AlphaBlend](#alphablend)
-    - [Dialog크기로 출력하기](#dialog크기로-출력하기)
-    - [사진 크기로 Dialog크기 변경하기](#사진-크기로-dialog크기-변경하기)
+- [소켓통신](#소켓통신)
+  - [소켓통신 사용 준비](#소켓통신-사용-준비)
+  - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
+  - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
+  - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
+  - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
+  - [소켓통신 함수별](#소켓통신-함수별)
+  - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입/출력-버퍼-확인)
+  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
+  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
       
-  </div>
-  </details>
+<br/>
 
-
-- <details markdown="1">
-  <summary>ListBox (리스트박스)</summary>
-  <div markdown="1">
-  
-  - [ListBox (리스트박스)](#listbox-리스트박스)
-    - [변수추가](#변수추가)
-    - [AddString](#addstring)
-    - [InsertString](#insertstring)
-    - [GetText](#gettext)
-    - [다양한 데이터 구조체로 보관해서 활용하기](#다양한-데이터-구조체로-보관해서-활용하기)
-      - SetItemDataPtr
-      - GetCurSel()
-      - LBN_SELCHANGE
-    - [SetItemHeight](#setitemheight)
-    - [OwnerDraw 사용하기](#ownerdraw-사용하기)
-      - 배경 컬러 바꾸기
-      - 텍스트 출력하기
-      - itemAction을 이용해 상황에 따른 그리기
-      - ODS_SELECTED, ODA_DRAWENTIRE...Etc
-      - List Box 배경색 지정
-      - Owner Draw : Variable을 사용해서 각각의 데이터의 height를 조절하기
-
-  </div>
-  </details>
-
-
-- <details markdown="1">
-  <summary>ListControl (리스트컨트롤)</summary>
-  <div markdown="1">
-  
-  - [ListControl (리스트컨트롤)](#listcontrol-리스트컨트롤)
-    - [칼럼 초기 설정](#칼럼-초기-설정)
-    - [LVCF_FMT 및 기타 속성들](#lvcf_fmt-및-기타-속성들)
-    - [칼럼에 데이터 추가하기](#칼럼에-데이터-추가하기)
-    - [SetExtendedStyle (열 전체를 선택하기)](#setextendedstyle-열-전체를-선택하기)
-    - [LVN_ITEMCHANGED 메시지](#lvn_itemchanged-메시지)
-    - [SetTextColor,SetTextBkColor](#settextcolorsettextbkcolor)
-    - [Owner Draw,GetItemText,MeasureItem](#owner-drawgetitemtextmeasureitem)
-    - [추가 작업 진행](#추가-작업-진행)
-
-  </div>
-  </details>
-
-
-- <details markdown="1">
-  <summary>Bitmap 리소스, 패턴 CBrush</summary>
-  <div markdown="1">
-  
-  - [Bitmap 리소스, 패턴 CBrush](#bitmap-리소스-패턴-cbrush)
-    - [Bitmap 리소스를 패턴 CBrush로 출력](#bitmap-리소스를-패턴-cbrush로-출력)
-    - [CBrush중심점 이동하여 출력](#cbrush중심점-이동하여-출력)
-    - [외부그림을 패턴 CBrush로 출력](#외부그림을-패턴-cbrush로-출력)
+- [기능별 정리](#기능별-정리)
+  - [캡쳐하기](#캡쳐하기)
+  - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
+  - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
+  - [Bitmap을 활용한 png 컬러 변경](#bitmap을-활용한-png-컬러-변경)
+  - [원하는 캡션가진 윈도우 잡기](#원하는-캡션가진-윈도우-잡기)
       
-  </div>
-  </details>
+<br/>
 
-
-- <details markdown="1">
-  <summary>http,https통신</summary>
-  <div markdown="1">
-  
-  - [http,https통신](#httphttps통신)
-    - [http,https Get통신](#httphttps-get통신)
-    - [http,https Post통신](#httphttps-post통신)
-    - [https Put통신](#https-put통신)
-    - [파일 다운받기](#파일-다운받기)
+- [GDI](#gdi)
+  - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
+  - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
+  - [GDI,GDI+,Direct2D](#gdigdidirect2d)
       
-  </div>
-  </details>
+<br/>
 
-
-- <details markdown="1">
-  <summary>소켓통신</summary>
-  <div markdown="1">
-  
-  - [소켓통신](#소켓통신)
-    - [소켓통신 사용 준비](#소켓통신-사용-준비)
-    - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
-    - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
-    - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
-    - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
-    - [소켓통신 함수별](#소켓통신-함수별)
-    - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입/출력-버퍼-확인)
-    - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
-    - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
+- [GDI Plus(+)](#gdi-plus)
+  - [GDI Plus(+) 초기화하기](#gdi-plus-초기화기)
+  - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
+  - [여러가지 그리기](#여러가지-그리기)
+  - [이미지 원하는 모양으로 출력하기](#이미지-원하는-모양으로-출력하기)
+  - [PNG A(알파)값 포함 이미지 출력하기](#png-a알파값-포함-이미지-출력하기)
       
-  </div>
-  </details>
+<br/>
 
-
-- <details markdown="1">
-  <summary>기능별 정리</summary>
-  <div markdown="1">
-  
-  - [기능별 정리](#기능별-정리)
-    - [캡쳐하기](#캡쳐하기)
-    - [동적으로 폰트 크기 맞추기](#동적으로-폰트-크기-맞추기)
-    - [멀티바이트 CString자료형에 한글확인 코드 와 짜르기](#멀티바이트-cstring자료형에-한글확인-코드-와-짜르기)
-    - [Bitmap을 활용한 png 컬러 변경](#bitmap을-활용한-png-컬러-변경)
-    - [원하는 캡션가진 윈도우 잡기](#원하는-캡션가진-윈도우-잡기)
-      
-  </div>
-  </details>
-
-
-- <details markdown="1">
-  <summary>GDI</summary>
-  <div markdown="1">
-  
-  - [GDI](#gdi)
-    - [CDC, CPaintDC, CClientDC, CWindowDC (화면출력)](#cdc-cpaintdc-cclientdc-cwindowdc-화면출력)
-    - [장치 DC, 메모리 DC (깜박임 없애기)](#장치-dc-메모리-dc-깜박임-없애기)
-    - [GDI,GDI+,Direct2D](#gdigdidirect2d)
-      
-  </div>
-  </details>
-
-
-- <details markdown="1">
-  <summary>GDI+</summary>
-  <div markdown="1">
-  
-  - [GDI Plus(+)](#gdi-plus)
-    - [GDI Plus(+) 초기화하기](#gdi-plus-초기화기)
-    - [GDI Plus(+) 더블 버퍼링(With GDI)](#gdi-plus-더블-버퍼링with-gdi)
-    - [여러가지 그리기](#여러가지-그리기)
-    - [이미지 원하는 모양으로 출력하기](#이미지-원하는-모양으로-출력하기)
-    - [PNG A(알파)값 포함 이미지 출력하기](#png-a알파값-포함-이미지-출력하기)
-      
-  </div>
-  </details>
-
-
-- <details markdown="1">
-  <summary>Direct2D</summary>
-  <div markdown="1">
-  
-  - [Direct2D](#direct2d)
-    - [Direct2D 초기화 및 기본출력](#direct2d-초기화-및-기본출력)
-    - [Direct2D 초기화 및 이미지출력](#direct2d-초기화-및-이미지출력)
-    - [Direct2D 초기화 및 이미지 라운드 출력](#direct2d-초기화-및-이미지-라운드-출력)
+- [Direct2D](#direct2d)
+  - [Direct2D 초기화 및 기본출력](#direct2d-초기화-및-기본출력)
+  - [Direct2D 초기화 및 이미지출력](#direct2d-초기화-및-이미지출력)
+  - [Direct2D 초기화 및 이미지 라운드 출력](#direct2d-초기화-및-이미지-라운드-출력)
  
-  </div>
-  </details>
-
+<br/>
 
 - [CFileDialog (파일열기 대화 상자) 사용법 및 사진불러오기](#cfiledialog-파일열기-대화-상자-사용법-및-사진불러오기)
 - [COLORREF (컬러 담는 변수)](#colorref-컬러-담는-변수)
