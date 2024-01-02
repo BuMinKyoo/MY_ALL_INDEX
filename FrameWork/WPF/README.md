@@ -1,17 +1,11 @@
 ###### Top
 
-- <details markdown="1">
-  <summary>예제</summary>
-  <div markdown="1">
-  
-  - [예제](#예제)
-    - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
-    - [Placeholder](#placeholder)
-    - [MultiBinding,IMultiValueConverter](#multibindingimultivalueconverter)
+- [예제](#예제)
+  - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
+  - [Placeholder](#placeholder)
+  - [MultiBinding,IMultiValueConverter](#multibindingimultivalueconverter)
 
-  </div>
-  </details>
-
+<br/>
 
 - [코딩표준](#코딩표준)
 
