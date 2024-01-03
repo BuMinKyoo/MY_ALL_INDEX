@@ -10,6 +10,8 @@
   - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
   - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
   - [PostMessage (사용자 지정 메시지) + MAKEWPARAM](#postmessage-사용자-지정-메시지--makewparam)
+  - [PostMessage,SendMessage(부모->자식)](#postmessagesendmessage부모->자식)
+  - [PostMessage,SendMessage(Win32함수, 캡션으로 찾기)](#postmessagesendmessagewin32함수-캡션으로-찾기)
   - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
   - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
   - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
@@ -30,6 +32,15 @@
   - [모달리스(modeless)](#모달리스modeless)
   - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
   - [모달, 모달리스 만들때 다른 dialog호출하기](#모달-모달리스-만들때-다른-dialog호출하기)
+  - [모달간 PreTranslateMessage전달](#모달간-pretranslatemessage전달)
+  - [모달리스간 PreTranslateMessage전달](#모달리스간-pretranslatemessage전달)
+
+<br/>
+
+- [CBase상속](#cbase상속)
+  - [CBase생성](#cbase생성)
+  - [GetClientRect 호출](#getclientrect-호출)
+  - [CBase상속시 PreTranslateMessage](#cbase상속시-pretranslatemessage)
 
 <br/>
 
@@ -258,6 +269,8 @@ _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
     - [WM_DRAWITEM (컨트롤 Backgroud, Border, Text 그리기)](#wm_drawitem-컨트롤-backgroud-border-text-그리기)
     - [PostMessage (사용자 지정 메시지) + MAKEWPARAM](#postmessage-사용자-지정-메시지--makewparam)
+    - [PostMessage,SendMessage(부모->자식)](#postmessagesendmessage부모->자식)
+    - [PostMessage,SendMessage(Win32함수, 캡션으로 찾기)](#postmessagesendmessagewin32함수-캡션으로-찾기)
     - [WM_CREATE, WM_SIZE (Dialog 변경시 컨트롤 크기 위치 유지하기)](#wm_create-wm_size-dialog-변경시-컨트롤-크기-위치-유지하기)
     - [WM_TIMER, WM_DESTROY (타이머,윈도우파괴시)](#wm_timer-wm_destroy-타이머윈도우파괴시)
     - [WM_MOUSEWHEEL (마우스 휠)](#wm_mousewheel-마우스-휠)
@@ -593,6 +606,115 @@ BOOL Cchaild::OnInitDialog()
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
+}
+~~~
+
+###### [Message](#message)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# PostMessage,SendMessage(부모->자식)
+
+#AppDlg.h
+~~~c++
+#include "CCD1.h"
+
+CCD1* dlg;
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	dlg = new CCD1;
+	dlg->Create(IDD_CD1);
+	dlg->ShowWindow(SW_SHOW);
+
+}
+
+void CMFCApplication1Dlg::OnBnClickedButton2()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	dlg->SendMessage(WM_RBUTTONDOWN);
+}
+~~~
+
+###### [Message](#message)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# PostMessage,SendMessage(Win32함수, 캡션으로 찾기)
+  - 사용자 메세지를 보내기 위해서는, 이미 예약 되어 있는 메세지 번호를 사용할 수 없기 때문에 WM_USER로 정의된 수 이상으로 사용하여야한다
+  - 사용
+  - 1. 보낼 메세지번호를 정의하고
+    - ::SendMessage(hDialogHandle, WM_USER+1, 0, 0);
+  - 2. 받는 곳에서 받을 메세지번호를 정의함
+    - ON_MESSAGE(WM_USER+1, OnFunction)
+  - 3. 받는 곳에서 함수 해더파일 정의
+    - afx_msg LRESULT OnFunction(WPARAM wParam, LPARAM lParam);
+  - 4. 함수 정의
+
+<br/>
+
+#AppDlg.h
+~~~c++
+#include "CCD1.h"
+
+CCD1* dlg;
+afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+~~~
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	dlg = new CCD1;
+	dlg->Create(IDD_CD1);
+	dlg->ShowWindow(SW_SHOW);
+}
+
+void CMFCApplication1Dlg::OnBnClickedButton2()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	// 캡션을 이용해 핸들 얻기
+	HWND hDialogHandle = ::FindWindow(NULL, L"AAAAA");
+
+	// 얻은 핸들을 이용해 메세지 보내기
+	::SendMessage(hDialogHandle, WM_USER+1, 0, 0);
+}
+~~~
+
+<br/>
+
+#CD1.h
+~~~c++
+public:
+	afx_msg LRESULT OnFunction(WPARAM wParam, LPARAM lParam);
+~~~
+
+<br/>
+
+#CD1.cpp
+~~~c++
+BEGIN_MESSAGE_MAP(CCD1, CDialogEx)
+	ON_MESSAGE(WM_USER+1, OnFunction)
+END_MESSAGE_MAP()
+
+LRESULT CCD1::OnFunction(WPARAM wParam, LPARAM lParam)
+{
+	// 처리할 내용
+	return 0;
 }
 ~~~
 
@@ -988,13 +1110,13 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 ***
 
 # 모달,모달리스
+  - [모달(modal)](#모달modal)
+  - [모달리스(modeless)](#모달리스modeless)
+  - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
+  - [모달, 모달리스 만들때 다른 dialog호출하기](#모달-모달리스-만들때-다른-dialog호출하기)
+  - [모달간 PreTranslateMessage전달](#모달간-pretranslatemessage전달)
+  - [모달리스간 PreTranslateMessage전달](#모달리스간-pretranslatemessage전달)
 
-  - 대화상자 만들기
-
-    - [모달(modal)](#모달modal)
-    - [모달리스(modeless)](#모달리스modeless)
-    - [캐스팅 하여 전부 접근 하는법](#캐스팅-하여-전부-접근-하는법)
-    - [모달, 모달리스 만들때 다른 dialog호출하기](#모달-모달리스-만들때-다른-dialog호출하기)
 
 ###### [모달,모달리스](#모달모달리스)
 ###### [Top](#top)
@@ -1321,29 +1443,517 @@ CD1::CD1(int Dialog, CWnd* pParent /*=NULL*/)
 <br/>
 <br/>
 
+# 모달간 PreTranslateMessage전달
+  - 모달을 사용하게 되면, 부모를 클릭시 메세지는 전달되지 않는다. 자식을 클릭하게 되면 자식에서 -> 부모로 향하는 버블링이 발생한다(PreTranslateMessage 수준에서)
+  - 실제 해당되는 다이얼로그가 받는 이벤트는 PreTranslateMessage가 모두 전달되고 발생된다.
+    - 클릭한 해당 자식 PreTranslateMessage -> 부모 PreTranslateMessage -> 클릭한 해당 자식 OnLButtonDown
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+#include "CCD1.h"
+
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CCD1 dlg;
+	dlg.DoModal();
+}
+
+void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+BOOL CMFCApplication1Dlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_LBUTTONDOWN)
+	{
+
+		return FALSE;
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+~~~
+
+<br/>
+
+#CD1.cpp
+~~~c++
+#include "CCD2.h"
+
+void CCD1::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CCD2 dlg;
+	dlg.DoModal();
+}
+
+void CCD1::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+BOOL CCD1::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_LBUTTONDOWN)
+	{
+
+		return FALSE;
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+~~~
+
+###### [모달,모달리스](#모달모달리스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 모달리스간 PreTranslateMessage전달
+  - 모달리스를 사용하게 되면, 부모를 클릭시 자식에게는 메세지가 전달되지 않는다. 자식에서 -> 부모로 향하는 버블링이 발생한다(PreTranslateMessage 수준에서)
+  - 실제 해당되는 다이얼로그가 받는 이벤트는 PreTranslateMessage가 모두 전달되고 발생된다
+    - 클릭한 해당 자식 PreTranslateMessage -> 부모 PreTranslateMessage -> 클릭한 해당 자식 OnLButtonDown
+  - 모달리스 생성시, 부모를 설정하게 되면, 그 부모의 부모의 부모로 메세지 버블링이 발생한다
+  - 부모를 설정하지 않는 다이얼로그에는 전달되지 않으며, 항상 최상위 부모에게는 메세지가 전달 되게 된다
+    - A(최상위),B,C,D(C의 자식)
+      - B를 클릭시 B->A전달
+      - D를 클릭시 D->C->A전달
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+#include "CCD1.h"
+
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CCD1* dlg = new CCD1();
+	dlg = new CCD1;
+	dlg->Create(IDD_CD1, this);
+	dlg->ShowWindow(SW_SHOW);
+
+}
+
+
+void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+BOOL CMFCApplication1Dlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_LBUTTONDOWN)
+	{
+
+		return FALSE;
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+~~~
+
+<br/>
+
+#CD1.cpp
+~~~c++
+#include "CCD2.h"
+
+void CCD1::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CCD2* dlg = new CCD2();
+	dlg = new CCD2;
+	dlg->Create(IDD_CD2, this);
+	dlg->ShowWindow(SW_SHOW);
+}
+
+void CCD1::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+BOOL CCD1::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_LBUTTONDOWN)
+	{
+
+		return FALSE;
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+~~~
+
+###### [모달,모달리스](#모달모달리스)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# CBase상속
+  - [CBase생성](#cbase생성)
+  - [GetClientRect 호출](#getclientrect-호출)
+  - [CBase상속시 PreTranslateMessage](#cbase상속시-pretranslatemessage)
+
+###### [CBase상속](#cbase상속)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# CBase생성
+  - 1. 클래스마법사 ->MFC클래스 추가->기본 클래스 CWnd
+  - 2. CDialog로 상속 임의로 바꾸기
+    - 처음부터  CDialog상속으로 만들면, 화면이 같이 만들어 지기 때문에 CWnd를 기본 클래스로 하고 CDialog상속으로 임의로 바꾼다
+
+<br/>
+
+CBase.h
+~~~c++
+#pragma once
+
+
+// CBase
+
+class CBase : public CDialog
+{
+	DECLARE_DYNAMIC(CBase)
+
+public:
+	CBase();
+	CBase(UINT uResourceID, CWnd* pParent = NULL);
+	virtual ~CBase();
+
+protected:
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+};
+~~~
+
+<br/>
+
+CBase.cpp
+~~~c++
+// CBase.cpp: 구현 파일
+//
+
+#include "pch.h"
+#include "MFCApplication2.h"
+#include "CBase.h"
+
+
+// CBase
+
+IMPLEMENT_DYNAMIC(CBase, CDialog)
+
+CBase::CBase()
+{
+
+}
+
+CBase::CBase(UINT uResourceID, CWnd* pParent)
+	: CDialog(uResourceID, pParent)
+{
+	
+}
+
+
+CBase::~CBase()
+{
+}
+
+
+BEGIN_MESSAGE_MAP(CBase, CDialog)
+	ON_WM_RBUTTONDOWN()
+END_MESSAGE_MAP()
+
+
+
+// CBase 메시지 처리기
+
+
+
+
+void CBase::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CDialog::OnRButtonDown(nFlags, point);
+}
+
+
+BOOL CBase::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_RBUTTONDOWN)
+	{
+		return FALSE;
+	}
+
+	return CDialog::PreTranslateMessage(pMsg);
+}
+~~~
+
+<br/>
+
+#CCD2.h
+~~~c++
+#pragma once
+#include "afxdialogex.h"
+#include "CBase.h"
+
+
+// CCD2 대화 상자
+
+class CCD2 : public CBase
+{
+	DECLARE_DYNAMIC(CCD2)
+
+public:
+	CCD2(CWnd* pParent = nullptr);   // 표준 생성자입니다.
+	virtual ~CCD2();
+
+// 대화 상자 데이터입니다.
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_CD2 };
+#endif
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
+
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnBnClickedButton1();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual BOOL OnInitDialog();
+};
+~~~
+
+<br/>
+
+#CCD2.cpp
+~~~c++
+// CCD2.cpp: 구현 파일
+//
+
+#include "pch.h"
+#include "MFCApplication2.h"
+#include "afxdialogex.h"
+#include "CCD2.h"
+#include "CCD2_2.h"
+
+
+// CCD2 대화 상자
+
+IMPLEMENT_DYNAMIC(CCD2, CBase)
+
+CCD2::CCD2(CWnd* pParent /*=nullptr*/)
+	: CBase(IDD_CD2, pParent)
+{
+
+}
+
+CCD2::~CCD2()
+{
+}
+
+void CCD2::DoDataExchange(CDataExchange* pDX)
+{
+	CBase::DoDataExchange(pDX);
+}
+
+
+BEGIN_MESSAGE_MAP(CCD2, CBase)
+	ON_WM_RBUTTONDOWN()
+	ON_BN_CLICKED(IDC_BUTTON1, &CCD2::OnBnClickedButton1)
+END_MESSAGE_MAP()
+
+
+// CCD2 메시지 처리기
+
+
+void CCD2::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CBase::OnRButtonDown(nFlags, point);
+}
+
+
+BOOL CCD2::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_RBUTTONDOWN)
+	{
+		return FALSE;
+	}
+
+	return CBase::PreTranslateMessage(pMsg);
+}
+
+
+void CCD2::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CCD2_2* chaild = new CCD2_2;
+	chaild->Create(IDD_CD2_2, this);
+	chaild->ShowWindow(SW_SHOW);
+}
+
+
+//BOOL CCD2::PreTranslateMessage(MSG* pMsg)
+//{
+//	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+//
+//	return CBase::PreTranslateMessage(pMsg);
+//}
+
+
+BOOL CCD2::OnInitDialog()
+{
+	CBase::OnInitDialog();
+
+	// TODO:  여기에 추가 초기화 작업을 추가합니다.
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
+}
+~~~
+
+###### [CBase상속](#cbase상속)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# GetClientRect 호출
+  - MFC의 함수에서는, CBase같은 상속을 통할때, CBase의 상속을 받은 다이얼로그들에게서 CBase의 함수를 호출할때 그 다이얼로그의 핸들을 알아서 가져가 준다.
+  - CCD2와 CCD2_2는 서로다른 다이얼로그이며, 다른 윈도우 사이즈를 가지고 있지만, 각각 CBase의 함수를 호출했을때, 자동적으로 각각의 다이얼로그의 윈도우핸들을 가져다가 함수에 적용하는것을 볼 수 있다
+
+<br/>
+
+#CBase.cpp
+~~~c++
+void CBase::GetR()
+{
+	CRect rect;
+	GetClientRect(rect);
+}
+~~~
+
+<br/>
+
+#CCD2.cpp
+~~~c++
+void CCD2::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CBase::GetR();
+
+	CBase::OnRButtonDown(nFlags, point);
+}
+~~~
+
+<br/>
+
+#CCD2_2.cpp
+~~~c++
+void CCD2_2::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CBase::GetR();
+	
+	CBase::OnRButtonDown(nFlags, point);
+}
+~~~
+
+###### [CBase상속](#cbase상속)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# CBase상속시 PreTranslateMessage
+  - CBase가 부모가 되지 않는 이상 상속으로는 자식의 PreTranslateMessage로 부터 메세지를 받지는 않는다.
+
+<br/>
+
+  - A(최상위)->CCD2(CBase상속)(부모)->CCD2_2(자식)일경우 아래와 같은 상황에서 CCD2을 클릭해 return FALSE 로 들어가게 되면, CBase로 전달되지 못하고 최상위 윈도우인 A에 전달되게 된다
+  - 이럴때 CBase로 전달하기 위해서는 그냥 A도 CBase상속하던지 아니면, return FALSE하지 않고 CBase함수로 보내는 방법이 있겠다
+
+<br/>
+
+#CCD2.cpp
+~~~c++
+BOOL CCD2::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_RBUTTONDOWN)
+	{
+		return FALSE;
+	}
+
+	return CBase::PreTranslateMessage(pMsg);
+}
+~~~
+
+<br/>
+
+  - 즉 정리하자면, PreTranslateMessage로 메세지가 버블링 되는것은 윈도우의 자식과 부모의 상관 관계로 진행되는 것이며, 나머지는 함수로 실제로 들어가야 이동될 수 있다
+
+###### [CBase상속](#cbase상속)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 ***
 
 # 다양한 함수
-
-  - 다양한 함수에 대한설명들
-
-    - [MoveWindows](#movewindows)
-    - [SetWindowPos](#setwindowpos)
-    - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
-    - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
-    - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
-    - [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
-    - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
-    - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
-    - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
-    - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
-    - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
-    - [GetTickCount](#gettickcount)
-    - [ShellExecute](#shellexecute)
-    - [AnimateWindow](#animatewindow)
-    - [FindWindow, FindWindowEx](#findwindow-findwindowex)
-    - [AfxExtractSubString](#afxextractsubstring)
-    - [GetLastError](#getlasterror)
+  - [MoveWindows](#movewindows)
+  - [SetWindowPos](#setwindowpos)
+  - [GetWindowRect(),GetClientRect() (윈도우 좌표, 클라이언트 좌표)](#getwindowrectgetclientrect-윈도우-좌표-클라이언트-좌표)
+  - [ShowWindow(),EnableWindow() (윈도우 활성, 비활성 및 숨김, 보임)](#showwindowenablewindow-윈도우-활성-비활성-및-숨김-보임)
+  - [윈도우 특정 부분 투명화 하기](#윈도우-특정-부분-투명화-하기)
+  - [윈도우 모양 바꾸기](#윈도우-모양-바꾸기)
+  - [Dialog Control 포커스 맞추기](#dialog-control-포커스-맞추기)
+  - [GetPrivateProfileString(),WritePrivateProfileString() (ini파일 읽기, 쓰기)](#getprivateprofilestringwriteprivateprofilestring-ini파일-읽기-쓰기)
+  - [time(NULL), localtime_s(), SYSTEMTIME(현재 시간, 날짜 출력)](#timenull-localtime_s-systemtime현재-시간-날짜-출력)
+  - [SetTimer() (타이머 사용하기)](#settimer-타이머-사용하기)
+  - [RegisterHotKey() (시스템 전역 단축키 지정하기)](#registerhotkey-시스템-전역-단축키-지정하기)
+  - [GetTickCount](#gettickcount)
+  - [ShellExecute](#shellexecute)
+  - [AnimateWindow](#animatewindow)
+  - [FindWindow, FindWindowEx](#findwindow-findwindowex)
+  - [AfxExtractSubString](#afxextractsubstring)
+  - [GetLastError](#getlasterror)
 
 ###### [다양한 함수](#다양한-함수)
 ###### [Top](#top)
