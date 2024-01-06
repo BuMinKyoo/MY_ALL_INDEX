@@ -2348,10 +2348,10 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
     - 4.Client가 Server에게 File을 달라고 요청(Request)
     - 5.Server는 Client의 요청을 받고, 하드 디스크의 디바이스 드라이버에 요청해, 하드 디스크에 있는 File(ex : 1.4MB)을 User application 가상 메모리 어딘가에 읽어냄(메모리에 복사함)
       - 파일이 큰 경우에는, 조금씩 조금씩 메모리에 copy하겠지만, 특수한 경우 속도를 위해 한꺼번에 copy해서 미리 메모리에 복사해 두는 경우도 있음
-    - 6.Server는 복사한 메모리를 가지고, Client와 데이터 송/수신을 위한 소켓(Socket)에 Send함(Write)하기 전에, Send함(Write)하기 위한 소켓(Socket) Buffered I/O 에 메모리를 다시 복사함
+    - 6.Server는 복사한 메모리를 가지고, Client와 데이터 송/수신을 위한 소켓(Socket)에 Send함(Write)
+    - 7.Send한 데이터는 Client와 데이터 송/수신을 위한 소켓(Socket) Buffered I/O 에 복사해 들어감(데이터 형태 : Stream)(이 부분의 데이터는 OS수준에서 관리해준다)
       - 소켓(Socket) Buffered I/O 크기를 할당할때는 개발자가 결정(보통 64kb가 가장 합당함)
       - 용량이 큰 파일은 조금씩 끊어서 전달하게 됨
-    - 7.소켓(Socket) Buffered I/O 에 있는 메모리를 Client와 데이터 송/수신을 위한 소켓(Socket)에 Send함(Write)(데이터 형태 : Stream)
     - 8.TCP(L4)가기전 분해하게 되는데, 소켓(Socket) Buffered I/O 에서 페이로드에 분해하여 복사(데이터 형태 : Segment)
       - TCP Window Size는 수신측에서 송신측으로 데이터를 얼마나 많이 전송할 수 있는지를 나타내는 값입니다. 이 값은 바이트 단위로 표현되며, 송신측이 전송한 데이터를 수신측이 얼마나 받을 수 있는지 결정합니다. Window Size 크기가 클수록 더 많은 데이터를 한 번에 전송할 수 있으며, 이로 인해 효율적인 데이터 전송이 가능해집니다 
     - 9.IP(L3)쪽으로 내려올때, TCP(L4)앞에 Ip해더를 붙여 Packet화 한다, TCP해더에 번호를 표기한다(데이터 형태 : Packet)
