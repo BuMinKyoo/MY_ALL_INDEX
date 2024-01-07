@@ -137,18 +137,18 @@
   - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
   - [소켓통신 함수별](#소켓통신-함수별)
   - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입출력-버퍼-확인)
-  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
-  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
-  - [소켓(Socket)입/출력 모델 비교](#소켓socket입/출력-모델-비교)
+  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입출력-tcp_nodelat)
+  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입출력-so_reuseaddr)
+  - [소켓(Socket)입/출력 모델 비교](#소켓socket입출력-모델-비교)
   - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
   - [파일 송신 전용API(TransmitFile)](#파일-송신-전용apitransmitfile)
-- [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송/수신-소켓socket통신)
-  - [파일 송/수신 프로토콜 정의](#파일-송/수신-프로토콜-정의)
+- [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송수신-소켓socket통신)
+  - [파일 송/수신 프로토콜 정의](#파일-송수신-프로토콜-정의)
   - [프로토콜이 적용된 파일 송수신 Socket통신 (서버Server)](#프로토콜이-적용된-파일-송수신-socket통신-서버server)
   - [프로토콜이 적용된 파일 송수신 Socket통신 (클라이언트Client)](#프로토콜이-적용된-파일-송수신-socket통신-클라이언트client)
 - [IOCP](#iocp)
-  - [비동기 File입/출력_Event](#비동기-file입/출력_event)
-  - [비동기 File입/출력_Callback](#비동기-file입/출력_callback)
+  - [비동기 File입/출력_Event](#비동기-file입출력_event)
+  - [비동기 File입/출력_Callback](#비동기-file입출력_callback)
 
 <br/>
 
@@ -4991,9 +4991,9 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
   - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
   - [소켓통신 함수별](#소켓통신-함수별)
   - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입출력-버퍼-확인)
-  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
-  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
-  - [소켓(Socket)입/출력 모델 비교](#소켓socket입/출력-모델-비교)
+  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입출력-tcp_nodelat)
+  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입출력-so_reuseaddr)
+  - [소켓(Socket)입/출력 모델 비교](#소켓socket입출력-모델-비교)
   - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
   - [파일 송신 전용API(TransmitFile)](#파일-송신-전용apitransmitfile)
 
@@ -6188,7 +6188,7 @@ int _tmain(int argc, _TCHAR* argv[])
 ***
 
 # 프로토콜이 적용된 파일 송/수신 소켓(Socket)통신
-  - [파일 송/수신 프로토콜 정의](#파일-송/수신-프로토콜-정의)
+  - [파일 송/수신 프로토콜 정의](#파일-송수신-프로토콜-정의)
   - [프로토콜이 적용된 파일 송수신 Socket통신 (서버Server)](#프로토콜이-적용된-파일-송수신-socket통신-서버server)
   - [프로토콜이 적용된 파일 송수신 Socket통신 (클라이언트Client)](#프로토콜이-적용된-파일-송수신-socket통신-클라이언트client)
 
@@ -6763,8 +6763,8 @@ int _tmain(int argc, _TCHAR* argv[])
 ***
 
 # IOCP
-  - [비동기 File입/출력_Event](#비동기-file입/출력_event)
-  - [비동기 File입/출력_Callback](#비동기-file입/출력_callback)
+  - [비동기 File입/출력_Event](#비동기-file입출력_event)
+  - [비동기 File입/출력_Callback](#비동기-file입출력_callback)
 
 ###### [IOCP](#iocp)
 ###### [Top](#top)
