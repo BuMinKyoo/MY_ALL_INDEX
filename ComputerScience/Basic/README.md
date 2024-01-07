@@ -69,6 +69,7 @@
   - [Windows시스템 메모리 운용 방법](#windows시스템-메모리-운용-방법)
   - [Window 프로세스 기본 힙할당](#window-프로세스-기본-힙할당)
   - [보호모드](#보호모드)
+  - [TCP장애유형](#tcp장애유형)
 
 <br/>
 <br/>
@@ -1196,6 +1197,7 @@ a : 8, b : 3
   - [Windows시스템 메모리 운용 방법](#windows시스템-메모리-운용-방법)
   - [Window 프로세스 기본 힙할당](#window-프로세스-기본-힙할당)
   - [보호모드](#보호모드)
+  - [TCP장애유형](#tcp장애유형)
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
@@ -1454,6 +1456,21 @@ a : 8, b : 3
 
 VirtualProtect사용예제는 MFC예제를 참고하기  
 [MFC](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/FrameWork/MFC)
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# TCP장애유형
+  - 1.Packet Loss
+    - 패킷이 유실된 경우
+  - 2.TCP Out of order
+    - 패킷의 순서가 뒤바뀐 경우
+  - 3.Retransmission과 Dup ACK
+  - 4.Zero-window
+    - 수신측 버퍼에 여유 공간이 하나도 없는 경우
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
