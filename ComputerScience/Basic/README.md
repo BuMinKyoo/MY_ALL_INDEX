@@ -2208,6 +2208,7 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
   - IP수준 : Packet
       - IP수준 에서의 최대 길이를 MTU라고 함(기본적으로 1500 바이트)
       - 따라서 Packet의 크기를 일반적으로 1500바이트이다(TCP,IP헤더 포함), 만일 1500바이트를 넘는다면 2개의 Packet으로 쪼개져서 가게 된다
+      - 루프백(loopback) ip에서는 더 큰 패킷이 오갈 수도 있다
   - 하드웨어 수준 : Frame
 
   - User수준인 어플리케이션 process가 추상화한 File에 다가 Stream데이터를 Write하고, kernel수준으로 내려간 Stream데이터가 TCP에서 Segment화 된다. 그것이 인터넷에서 전송 가능한 형태인 Packet으로 캡슐화 후, 실제로 Packet 실어 나를때는 또 캡슐화 하여 Frame이 되어 전송 된다
@@ -2622,6 +2623,7 @@ Network기초 부분은 유투브에서 널널한 개발자 로 활동중이신,
     - 3 - Virtual 로 만들어진 IP를 탄후, 본래의 IP를 타고 가게 된다
       - IP, TCP 헤더가 2개씩 붙게 된다
       - 헤더가 하나더 붙기 때문에 MTU 1500을 초과하게 되어 단편화가 발생되니, Payload를 기본적으로 1460보다 더 작게 만들어 헤더가 하나더 붙었을때 초과 되지 않게 만든다
+      - 루프백(loopback) ip에서는 더 큰 패킷이 오갈 수도 있다
     - 4 - 공유기가 그 IP를 받게 되고, 그것을 디캡슐화 시킨다
 
 ![image](https://user-images.githubusercontent.com/39178978/209433861-7cd9c8ee-d239-4185-a296-03a020ae46a0.png)
