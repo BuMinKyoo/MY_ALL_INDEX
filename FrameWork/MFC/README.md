@@ -150,8 +150,6 @@
   - [비동기 File입/출력_Event](#비동기-file입/출력_event)
   - [비동기 File입/출력_Callback](#비동기-file입/출력_callback)
 
-
-
 <br/>
 
 - [기능별 정리](#기능별-정리)
@@ -6182,6 +6180,773 @@ int _tmain(int argc, _TCHAR* argv[])
 ~~~
 
 ###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 프로토콜이 적용된 파일 송/수신 소켓(Socket)통신
+  - [파일 송/수신 프로토콜 정의](#파일-송/수신-프로토콜-정의)
+  - [프로토콜이 적용된 파일 송수신 Socket통신 (서버Server)](#프로토콜이-적용된-파일-송수신-socket통신-서버server)
+  - [프로토콜이 적용된 파일 송수신 Socket통신 (클라이언트Client)](#프로토콜이-적용된-파일-송수신-socket통신-클라이언트client)
+
+###### [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송/수신-소켓socket통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 파일 송/수신 프로토콜 정의
+
+  - 기본 헤더와 확장 헤더로 나눠서 정의
+  - 기본 헤더는 이어지는 확장 헤더를 결정하기 위한 코드 값 포함
+  - 코드 값에 따른 switch-case
+  - 각 경우에 대한 함수(처리기) 및 해석 방법 적용
+  - Send시에는 무조건 크게 한번에 보내는것이 속도 측면에서 무조건 빠르다
+  - Recv는 프로토콜상 끊어내서 읽어야 하는 부분이 있을뿐이다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/ec7722db-9e29-49b6-b151-5decd29a35ca)
+
+###### [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송/수신-소켓socket통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 프로토콜이 적용된 파일 송수신 Socket통신 (서버Server)
+  - Console Application예제
+
+#stdafx.cpp
+#서버(Server)
+~~~c++
+// stdafx.cpp : 표준 포함 파일만 들어 있는 소스 파일입니다.
+// TcpFileServer.pch는 미리 컴파일된 헤더가 됩니다.
+// stdafx.obj에는 미리 컴파일된 형식 정보가 포함됩니다.
+
+#include "stdafx.h"
+
+// TODO: 필요한 추가 헤더는
+// 이 파일이 아닌 STDAFX.H에서 참조합니다.
+~~~
+
+<br/>
+
+#stdafx.h
+#서버(Server)
+~~~c++
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
+// 들어 있는 포함 파일입니다.
+//
+
+#pragma once
+
+#include "targetver.h"
+
+#include <stdio.h>
+#include <tchar.h>
+
+
+
+// TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+~~~
+
+<br/>
+
+#targetver.h
+#서버(Server)
+~~~c++
+#pragma once
+
+// SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
+
+// 이전 Windows 플랫폼에 대해 응용 프로그램을 빌드하려는 경우에는 SDKDDKVer.h를 포함하기 전에
+// WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
+
+#include <SDKDDKVer.h>
+~~~
+
+<br/>
+
+#AppProtocol.h
+#서버(Server)
+~~~c++
+#pragma once
+
+/////////////////////////////////////////////////////////////////////////
+//MYCMD 구조체의 nCode 멤버에 적용될 수 있는 값
+typedef enum CMDCODE {
+	CMD_ERROR = 50,			//에러
+	CMD_GET_LIST = 100,			//C->S: 파일 리스트 요구
+	CMD_GET_FILE,				//C->S: 파일 전송 요구
+	CMD_SND_FILELIST = 200,		//S->C: 파일 리스트 전송
+	CMD_BEGIN_FILE			//S->C: 파일 전송 시작을 알림.
+} CMDCODE;
+
+/////////////////////////////////////////////////////////////////////////
+//기본헤더
+typedef struct MYCMD
+{
+	int nCode;			//명령코드
+	int nSize;			//데이터의 바이트 단위 크기
+} MYCMD;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: 에러 메시지 전송헤더
+typedef struct ERRORDATA
+{
+	int	nErrorCode;		//에러코드: ※향후 확장을 위한 멤버다.
+	char szDesc[256];	//에러내용
+} ERRORDATA;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: S->C: 파일 리스트 전송
+typedef struct SEND_FILELIST
+{
+	unsigned int nCount;	//전송할 파일정보(GETFILE 구조체) 개수
+} SEND_FILELIST;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: CMD_GET_FILE
+typedef struct GETFILE
+{
+	unsigned int nIndex;	//전송받으려는 파일의 인덱스
+} GETFILE;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: 
+typedef struct FILEINFO
+{
+	unsigned int nIndex;			//파일의 인덱스
+	char szFileName[_MAX_FNAME];	//파일이름
+	DWORD dwFileSize;				//파일의 바이트 단위 크기
+} FILEINFO;
+~~~
+
+<br/>
+
+#TcpFileServer.cpp
+#서버(Server)
+~~~c++
+// TcpFileServer.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+//※ 응용 프로그램 통신 프로토콜 정의가 들어있는 헤더파일
+#include "AppProtocol.h"
+
+
+/////////////////////////////////////////////////////////////////////////
+//전송할 파일정보 개수
+SEND_FILELIST g_flist = { 3 };
+
+//클라이언트가 다운로드 가능한 파일
+FILEINFO g_aFInfo[3] = {
+	{ 0, "Sleep Away.mp3", 4842585 },
+	{ 1, "Kalimba.mp3", 8414449 },
+	{ 2, "Maid with the Flaxen Hair.mp3", 4113874 }
+};
+
+/////////////////////////////////////////////////////////////////////////
+void ErrorHandler(const char *pszMessage)
+{
+	printf("ERROR: %s\n", pszMessage);
+	::WSACleanup();
+	exit(1);
+}
+
+/////////////////////////////////////////////////////////////////////////
+//파일 리스트 정보를 클라이언트에 전송하는 함수.
+void SendFileList(SOCKET hClient)
+{
+	// Send는 한번에 보내는것이 더 빠름
+
+	MYCMD cmd;
+	cmd.nCode = CMD_SND_FILELIST;
+	cmd.nSize = sizeof(g_flist)+sizeof(g_aFInfo);
+	//기본헤더 전송.
+	send(hClient, (const char*)&cmd, sizeof(cmd), 0);
+	//파일 리스트 헤더 전송.
+	send(hClient, (const char*)&g_flist, sizeof(g_flist), 0);
+	//파일 정보들 전송.
+	send(hClient, (const char*)g_aFInfo, sizeof(g_aFInfo), 0);
+}
+
+/////////////////////////////////////////////////////////////////////////
+//인덱스에 해당하는 파일을 클라이언트에게 송신하는 함수.
+void SendFile(SOCKET hClient, int nIndex)
+{
+	MYCMD cmd;
+	ERRORDATA err;
+	//파일 리스트에서 인덱스에 맞는 파일을 검사한다.
+	if (nIndex < 0 || nIndex > 2)
+	{
+		cmd.nCode = CMD_ERROR;
+		cmd.nSize = sizeof(err);
+		err.nErrorCode = 0;
+		strcpy_s(err.szDesc, "잘못된 파일 인덱스 입니다.");
+
+		// Send는 한번에 보내는것이 더 빠름
+		//오류 정보를 클라이언트에게 전송.
+		send(hClient, (const char*)&cmd, sizeof(cmd), 0);
+		send(hClient, (const char*)&err, sizeof(err), 0);
+		return;
+	}
+
+	//파일 송신 시작을 알리는 정보를 전송한다.
+	cmd.nCode = CMD_BEGIN_FILE;
+	cmd.nSize = sizeof(FILEINFO);
+	send(hClient, (const char*)&cmd, sizeof(cmd), 0);
+	//송신하는 파일에 대한 정보를 전송한다.
+	send(hClient, (const char*)&g_aFInfo[nIndex], sizeof(FILEINFO), 0);
+	// 네이글알고리즘으로 인해 연속적인 send를 했을때, 한번에 갔을 확률이 높다
+	// Send는 한번에 보내는것이 더 빠름
+
+	FILE *fp = NULL;
+	errno_t nResult = fopen_s(&fp, g_aFInfo[nIndex].szFileName, "rb");
+	if (nResult != 0)
+		ErrorHandler("전송할 파일을 개방할 수 없습니다.");
+
+	//파일을 송신한다.
+	//TransmitFile api를 사용해도 될거 같다
+	char byBuffer[65536];		//64KB
+	int nRead;
+	while ((nRead = fread(byBuffer, sizeof(char), 65536, fp)) > 0)
+		send(hClient, byBuffer, nRead, 0);
+
+	fclose(fp);
+}
+
+/////////////////////////////////////////////////////////////////////////
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//윈속 초기화
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		ErrorHandler("윈속을 초기화 할 수 없습니다.");
+
+	//접속대기 소켓 생성
+	SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("접속 대기 소켓을 생성할 수 없습니다.");
+
+	//포트 바인딩
+	SOCKADDR_IN	svraddr = { 0 };
+	svraddr.sin_family = AF_INET;
+	svraddr.sin_port = htons(25000);
+	svraddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	if (::bind(hSocket,
+		(SOCKADDR*)&svraddr, sizeof(svraddr)) == SOCKET_ERROR )
+		ErrorHandler("소켓에 IP주소와 포트를 바인드 할 수 없습니다.");
+
+	//접속대기 상태로 전환
+	if (::listen(hSocket, SOMAXCONN) == SOCKET_ERROR)
+		ErrorHandler("리슨 상태로 전환할 수 없습니다.");
+	puts("파일송신서버를 시작합니다.");
+
+	//클라이언트 연결을 받아들이고 새로운 소켓 생성(개방)
+	SOCKADDR_IN clientaddr = { 0 };
+	int nAddrLen = sizeof(clientaddr);
+
+	SOCKET hClient = ::accept(hSocket, (SOCKADDR*)&clientaddr, &nAddrLen);
+	if (hClient == INVALID_SOCKET)
+		ErrorHandler("클라이언트 통신 소켓을 생성할 수 없습니다.");
+	puts("클라이언트가 연결되었습니다.");
+
+	//클라이언트로부터 명령을 수신하고 대응하는 Event loop.
+	MYCMD cmd;
+	while (::recv(hClient, (char*)&cmd, sizeof(MYCMD), 0) > 0)
+	{
+		// 성능을 더 높이기 위해서는 switch가 아니라 lookup table을 사용해야 한다.
+		switch (cmd.nCode)
+		{
+		case CMD_GET_LIST:
+			puts("클라이언트가 파일목록을 요구함.");
+			SendFileList(hClient);
+			break;
+
+		case CMD_GET_FILE:
+			puts("클라이언트가 파일전송을 요구함.");
+			{
+				GETFILE file;
+				::recv(hClient, (char*)&file, sizeof(file), 0);
+				SendFile(hClient, file.nIndex);
+				break;
+			}
+
+		default:
+			ErrorHandler("알 수 없는 명령을 수신했습니다.");
+			break;
+		}
+	}
+
+	//클라이언트가 연결을 종료함.
+	::closesocket(hClient);
+	puts("클라이언트 연결이 끊겼습니다.");
+
+	//리슨 소켓 닫기
+	::closesocket(hSocket);
+	//윈속 해제
+	::WSACleanup();
+	return 0;
+}
+~~~
+
+###### [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송/수신-소켓socket통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 프로토콜이 적용된 파일 송수신 Socket통신 (클라이언트Client)
+  - Console Application예제
+
+#stdafx.cpp
+#클라이언트(Client)
+~~~c++
+// stdafx.cpp : 표준 포함 파일만 들어 있는 소스 파일입니다.
+// TcpFileClient.pch는 미리 컴파일된 헤더가 됩니다.
+// stdafx.obj에는 미리 컴파일된 형식 정보가 포함됩니다.
+
+#include "stdafx.h"
+
+// TODO: 필요한 추가 헤더는
+// 이 파일이 아닌 STDAFX.H에서 참조합니다.
+~~~
+
+<br/>
+
+#stdafx.h
+#클라이언트(Client)
+~~~c++
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
+// 들어 있는 포함 파일입니다.
+//
+
+#pragma once
+
+#include "targetver.h"
+
+#include <stdio.h>
+#include <tchar.h>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
+
+
+// TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+~~~
+
+<br/>
+
+#targetver.h
+#클라이언트(Client)
+~~~c++
+#pragma once
+
+// SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
+
+// 이전 Windows 플랫폼에 대해 응용 프로그램을 빌드하려는 경우에는 SDKDDKVer.h를 포함하기 전에
+// WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
+
+#include <SDKDDKVer.h>
+~~~
+
+<br/>
+
+#AppProtocol.h
+#클라이언트(Client)
+~~~c++
+#pragma once
+
+/////////////////////////////////////////////////////////////////////////
+//MYCMD 구조체의 nCode 멤버에 적용될 수 있는 값
+typedef enum CMDCODE {
+	CMD_ERROR = 50,			//에러
+	CMD_GET_LIST = 100,			//C->S: 파일 리스트 요구
+	CMD_GET_FILE,				//C->S: 파일 전송 요구
+	CMD_SND_FILELIST = 200,		//S->C: 파일 리스트 전송
+	CMD_BEGIN_FILE			//S->C: 파일 전송 시작을 알림.
+} CMDCODE;
+
+/////////////////////////////////////////////////////////////////////////
+//기본헤더
+typedef struct MYCMD
+{
+	int nCode;			//명령코드
+	int nSize;			//데이터의 바이트 단위 크기
+} MYCMD;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: 에러 메시지 전송헤더
+typedef struct ERRORDATA
+{
+	int	nErrorCode;		//에러코드: ※향후 확장을 위한 멤버다.
+	char szDesc[256];	//에러내용
+} ERRORDATA;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: S->C: 파일 리스트 전송
+typedef struct SEND_FILELIST
+{
+	unsigned int nCount;	//전송할 파일정보(GETFILE 구조체) 개수
+} SEND_FILELIST;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: CMD_GET_FILE
+typedef struct GETFILE
+{
+	unsigned int nIndex;	//전송받으려는 파일의 인덱스
+} GETFILE;
+
+/////////////////////////////////////////////////////////////////////////
+//확장헤더: 
+typedef struct FILEINFO
+{
+	unsigned int nIndex;			//파일의 인덱스
+	char szFileName[_MAX_FNAME];	//파일이름
+	DWORD dwFileSize;				//파일의 바이트 단위 크기
+} FILEINFO;
+~~~
+
+<br/>
+
+#TcpFileClient.cpp
+#클라이언트(Client)
+~~~c++
+// TcpFileClient.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+#include "AppProtocol.h"
+
+
+void ErrorHandler(const char* pszMessage)
+{
+	printf("ERROR: %s\n", pszMessage);
+	::WSACleanup();
+	exit(1);
+}
+
+/////////////////////////////////////////////////////////////////////////
+void GetFileList(SOCKET hSocket)
+{
+	//서버에 파일 리스트를 요청한다.
+	MYCMD cmd = { CMD_GET_LIST, 0 };
+	::send(hSocket, (const char*)&cmd, sizeof(cmd), 0);
+
+	//서버로부터 파일 리스트를 수신한다.
+	::recv(hSocket, (char*)&cmd, sizeof(cmd), 0);
+	if (cmd.nCode != CMD_SND_FILELIST)
+		ErrorHandler("서버에서 파일 리스트를 수신하지 못했습니다.");
+
+	SEND_FILELIST filelist;
+	::recv(hSocket, (char*)&filelist, sizeof(filelist), 0);
+
+	//수신한 리스트 정보를 화면에 출력한다.
+	FILEINFO fInfo;
+	for (unsigned int i = 0; i < filelist.nCount; ++i)
+	{
+		::recv(hSocket, (char*)&fInfo, sizeof(fInfo), 0);
+		printf("%d\t%s\t%d\n",
+			fInfo.nIndex, fInfo.szFileName, fInfo.dwFileSize);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+void GetFile(SOCKET hSocket)
+{
+	int nIndex;
+	printf("수신할 파일의 인덱스(0~2)를 입력하세요.: ");
+	fflush(stdin);
+	scanf_s("%d", &nIndex);
+
+	//1. 서버에 파일 전송을 요청
+	BYTE* pCommand = new BYTE[sizeof(MYCMD) + sizeof(GETFILE)];
+	memset(pCommand, 0, sizeof(MYCMD) + sizeof(GETFILE));
+
+	MYCMD* pCmd = (MYCMD*)pCommand;
+	pCmd->nCode = CMD_GET_FILE;
+	pCmd->nSize = sizeof(GETFILE);
+
+	GETFILE* pFile = (GETFILE*)(pCommand + sizeof(MYCMD));
+	pFile->nIndex = nIndex;
+	//두 헤더를 한 메모리에 묶어서 전송한다!
+	::send(hSocket,
+		(const char*)pCommand, sizeof(MYCMD) + sizeof(GETFILE), 0);
+	delete[] pCommand;
+
+	//2. 전송받을 파일에 대한 상세 정보 수신.
+	MYCMD cmd = { 0 };
+	FILEINFO fInfo = { 0 };
+	::recv(hSocket, (char*)&cmd, sizeof(cmd), 0);
+	if (cmd.nCode == CMD_ERROR)
+	{
+		ERRORDATA err = { 0 };
+		::recv(hSocket, (char*)&err, sizeof(err), 0);
+		ErrorHandler(err.szDesc);
+	}
+	else
+		::recv(hSocket, (char*)&fInfo, sizeof(fInfo), 0);
+
+	//3. 파일을 수신한다.
+	printf("%s 파일 수신을 시작합니다!\n", fInfo.szFileName);
+	FILE* fp = NULL;
+	errno_t nResult = fopen_s(&fp, fInfo.szFileName, "wb");
+	if (nResult != 0)
+		ErrorHandler("파일을 생성 할 수 없습니다.");
+
+	char byBuffer[65536];		//64KB
+	int nRecv;
+	DWORD dwTotalRecv = 0;
+	while ((nRecv = ::recv(hSocket, byBuffer, 65536, 0)) > 0)
+	{
+		fwrite(byBuffer, nRecv, 1, fp);
+		dwTotalRecv += nRecv;
+		putchar('#');
+
+		if (dwTotalRecv >= fInfo.dwFileSize)
+		{
+			putchar('\n');
+			puts("파일 수신완료!");
+			break;
+		}
+	}
+
+	fclose(fp);
+}
+
+/////////////////////////////////////////////////////////////////////////
+int _tmain(int argc, _TCHAR* argv[])
+{
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		ErrorHandler("윈속을 초기화 할 수 없습니다.");
+
+	SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("소켓을 생성할 수 없습니다.");
+
+	//포트 바인딩 및 연결
+	SOCKADDR_IN	svraddr = { 0 };
+	svraddr.sin_family = AF_INET;
+	svraddr.sin_port = htons(25000);
+	svraddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	if (::connect(hSocket,
+		(SOCKADDR*)&svraddr, sizeof(svraddr)) == SOCKET_ERROR)
+		ErrorHandler("서버에 연결할 수 없습니다.");
+
+	//서버로부터 파일 리스트를 수신한다.
+	GetFileList(hSocket);
+
+	//전송받을 파일을 선택하고 수신한다.
+	GetFile(hSocket);
+
+	::closesocket(hSocket);
+	::WSACleanup();
+	return 0;
+}
+~~~
+
+###### [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송/수신-소켓socket통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# IOCP
+  - [비동기 File입/출력_Event](#비동기-file입/출력_event)
+  - [비동기 File입/출력_Callback](#비동기-file입/출력_callback)
+
+###### [IOCP](#iocp)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 비동기 File입/출력_Event
+  - 중첩된 파일 입/출력을 하기 위해서는, CreateFile함수 사용하여야 한다(fopen함수는 불가)
+    - 두개 이상의 Process, Thread가 하나의 Filed을 Read하는 경우
+  - 비동기완료를 받는 방법은 2가지가 있다
+    - Event
+      - Process가 OS에게 파일 입/출력을 해달라고 요청, OS가 그것의 작업을 끝내면, Event를 Set해준다.
+    - Callback
+
+<br/>
+
+#stdafx.cpp
+~~~c++
+// stdafx.cpp : 표준 포함 파일만 들어 있는 소스 파일입니다.
+// AsyncFileEvent.pch는 미리 컴파일된 헤더가 됩니다.
+// stdafx.obj에는 미리 컴파일된 형식 정보가 포함됩니다.
+
+#include "stdafx.h"
+
+// TODO: 필요한 추가 헤더는
+// 이 파일이 아닌 STDAFX.H에서 참조합니다.
+~~~
+
+<br/>
+
+#stdafx.h
+~~~c++
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
+// 들어 있는 포함 파일입니다.
+//
+
+#pragma once
+
+#include "targetver.h"
+
+#include <stdio.h>
+#include <tchar.h>
+
+
+
+// TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+~~~
+
+<br/>
+
+#targetver.h
+~~~c++
+#pragma once
+
+// SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
+
+// 이전 Windows 플랫폼에 대해 응용 프로그램을 빌드하려는 경우에는 SDKDDKVer.h를 포함하기 전에
+// WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
+
+#include <SDKDDKVer.h>
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// AsyncFileEvent.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+#include <Windows.h>
+
+// 함수를 사용하기 전에 함수의 선언이 필요하여 작성
+DWORD WINAPI MyThreadFunction(LPVOID lpParam);
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread;
+	DWORD threadID;
+
+	// 스레드 생성
+	hThread = CreateThread(NULL, 0, MyThreadFunction, NULL, 0, &threadID);
+
+	if (hThread == NULL) {
+		puts("ERROR: 스레드 생성 실패");
+		return 1;
+	}
+
+	// 스레드 종료를 기다림
+	puts("생성 스레드 종료 대기");
+	WaitForSingleObject(hThread, INFINITE);
+	puts("생성 스레드 종료 완료");
+
+	// 스레드 핸들 해제
+	CloseHandle(hThread);
+
+	return 0;
+}
+
+DWORD WINAPI MyThreadFunction(LPVOID lpParam) 
+{
+	//중첩된 쓰기 속성을 부여하고 파일을 생성한다.
+	HANDLE hFile = ::CreateFile(
+		_T("TestFile.txt"),
+		GENERIC_WRITE,		//쓰기 모드
+		0,					//공유하지 않음.
+		NULL,
+		CREATE_ALWAYS,		//무조건 생성.
+		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,	//중첩된 쓰기
+		NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		puts("ERROR: 대상 파일을 열 수 없습니다.");
+		return 0;
+	}
+
+	//비동기 쓰기와 관련한 OVERLAPPED 구조체 및 이벤트 핸들을 선언 한다.
+	DWORD dwRead;
+	OVERLAPPED aOl[3] = { 0 };
+	HANDLE aEvt[3] = { 0 };
+
+	//세 번의 비동기 쓰기 완료를 확인하기 위한 이벤트 객체를 생성한다.
+	for (int i = 0; i < 3; ++i)
+	{
+		aEvt[i] = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+		aOl[i].hEvent = aEvt[i];
+	}
+
+	//비동기 쓰기가 시작될 지점을 기술한다.
+	//두 번째 쓰기는 세 번째 쓰기보다 나중에 이루어질 가능성이 높다.
+	aOl[0].Offset = 0;					//파일의 시작.
+	aOl[1].Offset = 1024 * 1024 * 128;	//5MB
+	aOl[2].Offset = 16;					//16바이트
+
+	//세 번의 비동기 쓰기를 순차적으로 수행한다.
+	for (int i = 0; i < 3; ++i)
+	{
+		printf("%d번째 중첩된 쓰기 시도.\n", i);
+		::WriteFile(hFile, "0123456789", 10, &dwRead, &aOl[i]);
+		//정상적인 경우 쓰기 시도는 지연(보류)된다!
+		//OS에게 요청한 명령이 OS가 가지고 있는 어떤 Queue에 쌓이면 그것이 PENDING되었다고 표현된다
+		if (::GetLastError() != ERROR_IO_PENDING)
+			exit(0);
+	}
+
+	//세 번의 비동기 쓰기가 완료되기를 대기한다.
+	DWORD dwResult = 0;
+	for (int i = 0; i < 3; ++i)
+	{
+		dwResult = ::WaitForMultipleObjects(3, aEvt, FALSE, INFINITE);
+		printf("-> %d번째 쓰기 완료.\n", dwResult - WAIT_OBJECT_0);
+	}
+
+	//이벤트 핸들과 파일을 닫는다.
+	for (int i = 0; i < 3; ++i)
+		::CloseHandle(aEvt[i]);
+	::CloseHandle(hFile);
+	return 0;
+}
+
+
+//생성 스레드 종료 대기
+//0번째 중첩된 쓰기 시도.
+//1번째 중첩된 쓰기 시도.
+//2번째 중첩된 쓰기 시도.
+//-> 0번째 쓰기 완료.
+//-> 2번째 쓰기 완료.
+//-> 1번째 쓰기 완료.
+//생성 스레드 종료 완료
+~~~
+
+###### [IOCP](#iocp)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 비동기 File입/출력_Callback
+
+###### [IOCP](#iocp)
 ###### [Top](#top)
 
 <br/>
