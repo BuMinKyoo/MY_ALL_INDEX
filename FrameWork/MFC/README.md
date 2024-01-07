@@ -139,7 +139,19 @@
   - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입/출력-버퍼-확인)
   - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
   - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
-      
+  - [소켓(Socket)입/출력 모델 비교](#소켓socket입/출력-모델-비교)
+  - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
+  - [파일 송신 전용API(TransmitFile)](#파일-송신-전용apitransmitfile)
+- [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송/수신-소켓socket통신)
+  - [파일 송/수신 프로토콜 정의](#파일-송/수신-프로토콜-정의)
+  - [프로토콜이 적용된 파일 송수신 Socket통신 (서버Server)](#프로토콜이-적용된-파일-송수신-socket통신-서버server)
+  - [프로토콜이 적용된 파일 송수신 Socket통신 (클라이언트Client)](#프로토콜이-적용된-파일-송수신-socket통신-클라이언트client)
+- [IOCP](#iocp)
+  - [비동기 File입/출력_Event](#비동기-file입/출력_event)
+  - [비동기 File입/출력_Callback](#비동기-file입/출력_callback)
+
+
+
 <br/>
 
 - [기능별 정리](#기능별-정리)
@@ -4983,6 +4995,9 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
   - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입/출력-버퍼-확인)
   - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입/출력-tcp_nodelat)
   - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입/출력-so_reuseaddr)
+  - [소켓(Socket)입/출력 모델 비교](#소켓socket입/출력-모델-비교)
+  - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
+  - [파일 송신 전용API(TransmitFile)](#파일-송신-전용apitransmitfile)
 
 ###### [소켓통신](#소켓통신)
 ###### [Top](#top)
@@ -5858,6 +5873,311 @@ int nOpt = 1;
 BOOL bOption = TRUE;
 if (::setsockopt(mh_listen_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&bOption, sizeof(bOption)) == SOCKET_ERROR) {
 	AfxMessageBox(L"소켓 옵션 설정 실패");
+}
+~~~
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓(Socket)입/출력 모델 비교
+  - 위에서부터 아래로, 최신기술이다
+
+<br/>
+
+  - Select 모델
+    - 모든 윈도우 버전은 물론 유닉스에서도 사용할 수 있으므로 이식성이 높다
+    - 하위 호환성을 위해 존재하며, 성능은 여섯 가지 모델 중 가장 떨어진다
+    - 64개 이상의 소켓을 처리하려면 여러개의 스레드를 사용해야 한다
+  - WSAAsyncSelect 모델
+    - 소켓 이벤트를 윈도우 메시지 형태로 처리하므로, GUI 애플리케이션과 잘 결합 할 수 있다
+    - 하나의 윈도우 프로시저에서 일반 윈도우 메시지와 소켓 메시지를 처리해야 하므로 성능저하의 요인이 된다
+  - WSAEventSelect 모델
+    - Select 모델과 WSAAsyncSelect 모델의 특성을 혼합한 형태로, 비교적 뛰어난 성능을 제공하면서 윈도우를 필요로 하지 않는다
+    - 64개 이상의 소켓을 처리하려면 여러 개의 스레드를 사용해야 한다
+  - Overlapped 모델(Ⅰ)
+    - WSAEventSelect 모델과 비슷하지만 비동기 입출력을 통해 성능이 뛰어나다
+    - 64개 이상의 소켓을 처리하려면 여러 개의 스레드를 사용해야 한다
+  - Overlapped 모델(Ⅱ)
+    - 비동기 입출력을 통해 성능이 뛰어나다. ( APC Queue )
+    - 모든 비동기 소켓 함수에 대해 완료 루틴을 사용 할 수 있는 것은 아니다
+  - Comlpetion Port 모델 ( IOCP )
+    - 비동기 입출력과 완료포트를 통해 가장 뛰어난 성능을 제공한다
+    - 가장 단순한 소켓 입출력 방식( 블로킹 소켓 + 스레드 )와 비교하면 코딩이 복잡하지만 성능면에서 특별한 단점이 없다
+    - 윈도우 NT계열에서만 사용할 수 있다
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓 통신 개발시 팁
+
+  - Client
+    - 네트워크 유입 속도는 상당히 빠르며, 하드디스크의 쓰기 속도는 굉장히 느린 편이다.
+    - 따라서 네트워크 유입 데이터를 손실없이 빠르게 받는것은 생각보다 더 많은 기술력이 요구된다
+    - 네트워크 유입을 받을때(recv)할때 그것을 바로바로 저장하기 위해 그 사이에 다양한 처리는 최대한 하지 않는 것이 좋다
+    - 아래의 코드에서도, fwrite을 별도 스레드(Thread)를 만들어서 하는것이 좋다
+
+<br/>
+
+#클라이언트(Client)
+~~~c++
+//서버가 전송하는 데이터를 반복해 파일에 붙여 넣는다.
+char byBuffer[65536];		//64KB
+int nRecv;
+while ((nRecv = ::recv(hSocket, byBuffer, 65536, 0)) > 0)
+{
+	//서버에서 받은 크기만큼 데이터를 파일에 쓴다.
+	fwrite(byBuffer, nRecv, 1, fp);
+	putchar('#');
+}
+~~~
+
+<br/>
+
+  - 데이터가 작을때는 주고 받는 것이 쉽지만(하나의 변수에 담아버리면 끝이니까)하지만, 파일정도의 큰 데이터를 오간다는 것은 그 송수신 방법이 달라지게 된다
+  - 고려할 사항(Client가 Server에게 파일을 요청하는 request를 보낸 상황)
+    - 1.Server는 파일을 보낼때, 하드에 있는 큰 용량의 데이터를 메모리에 한번에 올릴지 말지(올리면 빨라 지지만 특수한 경우에만 사용)
+    - 2.메모리에 올라간 데이터를 Server Socket Buffer에 복사할때 Buffer의 크기 문제
+    - 3.Server에서 온 데이터를 받을때, Client Socket Buffer에 복사할때 Buffer의 크기 문제
+    - 4.Client Socket Buffer에서 Client User 어플리케이션에 그 데이터를 복사해 받을때 어떻게 받을지
+  - 웹Client와 웹Server는 기본적으로 File을 송수신 받는 request, response이기 때문에, 성능과 장애를 둘다 깊게 신경 써야 한다
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 파일 송신 전용API(TransmitFile)
+  - TransmitFile : 윈도우즈 환경에서 File을 보낼때는 바로 아래와 같은 fread, send를 사용하기 보다 TransmitFile 을 사용하면된다, 많은 예외상황에 대한 처리가 되어 있으며 대비가되어 있다
+
+<br/>
+
+#서버(Server)
+#ConsoleApp.cpp
+~~~c++
+//사용X
+//파일송신
+char byBuffer[65536];		//64KB
+int nRead, nSent, i = 0;
+while ((nRead = fread(byBuffer, sizeof(char), 65536, fp)) > 0)
+{
+	//파일에서 읽고 소켓으로 전송한다.
+	//전송에 성공하더라도 nRead와 nSent 값은 다를 수 있다!!!
+	nSent = send(hClient, byBuffer, nRead, 0);
+	printf("[%04d] 전송된 데이터 크기: %d\n", ++i, nSent);
+	fflush(stdout);
+}
+~~~c++
+
+<br/>
+
+  - TransmitFile사용법
+
+#ConsoleApp.cpp
+#서버(Server)
+~~~c++
+// FileSenderWin32.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+//::TranmitFile() 함수를 사용하기 위한 헤더와 라이브러리 설정
+#include <Mswsock.h>
+#pragma comment(lib, "Mswsock")
+
+//전송할 파일에 대한 정보를 담기위한 구조체
+typedef struct MY_FILE_DATA
+{
+	char szName[_MAX_FNAME];
+	DWORD dwSize;
+} MY_FILE_DATA;
+
+void ErrorHandler(const char *pszMessage)
+{
+	printf("ERROR: %s\n", pszMessage);
+	::WSACleanup();
+	exit(1);
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//윈속 초기화
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		ErrorHandler("윈속을 초기화 할 수 없습니다.");
+
+	//전송할 파일 개방
+	HANDLE hFile = ::CreateFile(_T("Sleep Away.zip"),
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_SEQUENTIAL_SCAN,
+		NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+		ErrorHandler("전송할 파일을 개방할 수 없습니다.");
+
+	//접속대기 소켓 생성
+	SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("접속 대기 소켓을 생성할 수 없습니다.");
+
+	//포트 바인딩
+	SOCKADDR_IN	svraddr = { 0 };
+	svraddr.sin_family = AF_INET;
+	svraddr.sin_port = htons(25000);
+	svraddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	if (::bind(hSocket,
+		(SOCKADDR*)&svraddr, sizeof(svraddr)) == SOCKET_ERROR)
+		ErrorHandler("소켓에 IP주소와 포트를 바인드 할 수 없습니다.");
+
+	//접속대기 상태로 전환
+	if (::listen(hSocket, SOMAXCONN) == SOCKET_ERROR)
+		ErrorHandler("리슨 상태로 전환할 수 없습니다.");
+	puts("파일송신서버를 시작합니다.");
+
+	//클라이언트 연결을 받아들이고 새로운 소켓 생성(개방)
+	SOCKADDR_IN clientaddr = { 0 };
+	int nAddrLen = sizeof(clientaddr);
+	SOCKET hClient = ::accept(hSocket,
+		(SOCKADDR*)&clientaddr, &nAddrLen);
+	if (hClient == INVALID_SOCKET)
+		ErrorHandler("클라이언트 통신 소켓을 생성할 수 없습니다.");
+	puts("클라이언트가 연결되었습니다.");
+
+	//전송할 파일에 대한 정보를 작성한다.
+	MY_FILE_DATA fData = { "Sleep Away.zip", 0 };
+	fData.dwSize = ::GetFileSize(hFile, NULL);
+	TRANSMIT_FILE_BUFFERS tfb = { 0 };
+	tfb.Head = &fData;
+	tfb.HeadLength = sizeof(fData);
+
+	//파일송신
+	if ( ::TransmitFile(
+			hClient,	//파일을 전송할 소켓 핸들.
+			hFile,		//전송할 파일 핸들.
+			0,			//전송할 크기. 0이면 전체.
+			65536,		//한 번에 전송할 버퍼 크기.
+			NULL,		//비동기 입/출력에 대한 OVERLAPPED 구조체.
+			&tfb,		//파일 전송에 앞서 먼저 전송할 데이터.
+			0			//기타 옵션.
+			) == FALSE )
+		ErrorHandler("파일을 전송할 수 없습니다.");
+
+	//클라이언트가 연결을 끊을 끊기를 대기한다.
+	//클라이언트가 끊으면 0을 반환하는데, 원래는 그 값이 0인지 까지 확인하고 끊어야 한다
+	::recv(hClient, NULL, 0, 0);
+	puts("클라이언트가 연결을 끊었습니다.");
+
+	::closesocket(hClient);
+	::closesocket(hSocket);
+	::CloseHandle(hFile);
+	::WSACleanup();
+	return 0;
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+#클라이언트(Client)
+~~~c++
+// FileReceiverWin32.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+
+
+typedef struct MY_FILE_DATA
+{
+	char szName[_MAX_FNAME];
+	DWORD dwSize;
+} MY_FILE_DATA;
+
+void ErrorHandler(const char *pszMessage)
+{
+	printf("ERROR: %s\n", pszMessage);
+	::WSACleanup();
+	exit(1);
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//윈속 초기화
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		ErrorHandler("윈속을 초기화 할 수 없습니다.");
+
+	//소켓 생성
+	SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("소켓을 생성할 수 없습니다.");
+
+	//포트 바인딩 및 연결
+	SOCKADDR_IN	svraddr = { 0 };
+	svraddr.sin_family = AF_INET;
+	svraddr.sin_port = htons(25000);
+	svraddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	if (::connect(hSocket,
+		(SOCKADDR*)&svraddr, sizeof(svraddr)) == SOCKET_ERROR)
+		ErrorHandler("서버에 연결할 수 없습니다.");
+
+	//수신할 파일명, 크기 정보를 먼저 받는다.
+	MY_FILE_DATA fData = { 0 };
+	if (::recv(hSocket, (char*)&fData, sizeof(fData), 0) < sizeof(fData))
+		ErrorHandler("파일 정보를 수신하지 못했습니다.");
+
+	//수신할 파일을 생성한다.
+	puts("*** 파일 수신을 시작합니다. ***");
+	HANDLE hFile = ::CreateFileA(
+		fData.szName,
+		GENERIC_WRITE,
+		0,
+		NULL,
+		CREATE_ALWAYS,	//파일을 생성한다.
+		0,
+		NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+		ErrorHandler("전송할 파일을 개방할 수 없습니다.");
+
+	//서버가 전송하는 데이터를 반복해 파일에 붙여 넣는다.
+	char byBuffer[65536];		//64KB
+	int nRecv;
+	DWORD dwTotalRecv = 0, dwRead = 0;
+	while (dwTotalRecv < fData.dwSize)
+	{
+		if ((nRecv = ::recv(hSocket, byBuffer, 65536, 0)) > 0)
+		{
+			dwTotalRecv += nRecv;
+			//서버에서 받은 크기만큼 데이터를 파일에 쓴다.
+			::WriteFile(hFile, byBuffer, nRecv, &dwRead, NULL);
+			printf("Receive: %d/%d\n", dwTotalRecv, fData.dwSize);
+			fflush(stdout);
+		}
+		else
+		{
+			puts("ERROR: 파일 수신 중에 오류가 발생했습니다.");
+			break;
+		}
+	}
+
+	::CloseHandle(hFile);
+	//파일 수신 완료 후 클라이언트가 먼저 소켓을 닫는다!
+	::closesocket(hSocket);
+	printf("*** 파일수신이 끝났습니다. ***\n");
+
+	::WSACleanup();
+	return 0;
 }
 ~~~
 
