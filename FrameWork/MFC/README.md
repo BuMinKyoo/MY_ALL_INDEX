@@ -130,23 +130,25 @@
 <br/>
 
 - [소켓통신](#소켓통신)
+  - [소켓(Socket)입/출력 모델 비교](#소켓socket입출력-모델-비교)
+  - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
+- [소켓통신 함수별 기본](#소켓통신-함수별-기본)
+- [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
   - [소켓통신 사용 준비](#소켓통신-사용-준비)
   - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
   - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
   - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
   - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
-  - [소켓통신 함수별](#소켓통신-함수별)
+- [소켓통신 추가](#소켓통신-추가)
   - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입출력-버퍼-확인)
   - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입출력-tcp_nodelat)
   - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입출력-so_reuseaddr)
-  - [소켓(Socket)입/출력 모델 비교](#소켓socket입출력-모델-비교)
-  - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
   - [파일 송신 전용API(TransmitFile)](#파일-송신-전용apitransmitfile)
 - [프로토콜이 적용된 파일 송/수신 소켓(Socket)통신](#프로토콜이-적용된-파일-송수신-소켓socket통신)
   - [파일 송/수신 프로토콜 정의](#파일-송수신-프로토콜-정의)
   - [프로토콜이 적용된 파일 송수신 Socket통신 (서버Server)](#프로토콜이-적용된-파일-송수신-socket통신-서버server)
   - [프로토콜이 적용된 파일 송수신 Socket통신 (클라이언트Client)](#프로토콜이-적용된-파일-송수신-socket통신-클라이언트client)
-- [IOCP](#iocp)
+- [Overlapped I/O](#overlapped-io)
   - [비동기 File입/출력_Event](#비동기-file입출력_event)
   - [비동기 File입/출력_Callback](#비동기-file입출력_callback)
 
@@ -4984,20 +4986,295 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 ***
 
 # 소켓통신
+  - [소켓(Socket)입/출력 모델 비교](#소켓socket입출력-모델-비교)
+  - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓(Socket)입/출력 모델 비교
+  - 위에서부터 아래로, 최신기술이다
+
+<br/>
+
+  - Select 모델
+    - 모든 윈도우 버전은 물론 유닉스에서도 사용할 수 있으므로 이식성이 높다
+    - 하위 호환성을 위해 존재하며, 성능은 여섯 가지 모델 중 가장 떨어진다
+    - 64개 이상의 소켓을 처리하려면 여러개의 스레드를 사용해야 한다
+  - WSAAsyncSelect 모델
+    - 소켓 이벤트를 윈도우 메시지 형태로 처리하므로, GUI 애플리케이션과 잘 결합 할 수 있다
+    - 하나의 윈도우 프로시저에서 일반 윈도우 메시지와 소켓 메시지를 처리해야 하므로 성능저하의 요인이 된다
+  - WSAEventSelect 모델
+    - Select 모델과 WSAAsyncSelect 모델의 특성을 혼합한 형태로, 비교적 뛰어난 성능을 제공하면서 윈도우를 필요로 하지 않는다
+    - 64개 이상의 소켓을 처리하려면 여러 개의 스레드를 사용해야 한다
+  - Overlapped 모델(Ⅰ)
+    - WSAEventSelect 모델과 비슷하지만 비동기 입출력을 통해 성능이 뛰어나다
+    - 64개 이상의 소켓을 처리하려면 여러 개의 스레드를 사용해야 한다
+  - Overlapped 모델(Ⅱ)
+    - 비동기 입출력을 통해 성능이 뛰어나다. ( APC Queue )
+    - 모든 비동기 소켓 함수에 대해 완료 루틴을 사용 할 수 있는 것은 아니다
+  - Comlpetion Port 모델 ( IOCP )
+    - 비동기 입출력과 완료포트를 통해 가장 뛰어난 성능을 제공한다
+    - 가장 단순한 소켓 입출력 방식( 블로킹 소켓 + 스레드 )와 비교하면 코딩이 복잡하지만 성능면에서 특별한 단점이 없다
+    - 윈도우 NT계열에서만 사용할 수 있다
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 소켓 통신 개발시 팁
+  - Client
+    - 네트워크 유입 속도는 상당히 빠르며, 하드디스크의 쓰기 속도는 굉장히 느린 편이다.
+    - 따라서 네트워크 유입 데이터를 손실없이 빠르게 받는것은 생각보다 더 많은 기술력이 요구된다
+    - 네트워크 유입을 받을때(recv)할때 그것을 바로바로 저장하기 위해 그 사이에 다양한 처리는 최대한 하지 않는 것이 좋다
+    - 아래의 코드에서도, fwrite을 별도 스레드(Thread)를 만들어서 하는것이 좋다
+
+<br/>
+
+#클라이언트(Client)
+~~~c++
+//서버가 전송하는 데이터를 반복해 파일에 붙여 넣는다.
+char byBuffer[65536];		//64KB
+int nRecv;
+while ((nRecv = ::recv(hSocket, byBuffer, 65536, 0)) > 0)
+{
+	//서버에서 받은 크기만큼 데이터를 파일에 쓴다.
+	fwrite(byBuffer, nRecv, 1, fp);
+	putchar('#');
+}
+~~~
+
+<br/>
+
+  - 데이터가 작을때는 주고 받는 것이 쉽지만(하나의 변수에 담아버리면 끝이니까)하지만, 파일정도의 큰 데이터를 오간다는 것은 그 송수신 방법이 달라지게 된다
+  - 고려할 사항(Client가 Server에게 파일을 요청하는 request를 보낸 상황)
+    - 1.Server는 파일을 보낼때, 하드에 있는 큰 용량의 데이터를 메모리에 한번에 올릴지 말지(올리면 빨라 지지만 특수한 경우에만 사용)
+    - 2.메모리에 올라간 데이터를 Server Socket Buffer에 복사할때 Buffer의 크기 문제
+    - 3.Server에서 온 데이터를 받을때, Client Socket Buffer에 복사할때 Buffer의 크기 문제
+    - 4.Client Socket Buffer에서 Client User 어플리케이션에 그 데이터를 복사해 받을때 어떻게 받을지
+  - 웹Client와 웹Server는 기본적으로 File을 송수신 받는 request, response이기 때문에, 성능과 장애를 둘다 깊게 신경 써야 한다
+
+###### [소켓통신](#소켓통신)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 소켓통신 함수별 기본
+  - 소켓 순서(서버코드)
+
+<br/>
+
+  - 1. 접속대기 소켓 생성
+    - AF_INET : ip주소를 어떤 형식으로 사용 할 것인지, L3에 관련된것
+    - SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지, L4에 관련된것
+
+#AppDlg.cpp(서버)
+~~~c++
+SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+if (hSocket == INVALID_SOCKET)
+{
+	AfxMessageBox(_T("socket() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 2. 포트 바인딩
+    - INADDR_ANY : NIC은 여러개가 존재할 수 있기 때문에, INADDR_ANY 라고 한다면, 모든 NIC으로 들어오는 클라이언트를 승락 하겠다 라는 의미가 된다. 특정 IP주소에만 들어오는 클라이언트를 승락하려면, 특정 IP를 작성해 주면 된다
+    - 이때, 특정 ip를 쓰게 되면, 127.0.0.1은 그것과를 다른 주소이기 때문에 접속할 수 없으며, 특정 ip에 127.0.0.1까지 같이 넣어줘야, 루프백(Loopback) 주소로 클라이언트가 접속 할 수 있게 된다.
+    - Socket같은 경우는 대부분 빅엔디안으로 개발 되었기 때문에 htons, htonl함수는 리틀엔디안을 빅엔디안으로 바꿔주는 함수가 됨
+
+#AppDlg.cpp(서버)
+~~~c++
+SOCKADDR_IN servAddr = { 0 };
+servAddr.sin_family = AF_INET;
+servAddr.sin_port = htons(25000);
+servAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+if (::bind(hSocket, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+{
+	AfxMessageBox(_T("bind() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 3. 접속대기
+    - SOMAXCONN 이것은 옛날에 썼던 옵션으로 지금은 OS가 전부 처리해 주기 때문에 SOMAXCONN 으로 사용하면 된다
+
+#AppDlg.cpp(서버)
+~~~c++
+if (::listen(hSocket, SOMAXCONN) == SOCKET_ERROR) {
+	AfxMessageBox(_T("Listen Error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 4. 클라이언트 접속 처리 및 대응
+    - SOMAXCONN 이것은 옛날에 썼던 옵션으로 지금은 OS가 전부 처리해 주기 때문에 SOMAXCONN 으로 사용하면 된다
+
+#AppDlg.cpp(서버)
+~~~c++
+SOCKADDR_IN clientaddr = { 0 };
+int nAddrLen = sizeof(clientaddr);
+SOCKET hClient = 0;
+char szBuffer[128] = { 0 };
+int nReceive = 0;
+~~~
+
+<br/>
+
+  - 4-1. 클라이언트 연결을 받아들이고 새로운 소켓 생성
+    - hClient : Remote Client통신 소켓
+    - clientaddr : 여기에 접속한 Client정보가 담김
+
+#AppDlg.cpp(서버)
+~~~c++
+while ((hClient = ::accept(hSocket, (SOCKADDR*)&clientaddr, &nAddrLen)) != INVALID_SOCKET)
+{
+	AfxMessageBox(_T("클라이언트 접속"));
+}
+~~~
+
+<br/>
+
+  - 4-2. 클라이언트로부터 문자열을 수신함
+    - hClient : Remote Client통신 소켓
+    - clientaddr : 여기에 접속한 Client정보가 담김
+    - recv함수에서 어떤 데이터가 올 때까지 서버는 대기 하고있다
+    - recv함수가 0을 반환하면 while문이 종료 되는 것이고, 이것은 즉, 클라이언트가 자기의 Socket을 끊었을때 0을 반환하게 된다.
+
+#AppDlg.cpp(서버)
+~~~c++
+while ((nReceive = ::recv(hClient, szBuffer, sizeof(szBuffer), 0))
+{
+	// 4-3 수신한 문자열을 그대로 반향 전송
+	::send(hClient, szBuffer, sizeof(szBuffer), 0);
+	AfxMessageBox(szBuffer);
+	memset(szBuffer, 0, sizeof(szBuffer));
+}
+~~~
+
+<br/>
+
+  - 4-3. 클라이언트가 연결을 종료함
+
+#AppDlg.cpp(서버)
+~~~c++
+::shutdown(hClient, SD_BOTH);
+::closesocket(hClient);
+AfxMessageBox(_T("서버와의 연결이 끊어졌습니다."));
+
+// 5. 리슨 소켓 닫기
+::closesocket(hSocket);
+~~~
+
+<br/>
+
+  - 소켓 순서(클라이언트코드)
+
+<br/>
+
+  - 1. 클라이언트 소켓 생성
+    - AF_INET : ip주소를 어떤 형식으로 사용 할 것인지, L3에 관련된것
+    - SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지, L4에 관련된것
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+if (hSocket == INVALID_SOCKET)
+{
+	AfxMessageBox(_T("socket() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 2. 포트 바인딩 및 연결
+    - 서버의 ip및 포트번호를 써야함
+    - inet_addr : 문자열로 쓰면, S_addr에 알맞는 숫자로 바꿔줌
+    - 클라이언트는 OS가 임의로 포트를 열어서 지정해준다.
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+SOCKADDR_IN svraddr = { 0 };
+svraddr.sin_family = AF_INET;
+svraddr.sin_port = htons(25000);
+svraddr.sin_addr.S_un.S_addr = inet_addr("192.168.0.10");
+if (::connect(hSocket, (SOCKADDR*)&svraddr, sizeof(svraddr)) == SOCKET_ERROR)
+{
+	AfxMessageBox(_T("connect() error"));
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - 3. 채팅 메시지 송/수신
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+char szBuffer[128] = { 0 };
+while (1)
+{
+	// 사용자로부터 문자열을 입력받는다
+	gets_s(szBuffer);
+	if (strcmp(szBuffer, "EXIT") == 0)
+	{
+		break;
+	}
+
+	// 사용자가 입력한 문자열을 서버에 전송
+	::send(hSocket, szBuffer, strlen(szBuffer) + 1, 0);
+
+	// 서버로부터 방금 보낸 문자열에 대한 에코 메시지를 수신한다
+	memset(szBuffer, 0, sizeof(szBuffer));
+	::recv(hSocket, szBuffer, sizeof(szBuffer), 0);
+
+	CString str;
+	str.Format(_T("%s"), szBuffer);
+	AfxMessageBox(str);
+}
+~~~
+
+<br/>
+
+  - 4. 소켓을 닫고 종료
+
+#AppDlg.cpp(클라이언트)
+~~~c++
+::shutdown(hSocket, SD_BOTH);
+::closesocket(hSocket);
+~~~
+
+###### [소켓통신 함수별 기본](#소켓통신-함수별-기본)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 소켓통신WSAAsyncSelect모델
   - [소켓통신 사용 준비](#소켓통신-사용-준비)
   - [기본적인 비동기 통신 형태](#기본적인-비동기-통신-형태)
   - [일정한 크기의 데이터 보내기](#일정한-크기의-데이터-보내기)
   - [크기가 일정하지 않은 데이터 보내기](#크기가-일정하지-않은-데이터-보내기)
   - [소켓통신 암호코드 및 메시지 판단 코드 넣기](#소켓통신-암호코드-및-메시지-판단-코드-넣기)
-  - [소켓통신 함수별](#소켓통신-함수별)
-  - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입출력-버퍼-확인)
-  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입출력-tcp_nodelat)
-  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입출력-so_reuseaddr)
-  - [소켓(Socket)입/출력 모델 비교](#소켓socket입출력-모델-비교)
-  - [소켓 통신 개발시 팁](#소켓-통신-개발시-팁)
-  - [파일 송신 전용API(TransmitFile)](#파일-송신-전용apitransmitfile)
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -5045,7 +5322,7 @@ void CMFCApplication1Dlg::OnDestroy()
 #define _WINSOCK_DEPRECATED_NO_WARNINGS // 이전의 함수를 사용하고 싶어서 이용
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -5344,7 +5621,7 @@ afx_msg LRESULT CClientDlg::On26002(WPARAM wParam, LPARAM lParam)
 }
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -5404,14 +5681,13 @@ void CClientDlg::OnBnClickedSenddata()
 }
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
 # 크기가 일정하지 않은 데이터 보내기
-
   - 위에서 바꿔야 되는부분만 수정(클라이언트는 데이터를 보내는 send부분, 서버는 데이터를 받는 receive부분)
 
 <br/>
@@ -5517,14 +5793,13 @@ afx_msg LRESULT CServerDlg::On25002(WPARAM wParam, LPARAM lParam)
 }
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
 # 소켓통신 암호코드 및 메시지 판단 코드 넣기
-
   - 암호코드 - 메시지판단 코드 - 메시지 길이코드 - 실제 메시지
   - 위에서 바꿔야 되는부분만 수정(클라이언트는 데이터를 보내는 send부분, 서버는 데이터를 받는 receive부분)
 
@@ -5613,7 +5888,7 @@ void CClientDlg::OnBnClickedSenddata()
 }
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -5621,199 +5896,13 @@ void CClientDlg::OnBnClickedSenddata()
 
 ***
 
-# 소켓통신 함수별
-  - 소켓 순서(서버코드)
+# 소켓통신 추가
+  - [소켓(Socket) 입/출력 버퍼 확인](#소켓socket-입출력-버퍼-확인)
+  - [소켓(Socket) 입/출력 TCP_NODELAT](#소켓socket-입출력-tcp_nodelat)
+  - [소켓(Socket) 입/출력 SO_REUSEADDR](#소켓socket-입출력-so_reuseaddr)
+  - [파일 송신 전용API(TransmitFile)](#파일-송신-전용apitransmitfile)
 
-<br/>
-
-  - 1. 접속대기 소켓 생성
-    - AF_INET : ip주소를 어떤 형식으로 사용 할 것인지, L3에 관련된것
-    - SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지, L4에 관련된것
-
-#AppDlg.cpp(서버)
-~~~c++
-SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
-if (hSocket == INVALID_SOCKET)
-{
-	AfxMessageBox(_T("socket() error"));
-	return FALSE;
-}
-~~~
-
-<br/>
-
-  - 2. 포트 바인딩
-    - INADDR_ANY : NIC은 여러개가 존재할 수 있기 때문에, INADDR_ANY 라고 한다면, 모든 NIC으로 들어오는 클라이언트를 승락 하겠다 라는 의미가 된다. 특정 IP주소에만 들어오는 클라이언트를 승락하려면, 특정 IP를 작성해 주면 된다
-    - 이때, 특정 ip를 쓰게 되면, 127.0.0.1은 그것과를 다른 주소이기 때문에 접속할 수 없으며, 특정 ip에 127.0.0.1까지 같이 넣어줘야, 루프백(Loopback) 주소로 클라이언트가 접속 할 수 있게 된다.
-    - Socket같은 경우는 대부분 빅엔디안으로 개발 되었기 때문에 htons, htonl함수는 리틀엔디안을 빅엔디안으로 바꿔주는 함수가 됨
-
-#AppDlg.cpp(서버)
-~~~c++
-SOCKADDR_IN servAddr = { 0 };
-servAddr.sin_family = AF_INET;
-servAddr.sin_port = htons(25000);
-servAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
-if (::bind(hSocket, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
-{
-	AfxMessageBox(_T("bind() error"));
-	return FALSE;
-}
-~~~
-
-<br/>
-
-  - 3. 접속대기
-    - SOMAXCONN 이것은 옛날에 썼던 옵션으로 지금은 OS가 전부 처리해 주기 때문에 SOMAXCONN 으로 사용하면 된다
-
-#AppDlg.cpp(서버)
-~~~c++
-if (::listen(hSocket, SOMAXCONN) == SOCKET_ERROR) {
-	AfxMessageBox(_T("Listen Error"));
-	return FALSE;
-}
-~~~
-
-<br/>
-
-  - 4. 클라이언트 접속 처리 및 대응
-    - SOMAXCONN 이것은 옛날에 썼던 옵션으로 지금은 OS가 전부 처리해 주기 때문에 SOMAXCONN 으로 사용하면 된다
-
-#AppDlg.cpp(서버)
-~~~c++
-SOCKADDR_IN clientaddr = { 0 };
-int nAddrLen = sizeof(clientaddr);
-SOCKET hClient = 0;
-char szBuffer[128] = { 0 };
-int nReceive = 0;
-~~~
-
-<br/>
-
-  - 4-1. 클라이언트 연결을 받아들이고 새로운 소켓 생성
-    - hClient : Remote Client통신 소켓
-    - clientaddr : 여기에 접속한 Client정보가 담김
-
-#AppDlg.cpp(서버)
-~~~c++
-while ((hClient = ::accept(hSocket, (SOCKADDR*)&clientaddr, &nAddrLen)) != INVALID_SOCKET)
-{
-	AfxMessageBox(_T("클라이언트 접속"));
-}
-~~~
-
-<br/>
-
-  - 4-2. 클라이언트로부터 문자열을 수신함
-    - hClient : Remote Client통신 소켓
-    - clientaddr : 여기에 접속한 Client정보가 담김
-    - recv함수에서 어떤 데이터가 올 때까지 서버는 대기 하고있다
-    - recv함수가 0을 반환하면 while문이 종료 되는 것이고, 이것은 즉, 클라이언트가 자기의 Socket을 끊었을때 0을 반환하게 된다.
-
-#AppDlg.cpp(서버)
-~~~c++
-while ((nReceive = ::recv(hClient, szBuffer, sizeof(szBuffer), 0))
-{
-	// 4-3 수신한 문자열을 그대로 반향 전송
-	::send(hClient, szBuffer, sizeof(szBuffer), 0);
-	AfxMessageBox(szBuffer);
-	memset(szBuffer, 0, sizeof(szBuffer));
-}
-~~~
-
-<br/>
-
-  - 4-3. 클라이언트가 연결을 종료함
-
-#AppDlg.cpp(서버)
-~~~c++
-::shutdown(hClient, SD_BOTH);
-::closesocket(hClient);
-AfxMessageBox(_T("서버와의 연결이 끊어졌습니다."));
-
-// 5. 리슨 소켓 닫기
-::closesocket(hSocket);
-~~~
-
-<br/>
-
-  - 소켓 순서(클라이언트코드)
-
-<br/>
-
-  - 1. 클라이언트 소켓 생성
-    - AF_INET : ip주소를 어떤 형식으로 사용 할 것인지, L3에 관련된것
-    - SOCK_STREAM : 어떤 소켓 형식을 사용할 것인지, L4에 관련된것
-
-#AppDlg.cpp(클라이언트)
-~~~c++
-SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
-if (hSocket == INVALID_SOCKET)
-{
-	AfxMessageBox(_T("socket() error"));
-	return FALSE;
-}
-~~~
-
-<br/>
-
-  - 2. 포트 바인딩 및 연결
-    - 서버의 ip및 포트번호를 써야함
-    - inet_addr : 문자열로 쓰면, S_addr에 알맞는 숫자로 바꿔줌
-    - 클라이언트는 OS가 임의로 포트를 열어서 지정해준다.
-
-#AppDlg.cpp(클라이언트)
-~~~c++
-SOCKADDR_IN svraddr = { 0 };
-svraddr.sin_family = AF_INET;
-svraddr.sin_port = htons(25000);
-svraddr.sin_addr.S_un.S_addr = inet_addr("192.168.0.10");
-if (::connect(hSocket, (SOCKADDR*)&svraddr, sizeof(svraddr)) == SOCKET_ERROR)
-{
-	AfxMessageBox(_T("connect() error"));
-	return FALSE;
-}
-~~~
-
-<br/>
-
-  - 3. 채팅 메시지 송/수신
-
-#AppDlg.cpp(클라이언트)
-~~~c++
-char szBuffer[128] = { 0 };
-while (1)
-{
-	// 사용자로부터 문자열을 입력받는다
-	gets_s(szBuffer);
-	if (strcmp(szBuffer, "EXIT") == 0)
-	{
-		break;
-	}
-
-	// 사용자가 입력한 문자열을 서버에 전송
-	::send(hSocket, szBuffer, strlen(szBuffer) + 1, 0);
-
-	// 서버로부터 방금 보낸 문자열에 대한 에코 메시지를 수신한다
-	memset(szBuffer, 0, sizeof(szBuffer));
-	::recv(hSocket, szBuffer, sizeof(szBuffer), 0);
-
-	CString str;
-	str.Format(_T("%s"), szBuffer);
-	AfxMessageBox(str);
-}
-~~~
-
-<br/>
-
-  - 4. 소켓을 닫고 종료
-
-#AppDlg.cpp(클라이언트)
-~~~c++
-::shutdown(hSocket, SD_BOTH);
-::closesocket(hSocket);
-~~~
-
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -5839,7 +5928,7 @@ if (::getsockopt(mh_client_socket, SOL_SOCKET, SO_RCVBUF, (char*)&nBufSize, &nLe
 }
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -5855,7 +5944,7 @@ int nOpt = 1;
 ::setsockopt(mh_client_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&nOpt, sizeof(nOpt));
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -5874,82 +5963,12 @@ if (::setsockopt(mh_listen_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&bOption, si
 }
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 소켓(Socket)입/출력 모델 비교
-  - 위에서부터 아래로, 최신기술이다
-
-<br/>
-
-  - Select 모델
-    - 모든 윈도우 버전은 물론 유닉스에서도 사용할 수 있으므로 이식성이 높다
-    - 하위 호환성을 위해 존재하며, 성능은 여섯 가지 모델 중 가장 떨어진다
-    - 64개 이상의 소켓을 처리하려면 여러개의 스레드를 사용해야 한다
-  - WSAAsyncSelect 모델
-    - 소켓 이벤트를 윈도우 메시지 형태로 처리하므로, GUI 애플리케이션과 잘 결합 할 수 있다
-    - 하나의 윈도우 프로시저에서 일반 윈도우 메시지와 소켓 메시지를 처리해야 하므로 성능저하의 요인이 된다
-  - WSAEventSelect 모델
-    - Select 모델과 WSAAsyncSelect 모델의 특성을 혼합한 형태로, 비교적 뛰어난 성능을 제공하면서 윈도우를 필요로 하지 않는다
-    - 64개 이상의 소켓을 처리하려면 여러 개의 스레드를 사용해야 한다
-  - Overlapped 모델(Ⅰ)
-    - WSAEventSelect 모델과 비슷하지만 비동기 입출력을 통해 성능이 뛰어나다
-    - 64개 이상의 소켓을 처리하려면 여러 개의 스레드를 사용해야 한다
-  - Overlapped 모델(Ⅱ)
-    - 비동기 입출력을 통해 성능이 뛰어나다. ( APC Queue )
-    - 모든 비동기 소켓 함수에 대해 완료 루틴을 사용 할 수 있는 것은 아니다
-  - Comlpetion Port 모델 ( IOCP )
-    - 비동기 입출력과 완료포트를 통해 가장 뛰어난 성능을 제공한다
-    - 가장 단순한 소켓 입출력 방식( 블로킹 소켓 + 스레드 )와 비교하면 코딩이 복잡하지만 성능면에서 특별한 단점이 없다
-    - 윈도우 NT계열에서만 사용할 수 있다
-
-###### [소켓통신](#소켓통신)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# 소켓 통신 개발시 팁
-
-  - Client
-    - 네트워크 유입 속도는 상당히 빠르며, 하드디스크의 쓰기 속도는 굉장히 느린 편이다.
-    - 따라서 네트워크 유입 데이터를 손실없이 빠르게 받는것은 생각보다 더 많은 기술력이 요구된다
-    - 네트워크 유입을 받을때(recv)할때 그것을 바로바로 저장하기 위해 그 사이에 다양한 처리는 최대한 하지 않는 것이 좋다
-    - 아래의 코드에서도, fwrite을 별도 스레드(Thread)를 만들어서 하는것이 좋다
-
-<br/>
-
-#클라이언트(Client)
-~~~c++
-//서버가 전송하는 데이터를 반복해 파일에 붙여 넣는다.
-char byBuffer[65536];		//64KB
-int nRecv;
-while ((nRecv = ::recv(hSocket, byBuffer, 65536, 0)) > 0)
-{
-	//서버에서 받은 크기만큼 데이터를 파일에 쓴다.
-	fwrite(byBuffer, nRecv, 1, fp);
-	putchar('#');
-}
-~~~
-
-<br/>
-
-  - 데이터가 작을때는 주고 받는 것이 쉽지만(하나의 변수에 담아버리면 끝이니까)하지만, 파일정도의 큰 데이터를 오간다는 것은 그 송수신 방법이 달라지게 된다
-  - 고려할 사항(Client가 Server에게 파일을 요청하는 request를 보낸 상황)
-    - 1.Server는 파일을 보낼때, 하드에 있는 큰 용량의 데이터를 메모리에 한번에 올릴지 말지(올리면 빨라 지지만 특수한 경우에만 사용)
-    - 2.메모리에 올라간 데이터를 Server Socket Buffer에 복사할때 Buffer의 크기 문제
-    - 3.Server에서 온 데이터를 받을때, Client Socket Buffer에 복사할때 Buffer의 크기 문제
-    - 4.Client Socket Buffer에서 Client User 어플리케이션에 그 데이터를 복사해 받을때 어떻게 받을지
-  - 웹Client와 웹Server는 기본적으로 File을 송수신 받는 request, response이기 때문에, 성능과 장애를 둘다 깊게 신경 써야 한다
-
-###### [소켓통신](#소켓통신)
-###### [Top](#top)
-
-<br/>
-<br/>
 
 # 파일 송신 전용API(TransmitFile)
   - TransmitFile : 윈도우즈 환경에서 File을 보낼때는 바로 아래와 같은 fread, send를 사용하기 보다 TransmitFile 을 사용하면된다, 많은 예외상황에 대한 처리가 되어 있으며 대비가되어 있다
@@ -6179,7 +6198,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 ~~~
 
-###### [소켓통신](#소켓통신)
+###### [소켓통신WSAAsyncSelect모델](#소켓통신wsaasyncselect모델)
 ###### [Top](#top)
 
 <br/>
@@ -6762,11 +6781,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
 ***
 
-# IOCP
+# Overlapped I/O
   - [비동기 File입/출력_Event](#비동기-file입출력_event)
   - [비동기 File입/출력_Callback](#비동기-file입출력_callback)
 
-###### [IOCP](#iocp)
+###### [Overlapped I/O](#overlapped-io)
 ###### [Top](#top)
 
 <br/>
@@ -6938,7 +6957,7 @@ DWORD WINAPI MyThreadFunction(LPVOID lpParam)
 //생성 스레드 종료 완료
 ~~~
 
-###### [IOCP](#iocp)
+###### [Overlapped I/O](#overlapped-io)
 ###### [Top](#top)
 
 <br/>
@@ -7109,7 +7128,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 ~~~
 
-###### [IOCP](#iocp)
+###### [Overlapped I/O](#overlapped-io)
 ###### [Top](#top)
 
 <br/>
