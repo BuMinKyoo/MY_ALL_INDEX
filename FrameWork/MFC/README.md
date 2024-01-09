@@ -151,6 +151,7 @@
 - [Overlapped I/O](#overlapped-io)
   - [비동기 File입/출력_Event](#비동기-file입출력_event)
   - [비동기 File입/출력_Callback](#비동기-file입출력_callback)
+- [IOCP](#iocp)
 
 <br/>
 
@@ -7129,6 +7130,403 @@ int _tmain(int argc, _TCHAR* argv[])
 ~~~
 
 ###### [Overlapped I/O](#overlapped-io)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# IOCP모델
+
+#stdafx.cpp
+~~~c++
+// stdafx.cpp : 표준 포함 파일만 들어 있는 소스 파일입니다.
+// IOCP_ChatServer.pch는 미리 컴파일된 헤더가 됩니다.
+// stdafx.obj에는 미리 컴파일된 형식 정보가 포함됩니다.
+
+#include "stdafx.h"
+
+// TODO: 필요한 추가 헤더는
+// 이 파일이 아닌 STDAFX.H에서 참조합니다.
+~~~
+
+<br/>
+
+#stdafx.h
+~~~c++
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
+// 들어 있는 포함 파일입니다.
+//
+
+#pragma once
+
+#include "targetver.h"
+
+#include <stdio.h>
+#include <tchar.h>
+
+
+
+// TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+~~~
+
+<br/>
+
+#targetver.h
+~~~c++
+#pragma once
+
+// SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
+
+// 이전 Windows 플랫폼에 대해 응용 프로그램을 빌드하려는 경우에는 SDKDDKVer.h를 포함하기 전에
+// WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
+
+#include <SDKDDKVer.h>
+~~~
+
+<br/>
+
+#IOCP_ChatServer.cpp
+~~~c++
+// IOCP_ChatServer.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+#include "stdafx.h"
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+#include <windows.h>
+#include <list>
+#include <iterator>
+
+/////////////////////////////////////////////////////////////////////////
+typedef struct _USERSESSION
+{
+	SOCKET	hSocket;
+	char	buffer[8192];	//8KB
+} USERSESSION;
+
+/////////////////////////////////////////////////////////////////////////
+//클라이언트 처리를 위한 작업자 스레드 개수.
+#define MAX_THREAD_CNT		4
+
+CRITICAL_SECTION  g_cs;				//스레드 동기화 객체
+std::list<SOCKET>	g_listClient;	//연결된 클라이언트 소켓 리스트.
+SOCKET	g_hSocket;					//서버의 리슨 소켓
+HANDLE	g_hIocp;					//IOCP 핸들
+
+
+/////////////////////////////////////////////////////////////////////////
+//연결된 클라이언트 모두에게 메시지를 전송한다.
+void SendMessageAll(char *pszMessage, int nSize)
+{
+	std::list<SOCKET>::iterator it;
+
+	::EnterCriticalSection(&g_cs);
+	for (it = g_listClient.begin(); it != g_listClient.end(); ++it)
+		::send(*it, pszMessage, nSize, 0);
+	::LeaveCriticalSection(&g_cs);
+}
+
+/////////////////////////////////////////////////////////////////////////
+//연결된 모든 클라이언트 및 리슨 소켓을 닫는다.
+void CloseAll()
+{
+	std::list<SOCKET>::iterator it;
+
+	::EnterCriticalSection(&g_cs);
+	for (it = g_listClient.begin(); it != g_listClient.end(); ++it)
+	{
+		::shutdown(*it, SD_BOTH);
+		::closesocket(*it);
+	}
+	::LeaveCriticalSection(&g_cs);
+}
+
+/////////////////////////////////////////////////////////////////////////
+void CloseClient(SOCKET hSock)
+{
+	::shutdown(hSock, SD_BOTH);
+	::closesocket(hSock);
+
+	::EnterCriticalSection(&g_cs);
+	g_listClient.remove(hSock);
+	::LeaveCriticalSection(&g_cs);
+}
+
+/////////////////////////////////////////////////////////////////////////
+void ReleaseServer(void)
+{
+	//클라이언트 연결을 모두 종료한다.
+	CloseAll();
+	::Sleep(500);
+
+	//Listen 소켓을 닫는다.
+	::shutdown(g_hSocket, SD_BOTH);
+	::closesocket(g_hSocket);
+	g_hSocket = NULL;
+
+	//IOCP 핸들을 닫는다. 이렇게 하면 GQCS() 함수가 FALSE를 반환하며
+	//:GetLastError() 함수가 ERROR_ABANDONED_WAIT_0을 반환한다.
+	//IOCP 스레드들이 모두 종료된다.
+	::CloseHandle(g_hIocp);
+	g_hIocp = NULL;
+
+	//IOCP 스레드들이 종료되기를 일정시간 동안 기다린다.
+	::Sleep(500);
+	::DeleteCriticalSection(&g_cs);
+}
+
+/////////////////////////////////////////////////////////////////////////
+//Ctrl+C 이벤트를 감지하고 프로그램을 종료한다.
+BOOL CtrlHandler(DWORD dwType)
+{
+	if (dwType == CTRL_C_EVENT)
+	{
+		ReleaseServer();
+
+		puts("*** 채팅서버를 종료합니다! ***");
+		::WSACleanup();
+		exit(0);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+/////////////////////////////////////////////////////////////////////////
+DWORD WINAPI ThreadComplete(LPVOID pParam)
+{
+	DWORD			dwTransferredSize = 0;
+	DWORD			dwFlag = 0;
+	USERSESSION		*pSession = NULL;
+	LPWSAOVERLAPPED	pWol = NULL;
+	BOOL			bResult;
+
+	puts("[IOCP 작업자 스레드 시작]");
+	while (1)
+	{
+		bResult = ::GetQueuedCompletionStatus(
+			g_hIocp,				//Dequeue할 IOCP 핸들.
+			&dwTransferredSize,		//수신한 데이터 크기.
+			(PULONG_PTR)&pSession,	//수신된 데이터가 저장된 메모리
+			&pWol,					//OVERLAPPED 구조체.
+			INFINITE);				//이벤트를 무한정 대기.
+
+		if (bResult == TRUE)
+		{
+			//정상적인 경우.
+
+			/////////////////////////////////////////////////////////////
+			//1. 클라이언트가 소켓을 정상적으로 닫고 연결을 끊은 경우.
+			if (dwTransferredSize == 0)
+			{
+				
+				CloseClient(pSession->hSocket);
+				delete pWol;
+				delete pSession;
+				puts("\tGQCS: 클라이언트가 정상적으로 연결을 종료함.");
+			}
+
+			/////////////////////////////////////////////////////////////
+			//2. 클라이언트가 보낸 데이터를 수신한 경우.
+			else
+			{
+				SendMessageAll(pSession->buffer, dwTransferredSize);
+				memset(pSession->buffer, 0, sizeof(pSession->buffer));
+
+				//다시 IOCP에 등록.
+				DWORD dwReceiveSize	= 0;
+				DWORD dwFlag		= 0;
+				WSABUF wsaBuf		= { 0 };
+				wsaBuf.buf = pSession->buffer;
+				wsaBuf.len = sizeof(pSession->buffer);
+
+				::WSARecv(
+					pSession->hSocket,	//클라이언트 소켓 핸들
+					&wsaBuf,			//WSABUF 구조체 배열의 주소
+					1,					//배열 요소의 개수
+					&dwReceiveSize,
+					&dwFlag,
+					pWol,
+					NULL);
+				if (::WSAGetLastError() != WSA_IO_PENDING)
+					puts("\tGQCS: ERROR: WSARecv()");
+			}
+		}
+		else
+		{
+			//비정상적인 경우.
+
+			/////////////////////////////////////////////////////////////
+			//3. 완료 큐에서 완료 패킷을 꺼내지 못하고 반환한 경우.
+			if (pWol == NULL)
+			{
+				//IOCP 핸들이 닫힌 경우(서버를 종료하는 경우)도 해당된다.
+				puts("\tGQCS: IOCP 핸들이 닫혔습니다.");
+				break;
+			}
+
+			/////////////////////////////////////////////////////////////
+			//4. 클라이언트가 비정상적으로 종료됐거나
+			//   서버가 먼저 연결을 종료한 경우.
+			else
+			{
+				if (pSession != NULL)
+				{
+					CloseClient(pSession->hSocket);
+					delete pWol;
+					delete pSession;
+				}
+
+				puts("\tGQCS: 서버 종료 혹은 비정상적 연결 종료");
+			}
+		}
+	}
+
+	puts("[IOCP 작업자 스레드 종료]");
+	return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////
+DWORD WINAPI ThreadAcceptLoop(LPVOID pParam)
+{
+	LPWSAOVERLAPPED	pWol = NULL;
+	DWORD			dwReceiveSize, dwFlag;
+	USERSESSION		*pNewUser;
+	int				nAddrSize = sizeof(SOCKADDR);
+	WSABUF			wsaBuf;
+	SOCKADDR		ClientAddr;
+	SOCKET			hClient;
+	int				nRecvResult = 0;
+
+	while ((hClient = ::accept(g_hSocket,
+						&ClientAddr, &nAddrSize)) != INVALID_SOCKET)
+	{
+		puts("새 클라이언트가 연결됐습니다.");
+		::EnterCriticalSection(&g_cs);
+		g_listClient.push_back(hClient);
+		::LeaveCriticalSection(&g_cs);
+
+		//새 클라이언트에 대한 세션 객체 생성
+		pNewUser = new USERSESSION;
+		::ZeroMemory(pNewUser, sizeof(USERSESSION));
+		pNewUser->hSocket = hClient;
+
+		//비동기 수신 처리를 위한 OVERLAPPED 구조체 생성.
+		pWol = new WSAOVERLAPPED;
+		::ZeroMemory(pWol, sizeof(WSAOVERLAPPED));
+
+		//(연결된) 클라이언트 소켓 핸들을 IOCP에 연결.
+		::CreateIoCompletionPort( (HANDLE)hClient, g_hIocp,
+			(ULONG_PTR)pNewUser,		//KEY!!!
+			0);
+
+		dwReceiveSize = 0;
+		dwFlag = 0;
+		
+		// wsaBuf는 pNewUser->buffer만큼의 크기를 IOCP쪽에 등록하기 위해 사용 WSARecv를 사용하여 등록
+		wsaBuf.buf = pNewUser->buffer;
+		wsaBuf.len = sizeof(pNewUser->buffer);
+
+		//클라이언트가 보낸 정보를 비동기 수신한다.
+		nRecvResult = ::WSARecv(hClient, &wsaBuf, 1, &dwReceiveSize,
+							&dwFlag, pWol, NULL);
+		if (::WSAGetLastError() != WSA_IO_PENDING)
+			puts("ERROR: WSARecv() != WSA_IO_PENDING");
+	}
+
+	return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//윈속 초기화
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+	{
+		puts("ERROR: 윈속을 초기화 할 수 없습니다.");
+		return 0;
+	}
+
+	//임계영역객체를 생성한다.
+	::InitializeCriticalSection(&g_cs);
+
+	//Ctrl+C 키를 눌렀을 때 이를 감지하고 처리할 함수를 등록한다.
+	if (::SetConsoleCtrlHandler(
+			(PHANDLER_ROUTINE)CtrlHandler, TRUE) == FALSE)
+		puts("ERROR: Ctrl+C 처리기를 등록할 수 없습니다.");
+
+	//IOCP 생성
+	g_hIocp = ::CreateIoCompletionPort(
+		INVALID_HANDLE_VALUE,	//연결된 파일 없음.
+		NULL,			//기존 핸들 없음.
+		0,				//식별자(Key) 해당되지 않음.
+		0);				//스레드 개수는 OS에 맡김.
+	if (g_hIocp == NULL)
+	{
+		puts("ERORR: IOCP를 생성할 수 없습니다.");
+		return 0;
+	}
+
+	//IOCP 스레드들 생성
+	HANDLE hThread;
+	DWORD dwThreadID;
+	for (int i = 0; i < MAX_THREAD_CNT; ++i)
+	{
+		dwThreadID = 0;
+		//클라이언트로부터 문자열을 수신함.
+		hThread = ::CreateThread(NULL,	//보안속성 상속
+			0,				//스택 메모리는 기본크기(1MB)
+			ThreadComplete,	//스래드로 실행할 함수이름
+			(LPVOID)NULL,	//
+			0,				//생성 플래그는 기본값 사용
+			&dwThreadID);	//생성된 스레드ID가 저장될 변수주소
+
+		::CloseHandle(hThread);
+	}
+
+	//서버 리슨 소켓 생성
+	g_hSocket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP,
+						NULL, 0, WSA_FLAG_OVERLAPPED);
+
+	//bind()/listen()
+	SOCKADDR_IN addrsvr;
+	addrsvr.sin_family = AF_INET;
+	addrsvr.sin_addr.S_un.S_addr = ::htonl(INADDR_ANY);
+	addrsvr.sin_port = ::htons(25000);
+
+	if (::bind(g_hSocket,
+			(SOCKADDR*)&addrsvr, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
+	{
+		puts("ERROR: 포트가 이미 사용중입니다.");
+		ReleaseServer();
+		return 0;
+	}
+
+	if (::listen(g_hSocket, SOMAXCONN) == SOCKET_ERROR)
+	{
+		puts("ERROR:  리슨 상태로 전환할 수 없습니다.");
+		ReleaseServer();
+		return 0;
+	}
+
+	//반복해서 클라이언트의 연결을 accept() 한다.
+	hThread = ::CreateThread(NULL, 0, ThreadAcceptLoop,
+					(LPVOID)NULL, 0, &dwThreadID);
+	::CloseHandle(hThread);
+
+	//_tmain() 함수가 반환하지 않도록 대기한다.
+	puts("*** 채팅서버를 시작합니다! ***");
+	while (1)
+		getchar();
+
+	return 0;
+}
+~~~
+
+###### [IOCP모델](#iocp모델)
 ###### [Top](#top)
 
 <br/>
