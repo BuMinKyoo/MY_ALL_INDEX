@@ -70,6 +70,7 @@
   - [Window 프로세스 기본 힙할당](#window-프로세스-기본-힙할당)
   - [보호모드](#보호모드)
   - [TCP장애유형](#tcp장애유형)
+  - [IOCP모델](#iocp모델)
 
 <br/>
 <br/>
@@ -1198,6 +1199,7 @@ a : 8, b : 3
   - [Window 프로세스 기본 힙할당](#window-프로세스-기본-힙할당)
   - [보호모드](#보호모드)
   - [TCP장애유형](#tcp장애유형)
+  - [IOCP모델](#iocp모델)
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
@@ -1471,6 +1473,41 @@ VirtualProtect사용예제는 MFC예제를 참고하기
   - 3.Retransmission과 Dup ACK
   - 4.Zero-window
     - 수신측 버퍼에 여유 공간이 하나도 없는 경우
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# IOCP모델
+  - 빠른 이유는 OS에게 많은 부분을 맡기기 때문
+    - Proactor방식 고속 입/출력 모델
+      - Proactor : 개체가 작업을 시작한 다음 작업이 완료될 때까지 기다리지 않고 자체 작업을 계속할 수 있도록 하는 컴퓨터 프로그래밍의 디자인 패턴
+    - 사용자 요청에 대한 처리 스레드 풀을 OS가 직접 관리하고, 스레드를 미리 생성해둠
+    - 커널영역에서 사용자 메모리 영역을 공유해 불필요한 메모리 복사 방지
+    - 비동기 I / O 통지(Callback)구조
+    - 입/출력 처리시 관련 메모리에 대해 페이지 단위로 OS가 그 메모리에 대해서 다른 Process, Thread가 접근하지 못하도록 Lock/Unlock을 건다
+      - User mode 메모리를 Kernel이 Lock함으로써 사실 상 Kernel이 사용하는 메모리로 바꾼다(속도가 매우 빨라짐)
+        - Non-page pool메모리 확보
+          - 언제나 물리 메모리에 상주해 있기 때문에 페이지 폴트를 내지 않고 엑세스가 보장되는 영역
+  - Callback 함수는 사용자 모드 함수이나 커널에서 호출하며 이 때마다 스위칭
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b3286036-edb0-458c-83be-963e0d2df95d)
+
+<br/>
+
+  - IOCP가 아닌 일반 Socket통신 흐름
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/78e2e8b6-d0ae-4a24-9f6a-009d618240f6)
+
+<br/>
+
+  - IOCP Socket통신 흐름
+    - 첫번째 CreateIOCP : IOCP Queue를 생성
+    - 두번째 CreateIOCP : Client Socket을 감시해 달라고 요청하는것
+    - WSARecv : 감시해 달라고 했던 Client Socket에 데이터가 오는지 대기한다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1d309080-aa79-4566-9d0b-a0eef79ab13d)
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
