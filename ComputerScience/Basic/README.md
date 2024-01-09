@@ -71,6 +71,7 @@
   - [보호모드](#보호모드)
   - [TCP장애유형](#tcp장애유형)
   - [IOCP모델](#iocp모델)
+  - [DMA](#dma)
 
 <br/>
 <br/>
@@ -1200,6 +1201,7 @@ a : 8, b : 3
   - [보호모드](#보호모드)
   - [TCP장애유형](#tcp장애유형)
   - [IOCP모델](#iocp모델)
+  - [DMA](#dma)
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
@@ -1508,6 +1510,31 @@ VirtualProtect사용예제는 MFC예제를 참고하기
     - WSARecv : 감시해 달라고 했던 Client Socket에 데이터가 오는지 대기한다
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/1d309080-aa79-4566-9d0b-a0eef79ab13d)
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DMA
+  - 연산을 처리하는 과정에서 데이터를 계속 복사를 안하고 그냥 데이터를 쓱 주변기기에 직접 전달하는 것
+  - 하드웨어 수준에서 CPU의 개입 없이 메모리와 장치 간에 데이터를 직접 전송할 수 있게 해주는 기술
+  - 메모리 버퍼, 포인터, 카운터를 사용하여 장치 제어기가 CPU이 도움없이 DMA 컨트롤러를 이용하여 데이터를 직접 메모리로 전송하는 입출력 방식
+  - CPU는 상태, 제어정보만을 교환하고 데이터 전송은 I/O와 메모리간에 직접교환
+  - DMA 컨트롤러가 버스를 제어하고 I/O와 메모리가 정보를 집적 전송
+  - 중앙처리장치에게 PIO작업을 할당하지 않고 DMA라는 특수 프로세서에게 위임하여 메모리와 직접 데이터를 전송할 수 있게 하는 방법
+
+<br/>
+
+  - H/W Device가 NIC라고 하면,
+    - Process내의 네트워크로 송신할 데이터를 적재한다.
+    - Process가 I/O 버퍼에 Write를 한다. 정확히는 Socket에다가 Send를 한다
+    - Kernel 영역으로 내려오면서 Segmanation이 일어난다.
+    - I/O 버퍼 데이터가 쪼개져서 Kernel 영역의 Buffer에 복사를 한다.
+    - 커널 영역의 Buffer의 데이터를 NIC에 보내고 그걸 네트워크에 보낸다.
+
+그런데 보면 이 Process 메모리, I/O Buffer, Kernel Buffer도 다 RAM 메모리이다. 즉, NIC가 DMA를 지원하면 수 많은 메모리를 안 거치고 바로 process 메모리로 간다.
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
