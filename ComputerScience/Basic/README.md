@@ -1356,6 +1356,7 @@ a : 8, b : 3
       - Kernel의 2GB는 모든 어플리케이션에서 사실은 같은 곳을 가리키게 된다(즉 OS의 같은 영역을 가리킨다)
       - VMS는 전부 Page단위로 관리된다.
       - 어떤 VMS의 하나의 Page에 접근했을때 그것이 실제로는, RAM에 있을수도 있고 SSD,HDD의 하드 디스크 영역에 있을 수도 있다
+        - VMS(Virtual Memory)는 즉, RAM+HDD이라고 할 수 있고, Process입장에서는 RAM을 쓰는 것처럼 RAM+HDD를 사용할 수 있게 하기도 하는 방법이다
       - Process는 각각 VMS를 할당받고, 각 Process가 가지고 있는VMS의 같은 주소 위치에도 실제적으로는 각각 다른 위치의 RAM,SSD,HDD를 가리키게 된다.
       - OS는 최대한 RAM영역을 사용하려 하지만 부족하면 SSD,HDD을 사용할수도 있으며, RAM->SSD,HDD : Page-out, RAM<-SSD,HDD : Page-in이 일어나기도 한다(이것을 스왑이 일어난다고 한다)
       - VMS장점
