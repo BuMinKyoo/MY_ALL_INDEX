@@ -1460,6 +1460,7 @@ a : 8, b : 3
 <br/>
 
 VirtualProtect사용예제는 MFC예제를 참고하기  
+#보호모드VirtualProtect  
 [MFC](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/FrameWork/MFC)
 
 ###### [Window시스템기초](#window시스템기초)
