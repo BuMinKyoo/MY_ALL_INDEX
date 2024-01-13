@@ -8940,17 +8940,29 @@ GetParent()->PostMessage(20000, MAKEWPARAM(GetDlgCtrlID(), 1), (LPARAM)m_hWnd);
 ***
 
 # dll 만들어 사용하기
-  - 1. ‘Windows 데스크톱 마법사’로 프로젝트 만들기
+  - DLL개발 시 주의사항
+    - DLL 함수 내부에서 정적 지역 변수 사용 및 전역변수 선언 및 정의 시 반드시 멀티스레드 환경을 고려(TLS 적용)
+    - exe에서 동적 할당한 것은 exe에서, dll에서 동적 할당한 것은 dll에서 해제하기
+    - DllMain() 함수에서 너무 많은 작업을 하지 말 것
+    - TLS(ThreadLocalStorage)
+      - 각 스레드 별로 분리된 메모리 공간을 활용
+      - malloc(),free()함수처럼 사용 할 수 있으나 개수 제한이 있음
+      - 정적 TLS적용
+        - __declspec(thread) 이것을 앞에다가 각각 붙여주면 된다
+
+<br/>
+
+  - 1. ‘Windows 데스크톱 마법사’로 프로젝트 만들기  
 ![20220910_232004](https://user-images.githubusercontent.com/39178978/189487566-59866a5a-f4a2-43de-953a-5d859a76527c.png)
 
 <br/>
   
-  - 2. 동적 연결 라이브러리, 미리 컴파일된 헤더 클릭
+  - 2. 동적 연결 라이브러리, 미리 컴파일된 헤더 클릭  
 ![20220910_232052](https://user-images.githubusercontent.com/39178978/189487591-3820a3b1-0958-4f47-b32d-5fb1080a2b9a.png)
   
 <br/>
 
-  - 3. dllmain.cpp에서 작업 진행하기
+  - 3. dllmain.cpp에서 작업 진행하기  
 ![20220910_232156](https://user-images.githubusercontent.com/39178978/189487640-3182dbbc-99d2-4df4-a3b6-e58860cbc204.png)
 
 <br/>
@@ -8960,7 +8972,69 @@ GetParent()->PostMessage(20000, MAKEWPARAM(GetDlgCtrlID(), 1), (LPARAM)m_hWnd);
 
 <br/>
 
-  - 4. 작업진행
+  - 4-1. 묵시적로딩
+    - 묵시적은 h파일, dll파일 lib파일이 필요하다
+    - h파일같은 경우는 pragma comment와 각각의 함수를 써줘야 하기 때문에 전달해 주는것
+    - 명시적일때는 Thread마다 load와 free를 해줘야 하지만, 묵시적일때는 상관이 없다!
+    - __declspec(dllexport) : 일반적으로 함수를 어떤 cpp안에서 선언하면, 다른 cpp에서 사용이 불가 하지만, 그것을 밖에서 함수를 호출할 수 있게 해준다
+
+<br/>
+
+#dllmain.cpp
+~~~c++
+// dllmain.cpp : DLL 애플리케이션의 진입점을 정의합니다.
+#include "pch.h"
+
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+                     )
+{
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+    case DLL_PROCESS_DETACH:
+        break;
+    }
+    return TRUE;
+}
+
+__declspec(dllexport) int WINAPI Sum(int a, int b)
+{
+    return a + b;
+}
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/e2057256-6bc6-433b-b3d5-1d5e6973a57f)
+
+<br/>
+
+#AppDlg.cpp
+~~~c++
+// .h파일로 만들어서 보통 제공한다
+#pragma comment(lib, "..\\x64\\Debug\\Project1.lib")
+int WINAPI Sum(int a, int b);
+//
+
+void CMFCApplication1Dlg::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int num = Sum(1, 2);
+	CString str = _T("");
+	str.Format(_T("%d"), num);
+	AfxMessageBox(str);
+}
+~~~
+
+<br/>
+
+  - 4-2.명시적 로딩
+    - Thread마다 각각 load와 free를 해줘야 한다
+
+
+  - 5-2. 작업진행
     - __declspec(dllexport) : 일반적으로 함수를 어떤 cpp안에서 선언하면, 다른 cpp에서 사용이 불가 하지만, 그것을 밖에서 함수를 호출할 수 있게 해준다
     - extern "C" : c++컴파일러는 함수를 컴파일할때 함수의 이름을 임의로 수정하기 때문에 함수의 이름을 유지시켜줘야 밖에서 호출 할 수 있는데, C언어 방식으로 컴파일을 하면 가능하다, 즉 C언어 방식으로 컴파일 하게 해준다
 
@@ -8993,22 +9067,22 @@ extern "C" __declspec(dllexport) int Sum(int a, int b)
 
 <br/>
 
-  - 5. 솔루션 빌드 해서 dll파일 만들기
+  - 6-2. 솔루션 빌드 해서 dll파일 만들기  
 ![20220910_232422](https://user-images.githubusercontent.com/39178978/189487734-bfa51e7c-f262-42b3-ae57-15369f9d27fe.png)
 
 <br/>
 
-  - 6. dll파일을, 사용할 프로젝트 폴더에 복사해 넣기
+  - 7-2. dll파일을, 사용할 프로젝트 폴더에 복사해 넣기  
 ![20220910_232456](https://user-images.githubusercontent.com/39178978/189487764-219a128b-31df-4d40-a3ff-1e49a3bd29fd.png)
 
 <br/>
 
-  - 7. LoadLibrary함수를 사용해서 DLL파일 연결하기
-  - 8. GetProcAddress함수를 사용해서, DLL파일에서 사용할 함수 이름을 찾아서 사용하기
+  - 8-2. LoadLibrary함수를 사용해서 DLL파일 연결하기
+  - 9-2. GetProcAddress함수를 사용해서, DLL파일에서 사용할 함수 이름을 찾아서 사용하기
     - 함수포인터 선언 필요
     - GetProcAddress함수는 FARPROC형식으로 값을 반환하기 때문에 함수에 맞게 형식 변환 필요
-  - 9. 함수 사용
-  - 10. DLL연결 해제하기
+  - 10-2. 함수 사용
+  - 11-2. DLL연결 해제하기
 
 <br/>
 
