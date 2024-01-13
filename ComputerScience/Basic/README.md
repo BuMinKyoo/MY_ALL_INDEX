@@ -63,7 +63,7 @@
   - [스택, 힙, 코드, 데이터영역](#스택-힙-코드-데이터영역)
 - [Window시스템기초](#window시스템기초)
   - [보안DACL](#보안dacl)
-  - [Process, Thread, _beginthreadex, 동기화](#process-thread-_beginthreadex-동기화)
+  - [Process, Thread, _beginthreadex, 동기화(Event,Mutex,Semaphore)](#process-thread-_beginthreadex-동기화eventmutexsemaphore)
   - [Context Switch](#context-switch)
   - [Sleep()](#sleep)
   - [Windows시스템 메모리 운용 방법](#windows시스템-메모리-운용-방법)
@@ -1193,7 +1193,7 @@ a : 8, b : 3
 
 # Window시스템기초
   - [보안DACL](#보안dacl)
-  - [Process, Thread, _beginthreadex, 동기화](#process-thread-_beginthreadex-동기화)
+  - [Process, Thread, _beginthreadex, 동기화(Event,Mutex,Semaphore)](#process-thread-_beginthreadex-동기화eventmutexsemaphore)
   - [Context Switch](#context-switch)
   - [Sleep()](#sleep)
   - [Windows시스템 메모리 운용 방법](#windows시스템-메모리-운용-방법)
@@ -1252,7 +1252,7 @@ a : 8, b : 3
 <br/>
 <br/>
 
-# Process, Thread, _beginthreadex, 동기화
+# Process, Thread, _beginthreadex, 동기화(Event,Mutex,Semaphore)
   - 스레드 생성
     - 한 Process는 최소 1개이상의 Thread를 갖는다(메인 스레드)
     - Thread는 개별화된 흐름과 전용 스택(기본적으로 컴파일 할때 1MB를 할당받는다)을 갖는 실행의단위이다
