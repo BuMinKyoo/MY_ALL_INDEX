@@ -72,6 +72,9 @@
   - [TCP장애유형](#tcp장애유형)
   - [IOCP모델](#iocp모델)
   - [DMA](#dma)
+  - [UDP, 브로드캐스트 송신](#udp-브로드캐스트-송신)
+  - [WIN32 파일 입/출력](#win32-파일-입출력)
+  - [공유메모리기법](#공유메모리기법)
 
 <br/>
 <br/>
@@ -1203,6 +1206,9 @@ a : 8, b : 3
   - [TCP장애유형](#tcp장애유형)
   - [IOCP모델](#iocp모델)
   - [DMA](#dma)
+  - [UDP, 브로드캐스트 송신](#udp-브로드캐스트-송신)
+  - [WIN32 파일 입/출력](#win32-파일-입출력)
+  - [공유메모리기법](#공유메모리기법)
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
@@ -1538,6 +1544,174 @@ VirtualProtect사용예제는 MFC예제를 참고하기
     - 커널 영역의 Buffer의 데이터를 NIC에 보내고 그걸 네트워크에 보낸다.
 
 그런데 보면 이 Process 메모리, I/O Buffer, Kernel Buffer도 다 RAM 메모리이다. 즉, NIC가 DMA를 지원하면 수 많은 메모리를 안 거치고 바로 process 메모리로 간다.
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# UDP, 브로드캐스트 송신
+  - 연결, 상태 개념이 없음
+  - 흐름제어, 송/수신 보장 혹은 확인에 관한 기능 없음
+  - 개발자 스스로 TCP 구현가능
+  - TCP와 코드작성시 다른것
+    - socket생성시 SOCK_DGRAM, IPPROTO_UDP을 넣는것
+    - recvfrom이 TCP의 accept와 비슷하다
+    - sendto에서는 데이터를 보낼때, 매번 상대방의 아이피,포트 정보를 같이 이용해서 보내야 한다
+  - 브로드캐스트
+    - TCP는 없고, UDP에 브로드 캐스트가 존재한다
+    - 브로드 캐스트 ip로 데이터를 보내면, 내가 있는 공유기안에 있는 ip에게 전부다 보내준다
+    - UDP와 브로드캐스트 예제는 MFC에 있으니 참고
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# WIN32 파일 입/출력
+  - 디스크와 디렉토리 관련 핵심 API
+    - GetVolumeformation()
+      - C드라이브, D드라이브와 같은것을 말하는것
+      - 이런 Volume안에 directory가 있게 된다
+    - GetDiskFreeSpaceEx()
+      - 디스크 여유공간
+      - 어떤 파일을 다운 받을때 이것을 확인 해야한다
+    - FindFirstFile()
+      - 디렉토리, 파일찾기
+    - FindNextFile()
+      - FindFirstFile함수로부터 다음다음을 검색하기
+    - GetCurrentDirectory()
+      - 현재 exe 디렉토리가 어디인지?
+  - CreateDirectory()
+  - _wsetlocale(LC_ALL, TEXT(“korean”))
+
+<br/>
+
+  - 파일 입/출력 관련 핵심 API
+    - CreateFile()
+      - 파일생성, fopen과 같다고 생각하면 된다
+      - 스레드 접근에 대한 허용/미허용 옵션까지 조절 가능하다
+      - HANDLE을 반환 한다
+    - Read/WirteFile()
+      - fread, fwirte와 같다
+    - Read/WirteFileEx
+      - 비동기 및 중첩기능 지원
+    - CloseHandle()
+      - 파일 닫기
+    - GetFileSizeEx()
+      - 파일 사이즈
+    - DeleteFile()
+      - 파일 삭제
+    - SetFilePointer()
+      - 입출력이 일어나는 위치를 조정
+      - fseek와 같다
+
+<br/>
+
+  - Overlapped I/O
+    - 비동기완료를 받는 방법은 2가지가 있다
+      - Event
+        - Process가 OS에게 파일 입/출력을 해달라고 요청, OS가 그것의 작업을 끝내면, Event를 Set해준다.
+        - Event라는 것을 이용해서, 각 스레드의 상태를 조절한다
+      - Callback
+        - OS가 함수를 Call해준다
+        - Callback을 사용할때는 SleepEx라는 함수가 등장하게 되고, Thread상태중 Alertable wait상태가 등장하게 된다.
+        - SleeEx 함수를 사용하게 되면 해당 Thread는 Alertable wait상태로 전향된다
+        - SleeEx에 할당된 시간이 지남과, OS가 작업을 끝내고 함수를 콜하게 되면 Alertable wait상태에서 빠져나오게 된다.
+        - SleeEx에 할당된 시간이 지나지 않아도 OS가 해당하는 함수를 Callback하게 되면 Alertable wait상태에서 나오게 된다
+        - 메모리 할당은 OS에게 요청하기 전에 할당하게 되고, 그것에 대한 메모리 해제는 OS가 호출하는 Callback함수에서 이루어지게 된다
+        - IOCP로 가는 가장 중요한 방법이고, 이 방법에서 IOCP로 갈 수가 있다.
+        - 이 단계 에서는, 메모리의 copy가 빈번히 일어나며, 이것으로 인해 속도가 늦어 지게 되는 원인이 된다. IOCP는 그런 쓸데 없는 작업을 전부 줄인것
+        - 해당 예제들은 MFC쪽에 있으니 참고할것
+
+<br/>
+
+  - 파일 매핑 및 메모리 추상화 핵심 API
+    - File같은 것 또한 메모리로 추상화 할 수 있고, 추상화에 성공하게 된다면, memcpy같은 복사 함수로도, File을 복사할 수 있게 된다
+      - CreateFileMapping()
+        - 매핑 객체 생성
+      - OpenFileMapping()
+        - 매핑 객체 열기
+      - MapViewOfFile()
+        - 매핑에 대한 View를 만들어준다(= 추상화를 해준다)
+      - UnmapViewOfFile()
+      - 어떤 File도 메모리의 일부이고, 그것을 추상화해서 포인터를 얻어, 메모리끼리 복사하여 파일을 생성할 수 있다
+      - 맵핑객체는 커널쪽 메모리를 할당하는것이며,그것을 접근 가능하게한 변수를 유저모드 메모리에 할당해 접근하는 것이기 때문에, IPC중 공유 메모리 기법으로 연결된다
+      - 파일을 복사하는 방법2가지중, 64kb씩 여러번 짤라서 Read와 write를 반복하는 방법보다, 복사할 File의 크기를 메모리로 잡고 한번 Read하고 한번 Write하는것이 더 빠르지만, 보통 복사하기위헤 잠깐일지 모르지만, 큰 용량을 적재하는것은 일반적이지 않다.
+        - 이럴때 Map을 사용하면 메모리를 적재하지 않아도 File을 복사할 수 있다
+        - 아래와 같은 코드에서는
+          - 1. CreateFile을 읽기모드 사용하여 원래 있던 파일을 열고
+          - 2. CreateFileMapping을 사용하여 원본 파일에 대한 맵핑 객체를 만든후
+          - 3. MapViewOfFile을 사용하여 맵핑 객체에 대한 접근 포인터를 얻고
+          - 4.CreateFile을 쓰기모드를 사용하여 핸들을 얻고
+          - 5.WriteFile을 사용하여 거기에 3번에서 얻은 것으로부터 4번에 쓰게 되면, 파일이 복사가 되게 된다
+
+<br/>
+
+~~~c++
+	// 1. 텍스트 파일을 생성
+	HANDLE hFile = ::CreateFile(L"C:\\minkyoo\\test.txt",
+		GENERIC_READ | GENERIC_WRITE, // 읽기/쓰기 모드로 파일을 생성
+		FILE_SHARE_READ, // 다른 프로세스가 읽기를 할 수 있도록 설정
+		NULL, // 보안 속성을 설정하지 않음
+		CREATE_ALWAYS, // 파일이 존재하면 덮어쓰기
+		FILE_ATTRIBUTE_NORMAL, // 일반 파일 속성
+		NULL); // 템플릿 파일을 사용하지 않음
+
+	// 생성한 파일의 크기를 1024로 강제 설정
+	::SetFilePointer(hFile, 1024, NULL, FILE_BEGIN);
+
+	// 2. 파일 매핑 객체 생성
+	// 위에서 생성한 파일의 크기를 1024로 설정했으니 그것에 맞게 매핑 객체도 생성(복사하기 위함)
+	HANDLE hMap = ::CreateFileMapping(hFile,
+				NULL, // 보안 속성을 설정하지 않음
+				PAGE_READWRITE, // 읽기/쓰기 모드로 파일 매핑 객체 생성
+				0, // 파일 전체를 매핑
+				1024, // 파일의 크기와 동일하게 설정
+				NULL); // 이름 없는 파일 매핑 객체 생성
+	if (hMap == NULL) {
+		AfxMessageBox(L"파일 매핑 객체 생성 실패");
+
+		::CloseHandle(hFile);
+		return FALSE;
+	}
+
+	// 3. 파일 매핑 객체를 가상 메모리에 매핑
+	char* pszMemory = (char*)::MapViewOfFile(hMap,
+				FILE_MAP_ALL_ACCESS, // 읽기/쓰기 모드로 가상 메모리에 매핑
+				0, 0, 1024);
+	if (pszMemory == NULL)
+	{
+		AfxMessageBox(L"가상 메모리 매핑 실패");
+
+		::CloseHandle(hMap);
+		::CloseHandle(hFile);
+		return FALSE;
+	}
+
+	// 4. 가상 메모리에 매핑된 데이터에 문자열을 쓰기
+	strcpy_s(pszMemory, 1024, "Hello, World!");
+
+	// 5. 메모리 매핑을 해제하고 종료
+	::UnmapViewOfFile(pszMemory);
+	::CloseHandle(hMap);
+	::CloseHandle(hFile);
+~~~
+
+###### [Window시스템기초](#window시스템기초)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 공유메모리기법
+  - 커널 오브젝트로 구현
+  - 동기화 : Event, Mutex, Semaphore
+  - 메모리 맵을 만들어서, 그곳에 데이터를 쓰고 읽고 하는것. 각 다른 Process에서 자신의 VMS에 접근하지만 도달하는 kernel영역은 같은 곳이 된다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6b62b841-64a1-45d3-8add-a8793eda2b99)
 
 ###### [Window시스템기초](#window시스템기초)
 ###### [Top](#top)
