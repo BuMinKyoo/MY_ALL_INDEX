@@ -125,6 +125,7 @@
 <br/>
 
 - [리버싱](#리버싱)
+- [DB연결](#db연결)
 
 <br/>
 <br/>
@@ -2802,4 +2803,40 @@ A. MFC (Microsoft Foundation Classes)는 Microsoft가 제공하는 C++ 클래스
     - F7단축키 : 함수 안으로 들어가기
 
 ###### [리버싱](#리버싱)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# DB연결
+  - ODBC (Open Database Connectivity)
+    - 예전의 데이터베이스는 폐쇄적으로 각 데이터베이스에서 제공하는 클라이언트가 없으면 데이터베이스 서버로 접근이 불가능 했다.
+    - 이러한 문제점을 보완하기 위해서 MS에서 ODBC라는 기술을 개발했다.
+    - 그림에서 알 수 있드시 ODBC를 사용하면 모든 DBMS에 접근이 가능하다.
+    - 여기서 더 발전된 기술이 oleDB 다.
+  - OLEDB
+    - ODBC를 모든 데이터베이스에 접근이 가능한 반면, oleDB 기술은 MS에서 UDA(Universal Data Access)란 개념을 체택 광범위한 데이터에 접근 할 수 있다. UDA는 실제 사용되는 기술이 아니라 개념일 뿐이다.
+    - ADO와 oleDB를 이용하여 광범위한 데이터를 처리하는 기술을 UDA라고 한다.
+  - ADO(ActiveX Data Object)
+    - ODBC와 OleDB는 데이터베이스를 연결하는 기술인반면, ADO는 연결된 통로를 통해서 데이터를 직접 가공하는 데이터를 핸들링 할수 있는 기술이다.(데이터를 처리하는 기술을 담당한다.)
+  - ODBC는 이기종의 데이터베이스(거의 모든 관계형 데이터베이스)에 접근을 가능하게 해주는 표준적인 방법인 반면에 oleDB는 이기종의 데이터베이스뿐만 아니라 비 관계형 데이터에도 접근이 가능, 즉 SQL서버나 Oracle, DB@ 뿐만 아니라 메일, 메일폴더, 텍스트, 디렉토리, 웹사이트등 비관계형 계층구조적인 데이터들에게도 접근을 가능하게 한다.
+  - ADO : 데이터를 다루는 객체(데이터를 처리하는 기술)
+  - ODBC, oleDB : 데이터 제공자 (원본 데이터를 사용할 수 있게 연결해주는 기술)
+
+  - OLEDB connection string
+    - Data Source
+      - SQL서버가 있는 위치가된다. IP주소가 될수도 있고 PC이름이 될수도 있다(= Server,Address,Addr, Network Address)
+    - User ID
+      - SQL로그인인 경우, 사용자User 이름
+    - Password
+      - SQL로그인인 경우, 사용자 Password
+    - Integrated Security
+      - 값이 True이면 윈도우 인증을 사용해서 SQL Server에 로그온을 시도한다 따라서 이키의 값이 True일때면 User ID/Password 와 동시에 사용하는것은 원도우인증과 SQL인증을 동시에 하겠다는것이며 이는 원하지 않는 결과를 얻을수있다 (True값대신 yes, sspi 값도 윈도우인증하겠다는 값으로 표시된다. MSDN에는 sspi가 권장됨)(= Trusted_Connection)
+    - 옵션
+      - Initial Catalog
+        - 접속되어질 Database이름, 생략되어지면 User에 따라설정된 Default Database로 자동연결된다, 옵션이긴 하지만 되도록이면 사용하는것이 좋다
+
+###### [DB연결](#db연결)
 ###### [Top](#top)
