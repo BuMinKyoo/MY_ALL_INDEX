@@ -2,8 +2,10 @@
 
 - [예제](#예제)
   - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
+  - [전역 FontFamily 적용](#전역-fontfamily-적용)
   - [Placeholder](#placeholder)
   - [MultiBinding,IMultiValueConverter](#multibindingimultivalueconverter)
+  - [현재 실행파일 위치 가져오기](#현재-실행파일-위치-가져오기)
 
 <br/>
 
@@ -244,8 +246,10 @@
 
 # 예제
   - [FontFamily, FontSize지정할시,FrameworkElement](#fontfamily-fontsize지정할시frameworkelement)
+  - [전역 FontFamily 적용](#전역-fontfamily-적용)
   - [Placeholder](#placeholder)
   - [MultiBinding,IMultiValueConverter](#multibindingimultivalueconverter)
+  - [현재 실행파일 위치 가져오기](#현재-실행파일-위치-가져오기)
 
 ###### [예제](#예제)
 ###### [Top](#top)
@@ -284,6 +288,47 @@
         <TextBox Text="sdfsdf"/>
     </StackPanel>
 </Window>
+~~~
+
+###### [예제](#예제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 전역 FontFamily 적용
+  - Font와 같이 바꿀 필요 없으며, 객체 하나하나에 적용하는 것이 아니라, 전부다에 적용하고 싶을때
+  - 아래의 코드에서는 DefaultResource와 같은 곳에서 Style정의 후, App.xaml에 전역으로 정의 한 후, 각 Window의 Style을 직접 정의해 준다
+
+<br/>
+
+#DefaultResource.xaml
+~~~c#
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="DefaultStyle" TargetType="{x:Type Window}">
+        <Setter Property="FontFamily" Value="Pretendard Variable" />
+    </Style>
+
+</ResourceDictionary>
+~~~
+
+<br/>
+
+#모든Window.xaml
+~~~c#
+<Window x:Class="WPF_Kiosk.View.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:WPF_KioskVM="clr-namespace:WPF_Kiosk.ViewModel"
+        WindowStyle="None" AllowsTransparency="True"
+        SizeToContent="WidthAndHeight"
+        mc:Ignorable="d"
+        Title="LoginWindow"
+        Style="{StaticResource DefaultStyle}">
 ~~~
 
 ###### [예제](#예제)
@@ -400,6 +445,23 @@ namespace WpfApp2
         }
     }
 }
+~~~
+
+###### [예제](#예제)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# 현재 실행파일 위치 가져오기
+
+App.cs
+~~~c#
+// 1
+string appStartPath = AppDomain.CurrentDomain.BaseDirectory;
+
+// 2
+string appStartPath1 = System.IO.Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 ~~~
 
 ###### [예제](#예제)
