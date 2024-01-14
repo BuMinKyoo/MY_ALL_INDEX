@@ -152,6 +152,9 @@
   - [비동기 File입/출력_Event](#비동기-file입출력_event)
   - [비동기 File입/출력_Callback](#비동기-file입출력_callback)
 - [IOCP](#iocp)
+- [UDP](#udp)
+- [브로드캐스트(broadcast)](#브로드캐스트broadcast)
+- [공유메모리기법](#공유메모리기법)
 
 <br/>
 
@@ -195,6 +198,7 @@
 - [사용자정의 윈도우 만들기](#사용자정의-윈도우-만들기)
 - [Windows Media Player ActiveX컨트롤 사용하기](#windows-media-player-activex컨트롤-사용하기)
 - [음악 재생하기](#음악-재생하기)
+- [실행중인 Process열거하기](#실행중인-process열거하기)
 
 <br/>
 
@@ -7131,7 +7135,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 ***
 
-# IOCP모델
+# IOCP
 
 #stdafx.cpp
 ~~~c++
@@ -7521,6 +7525,690 @@ int _tmain(int argc, _TCHAR* argv[])
 ~~~
 
 ###### [IOCP모델](#iocp모델)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# UDP
+  - 연결, 상태 개념이 없음
+  - 흐름제어, 송/수신 보장 혹은 확인에 관한 기능 없음
+  - 개발자 스스로 TCP 구현가능
+  - TCP와 코드작성시 다른것
+    - socket생성시 SOCK_DGRAM, IPPROTO_UDP을 넣는것
+    - recvfrom이 TCP의 accept와 비슷하다
+    - sendto에서는 데이터를 보낼때, 매번 상대방의 아이피,포트 정보를 같이 이용해서 보내야 한다
+
+<br/>
+
+#stdafx.cpp
+~~~c++
+// stdafx.cpp : 표준 포함 파일만 들어 있는 소스 파일입니다.
+// UdpSample.pch는 미리 컴파일된 헤더가 됩니다.
+// stdafx.obj에는 미리 컴파일된 형식 정보가 포함됩니다.
+
+#include "stdafx.h"
+
+// TODO: 필요한 추가 헤더는
+// 이 파일이 아닌 STDAFX.H에서 참조합니다.
+~~~
+
+<br/>
+
+#stdafx.h
+~~~c++
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
+// 들어 있는 포함 파일입니다.
+//
+
+#pragma once
+
+#include "targetver.h"
+
+#include <stdio.h>
+#include <tchar.h>
+
+
+
+// TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+~~~
+
+<br/>
+
+#targetver.h
+~~~c++
+#pragma once
+
+// SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
+
+// 이전 Windows 플랫폼에 대해 응용 프로그램을 빌드하려는 경우에는 SDKDDKVer.h를 포함하기 전에
+// WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
+
+#include <SDKDDKVer.h>
+~~~
+
+<br/>
+
+#UdpSample.cpp
+~~~c++
+// UdpSample.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+
+
+char g_szRemoteAddress[32];
+int g_nRemotePort;
+int g_nLocalPort;
+
+void ErrorHandler(const char *pszMessage)
+{
+	printf("ERROR: %s\n", pszMessage);
+	::WSACleanup();
+	exit(1);
+}
+
+//원격지로 메시지를 전송하는 스레드 함수.
+DWORD WINAPI ThreadSendto(LPVOID pParam)
+{
+	//송신을 위한 UDP 소켓을 하나 더 개방한다.
+	SOCKET hSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("UDP 소켓을 생성할 수 없습니다.");
+
+	char szBuffer[128];
+	SOCKADDR_IN	remoteaddr = { 0 };
+	remoteaddr.sin_family = AF_INET;
+	remoteaddr.sin_port = htons(g_nRemotePort);
+	remoteaddr.sin_addr.S_un.S_addr = inet_addr(g_szRemoteAddress);
+	while (1)
+	{
+		gets_s(szBuffer);
+		if (strcmp(szBuffer, "EXIT") == 0)
+			break;
+
+		//사용자가 입력한 메시지를 원격지로 전송한다.
+		::sendto(hSocket, szBuffer, strlen(szBuffer) + 1, 0,
+			(sockaddr*)&remoteaddr, sizeof(remoteaddr));
+	}
+
+	//수신을 위한 UDP 소켓을 닫는다. _tmain() 함수의 while문이 끝난다.
+	::closesocket((SOCKET)pParam);
+	::closesocket(hSocket);
+	return 0;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//윈속 초기화
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		ErrorHandler("윈속을 초기화 할 수 없습니다.");
+
+	//소켓 생성. SOCK_DGRAM 타입을 사용한다!
+	SOCKET hSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("UDP 소켓을 생성할 수 없습니다.");
+
+	//주소와 포트번호를 입력 받는다.
+	printf("원격지 IP주소를 입력하세요.: ");
+	gets_s(g_szRemoteAddress);
+	fflush(stdin);
+	printf("원격지 포트번호를 입력하세요.: ");
+	scanf_s("%d", &g_nRemotePort);
+	fflush(stdin);
+	printf("로컬 포트번호를 입력하세요.: ");
+	scanf_s("%d", &g_nLocalPort);
+
+	//포트 바인딩
+	SOCKADDR_IN	addr = { 0 };
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(g_nLocalPort);
+	addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	if (::bind(hSocket, (SOCKADDR*)&addr, sizeof(addr)) == SOCKET_ERROR)
+		ErrorHandler("소켓에 IP주소와 포트를 바인드 할 수 없습니다.");
+
+	//메시지 송신 스레드 생성.
+	DWORD dwThreadID = 0;
+	HANDLE hThread = ::CreateThread(NULL,
+		0,					//스택 메모리는 기본크기(1MB)
+		ThreadSendto,		//스래드로 실행할 함수이름
+		(LPVOID)hSocket,
+		0,					//생성 플래그는 기본값 사용
+		&dwThreadID);		//생성된 스레드ID가 저장될 변수주소
+	::CloseHandle(hThread);
+
+	//메시지 수신 및 출력.
+	char szBuffer[128];
+	SOCKADDR_IN	remoteaddr;
+	int nLenSock = sizeof(remoteaddr), nResult;
+	while ((nResult = ::recvfrom(hSocket, szBuffer, sizeof(szBuffer), 0,
+		(sockaddr*)&remoteaddr, &nLenSock)) > 0)
+	{
+		printf("-> %s\n", szBuffer);
+		memset(szBuffer, 0, sizeof(szBuffer));
+	}
+
+	puts("UDP 통신 종료.");
+	::closesocket(hSocket);
+	::WSACleanup();
+	return 0;
+}
+~~~
+
+###### [UDP](#udp)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 브로드캐스트(broadcast)
+  - TCP는 없고, UDP에 브로드 캐스트가 존재한다
+  - 브로드 캐스트 ip로 데이터를 보내면, 내가 있는 공유기안에 있는 ip에게 전부다 보내준다
+
+<br/>
+
+  - 브로드캐스트 발신  
+#BroadcastReceiver.cpp
+~~~c++
+// BroadcastReceiver.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+
+
+void ErrorHandler(const char *pszMessage)
+{
+	printf("ERROR: %s\n", pszMessage);
+	::WSACleanup();
+	exit(1);
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//윈속 초기화
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		ErrorHandler("윈속을 초기화 할 수 없습니다.");
+
+	//소켓 생성
+	SOCKET hSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("UDP 소켓을 생성할 수 없습니다.");
+
+	//포트 바인딩
+	SOCKADDR_IN	addr = { 0 };
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(25000);
+	addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	if (::bind(hSocket, (SOCKADDR*)&addr, sizeof(addr)) == SOCKET_ERROR)
+	{
+		puts("ERROR: 소켓에 IP주소와 포트를 바인드 할 수 없습니다.");
+		return 0;
+	}
+
+	//메시지를 수신하고 화면에 출력한다.
+	char szBuffer[128] = { 0 };
+	while (::recvfrom(hSocket,
+				szBuffer, sizeof(szBuffer), 0, NULL, 0) >= 0)
+	{
+		printf(":%s\n", szBuffer);
+		memset(szBuffer, 0, sizeof(szBuffer));
+	}
+
+	::closesocket(hSocket);
+	::WSACleanup();
+	return 0;
+}
+~~~
+
+<br/>
+
+#stdafx.cpp
+~~~c++
+// stdafx.cpp : 표준 포함 파일만 들어 있는 소스 파일입니다.
+// BroadcastReceiver.pch는 미리 컴파일된 헤더가 됩니다.
+// stdafx.obj에는 미리 컴파일된 형식 정보가 포함됩니다.
+
+#include "stdafx.h"
+
+// TODO: 필요한 추가 헤더는
+// 이 파일이 아닌 STDAFX.H에서 참조합니다.
+~~~
+
+<br/>
+
+#stdafx.h
+~~~c++
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
+// 들어 있는 포함 파일입니다.
+//
+
+#pragma once
+
+#include "targetver.h"
+
+#include <stdio.h>
+#include <tchar.h>
+
+
+
+// TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+~~~
+
+<br/>
+
+#targetver.h
+~~~c++
+#pragma once
+
+// SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
+
+// 이전 Windows 플랫폼에 대해 응용 프로그램을 빌드하려는 경우에는 SDKDDKVer.h를 포함하기 전에
+// WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
+
+#include <SDKDDKVer.h>
+~~~
+
+<br/>
+
+  - 브로드캐스트 수신
+
+#BroadcastSender.cpp
+~~~c++
+// BroadcastSender.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+//
+
+#include "stdafx.h"
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32")
+
+
+void ErrorHandler(const char *pszMessage)
+{
+	printf("ERROR: %s\n", pszMessage);
+	::WSACleanup();
+	exit(1);
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//윈속 초기화
+	WSADATA wsa = { 0 };
+	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		ErrorHandler("윈속을 초기화 할 수 없습니다.");
+
+	//소켓 생성
+	SOCKET hSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (hSocket == INVALID_SOCKET)
+		ErrorHandler("UDP 소켓을 생성할 수 없습니다.");
+
+	//포트 바인딩
+	SOCKADDR_IN	addr = { 0 };
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(25000);
+	addr.sin_addr.S_un.S_addr = htonl(INADDR_BROADCAST);
+	// INADDR_BROADCAST 을 사용하면 알아서 브로드 캐스트 주소로 변환해준다.
+
+	//방송주소로 전송하기 위해 소켓 옵션을 변경한다.
+	int nOption = 1;
+	::setsockopt(hSocket,
+		SOL_SOCKET,
+		SO_BROADCAST,			//방송주소로 설정한다.
+		(const char*)&nOption,
+		sizeof(nOption));
+
+	char szBuffer[128] = { 0 };
+	while (1)
+	{
+		//사용자로부터 문자열을 입력 받는다.
+		putchar('>');
+		gets_s(szBuffer);
+		if (strcmp(szBuffer, "EXIT") == 0)		break;
+
+		//방송주소로 메시지를 전송한다.
+		//따라서 모든 Peer들이 동시에 메시지를 수신한다.
+		::sendto(hSocket, szBuffer, sizeof(szBuffer), 0,
+			(const SOCKADDR*)&addr, sizeof(addr));
+	}
+
+	::closesocket(hSocket);
+	::WSACleanup();
+	return 0;
+}
+~~~
+
+<br/>
+
+#stdafx.cpp
+~~~c++
+// stdafx.cpp : 표준 포함 파일만 들어 있는 소스 파일입니다.
+// BroadcastSender.pch는 미리 컴파일된 헤더가 됩니다.
+// stdafx.obj에는 미리 컴파일된 형식 정보가 포함됩니다.
+
+#include "stdafx.h"
+
+// TODO: 필요한 추가 헤더는
+// 이 파일이 아닌 STDAFX.H에서 참조합니다.
+~~~
+
+<br/>
+
+#stdafx.h
+~~~c++
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
+// 들어 있는 포함 파일입니다.
+//
+
+#pragma once
+
+#include "targetver.h"
+
+#include <stdio.h>
+#include <tchar.h>
+
+
+
+// TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+~~~
+
+<br/>
+
+#targetver.h
+~~~c++
+#pragma once
+
+// SDKDDKVer.h를 포함하면 최고 수준의 가용성을 가진 Windows 플랫폼이 정의됩니다.
+
+// 이전 Windows 플랫폼에 대해 응용 프로그램을 빌드하려는 경우에는 SDKDDKVer.h를 포함하기 전에
+// WinSDKVer.h를 포함하고 _WIN32_WINNT 매크로를 지원하려는 플랫폼으로 설정하십시오.
+
+#include <SDKDDKVer.h>
+~~~
+
+###### [브로드캐스트(broadcast)](#브로드캐스트broadcast)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 공유메모리기법
+  - 1.Client실행
+  - 2.Server가 데이터 보내주기를 기다림
+  - 3.Server가 데이터 씀, 썼다고 알림
+  - 4.Client가 데이터 읽은후, 읽었다고 알림
+
+<br/>
+
+#ConsoleApp.cpp
+#Server(서버)
+~~~c++
+#include <iostream>
+#include <tchar.h>
+#include <Windows.h>
+#include <TlHelp32.h>
+
+int main()
+{
+	OutputDebugString(L"Server - begin\n");
+
+	// 1. 파일 매핑 객체 생성
+	HANDLE hMap = CreateFileMapping(
+		INVALID_HANDLE_VALUE,	// 파일 핸들
+		NULL,					// 보안 속성
+		PAGE_READWRITE,			// 파일 매핑 속성
+		0,						// 파일 크기 (상위 32비트)
+		128,					// 파일 크기 (하위 32비트)
+		L"IPC_TEST_SHARED_MEMORY");	// 파일 매핑 이름
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 파일 매핑 객체가 이미 존재하는 경우
+		hMap = OpenFileMapping(
+			FILE_MAP_ALL_ACCESS,	// 파일 매핑 접근 권한
+			FALSE,					// 상속 가능 여부
+			L"IPC_TEST_SHARED_MEMORY");	// 파일 매핑 이름
+	}
+
+	// 2. 매핑 객체에 대한 접근 포인터를 얻음(메모리 추상화)
+	TCHAR* pSharedMemory = (TCHAR*)MapViewOfFile(
+		hMap,					// 파일 매핑 객체 핸들
+		FILE_MAP_ALL_ACCESS,	// 파일 매핑 접근 권한
+		0,						// 파일 오프셋 (상위 32비트)
+		0,						// 파일 오프셋 (하위 32비트)
+		128);					// 파일 매핑 크기
+	if (pSharedMemory == NULL)
+	{
+		_tprintf(_T("Server - Failed to get shared memory. (%d)\n"), GetLastError());
+		::CloseHandle(hMap);
+		return 0;
+	}
+
+	// 3. 이벤트	객체 생성
+	HANDLE hEvent = ::CreateEvent(
+		NULL, TRUE, FALSE, L"IPC_SHAREDMEM_ACCESS");
+	if (::GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 이벤트 객체가 이미 존재하는 경우
+		hEvent = ::OpenEvent(
+			EVENT_ALL_ACCESS,	// 이벤트 접근 권한
+			FALSE,				// 상속 가능 여부
+			L"IPC_SHAREDMEM_ACCESS");	// 이벤트 이름
+		if (hEvent == NULL)
+		{
+			_tprintf(_T("Server - Failed to open event. (%d)\n"), GetLastError());
+		}
+	}
+
+	HANDLE hEvtComplete = ::CreateEvent(
+		NULL, TRUE, FALSE, L"IPC_SHAREDMEM_RECV_COMPLETE");
+	if (::GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 이벤트 객체가 이미 존재하는 경우
+		hEvtComplete = ::OpenEvent(
+			EVENT_ALL_ACCESS,	// 이벤트 접근 권한
+			FALSE,				// 상속 가능 여부
+			L"IPC_SHAREDMEM_RECV_COMPLETE");	// 이벤트 이름
+		if (hEvent == NULL)
+		{
+			_tprintf(_T("Server - Failed to open event obj. (%d)\n"), GetLastError());
+		}
+	}
+
+	// 4,프로세스 동기화를 위한 뮤텍스 생성
+	HANDLE hMutex = ::CreateMutex(
+		NULL, FALSE, L"IPC_SHAREDMEM_MUTEX");
+	if (::GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 뮤텍스 객체가 이미 존재하는 경우
+		hMutex = ::OpenMutex(
+			MUTEX_ALL_ACCESS,	// 뮤텍스 접근 권한
+			FALSE,				// 상속 가능 여부
+			L"IPC_SHAREDMEM_MUTEX");	// 뮤텍스 이름
+		if (hMutex == NULL)
+		{
+			_tprintf(_T("Server - Failed to open mutex obj. (%d)\n"), GetLastError());
+		}
+	}
+
+	// 5. 공유 메모리 읽기/쓰기 이벤트 대기
+	OutputDebugString(L"Server - Server Data Write Start\n");
+
+	// 6. 뮤텍스를 이용한 프로세스 동기화 (메모리 접근)
+	if (::WaitForSingleObject(hMutex, INFINITE) != WAIT_OBJECT_0)
+		OutputDebugString(L"Server - MUTEX error\n");
+	else
+		OutputDebugString(L"Server - MUTEX Lock\n"); // 임계구간(아래)
+
+	// 쓰기(Server)
+	{
+		// 7. 공유 메모리에 데이터 쓰기
+		wsprintfW(pSharedMemory, _T("%s"), _T("Server - Hello, Client! I'm Servers."));
+	}
+
+	::ReleaseMutex(hMutex);
+	OutputDebugString(L"Server - MUTEX UnLock\n"); // 임계구간(위)
+
+
+	// 8. 메모리 쓰기 완료 이벤트 세트
+	::SetEvent(hEvent);
+	OutputDebugString(L"Server - Completion event for Client!\n");
+
+	if (::WaitForSingleObject(hEvtComplete, INFINITE) == WAIT_OBJECT_0)
+	{
+		OutputDebugString(L"Server - Completion event for Client!\n");
+	}
+
+	::UnmapViewOfFile(pSharedMemory);
+	::CloseHandle(hMap);
+	::CloseHandle(hEvent);
+	::CloseHandle(hEvtComplete);
+	::CloseHandle(hMutex);
+
+	return 0;
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+#Client(클라이언트)
+~~~c++
+#include <iostream>
+#include <tchar.h>
+#include <Windows.h>
+#include <TlHelp32.h>
+
+int main()
+{
+	OutputDebugString(L"Client - begin\n");
+
+	// 1. 파일 매핑 객체 생성
+	HANDLE hMap = CreateFileMapping(
+		INVALID_HANDLE_VALUE,	// 파일 핸들
+		NULL,					// 보안 속성
+		PAGE_READWRITE,			// 파일 매핑 속성
+		0,						// 파일 크기 (상위 32비트)
+		128,					// 파일 크기 (하위 32비트)
+		L"IPC_TEST_SHARED_MEMORY");	// 파일 매핑 이름
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 파일 매핑 객체가 이미 존재하는 경우
+		hMap = OpenFileMapping(
+			FILE_MAP_ALL_ACCESS,	// 파일 매핑 접근 권한
+			FALSE,					// 상속 가능 여부
+			L"IPC_TEST_SHARED_MEMORY");	// 파일 매핑 이름
+	}
+
+	// 2. 매핑 객체에 대한 접근 포인터를 얻음(메모리 추상화)
+	TCHAR* pSharedMemory = (TCHAR*)MapViewOfFile(
+		hMap,					// 파일 매핑 객체 핸들
+		FILE_MAP_ALL_ACCESS,	// 파일 매핑 접근 권한
+		0,						// 파일 오프셋 (상위 32비트)
+		0,						// 파일 오프셋 (하위 32비트)
+		128);					// 파일 매핑 크기
+	if (pSharedMemory == NULL)
+	{
+		_tprintf(_T("Client - Failed to get shared memory. (%d)\n"), GetLastError());
+		::CloseHandle(hMap);
+		return 0;
+	}
+
+	// 3. 이벤트	객체 생성
+	HANDLE hEvent = ::CreateEvent(
+		NULL, TRUE, FALSE, L"IPC_SHAREDMEM_ACCESS");
+	if (::GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 이벤트 객체가 이미 존재하는 경우
+		hEvent = ::OpenEvent(
+			EVENT_ALL_ACCESS,	// 이벤트 접근 권한
+			FALSE,				// 상속 가능 여부
+			L"IPC_SHAREDMEM_ACCESS");	// 이벤트 이름
+		if (hEvent == NULL)
+		{
+			_tprintf(_T("Client - Failed to open event. (%d)\n"), GetLastError());
+		}
+	}
+
+	HANDLE hEvtComplete = ::CreateEvent(
+		NULL, TRUE, FALSE, L"IPC_SHAREDMEM_RECV_COMPLETE");
+	if (::GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 이벤트 객체가 이미 존재하는 경우
+		hEvtComplete = ::OpenEvent(
+			EVENT_ALL_ACCESS,	// 이벤트 접근 권한
+			FALSE,				// 상속 가능 여부
+			L"IPC_SHAREDMEM_RECV_COMPLETE");	// 이벤트 이름
+		if (hEvent == NULL)
+		{
+			_tprintf(_T("Client - Failed to open event obj. (%d)\n"), GetLastError());
+		}
+	}
+
+	// 4,프로세스 동기화를 위한 뮤텍스 생성
+	HANDLE hMutex = ::CreateMutex(
+		NULL, FALSE, L"IPC_SHAREDMEM_MUTEX");
+	if (::GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		// 뮤텍스 객체가 이미 존재하는 경우
+		hMutex = ::OpenMutex(
+			MUTEX_ALL_ACCESS,	// 뮤텍스 접근 권한
+			FALSE,				// 상속 가능 여부
+			L"IPC_SHAREDMEM_MUTEX");	// 뮤텍스 이름
+		if (hMutex == NULL)
+		{
+			_tprintf(_T("Client - Failed to open mutex obj. (%d)\n"), GetLastError());
+		}
+	}
+
+	// 5. 공유 메모리 읽기/쓰기 이벤트 대기
+	OutputDebugString(L"Client - Waiting message from server...\n");
+	if (::WaitForSingleObject(hEvent, INFINITE) == WAIT_OBJECT_0)
+	{
+		// 6. 뮤텍스를 이용한 프로세스 동기화 (메모리 접근)
+		if (::WaitForSingleObject(hMutex, INFINITE) != WAIT_OBJECT_0)
+			OutputDebugString(L"Client - MUTEX error\n");
+		else
+			OutputDebugString(L"Client - MUTEX Lock\n"); // 임계구간(아래)
+
+		// 읽기(Client)
+		{
+			// 7. 공유 메모리에 데이터 읽기
+			OutputDebugString(pSharedMemory);
+		}
+		
+		::ReleaseMutex(hMutex);
+		OutputDebugString(L"Client - MUTEX UnLock\n"); // 임계구간(위)
+
+
+		// 8. 메모리 읽기 완료 이벤트 세트
+		::SetEvent(hEvtComplete);
+		OutputDebugString(L"Client - Completion event for server!\n");
+	}
+
+	::UnmapViewOfFile(pSharedMemory);
+	::CloseHandle(hMap);
+	::CloseHandle(hEvent);
+	::CloseHandle(hEvtComplete);
+	::CloseHandle(hMutex);
+
+	return 0;
+}
+~~~
+
+###### [공유메모리기법](#공유메모리기법)
 ###### [Top](#top)
 
 <br/>
@@ -9285,6 +9973,59 @@ mciSendCommand(dwID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&openBgm);    //반복
 ~~~
 
 ###### [음악 재생하기](#음악-재생하기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 실행중인 Process열거하기
+  - Process관련 핵심 API
+    - CreateProcess(), OpenProcess()
+      - HANDLE값을 반환한다
+    - ExitProcess()
+  - 나의 프로세스 종료
+      - TerminateProcess()
+  - 다른 프로세스 종료
+      - Get/SetProcessAffinityMask()
+  - 프로세스 수준에서 cpu 코어 친화력
+      - CreateToolhelp32Snapshot()
+  - 프로세스 열거하기
+      - Process32First(), Process32Next()
+
+<br/>
+
+실행중인 Process열거하기
+
+#ConSoleApp.cpp
+~~~c++
+#include <iostream>
+#include <tchar.h>
+#include <Windows.h>
+#include <TlHelp32.h>
+
+int main()
+{
+	_wsetlocale(LC_ALL, L"Korean");
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnapshot != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe32 = { sizeof(pe32) };
+
+		BOOL bFlag = Process32First(hSnapshot, &pe32);
+		for (; bFlag; bFlag = Process32Next(hSnapshot, &pe32))
+		{
+			_tprintf(_T("[PID: %d] %s\n"), pe32.th32ProcessID, pe32.szExeFile);
+		}
+		::CloseHandle(hSnapshot);
+	}
+
+	return 0;
+}
+~~~
+
+###### [실행중인 Process열거하기](#실행중인-process열거하기)
 ###### [Top](#top)
 
 <br/>
