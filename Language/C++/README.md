@@ -1918,7 +1918,7 @@ int main()
 	Dog* dog = new Dog();
 	delete dog; // 자식을 지우게 되면, 자식 소멸자가 실행된후, 부모 소멸자가 실행된다
 
-	Animal* animal = new Animal();
+	Animal* animal = new Dog();
 	delete animal; // 부모를 지우개 되면, 부모 소멸자만 실행되기 때문에 자식쪽에 메모리 할당된 곳이 있다면 메모리 누수가 발생된다. 따라서 소멸자도 가상 소멸자를 사용하여야 한다
 
 }
