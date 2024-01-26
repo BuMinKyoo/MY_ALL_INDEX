@@ -931,6 +931,147 @@ namespace ConsoleApp1
 ***
 
 # 상속 vs 컴포지션
+  - 둘다 재사용성을 위한 방법
+  - 상속으로 해결할 수 있는 많은 문제를 컴포지션으로도 가능
+    - 그 반대도 가능
+    - 순전히 기술적인 관점
+  - OOP에서 큰 결정사항 중 하나 : 상속 vs 컴포지션 중 하나를 고르는 것
+  - 일단은…
+    - B는 A이다(is-a관계) = 상속으로 만들자
+    - A가 B를 가지고 있다, A가 B를 포함하고 있다(has-a관계) = 컴포지션 으로 만들자
+
+<br/>
+
+  - 코드 재사용성
+    - 설계와 코딩에 드는 시간을 절약
+      - 하지만 실적에서 100%적용은 불가능
+      - 프로그램이 미래에 어떻게 변할지 완전히 예측 불가
+      - 재사용성에 눈이 멀어 잘못된 바퀴를 장착할 수도 있음
+    - 테스트에 걸리는 시간을 절약
+      - 이미 테스트까지 끝낸 클래스를 다시 테스트할 필요가 없음
+      - 상속 시 부모 클래스는 이미 테스트가 끝난 상황
+      - 이때 부모 클래스를 테스트할 필요가 없다 말하는 사람도 있음
+      - 하지만 실제로는 그렇지 않은 경우가 빈번
+        - 새로운 방법으로 부모 클래스 사용, 자식 클래스에서 부모 클래스를 다른 방식으로 사용할 수 있음
+      - 부모 클래스를 변경
+        - 새로운 자식 클래스가 상속받을 수 있도록 부모 클래스 수정가능성 있음
+    - 관리 비용을 절약
+      - 코드 중복이 없음, 따라서 한곳만 고치고 다른 곳을 실수로 안 고칠 가능성이 없음
+      - 관련된 코드가 모두 한 파일 안에 있음
+       - 따라서, 그 파일을 열어 모든 로직 및 데이터 파악 가능
+        - 단, 재사용성을 위해 클래스를 잘게 나누다 보면 파일 수가 많아짐
+  - OOP모델링은 많은 연습이 필요
+    - 몇 개의 베스트 프랙티스로 간단히 정리가 불가능
+      - 주관성이 높음
+      - 너무나 다양한 프로그램이 존재
+    - OOP모델링에 지름길은 없으며, 많은 코딩 경험이 필요하다
+    - 다른 사람의 코드를 많이 사용해 보자
+    - 코드 리뷰를 주고받아 보자
+
+<br/>
+
+//상속
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Box box = new Box(1, 2, 3);
+
+        }
+    }
+
+    public class Rectangle
+    {
+        private int widht;
+        private int height;
+
+       public Rectangle(int widht, int height)
+       {
+           this.widht = widht;
+           this.height = height;
+       }
+    }
+    
+    public class Box : Rectangle
+    {
+        private int depth;
+
+        public Box(int widht, int height, int depth) : base(widht, height)
+        {
+            this.depth = depth;
+        }
+    }
+}
+~~~
+
+<br/>
+
+//컴포지션
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Rectangle rectangle = new Rectangle(5, 6);
+            Box box = new Box(rectangle, 10);
+
+        }
+    }
+
+    public class Rectangle
+    {
+        private int widht;
+        private int height;
+
+       public Rectangle(int widht, int height)
+       {
+           this.widht = widht;
+           this.height = height;
+       }
+    }
+    
+    public class Box
+    {
+        private Rectangle rectangle;
+        private int depth;
+
+        public Box(Rectangle rectangle, int depth)
+        {
+            this.rectangle = rectangle;
+            this.depth = depth;
+        }
+    }
+}
+~~~
+
+<bt/>
+
+  - 상속,컴포지션
+    - 상속은, 개체 생성시, 메모리가 하나의 덩어리로 된다, new를 한번만 하기 때문
+    - 컴포지션은 메모리가 여러덩어리 new를 여러번 하게 된다.
+    - 메모리에 차지하는 용량의 차이는 미비 할지라도, 실행 속도에 영향을 주게 된다.
+      - 상속은 개체 메모리가 하나의 덩어리로 되어 있기 때문에, 개체가 한번에 캐시 메모리에 들어갈 가능성이 높다
+      - 컴포지션은 메모리가 여러 덩어리로 되어 있게 때문에, 개체 내 부품 수 만큼 캐시 메모리로 로딩할 가능성이 높다.
+      - 캐시 메모리는, RAM메모리에서 특정 메모리 위치에서 연속적으로 메모리를 읽어 올 수 있다
+    - 컴포지션은 개체메모리를 할당하고 해제하는 횟수가 많기 때문에 더 느릴수 있다
+    - 다형성을 사용하기 위해서는 무조건 상속을 사용해야 한다
+    - 깊은 상속을 하면, 상속은 부모의 기능을 내려 받는 것이기 때문에 부모를 고치면 아래의 자식들의 기능을 전부다 확인해 봐야 한다. 컴포지션은 기능을 내려 받는 다기 보다는, 특정 Class를 내 안에 넣어서, 그 기능을 부분적으로 사용하는것이기 때문에 깊은 상속보다는 관리가 쉬울 수 있다
+
+<br/>
+
+  - 엔티티 컴포넌트 시스템
+    - 줄여서 ECS(Entity Component System)라고도 함
+    - 프로그래머가 컴포지션을 선호하는 또 다른 예
+    - 코드 변경 없이 자유롭게 개체를 만들 수 있도록 하는 게 목적
+    - 아키텍처 패턴 중 하나
+      - 디자인 패턴과 비슷
+      - 그러나 아직 약장수가 적음
+    - 특히 게임 업계에서 많이 사용
 
 ###### [상속 vs 컴포지션](#상속-vs-컴포지션)
 ###### [Top](#top)
@@ -941,6 +1082,238 @@ namespace ConsoleApp1
 ***
 
 # 다형성
+  - 많은 사람들이 OOP의 핵심이라 여기는 특징
+  - 같은 지시를 내렸는데 다른 종류의 개체가 동작을 달리하는 것
+    - 같은 지시 : 동일한 함수 시그니처 호출
+    - 달리 동작 : 개체의 종류에 따라 실제로 실행되는 함수 구현 코드가 다름, 절차적 언어에서 이런 일을 하려면 if문을 사용해야 했음
+    - 어떤 함수 구현이 실행될지는 실행 중에 결졍됨, 이를 늦은 바인딩(late binding)이라고 함, 일반적인 함수 호출은 이른 바인딩(early binding)이것은 컴파일 중에 결정됨
+    - 다형성의 혜택을 받으려면 상속 관계가 필요
+      - 부모 개체에서 함수 시그니처를 선언
+      - 자식 개체에서 그 함수를 다르게 구현(오버라이딩)
+      - 실용적인 용도 : 다른 종류의 개체를 편하게 저장 및 처리 가능
+      - 예 : 부모의 형(type)을 저장하는 배열에 모든 자식 개체를 저장
+        - for문 하나로 모든 개체를 순회하며 동일한 함수를 호출
+        - 그러면 각 개체가 자신의 종류에 따라 다른 동작을 함
+
+<br/>
+
+  - 무늬 vs 실체
+    - virtual, override키워드를 사용하면 다형성이 적용되게 되고, 실체에 따라서 호출이 진행되게 된다
+      - virtual이 아닌함수에 override키워드를 사용하면 컴파일 에러가 난다
+      - virtual인 함수에 override키워드를 꼭 사용하지 않고, 다형성을 일으키지 않을 수 있다
+      - virtual :  이 함수를 다른 자식 클래스에서 덮어쓸 수 있게 바꿔준다
+      - override : 자식클래스에서 부모의 같은 시그니처를 가진 함수를 덮어 쓰겠다
+    - 다형성은 무늬가 아닌 실체를 따라간다!
+
+<br/>
+
+~~~c#
+// Java에서는 virtual, override 키워드가 없어도 컴파일러가 만들어 준다
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Animal[] animals = new Animal[4];
+            animals[0] = new Dog();
+            animals[1] = new Bird();
+            animals[2] = new Cat();
+            animals[3] = new Animal();
+
+            for (int i = 0; i < animals.Length; i++)
+            {
+                animals[i].shout();
+            }
+
+        }
+    }
+
+    public class Animal
+    {
+        public virtual void shout()
+        {
+            Console.WriteLine("난 Animal");
+        }
+
+    }
+    
+    public class Dog : Animal
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Dog");
+        }
+    }
+
+    public class Bird : Animal
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Bird");
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Cat");
+        }
+    }
+}
+
+// 출력
+// 난 Dog
+// 난 Bird
+// 난 Cat
+// 난 Animal
+~~~
+
+<br/>
+
+  - override 되어 있지 않지만, 그것을 실체는 자식인데, 무늬가 부모인 것에서 출력하기 위해서는, 무늬를 자식으로 바꾸어서 출력해야 한다
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Animal[] animals = new Animal[4];
+            animals[0] = new Dog();
+            animals[1] = new Bird();
+            animals[2] = new Cat();
+            animals[3] = new Animal();
+
+            for (int i = 0; i < animals.Length; i++)
+            {
+                animals[i].shout();
+            }
+
+            ((Dog)animals[0]).shout2(); // 부모에서 바로는 불가능하며, 자식으로 형변환을 해줘야 가능하다.
+        }
+    }
+
+    public class Animal
+    {
+        public virtual void shout()
+        {
+            Console.WriteLine("난 Animal");
+        }
+
+    }
+    
+    public class Dog : Animal
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Dog");
+        }
+        public void shout2()
+        {
+            Console.WriteLine("난 Dog2");
+        }
+    }
+
+    public class Bird : Animal
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Bird");
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Cat");
+        }
+    }
+}
+
+// 출력
+// 난 Dog
+// 난 Bird
+// 난 Cat
+// 난 Animal
+// 난 Dog2
+~~~
+
+<br/>
+
+  - base키워드 사용하여 자식에서 부모의 함수 출력하기
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Animal animal = new Animal();
+            animal = new Dog();
+            animal.shout();
+        }
+    }
+
+    public class Animal
+    {
+        public virtual void shout()
+        {
+            Console.WriteLine("난 Animal");
+        }
+
+    }
+    
+    public class Dog : Animal
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Dog");
+            base.shout();
+        }
+    }
+}
+
+// 출력
+// 난 Dog
+// 난 Animal
+~~~
+
+<br/>
+
+  - 다형성의 장점
+    - 각 자료형의 코드가 클래스 안에 들어가니 캡슐화 올라감
+      - 프로그램의 크기가 커지면, 각 상태와 동작간에 상관성이 있는 것들끼리 같이 분류해 두거나 하는 정리가 필요한데, 개체지향과 다형성이 있다면 그것들을 정리하게 될 수 밖에 없다(언어 수준에서 그렇게 할 수 밖에 없도록 함)
+    - 유지 보수성도 높아짐
+    - 새로운 클래스를 추가할 때 클래스 코드만 추가하면 됨
+
+<br/>
+
+  - 다형성은 늦은 바인딩
+    - 실제로 호출되는 메서드 구현이 프로그램 실행 중에 결정된다
+    - 동적 바인딩이라고도 함
+    - C에서 함수 포인터는 늦은 바인딩!
+  - 이른 바인딩
+    - 정적 바인딩이라고도 함
+    - C에서 배웠던 함수의 호출 방식
+    - 어떤 함수 구현을 호출해야 할지가 빌드 중에 결정 남
+  - 이른 바인딩 vs 늦은 바인딩
+    - 둘 중에 CPU최적화가 더 잘 될 가능성이 높은 것은?
+    - 당연히 이른 바인딩
+      - 컴파일러가 어떤 함수를 호출해야 하는지 앎
+      - 따라서 컴파일 중에 충분한 시간을 들여 최적화를 할 수 있음
+      - 실행 중에 이렇게 충분한 시간을 사용할 수 없음
+
+<br/>
+
+  - 함수에 대해서는 나중에 따로 공부하기
+    - toString()
+    - equals()
+    - hasgCode()
 
 ###### [다형성](#다형성)
 ###### [Top](#top)
@@ -952,6 +1325,160 @@ namespace ConsoleApp1
 
 # 추상 메서드/클래스
 
+<br/>
+
+~~~c#
+// 상속 사용시, 추상화되는 과정에서 의미 없는 것들과 실수할 것들을 방지 하기 위해 추상 메서드가 생기게 되었다
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 아래 클래스의 사용법
+            Monster monster1 = new Ghost();
+            Monster monster2 = new Troll();
+            monster1.attack(monster2);
+
+            // 문제점
+            // 1. 의미 없는 Monster클래스의 개체를 만들어 낼 수 있다
+            Monster monster3 = new Monster();
+
+            // 2. 자식클래스에서 calculateDamage를 오버라이딩 하지 않으면, 부모의 의미없는 calculateDamage가 호출된다
+        }
+    }
+
+    public class Monster
+    {
+        public virtual void shout()
+        {
+            Console.WriteLine("난 Animal");
+        }
+
+        public virtual int attack(Monster monster)
+        {
+            int damage = calculateDamage(monster);
+            return damage;
+        }
+
+        // 자식 클래스에서 오버라이딩만을 하기 위해 virtual로 선언
+        public virtual int calculateDamage(Monster monster)
+        {
+            return 0;
+        }
+    }
+    
+    public class Ghost : Monster
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Ghost");
+        }
+        public override int calculateDamage(Monster monster)
+        {
+            int temp = 100;
+            return temp;
+        }
+    }
+
+    public class Troll : Monster
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Troll");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 위와 같은 실수를 막기 위해 abstract 키워드를 사용하여 추상메서드/클래스를 사용하게 되면
+    - 추상메서드는 개체를 만들수 없게 된다(왜냐면 구현이 없기 때문)
+    - 추상 클래스를 상속받는 자식 클래스는 부모의 추상 메서드를 무조건 작성해야 한다
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Monster monster3 = new Monster(); // 컴파일에러
+
+            // Troll클래스는 calculateDamage가 없기 때문에 컴파일 에러
+        }
+    }
+
+    public abstract class Monster
+    {
+        public virtual void shout()
+        {
+            Console.WriteLine("난 Animal");
+        }
+
+        public virtual int attack(Monster monster)
+        {
+            int damage = monster.calculateDamage(monster);
+            return damage;
+        }
+
+        // 자식 클래스에서 오버라이딩만을 하기 위해 virtual로 선언
+        public abstract int calculateDamage(Monster monster)
+        {
+            return 0;
+        }
+    }
+    
+    public class Ghost : Monster
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Ghost");
+        }
+        public override int calculateDamage(Monster monster)
+        {
+            int temp = 100;
+            return temp;
+        }
+    }
+
+    public class Troll : Monster
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Troll");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 추상클래스
+    - <접근제어자> abstract class <클래스명> {...}
+    - 인스턴스를 만들 수 없는 클래스
+      - 인스턴스를 만들 수 있는 클래스는 구체 클래스라고 함
+      - 따라서 구체 클래스가 아닌 클래스를 추상 클래스라고도 함
+    - 다른 클래스의 부모 클래스가 될 수는 있음
+    - 반드시 추상 메서드가 들어 있을 필요는 없음
+    - 추상 메서드는 구현이 없는 메서드
+      - 시그니처는 있음
+      - 함수 속 코드는 없음
+    - 동작이 일부라도 구현되지 않은 클래스는 실체가 완성되지 않은 클래스
+      - 다른 말로 하면 구체적이지 않음
+      - 즉, 이 클래스는 (어느 정도) 추상적이다 라고 말할 수 있음
+
+<br/>
+
+  - 정리
+    - 어떤 클래스가 따로 독자 생성이 필요 없는(자체 개체 생성이 필요 없거나 의미 없는)클래스라면 추상 클래스로 만든다
+    - 어떤 자식들에게 무조건적으로 이 함수를 만드려고 강제 하기 위해서는 추상 메서드를 사용한다(함수가 추상 메서드면 클래스도 무조건 추상 클래스가 된다)
+
+
 ###### [추상 메서드/클래스](#추상-메서드/클래스)
 ###### [Top](#top)
 
@@ -961,6 +1488,182 @@ namespace ConsoleApp1
 ***
 
 # 인터페이스(interface)
+  - ‘순수 추상 클래스’라고도 불림
+  - 특수한 형태의 클래스
+  - 어떤 상태도 없음
+  - 동작의 구현도 없음
+  - 동작의 시그니처만 있음
+  - public메서드 시그니처만 모아 놓은 것
+  - C언어의 헤더 파일 같은 존재
+  - 이런 특징 때문에 클래스하고는 약간 다른 규칙을 따름
+  - 인터페이스는 다형성을 위해 존재한다
+    - 인터페이스는 함수 포인터 처럼 사용되어짐!!
+    - 다중 상속을 흉내 낼 수 있는 방법
+    - 변화에 대비해 결합도를 낮추는것
+    - 다중 상속문제의 해결법(다중 상속을 흉내 내는 방법)_다형성을 위해 사용한다는것!!!
+      - 인터페이스를 사용하면 다중 상속을 흉내 낼 수 있음
+      - 여전히 상속과 마찬가지로 각 클래스에서 함수를 구현해야함(다형적으로 쓰기 위해)
+      - 부모 인터페이스로 for문 돌리면서 다형성을 이뤄낼 수 있음
+
+<br/>
+
+  - 추상클래스에서, 인터페이스로 변경
+    - class를 interface로 변경
+    - abstract키워드가 필요 없음
+      - interface는 그 자체가 추상적
+    - 메서드는 언제나 public이기때문에  public키워드 생략
+    - 추상클래스에 있는 상태인 필드멤버는 다 없어진다
+  - 추상클래스와 인터페이스의 차이
+    - 추상 클래스는 그 클래스 안에서 기능적인 부분들을 만들수 있지만, 인터페이스(interface)는 만들 수 없다, 구현만 존재한다
+    - 추상 클래스는 상태와 함수 모두 만들 수 있지만, 인터페이스는 구현없는 함수만 만들 수 있다
+    - 추상 메서드는 protected를 붙일 수 있었고 외부에서 호출은 못해도 자식 클래스가 구현하게 강제할 수 있었다.
+    - 인터페이스는 다중상속이 되고, 추상클래스는 다중상속이 안된다
+      - 다중상속의 문제는 구현되어 있는 것을 받는것이 문제였기 때문에 구현이 없는 인터페이스는 다중 상속을 받을 수 있다
+      - 단, 인터페이스를 다중 상속시, 반환형만 다른 함수가 있다면 컴파일 오류가 난다. 올바른 함수 오버로딩이 아니기 때문
+
+<br/>
+
+~~~c#
+// 추상 클래스
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Monster monster = new Ghost();
+            monster.shout();
+            Console.WriteLine(monster.attack(monster));
+
+            monster = new Troll();
+            monster.shout();
+            Console.WriteLine(monster.attack(monster));
+        }
+    }
+
+    public abstract class Monster
+    {
+        public virtual void shout()
+        {
+            Console.WriteLine("난 Animal");
+        }
+
+        public int attack(Monster monster)
+        {
+            int damage = monster.calculateDamage(monster);
+            return damage;
+        }
+
+        // 자식 클래스에서 오버라이딩만을 하기 위해 virtual로 선언
+        public abstract int calculateDamage(Monster monster);
+    }
+
+    public class Ghost : Monster
+    {
+        public override void shout()
+        {
+            Console.WriteLine("난 Ghost");
+        }
+        public override int calculateDamage(Monster monster)
+        {
+            int temp = 100;
+            return temp;
+        }
+    }
+
+    public class Troll : Monster
+    {
+        //public override void shout()
+        //{
+        //    Console.WriteLine("난 Troll");
+        //}
+
+        public override int calculateDamage(Monster monster)
+        {
+            int temp = 200;
+            return temp;
+        }
+    }
+}
+
+
+// 출력
+//난 Ghost
+//100
+//난 Animal
+//200
+~~~
+
+<br/>
+
+~~~c#
+// 인터페이스
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            IMonster monster = new Ghost();
+            monster.Shout();
+            Console.WriteLine(monster.Attack(monster));
+
+            monster = new Troll();
+            monster.Shout();
+            Console.WriteLine(monster.Attack(monster));
+        }
+    }
+
+    // 인터페이스 정의
+    public interface IMonster
+    {
+        void Shout();
+        int Attack(IMonster monster);
+    }
+
+    public class Ghost : IMonster
+    {
+        public void Shout()
+        {
+            Console.WriteLine("난 Ghost");
+        }
+
+        public int Attack(IMonster monster)
+        {
+            int damage = CalculateDamage(monster);
+            return damage;
+        }
+
+        public int CalculateDamage(IMonster monster)
+        {
+            int temp = 100;
+            return temp;
+        }
+    }
+
+    public class Troll : IMonster
+    {
+        public void Shout()
+        {
+            Console.WriteLine("난 Troll");
+        }
+
+        public int Attack(IMonster monster)
+        {
+            int damage = CalculateDamage(monster);
+            return damage;
+        }
+
+        public int CalculateDamage(IMonster monster)
+        {
+            int temp = 200;
+            return temp;
+        }
+    }
+}
+~~~
 
 ###### [인터페이스(interface)](#인터페이스interface)
 ###### [Top](#top)
