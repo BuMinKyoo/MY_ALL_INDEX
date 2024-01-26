@@ -1674,6 +1674,379 @@ namespace ConsoleApp1
 ***
 
 # 인터페이스 vs 구현, 의존성 주입
+  - 종종 듣는 이상한 이야기
+    - 클래스 간에 의존성이 있으면 잘못된 OOP설계의 냄새가 난다
+    - 하지만,,,의존성이 있어야 좋은 설계
+      - 각 클래스의 목적이 뚜렷하다는 의미
+     - 캡슐화가 잘 되어 있다는 의미
+     - 클래스를 재사용할 수 있다는 의미
+       - 함수 재사용성과 마찬가지
+       - 의존성을 완전히 없애려면 프로그램 전체를 함수 하나에 작성하면 됨
+     - 결합도라는 말과 혼동되어서 사용하기 때문
+  - 결합도(coupling)
+    - 종종 커플링이라고 그대로 음차 해서 사용
+    - 원래 의미는 두 소프트웨어 모듈 간에 상호 의존성 정도
+     - 클래스 A가 클래스 B에 의존
+     - 클래스 B도 클래스 A에 의존
+     - A와B중 하나도 독자 생존이 불가능
+  - OOP에서 흔히 논하는 결합도
+    - A가B에 의존하는 상황에서 B를 변경할 때 프로그램이 잘 작동하는가?
+     - 1. A의 내부를 변경 안 해도 제대로 동작
+       - A가 B에 의존하나 그 정도가 높지 않음
+       - 즉, 결합도가 낮음
+     - 2. A의 내부를 변경해야만 제대로 동작
+       - A가 B에 의존하는 정도가 높음
+       - 즉, 결합도가 높음
+
+<br/>
+
+~~~c#
+// 결합도가 높다
+// 즉, Head가 바뀌면 Robot에서 컴파일이 안될수가 있다
+namespace ConsoleApp2
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Robot robot = new Robot();
+        }
+    }
+
+    public class Head
+    {
+        public Head()
+        {
+            Console.WriteLine("Head");
+        }
+    }
+
+    public class Robot
+    {
+        private Head head;
+        public Robot()
+        {
+            this.head = new Head();
+            Console.WriteLine("Robot");
+        }
+    }
+}
+~~~
+
+<br/>
+
+~~~c#
+// 결합도가 낮다
+// 즉, Head가 바뀌어도 Robot에서 컴파일이 안될가능성이 낮다
+// 이것이 의존성 주입의 예
+namespace ConsoleApp2
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Head head = new Head();
+            Robot robot = new Robot(head);
+        }
+    }
+
+    public class Head
+    {
+        public Head()
+        {
+            Console.WriteLine("Head");
+        }
+    }
+
+    public class Robot
+    {
+        private Head head;
+        public Robot(Head head)
+        {
+            this.head = head;
+            Console.WriteLine("Robot");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 의존성 주입(dependency injection, DI)
+    - 바로 위의 코드처럼, 어떤 클래스안에 다른 클래스를 주입하는것
+      - 위의 코드는 생성자를 통해 전달하기 때문에 ‘생성자 주입’
+      - ‘setter주입’ 이라는 다른 방식도 있음
+    - setter주입
+      - setter주입을 사용하면 생성자 주입을 생략할 수도 있음
+      - 하지만 개체의 유효한 상태에 해가 될 수도?
+        - 개체는 생성 시부터 유효한 상태를 가져야 한다는 원칙..
+    - 얻은것
+      - 결합도를 낮춤
+      - 위의 코드처럼, 나중에 Head의 생성자가 바뀌어도 Robot을 바꿀 필요가 없음
+      - 위의 코드처럼, Head가 바뀌면 이 클래스만 따로 컴파일해서 배포 가능
+    - 읽은것
+      - 편의성
+        - 예 : Robot만 생성하면 머리도 딸려 옴
+      - 프로그래머의 원래 의도를 잘 보여주는 클래스
+
+<br/>
+
+  - 확장성과, 결합도를 낯추기 위해서 상속, 추상클래스를 사용하기도하며, 인터페이스도 이와 같다
+  - 아래는 일반상속과, 추상클래스와, 인터페이스로부터 결합도를 낮추는 방법을 본다
+
+<br/>
+
+~~~c#
+// 일반 상속
+namespace ConsoleApp2
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Head head = new Head();
+            Head head1 = new AHead();
+            Head head2 = new BHead();
+
+            Robot robot = new Robot(head);
+            Robot robot1 = new Robot(head1);
+            Robot robot2 = new Robot(head2);
+
+            robot.headMethod(); // Method
+            robot1.headMethod(); // Method AHead
+            robot2.headMethod(); // Method BHead
+        }
+    }
+
+    public class Head
+    {
+        public Head()
+        {
+
+        }
+
+        public virtual void Method()
+        {
+            Console.WriteLine("Method");
+        }
+    }
+
+    public class Robot
+    {
+        private Head head;
+        public Robot(Head head)
+        {
+            this.head = head;
+
+        }
+
+        public void headMethod()
+        {
+            head.Method();
+        }
+    }
+
+    public class AHead : Head
+    {
+        public AHead()
+        {
+
+        }
+
+        public override void Method()
+        {
+            Console.WriteLine("Method AHead");
+        }
+    }
+
+    public class BHead : Head
+    {
+        public BHead()
+        {
+
+        }
+
+        public override void Method()
+        {
+            Console.WriteLine("Method BHead");
+        }
+    }
+}
+~~~
+
+<br/>
+
+~~~c#
+// 추상 클래스
+namespace ConsoleApp2
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            //Head head = new Head(); // 컴파일에러
+            Head head1 = new AHead();
+            Head head2 = new BHead();
+
+            //Robot robot = new Robot(head); // 컴파일에러
+            Robot robot1 = new Robot(head1);
+            Robot robot2 = new Robot(head2);
+
+            //robot.headMethod(); // Method // 컴파일에러
+            robot1.headMethod(); // Method AHead
+            robot2.headMethod(); // Method BHead
+        }
+    }
+
+    public abstract class Head
+    {
+        public Head()
+        {
+
+        }
+
+        public abstract void Method();
+    }
+
+    public class Robot
+    {
+        private Head head;
+        public Robot(Head head)
+        {
+            this.head = head;
+
+        }
+
+        public void headMethod()
+        {
+            head.Method();
+        }
+    }
+
+    public class AHead : Head
+    {
+        public AHead()
+        {
+
+        }
+
+        public override void Method()
+        {
+            Console.WriteLine("Method AHead");
+        }
+    }
+
+    public class BHead : Head
+    {
+        public BHead()
+        {
+
+        }
+
+        public override void Method()
+        {
+            Console.WriteLine("Method BHead");
+        }
+    }
+}
+~~~
+
+<br/>
+
+~~~c#
+// 인터페이스
+namespace ConsoleApp2
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            //Head head = new Head(); // 컴파일에러
+            IHead head1 = new AHead();
+            IHead head2 = new BHead();
+
+            //Robot robot = new Robot(head); // 컴파일에러
+            Robot robot1 = new Robot(head1);
+            Robot robot2 = new Robot(head2);
+
+            //robot.headMethod(); // Method // 컴파일에러
+            robot1.headMethod(); // Method AHead
+            robot2.headMethod(); // Method BHead
+        }
+    }
+
+    public interface IHead
+    {
+        // 생성자 생성불가 컴파일에러
+        //public IHead()
+        //{
+
+        //}
+
+        void Method();
+    }
+
+    public class Robot
+    {
+        private IHead head;
+        public Robot(IHead head)
+        {
+            this.head = head;
+
+        }
+
+        public void headMethod()
+        {
+            head.Method();
+        }
+    }
+
+    public class AHead : IHead
+    {
+        public AHead()
+        {
+
+        }
+
+        public void Method()
+        {
+            Console.WriteLine("Method AHead");
+        }
+    }
+
+    public class BHead : IHead
+    {
+        public BHead()
+        {
+
+        }
+
+        public void Method()
+        {
+            Console.WriteLine("Method BHead");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 디커플링은 유연성/재사용성을 높임
+    - 디커플링은 즉 결합도를 낮추는것을 의미
+    - 앞에서 추상화는 유연성/재사용성을 높인다고 했음
+    - 재사용성을 높였단 이야기는 미래의 변화에 대비되어 있다는 의미
+    - 단점
+      - 직관적이지 못하다
+        - 무늬만 보고 판단이 불가능, 무늬는 똑같지만 실체가 다르기 때문
+
+<br/>
+
+  - 그러나 어쨌든 이런 이상한 소리를 하는 사람이 있다
+    - 다른 클래스에 속한 개체의 메서드를 절대로 직접 호출하면 안된다 그 대신 모든걸 인터페이스로 만들어라
+      - 왜? -> OOP에서는 디커플링이 언제나 제일 중요하니까!
+      - 라고 하는것은 다 맞지 않다!
+  - 인터페이스 : 구현 = 1 : 1은 이상한 일!
+    - 다형성이 필요 없는데도 클래스마다 인터페이스를 만드는 꼴이 될 수 있다
 
 ###### [인터페이스 vs 구현, 의존성 주입](#인터페이스-vs-구현-의존성-주입)
 ###### [Top](#top)
@@ -1684,6 +2057,77 @@ namespace ConsoleApp1
 ***
 
 # 디자인 패턴
+  - 알고리즘, 베스트 프랙티스, 디자인 패턴 으로 갈수록 추상적인 개념
+  - 소프트웨어 설계에서 흔히 겪는 문제에 대한 해결책
+  - 범용적, 반복적
+  - 완성된 설계가 아님
+    - 곧바로 코드로 바뀌지 않음
+    - 어떤 문제를 다양한 환경에서 해결하는 법을 설명한 가이드로 생각하면 됨
+  - 장점
+    - 이미 테스트를 마친 검증된 개발 방법을 사용해 개발 속도를 향상
+    - 공통 용어 정립을 통한 개발자들 간의 빠른 의사소통을 촉진
+      - xx패턴을 사용하면돼 라는 한 마디로 의사소통이 가능
+  - 단점
+    - 곧바로 적용할 수 없는 참고 가이드를 ‘패턴’이라 부를 수 없음
+    - 잘못 적용하는 경우가 빈번함
+    - 비효율적인 해법이 되는 경우가 많음
+      - 디자인 패턴은 범용적, 추상적
+      - 코드 중복이 많아지고 성능이 떨어질 수 있음
+    - 다른 추상화 기법과 크게 다르지 않음
+  - 디자인 패턴은 만능이 아님
+    - 프로그래밍을 잘 못하는 사람이 디자인 패턴 익힌다고 더 잘하지 않음
+  - 생성패턴(Createional)
+    - 클래스 : 팩토리 메서드
+    - 개체 : 추상 메서드
+    - 개체 : 빌더
+    - 개체 : 프로토타입
+    - 개체 : 싱글턴
+  - 구조패턴(Structural)
+    - 클래스 : 어댑터
+    - 개체 : 브리지
+    - 개체 : 컴포지트
+    - 개체 : 데코레이터
+    - 개체 : 퍼사드
+    - 개체 : 플라이웨이트
+    - 개체 : 프록시
+  - 행위패턴(Behavioral)
+    - 클래스 : 인터프리터, 템플릿 메서드
+    - 개체 : 책임 연쇄
+    - 개체 : 커맨드
+    - 개체 : 반복자
+    - 개체 : 중재자
+    - 개체 : 메멘토
+    - 개체 : 옵저버
+    - 개체 : 상태
+    - 개체 : 전략
+    - 개체 : 방문자
+
+<br/>
+
+  - 이미 싱글턴 패턴은 위에서 봤음
+  - 이번에는 그나마 많이 사용하는 패턴을 몇 개 더 볼 생각
+
+<br/>
+
+  - 팩토리 메서드패턴
+    - 사용할 클래스를 정확히 몰라도 개체 생성을 가능하게 해주는 패턴
+  - 빌더 패턴
+    - 개체의 생성과정을 그 개체의 클래스로부터 분리하는 방법
+    - 개체의 부분부분을 만들어 나가다 준비되면 그제서야 개체를 생성
+  - 래퍼 패턴 = 어댑터 패턴
+    - 어떤 클래스의 메서드 시그니처가 맘에 안 들 때 다른 걸로 바꾸는 방법
+    - 단, 그 클래스의 메서드 시그니처를 직접 변경하지 않음
+    - 그 대신 새로운 클래스를 만들어 기존 클래스를 감쌈
+    - 추후 외부 라이브러리를 바꿀 때 클라이언트 코드를 변경하지 않기 위해서도 많이 사용한다
+  - 프록시
+    - 프록시 서버처럼, 프록시 패턴이 이루려는 목적도 비슷
+    - 클래스 안에서 어떤 상태를 유지하는 게 여의치 않은 경우가 있음
+      - 개체 생성 시에는 데이터 로딩에 필요한 정보만 기억해 둠
+      - 클라이언트가 실제로 데이터를 요청할 때 메모리에 로딩함
+  - 책임 연쇄
+    - …
+  - 옵저버 패턴 -> 발생-구독패턴
+    - 어떤 것을 관찰하고 있다가 그것이 바뀌면 나도 행동하는것
 
 ###### [디자인 패턴](#디자인-패턴)
 ###### [Top](#top)
@@ -1694,6 +2138,33 @@ namespace ConsoleApp1
 ***
 
 # 예외
+  - try-catch-finally문
+    - try : 이 안에 있는것에서 에러가 나면 잡힌다
+    - catch : 에러가 잡히면 이쪽으로 이동한다
+    - finally : 에러가 잡히든 안잡히든 여기는 무조건 통과 한다
+  - 정리 : 예외가 발생했을 때 진행 순서
+    - 1. try블록의 실행이 중단됨
+    - 2. catch블록 중에 발생한 예외를 처리할 수 있는 블록이 있는지 찾음
+      - 위에서 부터 하나씩 평가
+    - 3.1. 예외를 처리할 수 있는 catch블록이 없다면 finally블록을 실행 후, 한 단계 높은 try블록으로 전달
+    - 3.2. 예외를 처리할 수 있는 catch블록이 있다면 해당 catch블록 안의 코드들이 실행
+      - finally블록을 실행
+      - try블록 이후의 코드들이 실행됨
+  - 다시 예외 던지기
+    - 언어마다 다르지만, throw키워드를 사용해서 던지게 된다
+
+<br/>
+
+  - 예전에는 예외가 발생되면 그 예외가 무엇인가 확인하고 회복하고자 했지만, 요즘에는 예외는 한번에 잡거나, 프로그램이 뻑이나면 그냥 재실행 하는 방향으로 가고 있다
+  - 요즘에는 항상예외를 많이 쓰는것도 좋지 않을 수도 있고, 예외를 모두 잡을 수 없다는 사실도 인정해야 한다
+
+<br/>
+
+  - 오류 상황을 처리하는 4가지 방법
+    - 무시하고 넘어간다(무시)
+    - 문제를 일으킬 수 있는 상황이 있는지 검사하고, 그렇다면 프로그램을 종료한다(종료)
+    - 문제를 일으킬 수 있는 상황이 있는지 검사하고, 그렇다면 실수를 고친 뒤 계속 프로그램을 실행되게 한다(수정)
+    - 문제가 발생하면 예외를 던진다(예외)
 
 ###### [예외](#예외)
 ###### [Top](#top)
@@ -1704,6 +2175,50 @@ namespace ConsoleApp1
 ***
 
 # SOLID설계 정신
+  - 소프트웨어 설계를 이해하기 쉽고, 유연하고, 유지보수가 쉽게 만들기 위해 나온 원칙 
+  - 하지만,,
+    - 원칙도 규칙도 아닌 방향성을 제시할 뿐
+    - 알아두면 좋은 정도의 주관적인 내용
+    - 이미 기존에 존재하던 베스트 프랙티스를 이름만 바꾼 것도 있음
+      - 그러나 이들은 스스로를 원칙이라 부르지 않았음
+    - 심지어 좀 극단적인 주장을 한 것도 있음
+    - 모든 코드를 SOLID에 맞춰 작성하면 그 자체로 유지보수가 힘든 코드가 될 것임!!
+  - 어쨌든, SOLID를 적용하면 유연해 진다, 즉 추상적인 설계로 커플링을 제거할 수 있다
+
+<br/>
+
+  - 현재 SOLID정신이 도움될 만한 곳
+    - SOLID는 디커플링을 중요하게 여기니 대규모 프로젝트일수록 유용
+    - 따라서 모든 프로젝트에 적용할 수 있다 생각치 말 것
+    - 직접적/구체적인 게 더 이해하기 쉽다는 사실을 잊지 말것
+    - 많은 프로젝트의 시작은 직접적/구체적인 설계로 시작된다
+      - 규모가 커지면서 유연성이 필요 해지면 그때부터 바꿔갈 때 도움이 될 정신
+
+<br/>
+
+  - SOLID
+    - SRP : 단일 책임 원칙(single responsibility principle)
+      - 클래스의 존재 이유는 하나여야만 한다는 의미
+      - 한 함수에서 너무 많은 일을 하지 말라는 말과 비슷
+      - 그냥 클래스 하나에서 너무 많은 일을 하지 말라는 이야기
+      - 기본적으로는 좋은 정신
+      - 이 코드를 보는 대부분의 사람이 이해할 수 있는 크기로 클래스를 만들자! 라는 의미
+    - OCP : 개방-폐쇄 원칙(open/closed principle)
+      - 클래스 내부 수정 없이 동작을 확장할 수 있어야 한다는 의미
+      - 상속이 그 좋은 예
+    - LSP : 리스코프 치환 원칙(Liskov substitution principle)
+      - 1. 부모 클래스의 개체를 사용하는 코드 A가 있음
+      - 2. 나중에 자식 클래스의 개체를 거기에 대신 사용함(치환)
+      - 3. 이때 A가 아무 문제 없이 작동해야 한다
+      - 즉, 부모가 할 수 있었던 일은 자식도 다 할 수 있어야 함
+    - ISP : 인터페이스 분리 원칙(interface segregation principle)
+    - DIP : 의존 역전 원칙(dependency inversion principle)
+  - 인터페이스 분리 정신
+    - 큰 인터페이스가 몇개 있는 것 보단 작은 인터페이스가 많이 있는 게 좋다
+      - 하지만 역시 항상 그런것은 아니고, 밸런스가 중요하다!
+  - 의존 역전 정신
+    - 개체끼리 통신할 때 구체적인 것 말고 추상적인 것에 의존하란 이야기
+      - 하지만 구체적인 것에 의존하면 좋은 상황들도 충분히 있음
 
 ###### [SOLID설계 정신](#solid설계-정신)
 ###### [Top](#top)
