@@ -184,8 +184,7 @@ int main()
 // Hello World!
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
   - 같은 이름을 가진 함수라도 namespace를 이용해서 사용할 수 있게 된다
@@ -261,8 +260,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
   - setw, setfill 등과 같은 것을 이용하기 위해서는 iomanip를 include해줘야 한다
@@ -328,8 +326,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
   - c++로 안전하게 배열에 입력 받는 방법은 setw를 이용하는 방법이다 
@@ -348,8 +345,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
   - 숫자를 입력받을시에, 숫자로 입력 받을 수 있는 부분까지 입력 된다는 것을 기억하기 
@@ -459,8 +455,7 @@ std::string firstName;
 std::cin >> firstName;
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -476,8 +471,7 @@ firstName_c = firstName;
 firstName_c = firstName_c  + " CCC" + firstName_c
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -624,8 +618,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -653,8 +646,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -681,8 +673,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -710,8 +701,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -724,8 +714,7 @@ while (!fin,eof())
 {
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -804,8 +793,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -1427,7 +1415,7 @@ private:
 void Print(int score); // OK
 void Print(Const char* name);  // OK
 void Print(float gpa, const char* name);  // OK
-int Print(int score); // 컴파일 에러
+int Print(int score); // 컴파일 에러 : void반환형 함수가 있기 때문에 컴파일러는 어떤 함수를 호출할지 알수가 없다
 int Print(float gpa);  // OK
 ~~~
 
@@ -1462,7 +1450,7 @@ public:
 	{
 	}
 
-	NumberClass operator+(const NumberClass& other) const
+	NumberClass operator+(const NumberClass& other) const // NumberClass 클래스에 있는 + 연산자를 오버로딩 한것
 	{
 		NumberClass sum;
 		sum.mNum1 = mNum1 + other.mNum1;
@@ -1514,6 +1502,8 @@ int main()
   - 1. class내에서 private를 호출 할 수 있게 해주는것
   - 2. 전역함수 내에서 private를 호출 할 수 있게 해주는것
 
+<br/>
+
 #ConsoleApp.cpp
 ~~~c++
 // 1. class내에서 private를 호출 할 수 있게 해주는것
@@ -1556,8 +1546,7 @@ int main()
 // 10
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -1596,8 +1585,7 @@ int main()
 // 10
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -1649,6 +1637,7 @@ int main()
   - 복사 생성자
   - 소멸자
   - 대입(=) 연산자
+    - 복사 생성자와 사실상 기능은 거의 동일하다
 
 <br/>
 
@@ -1677,8 +1666,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
   - 암시적 복사 생성자 지우기
@@ -1714,8 +1702,7 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
   - 암시적 소멸자 지우기
