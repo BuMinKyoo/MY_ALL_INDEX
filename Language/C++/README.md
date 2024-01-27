@@ -2620,12 +2620,79 @@ int main()
 ***
 
 # static
+  - 범위(scope)의 제한을 받는 전역 변수
+    - c에서 어디서든 추출해서 사용했던 extern과 다른 개념
+  - 어떤 범위?
+    - 파일 속
+    - 네임스페이스 속
+    - 클래스 속
+    - 함수 속
+
+<br/>
+
+  - 함수속 정적 맴버 변수
+    - 함수가 종료 됐을때 스택은 전부 사라지지만 함수속에 있는 정적 변수는 없어 지지 않고 누수가 될 수 있다.
+
+#ConsoleApp.cpp
+~~~c++
+// 함수로 범위가 제한된 전역 변수
+#include <iostream>
+using namespace std;
+
+void Accumulate(int number)
+{
+	static int result = 0; // 딱 한번만 초기화 된다.
+	result += number;
+	cout << result << endl;
+}
+
+int main()
+{
+	Accumulate(5); // 5
+	Accumulate(10); // 15
+
+	// 여기서는 static int result를 접근할 수 없다
+}
+~~~
+
+<br/>
 
   - 클래스 속 정적 변수, 함수
     - 개체를 만들지 않고도 호출 할 수 있고, 개체를 많이 만든다해도 한개만 존재하며 각각의 개체가 그것을 서로 공유한다
     - 정적 맴버 함수안에서 비정적 맴버 변수를 호출 할 수 없음. 왜냐하면 비정적 변수는 각각의 객체가 별도로 가지기 때문에 어떤 객체를 호출 하는지 알 수 없기 때문에
-  - 함수속 정적 맴버 변수
-    - 함수가 종료 됐을때 스택은 전부 사라지지만 함수속에 있는 정적 변수는 없어 지지 않고 누수가 될 수 있다.
+
+#Cat.h
+~~~c++
+class Cat
+{
+public:
+	Cat();
+private:
+	static int mCount;
+};
+~~~
+
+<br/>
+
+#Cat.cpp
+~~~c++
+#include "Cat.h"
+
+int Cat::mCount = 0; // 초기화 하는 방법
+Cat::Cat()
+{
+	mCount++;
+}
+~~~
+
+<br/>
+
+  - 정적 멤버 변수 베스트 프랙티스
+    - 함수안에서 정적 변수를 넣지 말것
+      - 클래스 안에 넣을 것
+    - 전역변수 대신 정적 멤버변수를 쓸 것
+      - 범위를 제한하기 위해
+    - C스타일의 정적 변수를 쓸 이유가 없음!
 
 ###### [static](#static)
 ###### [Top](#top)
