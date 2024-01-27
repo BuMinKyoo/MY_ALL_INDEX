@@ -1760,52 +1760,6 @@ int main()
 
 <br/>
 
-  - 상속시에 메모리를 확인해보자
-    - 자식을 컴파일하면 부모를 먼저 만들기 때문에 스택의 첫번째는 부모를 가리키게 된다, 하지만 자식을 사용할때는 부모의 메모리의 크기를 알고 있기에 그것을 건너뛰면 자식을 호출할 수 있게 된다.
-    - 나중에 다형성을 사용할때 이러한 메모리를 사용한다는것을 이해한다면 더욱 깊은 이해가 가능하게 된다
-
-![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/753355c9-c1c6-4a0b-978f-c0ca9759e6ad)
-
-<br/>
-
-~~~c++
-#include <iostream>
-using namespace std;
-
-class Animal
-{
-public:
-
-	Animal()
-	{
-		cout << "Animal()" << endl;
-	}
-};
-
-class Cat : public Animal
-{
-public:
-	int num1;
-
-	Cat()
-		:num1(0)
-	{
-		cout << "Cat()" << endl;
-	}
-};
-
-int main()
-{
-	Cat* cat = new Cat();
-}
-
-//출력
-//Animal()
-//Cat()
-~~~
-
-<br/>
-
   - 기본 상속 사용법
 
 #ConsoleApp.cpp
@@ -1939,6 +1893,73 @@ int main()
 <br/>
 
 # 오버라이딩, 다형성, 정적 바인딩, 가상함수(virtual), 동적 바인딩
+
+  - 상속시에 메모리를 확인해보자
+    - 자식을 컴파일하면 부모를 먼저 만들기 때문에 스택의 첫번째는 부모를 가리키게 된다, 하지만 자식을 사용할때는 부모의 메모리의 크기를 알고 있기에 그것을 건너뛰면 자식을 호출할 수 있게 된다.
+    - 나중에 다형성을 사용할때 이러한 메모리를 사용한다는것을 이해한다면 더욱 깊은 이해가 가능하게 된다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c4906aa6-c01c-4aac-8525-8fc32cfb76f3)
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class Animal
+{
+
+private:
+	int mAge;
+
+public:
+	Animal(int Age)
+		:mAge(Age)
+	{
+		
+	}
+	const int GetAge() const
+	{
+		return mAge;
+	}
+
+};
+
+class Cat : public Animal
+{
+public:
+	const char* GetName() const
+	{
+		return nName;
+	}
+
+	Cat(int Age, const char* Name)
+		:Animal(Age)
+	{
+		nName = Name;
+	}
+private:
+	const char* nName;
+
+};
+
+int main()
+{
+	Cat* myCat = new Cat(5, "Coco");
+	Cat* yourCat = new Cat(2, "Mocha");
+}
+~~~
+
+  - 멤버 함수의 메모리
+    - 멤버 함수도 메모리 어딘가에 위치해 있음
+      - 모든 것이 메모리 어딘가에 위치해 있어야함
+    - 그런데 각 개체마다 멤버 함수의 메모리가 잡혀 있을까?
+      - 위의 코드에서 myCat개체와, yourCat개체는 같은 함수를 쓰고 있는 같은 클래스이다. 각 개체마다 함수의 메모리가 잡혀 있지 않다
+    - 그 대신 각 멤버 함수는 컴파일 시에 딱 한 번만 메모리에 "할당"됨
+      - 저수준에서는 멤버 함수는 전역 함수와 그다지 다르지 않음
+
+<br/>
 
   - 오버라이딩
     - 부모 클래스가 가지고 있는 기능의 형태만 가져와서, 자식 클래스에서 그 기능에 맞게 바꿔서 쓰는것(하는 행동의 정의는 똑같은데, 실제 하는 행동의 디테일이 다르다), ex) 말한다는 것은 똑같지만, 무엇을 말하는지가 다르다
