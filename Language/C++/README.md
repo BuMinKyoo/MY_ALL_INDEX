@@ -1,16 +1,8 @@
 ###### Top
   
   - [메모리 누수 확인](#메모리-누수-확인)
-
-  - [출력](#출력)
-    - [Hello World 출력하기](#hello-world-출력하기)
-    - [using namespace](#using-namespace)
-    - [조정자(Manipulator)](#조정자manipulator)
-
-  - [입력](#입력)
-    - [입력하기](#입력하기)
-    - [입력버리기](#입력버리기)
-
+  - [출력,using namespace,조정자(Manipulator)](#출력using-namespace조정자manipulator)
+  - [입력,입력하기,입력버리기](#입력입력하기입력버리기)
   - [참조(Reference)](#참조reference)
 
   - [문자열](#문자열)
@@ -92,8 +84,9 @@
 ***
 
 # 메모리 누수 확인
-
   - 메모리 누수를 확인 하는 방법
+
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
@@ -128,24 +121,12 @@ int main()
 
 ***
 
-# 출력
-
-  - 출력하기!!
-
-    - [Hello World 출력하기](#hello-world-출력하기)
-    - [using namespace](#using-namespace)
-    - [조정자(Manipulator)](#조정자manipulator)
-
-###### [출력](#출력)
-###### [Top](#top)
+# 출력,using namespace,조정자(Manipulator)
+  - Hello World 출력하기
+    - std::cout 를 사용해서 출력할 수있다.
+    - ‘<<’ 왼쪽으로 데이터를 밀어 넣는 다는 느낌으로 암기하면 될것
 
 <br/>
-<br/>
-
-# Hello World 출력하기
-
-  - std::cout 를 사용해서 출력할 수있다.
-  - ‘<<’ 왼쪽으로 데이터를 밀어 넣는 다는 느낌으로 암기하면 될것
 
 #ConsoleApp.cpp
 ~~~c++
@@ -160,15 +141,12 @@ int main()
 // Hello World!
 ~~~
 
-###### [출력](#출력)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# using namespace
+  - using namespace
+    - Java의 패키지나 C#의 네임스페이스와 비슷
 
-  - using namespace 를 이용해 편하게 쓰기
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
@@ -189,6 +167,8 @@ int main()
 
   - 같은 이름을 가진 함수라도 namespace를 이용해서 사용할 수 있게 된다
   - 아래와 같이 사용할때, main함수 위쪽에 namespace를 정의해야 된다!(잊지 말기!)
+
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
@@ -219,15 +199,12 @@ int main()
 }
 ~~~
 
-###### [출력](#출력)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 조정자(Manipulator)
+  - 조정자(Manipulator)
+    - C언어에서 printf를 쓸때 형식 지정자 처럼 사용했던 부분과 비슷하게 이용하게 된다.
 
-  - C언어에서 printf를 쓸때 형식 지정자 처럼 사용했던 부분과 비슷하게 이용하게 된다.
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
@@ -288,7 +265,7 @@ int main()
 }
 ~~~
 
-###### [출력](#출력)
+###### [출력,using namespace,조정자(Manipulator)](#출력using-namespace조정자manipulator)
 ###### [Top](#top)
 
 <br/>
@@ -296,22 +273,11 @@ int main()
 
 ***
 
-# 입력
-
-  - c++ 입력받는법
-
-    - [입력하기](#입력하기)
-    - [입력버리기](#입력버리기)
-
-###### [입력](#입력)
-###### [Top](#top)
+# 입력,입력하기,입력버리기
+  - 입력하기
+    - cin은 배열에 입력을 받을때, 배열의 길이를 알 수 없기 때문에 더 큰 데이터가 들어오면 예외가 발생될 수 있다. 
 
 <br/>
-<br/>
-
-# 입력하기
-
-  - cin은 배열에 입력을 받을때, 배열의 길이를 알 수 없기 때문에 더 큰 데이터가 들어오면 예외가 발생될 수 있다. 
 
 #ConsoleApp.cpp
 ~~~c++
@@ -327,9 +293,10 @@ int main()
 ~~~
 
 <br/>
-<br/>
 
   - c++로 안전하게 배열에 입력 받는 방법은 setw를 이용하는 방법이다 
+
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
@@ -346,9 +313,10 @@ int main()
 ~~~
 
 <br/>
-<br/>
 
   - 숫자를 입력받을시에, 숫자로 입력 받을 수 있는 부분까지 입력 된다는 것을 기억하기 
+
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
@@ -363,35 +331,30 @@ int main()
 }
 ~~~
 
-###### [입력](#입력)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 입력버리기
+  - 입력버리기
+    - clear()
+      - 스트림을 좋은 상태로 돌려 줌
+        - cin.clear();
+    - ignore()
+      - 파일 끝에 도달하거나, 지정한 수만큼 문자를 버리면 멈춤
+        - cin.ignore(); // 문자1개 버림
+        - cin.ignore(10); // 문자10개 버림
+        - cin.ignore(10, ‘\n’); // 문자 10개를 버림, 단 그 전에 뉴라인을 만나면 멈춤
+        - cin.ignore(LLONG_MAX, ‘\n’); // 최대 문자 수를 버림, 단 그 전에 뉴라인을 만나면 멈춤
+    - get()
+      - 뉴라인 문자를 만나기까지 모든 문자를 가져옴
+      - 뉴라인 문자는 입력 스트림에 남아 있음
+        - get(firstName, 100); // 99개 가져오거나, 뉴라인 문자를 만날때까지 가져옴
+        -  get(firstName, 100, ‘#’) // 99개 가져오거나, ‘#’ 문자를 만날때까지 가져옴
+    - getline()
+      - 뉴라인 문자를 만나기까지 모든 문자를 가져옴
+      - 뉴라인 문자는 입력 스트림에 남아 있지 않음
+        - get(firstName, 100);
+        - get(firstName, 100, ‘#’)
 
-  - clear()
-    - 스트림을 좋은 상태로 돌려 줌
-      - cin.clear();
-  - ignore()
-    - 파일 끝에 도달하거나, 지정한 수만큼 문자를 버리면 멈춤
-      - cin.ignore(); // 문자1개 버림
-      - cin.ignore(10); // 문자10개 버림
-      - cin.ignore(10, ‘\n’); // 문자 10개를 버림, 단 그 전에 뉴라인을 만나면 멈춤
-      - cin.ignore(LLONG_MAX, ‘\n’); // 최대 문자 수를 버림, 단 그 전에 뉴라인을 만나면 멈춤
-  - get()
-    - 뉴라인 문자를 만나기까지 모든 문자를 가져옴
-    - 뉴라인 문자는 입력 스트림에 남아 있음
-      - get(firstName, 100); // 99개 가져오거나, 뉴라인 문자를 만날때까지 가져옴
-      -  get(firstName, 100, ‘#’) // 99개 가져오거나, ‘#’ 문자를 만날때까지 가져옴
-  - getline()
-    - 뉴라인 문자를 만나기까지 모든 문자를 가져옴
-    - 뉴라인 문자는 입력 스트림에 남아 있지 않음
-      - get(firstName, 100);
-      - get(firstName, 100, ‘#’)
-
-###### [입력](#입력)
+###### [입력,입력하기,입력버리기](#입력입력하기입력버리기)
 ###### [Top](#top)
 
 <br/>
