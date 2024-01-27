@@ -42,7 +42,6 @@
     - [reinterpret_cast](#reinterpret_cast)
     - [const_cast](#const_cast)
     - [dynamic_cast](#dynamic_cast)
-
   - [인라인 함수](#인라인-함수)
   - [static](#static)
   - [벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿](#벡터vector-맵map-셋set-stl컨테이너-템플릿)
@@ -2233,7 +2232,52 @@ int main()
 
 # 캐스팅
 
-  - 형변환(캐스팅) 하는 방법에는 여러가지가 있는데, 컴파일러가 해주는 묵시적 형변환, 프로그래머가 따로 지정하는 명시적 형변환 이 있다. 또한 이 장에서 설명하는 c++에서 제공되는 다양한 형변환 방법들이 있다. 이렇게 C++에 다양한 방법이 있는 이유는, C방법에서는 그 어떤 상황도 묘상하게 캐스팅해 바꿔 버릴 수 있기 때문에 C++에서는 그것을 안전하게 방지하고, 프로그래머의 실수를 방지해 주는 방법들이 많이 있기 때문이다
+  - 암시적 캐스팅
+    - 컴파일러가 형을 변환해 줌
+      - 단, 형 변환이 허용되고
+      - 프로그래머가 명시적으로 형 변환을 안할 경우
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	int number1 = 3;
+	long number2 = number1; // 암시적 캐스팅
+
+	// 콘솔에 출력하기
+	cout << "number2 = " << number2 << endl; // 3
+}
+~~~
+
+<br/>
+
+  - 명시적 캐스팅
+    - 프로그래머가 형 변환을 위한 코드를 직접 작성
+    - C++캐스팅
+      - 1. static_cast(정적 캐스팅)
+      - 2. const_cast
+      - 3. dynamic_cast(C++98, 모던 C++)
+      - 4. reinterpret_cast
+    - C++에 이런 많은 캐스팅이 있는 이유..
+      - int score = (int)someVariable 이것 한줄에 위의 캐스팅 4가지중 하나를 하는것
+        - 뭔가 명확하지 못함
+        - 명백한 실수를 컴파일러가 캐치하지 못함
+        - c++ 캐스팅이 이런 문제를 해결해준다
+        - 따라서 이런 캐스팅을 용도에 따라서 다른 캐스팅을 쓰기 위해서 캐스팅을 세분화 하였음
+
+<br/>
+
+  - 캐스팅 규칙
+    - 기본적으로 static_cast를 쓸것
+    - reinterpret_cast를 쓸것
+    - 내가 변경 권한이 없는 외부 라이브러리를 호출할 때만 const_cast를 쓸 것
+
+<br/>
 
     - [static_cast](#static_cast)
     - [reinterpret_cast](#reinterpret_cast)
@@ -2247,25 +2291,43 @@ int main()
 <br/>
 
 # static_cast
+  - 1. 값
+    - 두 숫자 형간의 변환
+      - 값을 유지(단 반올림 오차는 제외)하려고 노력함
+      - 이진수 표기는 달라질 수 있음
 
-  - 두 숫자 형 간의 변환
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
-//사용법
 #include <iostream>
 using namespace std;
 
 int main()
 {
-	float num1 = 3.1f;
-	int num2 = static_cast<int>(num1);
+	// 예시 1
+	// 둘다 정수형 이기 때문에 비트 값이 바뀌지 않는다
+	int number1 = 3; // 0000 0000 0000 0011
+	short number2 = static_cast<short>(number1); // 0000 0011
 
-	cout << num2;
+	// 예시 2
+	// 정수형과 실수형은 비트 값이 바뀐다
+	// 하지만 실제로 쓰는 값은 바뀌지 않으려고 한다
+	float number3 = 3.f; // 0100 0000 0100 0000
+	int number4 = static_cast<int>(number3); // 0000 0000 0000 0011
 }
 ~~~
 
-  - 개체 포인터
+<br/>
+
+  - 2. 개체 포인트
+    - 변수형 체크 후 베이스 클래스를 파생 클래스로 변환
+    - 컴파일 시에만 형 체크 가능
+    - 실행 도중 여전히 크래시가 날 수 있음
+
+<br/>
+
+c++은 서로 상속 관계가 아니여도 명시적으로 캐스팅을 하면 컴파일이 되어 버린다..하지만 그렇게 하면 위험하기 때문에 static_cast을 사용하면 서로간에 상속관계를 확인해서 캐스팅 해준다
 
 #ConsoleApp.cpp
 ~~~c++
@@ -2278,7 +2340,6 @@ class Animal
 	{
 		cout << "나는 동물 클래스" << endl;
 	}
-
 };
 
 class Cat : Animal
@@ -2318,7 +2379,6 @@ int main()
 
 	table = (Table*)dog; // 명시적 형변환, 컴파일 ok 지만 말도 안되는 상황 발생함
 	table = static_cast<Table*>(dog); // static_cast 형변환, 이런 맞지 않은 상황에서 에러를 밷기 때문에 안정적, class의 부모 자식관의 상속 관계가 아니기 때문에 말이 안됨
-
 }
 ~~~
 
@@ -2329,11 +2389,83 @@ int main()
 <br/>
 
 # reinterpret_cast
+  - 가장 위험한 캐스팅중 하나
+  - 연관 없는 두 포인터 형 사이의 변환을 허용
+    - Cat* <-> House*
+    - char <-> int*
+  - 포인터와 포인터 아닌 변수 사이의 형 변환을 허용
+    - Cat* <-> unsigned int
+  - 이진수 표기는 달라지지 않음
+    - A형의 이진수 표기를 그냥 B형인 것처럼 해석
+    - 컴퓨터는 무조건 이진수로 데이터를 보관하는데, 자료형은 이 이진수를 어떻게 해석할지에 관련된 것이다. 그런데, 그냥 이진수를 달라지지 않고, 다른것처럼 해석하겠다고 하는것.(굉장히 위험한 방법)
 
-  - 가장 위험한 캐스팅
-  - 말도 안되는 형변환을 할 수 있음
-  - 따라서,  일반적인 상황에서는 static_cast 을 쓰면 될것이고, 정말 희한하게 사용할 그 상황에서는 reinterpret_cast를 쓰게 될 수도 있을 것 같다
-  - 더 공부하기!!
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	int* singedNumber = new int(-10);
+
+	// 콘솔에 출력
+	cout << "singedNumber: " << *singedNumber << endl; // singedNumber: -10
+
+	unsigned int* unsignedNumber = reinterpret_cast<unsigned int*>(singedNumber);
+
+	cout << "unsignedNumber: " << *unsignedNumber << endl; // unsignedNumber: 4294967286
+}
+~~~
+
+  - 만약 위의 상황에서 static_cast를 사용했다면 컴파일 에러를 냈을 것이다
+
+<br/>
+
+  - reinterpret_cast을 실무에서 사용할 예시
+    - 특정 데이터를 간단한 형식으로 변환해 저장하고 있다가, 다시 불러올때, 해당하는 데이터로 캐스팅을 해서 다시 사용할 수 있다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+class NumberClass
+{
+public:
+	NumberClass()
+		: num1(10)
+	{
+	}
+
+	int GetNum0()
+	{
+		return num1;
+	}
+
+private:
+	int num1;
+};
+
+int main()
+{
+	NumberClass* numClass = new NumberClass();
+
+	unsigned int intAddress = reinterpret_cast<unsigned int>(numClass);
+
+	cout << "Address of numClass: " << intAddress << endl;
+
+	numClass = reinterpret_cast<NumberClass*>(intAddress);
+	int n = numClass->GetNum0();
+
+	cout << "n : " << n << endl;
+
+	delete numClass;
+
+	return 0;
+}
+~~~
 
 ###### [캐스팅](#캐스팅)
 ###### [Top](#top)
@@ -2342,15 +2474,60 @@ int main()
 <br/>
 
 # const_cast
+  - 하지 말아야할 캐스팅..
+  - const_cast로 형을 바꿀 수 없음
+  - const또는 volatile애트리뷰트를 제거할 때 사용
+  - 포인터 형에 사용할 때만 말이 됨
+    - 값 형은 언제나 복사되니까
 
-  - 다음에 쓸때 자세히 공부하기
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+using namespace std;
+
+void Print(const char* name)
+{
+    char* str = const_cast<char*>(name);
+    *str = 'p';
+    cout << str << endl; // pello
+}
+
+int main()
+{
+    char name[] = "Hello"; // 수정 가능한 문자열 배열로 초기화
+    Print(name);
+    return 0;
+}
+~~~
+
+<br/>
+
+  - const_cast를 실무 용도에 쓸일이 있다면, 내가 수정할수 없는 어떠한 곳에 const가 쓰여 있지 않았을 경우, 내가 따로 만든 함수에 const를 쓰고, 그 안에 const를 없앤 값을 넣을 수 있도록 한다
+
+#ConsoleApp.cpp
+~~~
+void WriteLine(char* ptr) // 뭔가 별로인 외부 라이브러리
+
+void MyWriteLine(const char* ptr) // 우리 프로그램에 있는 함수
+{
+	WriteLine(const_cast<char*>(ptr));
+}
+~~~
 
 ###### [캐스팅](#캐스팅)
 ###### [Top](#top)
 
 # dynamic_cast
-
-  - 다음에 쓸때 자세히 공부하기
+  - 실행 중에 형을 판단
+  - 포인터 또는 참조 형을 캐스팅할 때만 쓸 수 있음
+  - 호환되지 않는 자식형으로 캐스팅하려 하면 NULL을 반환
+    - 따라서, dynamic_cast가 static_cast보다 안전
+  - 그러나 이걸 쓰려면 컴파일 중에 RTTI(실시간 타입정보)를 켜야함
+    - 이것이 켜있지 않으면 static_cast와 똑같이 작동한다
+  - 하지만 보통 C++ 프로젝트에서 RTTI를 끄는 것이 보통
+    - 속도가 느려짐…
 
 ###### [캐스팅](#캐스팅)
 ###### [Top](#top)
