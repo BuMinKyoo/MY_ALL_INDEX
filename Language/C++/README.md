@@ -3,11 +3,8 @@
   - [메모리 누수 확인](#메모리-누수-확인)
   - [출력,using namespace,조정자(Manipulator)](#출력using-namespace조정자manipulator)
   - [입력,입력하기,입력버리기](#입력입력하기입력버리기)
-  - [참조(Reference)](#참조reference)
-
+  - [일부 새로운 C++기능(Bool 데이터,참조)](#일부-새로운-c++기능bool-데이터참조)
   - [문자열](#문자열)
-    - [std::string](#stdstring)
-    - [함수](#함수)
 
   - [파일 입출력](#파일-입출력)
     - [파일 스트림](#파일-스트림)
@@ -362,19 +359,24 @@ int main()
 
 ***
 
-# 참조(Reference)
-
-  - 포인터를 사용하게 되면, 여러가지 신경써야할 부분이 많아지지만 참조를 이용하면 훨씬더 안전하게 성능좋게 사용할 수 있다
-  - 별칭이다
+# 일부 새로운 C++기능(Bool 데이터,참조)
+  - Bool 데이터형
+    - C언어 에서는 0과, 0이 아닌것을 비교했던 반면, C++에서는 false와 true값을 사용할 수 있게 되었다.
+    - 하지만 C와 다른것은 없으며 단지 0 을 false로 1 을 true로 define한것 뿐, 0이면 false,  0이 아니면 true로 구분된다는 사실은 같기 때문에 유의해야 한다
+  - 참조
+    - 포인터를 사용하게 되면, 여러가지 신경써야할 부분이 많아지지만 참조를 이용하면 훨씬더 안전하게 성능좋게 사용할 수 있다
+    - 별칭이다
     - 그냥 이 변수를 다른 이름으로 부르겠다고 하는것이 전부이다
-    - int& reference = number;
-  - NULL이 될 수 없다
-    - int& reference = NULL;  // error
-  - 초기화 중에 반드시 선언되어야 한다
-    - int& reference;   // error
-  - 참조하는 대상을 바꿀 수 없음 // 선언시 참조의 대상이 결정되고 그 이후에 대입은 그냥 값을 그대로 대입하여 바꾼다는것
-  - 소유하지 않은 메모리 장소를 가리킬 수 없음
+      - int& reference = number;
+    - NULL이 될 수 없다
+      - int& reference = NULL;  // error
+    - 초기화 중에 반드시 선언되어야 한다
+      - int& reference;   // error
+    - 참조하는 대상을 바꿀 수 없음 // 선언시 참조의 대상이 결정되고 그 이후에 대입은 그냥 값을 그대로 대입하여 바꾼다는것
+    - 소유하지 않은 메모리 장소를 가리킬 수 없음
     - 포인터 처럼 플러스하여 다음 메모리를 참조 할 수 없음
+
+<br/>
 
 #ConsoleApp.cpp
 ~~~c++
@@ -385,7 +387,16 @@ int& reference = number1;
 reference = number2; // reference가 number2를 다시 새롭게 참조하는것이 아니라, number2의 값을 reference에 대입 하는것이 되기 때문에 변수 3개 모두 값이 200이됨
 ~~~
 
-###### [참조(Reference)](#참조reference)
+<br/>
+
+  - 컴퓨터는 참조가 뭔지 알까?
+    - 모름
+    - 포인터와 참조는 같은 어셈블리 명령어를 생성함
+    - 참조는 오직 인간을 위한 것임
+    - 컴파일러는 참조를 포인터로 바꿔준다. 기계가 이해할 수 없도록
+    - 즉, 참조는 프로그래머가 그 포인터를 가지고 이상한 곳에 가지고 놀 수 없게끔 제한하여 실수하지 않게끔 만들어 줄 뿐이다
+
+###### [일부 새로운 C++기능(Bool 데이터,참조)](#일부-새로운-c++기능bool-데이터참조)
 ###### [Top](#top)
 
 <br/>
@@ -395,20 +406,19 @@ reference = number2; // reference가 number2를 다시 새롭게 참조하는것
 
 # 문자열
 
-  - c++ 입력받는법
+#ConsoleApp.cpp
+~~~c++
+char line[256];
+cin.getline(line, 256)
+~~~
 
-    - [std::string](#stdstring)
-    - [함수](#함수)
-
-###### [문자열](#문자열)
-###### [Top](#top)
+  - 처음에 입력을 받기 위해 사용했던 위의 코드들은 아래의 두 경우에 작동하지 않는다
+    - 아무것도 읽지 못했을 때
+    - 한줄에 문자가 256자 이상일때(즉, 버퍼가 충분히 크지 않을 때)
+  - 위의 대안으로써 std:string 클래스가 있다!
+    - std:string 클래스를 이용한 문자열은 길이가 증가할 수 있다!
 
 <br/>
-<br/>
-
-# std::string
-
-  - 길이가 증가 할 수 있음(할당을 따로 하지 않아도?!)
 
 #ConsoleApp.cpp
 ~~~c++
@@ -418,7 +428,6 @@ std::string firstName;
 std::cin >> firstName;
 ~~~
 
-<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -434,7 +443,6 @@ firstName_c = firstName;
 firstName_c = firstName_c  + " CCC" + firstName_c
 ~~~
 
-<br/>
 <br/>
 
 #ConsoleApp.cpp
@@ -452,19 +460,11 @@ if (firstName > firstName_c)
 }
 ~~~
 
-###### [문자열](#문자열)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 함수
-
-  - size(), length()
-    - 문자열의 길이를 반환
-  - c_str()
-    - const char*
-    - 해당 string이 가지고 있는 문자 배열의 시작 주소를 가리키는 포인터를 반환
+  - size(), length() : 문자열의 길이를 반환
+  - c_str() : 해당 string이 가지고 있는 문자 배열의 시작 주소를 가리키는 포인터를 반환한다
+    - const char*를 반환한다
 
 #ConsoleApp.cpp
 ~~~c++
@@ -472,6 +472,39 @@ string line;
 cin >> line;
 const char* cLine = line.c_str();
 ~~~
+
+<br/>
+
+  - string안의 한 문자에 접근 가능하다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main()
+{
+	string firstName = "qwer";
+
+	// 콘솔에 출력하기
+	cout << firstName[0] << endl; // q
+
+	firstName[0] = 'a';
+
+	// 콘솔에 출력하기
+	cout << firstName[0] << endl; // a
+}
+~~~
+
+<br/>
+
+  - std:string이 좋은가요?
+    - 더하기를 할때 메모리를 더 할당하는 과정을 거치게 되고, 그것을 내부적으로 알아서 해주게 된다
+      - 힙 메모리 할당은 느림
+      - 메모리 단편화 문제
+      - 내부 버퍼의 증가는 멀티 쓰레드 환경에서 안전하지 않을 수도 있다
+    - 그래서 여전히 std::string을 사용하지 않고 sprintf와 함께 char[]를 매우 많이 사용하게 된다
 
 ###### [문자열](#문자열)
 ###### [Top](#top)
