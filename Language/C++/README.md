@@ -973,8 +973,7 @@ int main()
 ~~~
 
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
   - 생성자 내에서 초기화 하기
@@ -1012,11 +1011,10 @@ int main()
 // 20
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
+<br/>
 <br/>
 
-  - 상수, 참조변수 초기화 하기(대입이 아닌 초기화리스트!)
+  - 상수, 참조변수 초기화 하기
 
 #ConsoleApp.cpp
 ~~~c++
@@ -1052,6 +1050,43 @@ int main()
 // 10
 // 20
 // 10
+~~~
+
+<br/>
+<br/>
+
+  - 이런 방법은 초기화가 아니기때문에, 상수나, 참조변수를 초기화 시킬수 없다.
+  - 위와 같이 초기화리스트라는 방법을 이용해야 한다. 아래에 있는것은 그냥 '대입'방법이 된다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+using namespace std;
+
+class NumberClass
+{
+public:
+	int num1;
+	const int num2;
+	int& num3;
+
+
+	NumberClass()
+	{
+		num1 = 1;
+		num2 = 2; // 컴파일 에러
+		num3 = 3; // 컴파일 에러
+	}
+};
+
+int main()
+{
+	NumberClass numberclass;
+	cout << numberclass.num1 << endl;
+	cout << numberclass.num2 << endl;
+	cout << numberclass.num3 << endl;
+}
 ~~~
 
 ###### [개체](#개체)
