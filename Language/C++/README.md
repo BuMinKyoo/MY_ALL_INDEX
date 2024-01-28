@@ -4500,8 +4500,9 @@ private:
   - 두개의 포인터를 소유하고있음
     - 데이터 포인터
     - 제어블록 포인터(몇번 참조했는지 세야하기 때문)
-    - 참조 카운팅기반
-      - 어떤 곳에도 참조되지 않으면 지워줌
+  - std::unique_ptr와 달리, 포인터를 다른 std::shared_ptr와 공유할 수 있음
+  - 참조 카운팅기반
+  - 원시 포인터는 어떠한 std::shared_ptrd에게도 참조되지 않으면 소면됨
 
 <br/>
 
@@ -4559,6 +4560,9 @@ int main()
 <br/>
 
   - 포인터 재설정 하기
+    - 원시 포인터를 해제한다
+    - 참조 카운트가 1 줄어듦
+    - nullptr를 대입하는 것과 같음
 
 #ConsoleApp.cpp
 ~~~c++
@@ -4586,6 +4590,10 @@ int main()
 
 ![image](https://user-images.githubusercontent.com/39178978/200856294-190ba46a-b3ea-4e40-b950-d525e718d557.png)
 
+<br/>
+
+  - 참조 횟수 구하기
+    - use_count 함수를 사용해서 참조 횟수를 구해올 수 있다
 
 ###### [스마트(Smart) 포인터](#스마트smart-포인터)
 ###### [Top](#top)
