@@ -44,13 +44,11 @@
     - [dynamic_cast](#dynamic_cast)
   - [인라인 함수](#인라인-함수)
   - [static](#static)
-  - [벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿](#벡터vector-맵map-셋set-stl컨테이너-템플릿)
+  - [표준 템플릿 라이브러리(STL컨테이너)](#표준-템플릿-라이브러리stl컨테이너)
+  - [템플릿 프로그래밍](#템플-프로그래밍)
 
 <br/>
   - c++11 / 14/ 17 / … 이후의 추된 부분들
-
-<br/>
-
   - [auto](#auto)
   - [static_assert](#static_assert)
   - [default](#default)
@@ -2702,30 +2700,450 @@ Cat::Cat()
 
 ***
 
-# 벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿
+# 표준 템플릿 라이브러리(STL컨테이너)
+  - 벡터(vector)
+  - 맵(map)
+  - 셋(set)
+  - 스택(stack)
+  - 큐(queue)
+  - 리스트(list)
+  - 덱(deque)
+  - …
+
+<br/>
+
+  - STL컨테이너의 목적
+   - 템플릿 프로그래밍 기반
+   - 모든 컨테이너에 적용되는 표준 인터페이스
+   - 메모리 자동 관리
+   - std알고리듬은 많은 컨테이너에서 작동
+  - STL컨테이너의 단점
+   - 빈번한 메모리 재할당은 메모리 단편화를 초래함
+   - 메모리 단편화를 엄청난 문제가 될 수 있음. 특히 가상 메모리를 지원하지 않는 플랫폼에서 프로그램을 실행할 때..
+   - 메모리 단편화 때문에 애플리케이션이 뻗어 버릴 수 있음
+     - 즉, 총 여유 공간은 충분하나 충분히 큰 연속되는 메모리가 없는 경우
+   - 디버깅 및 고치는 게 쉽지 않음
+  - STL컨테이너를 순회할 때는 반복자(iterator)를 쓰는게 표준 방식
+
+<br/>
 
   - 벡터
-    - 어떤 자료형도 넣을 수 있는 동적 배열
-    - include “vector” 필요
-    - 나중에 필요할때 더 공부하기
+    - 어떤 자료형도 넣을 수 있는 동적 배열(std::string처럼 자동으로 늘려준다는것)
+      - 기본 데이터
+      - 클래스
+      - 포인터
+    - 그 안에 저장된 모든 요소들이 연속된 메모리 공간에 위치
+    - 요소 수가 증가함에 따라 자동으로 메모리를 관리해 줌
+    - 어떤 요소에도 임의로 접근 가능
+    - reserve를 사용하면 vector의 용량을 늘릴수 있지만, 용량이 증가해야 하면 새로운 저장 공간을 재할당하고 기존 요소들을 모두 새 공간으로 복사하게 된다(=vector안에 있는 데이터는 연속된 메모리 공간에 위치 하기 때문에)
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <vector>
+
+int main()
+{
+	std::vector<int> scores; // 자료형만 바꿔서 다른 vector를 만들 수 있다
+	//  std::vector<string> scores; // string형 vector
+	scores.reserve(2);
+
+	scores.push_back(10);
+	scores.push_back(20);
+
+	scores.pop_back();
+
+	std::cout << "Size: " << scores.size() << std::endl; // 1
+	std::cout << "Capacity: " << scores.capacity() << std::endl; // 2
+}
+~~~
+
+<br/>
+
+  - vector 앞에서부터 순회하기
+    - iterator을 사용하여 순회한다
+  - vector 뒤에서부터 접근하기
+    - reverse_iterator을 사용해서 순회한다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <vector>
+
+int main()
+{
+	std::vector<int> scores;
+	scores.reserve(3);
+
+	scores.push_back(10);
+	scores.push_back(20);
+	scores.push_back(30);
+
+	scores.pop_back();
+
+	std::cout << "Size: " << scores.size() << std::endl; // 2
+	std::cout << "Capacity: " << scores.capacity() << std::endl; // 3
+
+	for (std::vector<int>::iterator it = scores.begin(); it != scores.end(); ++it)
+	{
+		std::cout << *it << std::endl;
+	}
+}
+~~~
+
+<br/>
 
   - 맵
-    - 딕셔너리 처럼 키와 값의 쌍을 저장함
+    - 키(key)와 값(value)의 쌍들의 저장
+    - 키는 중복될 수 없음
+    - C++맵은 자동 정렬되는 컨테이너..
+    - 이진 탐색 트리 기반
+    - 맵의 장점과 단점
+      - 장점
+        - std::list나 std::vector보다 탐색 속도가 더 빠름 -> 왜냐하면 맵은 자동정렬으로 이진트리로 탐색하기 때문에
+      - 단점
+        - 자동으로 정렬됨
+        - 해쉬맵이 아님, 따라서 O(1)이 아님
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <map>
+
+int main()
+{
+	std::map<std::string, int> simpleScoreMap;
+
+	simpleScoreMap.insert(std::pair<std::string, int>("A", 1));
+	simpleScoreMap.insert(std::pair<std::string, int>("B", 3));
+
+	simpleScoreMap["A"] = 0;
+
+	std::cout << "A: " << simpleScoreMap["A"] << std::endl; // A: 0
+	std::cout << "B: " << simpleScoreMap["B"] << std::endl; // B : 3
+	std::cout << "size: " << simpleScoreMap.size() << std::endl; // size : 2
+}
+~~~
+
+<br/>
 
   - 셋
-    - 맵에서 값을 뺀 데이터와 같다
-    - 나중에 필요할때 더 공부하기
+    - 역시 정렬되는 컨테이너
+    - 중복되지 않는 키를 요소로 저장함
+    - 역시 이진 탐색 트리 기반
+    - 셋은 맵과 거의 같다
+      - 맵에서 값을 빼버린것과 같다
+    - 맵의 장점과 단점과 똑같다
 
-  - STL컨테이너
-    - 링크드리스트
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <set>
+
+int main()
+{
+	std::set<int> simpleScoreSet;
+
+	simpleScoreSet.insert(20);
+	simpleScoreSet.insert(100);
+
+	for (auto it = simpleScoreSet.begin(); it != simpleScoreSet.end(); ++it)
+	{
+		std::cout << *it << std::endl;
+	}
+}
+~~~
+
+<br/>
+
     - 큐
+      - 선입 선출 자료구조
+      - 먼저 들어간 자료가 먼저 나간다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <queue>
+
+int main()
+{
+	std::queue<std::string> studentNameQueue;
+	studentNameQueue.push("John");
+	studentNameQueue.push("Jane");
+
+	while (!studentNameQueue.empty())
+	{
+		std::cout << "Waiting student : " << studentNameQueue.front() << std::endl;
+		studentNameQueue.pop();
+	}
+}
+
+//Waiting student : John
+//Waiting student : Jane
+~~~
+
+<br/>
+
     - 스택
-    - 등등
+      - 후입 선출 자료 구조
+      - 마지막에 들어온것이 먼저 나간다는것
 
-  - 템플릿
-    - 어떤 자료형이든 필요할때 컴파일러가 대신 만들어줌. 그러한 틀을 가질 수 있게 해주는것
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <stack>
 
-###### [벡터(vector), 맵(Map), 셋(Set), STL컨테이너, 템플릿](#벡터vector-맵map-셋set-stl컨테이너-템플릿)
+int main()
+{
+	std::stack<std::string> studentNamestack;
+	studentNamestack.push("John");
+	studentNamestack.push("Jane");
+
+	while (!studentNamestack.empty())
+	{
+		std::cout << studentNamestack.top() << std::endl;
+		studentNamestack.pop();
+	}
+}
+
+//Jane
+//John
+~~~
+
+<br/>
+
+    - 리스트
+      - 양방향 연결리스트
+      - 양쪽 끝에서 삽입/제거 가능
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <list>
+
+int main()
+{
+	std::list<int> lists;
+	lists.push_front(1); // 1
+	lists.push_front(2); // 2 1
+	lists.push_back(3); // 2 1 3
+}
+~~~
+
+<br/>
+
+    - 그 밖의 컨테이너
+      - 멀티셋, 멀티맵, 덱, 우선순위 큐..
+
+###### [표준 템플릿 라이브러리(STL컨테이너)](#표준-템플릿-라이브러리stl컨테이너)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 템플릿 프로그래밍
+  - 템플릿이란?
+    - Java와 C#에서 제네릭 메서드/클래스와 비슷
+    - STL컨테이너  또한 템플릿
+    - 덕분에 코드를 자료형마다 중복으로 작성하기 않아도 됨
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+template <typename T>
+T Add(T a, T b)
+{
+	return a + b;
+}
+
+// typename과 class는 같은 의미
+//template <class T>
+//T Add(T a, T b)
+//{
+//	return a + b;
+//}
+
+int main()
+{
+	std::cout << Add<int>(1, 2) << std::endl; // 3
+	std::cout << Add(1.1, 2.2) << std::endl; // 3.3
+	std::cout << Add(1.1f, 2.2f) << std::endl; // 3.3
+}
+~~~
+
+<br/>
+
+    - 템플릿은 어떻게 작동할까?
+      - 템플릿을 인스턴스화할 때마다 컴파일러가 내부적으로 코드를 생성(컴파일 도중에 완료함)
+        - 인스턴스화 한다는것은 코드중에 Add<int> 요런것, Add<double>요런것들을 볼때 만들어 준다는것, 물론 이런것들은 자료형을 생략해도 컴파일러가 알 수가 있다
+      - 템플릿에 넣는 자료형 가지 수에 비례해서 exe파일 크기 증가
+      - 컴파일 타임에 어느 정도 다형성을 부여할 수 있음
+
+<br/>
+
+    - 클래스 템플릿
+      - 클래스도 템플릿을 만들 수 있다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+template <typename T>
+class Compare {
+public:
+    Compare(T a, T b) : value1(a), value2(b) {}
+
+    T getMax() {
+        return (value1 > value2) ? value1 : value2;
+    }
+
+private:
+    T value1;
+    T value2;
+};
+
+int main() {
+    Compare<int> intComparer(10, 20);
+    std::cout << "더 큰 값은: " << intComparer.getMax() << std::endl;  // 20
+
+    Compare<double> doubleComparer(3.14, 2.71);
+    std::cout << "더 큰 값은: " << doubleComparer.getMax() << std::endl;  // 3.14
+
+    return 0;
+}
+~~~
+
+<br/>
+
+    - 또한 하나 유의 할 것은, 템플릿 클래스를 사용할때는 구현또한 cpp가 아닌 h파일에 옮겨야 한다는것
+    - 아래 코드처럼 하면 컴파일 에러가 발생하게 된다
+
+#MyArray.h
+~~~c++
+#include <iostream>
+
+#include "MyArray.h"
+
+int main()
+{
+    MyArray<int> scores;
+
+    scores.Add(10);
+    scores.Add(20);
+    scores.Add(30);
+    scores.Add(40);
+
+    return 0;
+}
+~~~
+
+<br/>
+
+#MyArray.cpp
+~~~c++
+#include <iostream>
+
+#include "MyArray.h"
+
+int main()
+{
+    MyArray<int> scores;
+
+    scores.Add(10);
+    scores.Add(20);
+    scores.Add(30);
+    scores.Add(40);
+
+    return 0;
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+#include "MyArray.h"
+
+int main()
+{
+    MyArray<int> scores;
+
+    scores.Add(10);
+    scores.Add(20);
+    scores.Add(30);
+    scores.Add(40);
+
+    return 0;
+}
+~~~
+
+<br/>
+
+    - 구현부까지 h파일에 넣어야 한다는 단점이 있다
+      - 아래는 컴파일이 된다
+
+#MyArray.h
+~~~c++
+#pragma once
+template<typename T>
+class MyArray
+{
+public:
+    bool Add(T data);
+    MyArray();
+
+private:
+    enum { MAX = 3 };
+    int mSize;
+    T mArray[MAX];
+};
+
+template<typename T>
+bool MyArray<T>::Add(T data)
+{
+    if (mSize >= MAX)
+    {
+        return false;
+    }
+
+    mArray[mSize++] = data;
+    return true;
+}
+
+template<typename T>
+MyArray<T>::MyArray()
+    : mSize(0)
+{
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+#include "MyArray.h"
+
+int main()
+{
+    MyArray<int> scores;
+
+    scores.Add(10);
+    scores.Add(20);
+    scores.Add(30);
+    scores.Add(40);
+
+    return 0;
+}
+~~~
+
+###### [템플릿 프로그래밍](#템플-프로그래밍)
 ###### [Top](#top)
 
 <br/>
