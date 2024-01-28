@@ -3155,8 +3155,8 @@ int main()
 ***
 
 # auto
-
   - 자료형을 추론해줌
+  - JavaScritp등의 언어에 있는 동적인 형과는 다름
   - 실제 자료형은 컴파일하는 동안 결정됨
   - auto변수는 반드시 초기화 해줘야함
 
@@ -3164,8 +3164,6 @@ int main()
 auto x; // 에러
 auto x = "qwe"
 ~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -3177,8 +3175,6 @@ auto a = 3;
 auto b = ptr;  // ptr이 포인터라면 auto는 그 포인터를 받음
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
 <br/>
 
   - auto를 사용하여 참조 받을 때 : auto&
@@ -3187,8 +3183,6 @@ auto b = ptr;  // ptr이 포인터라면 auto는 그 포인터를 받음
 ~~~c++
 auto& a = b // b는 참조자료형
 ~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -3200,8 +3194,6 @@ auto& a = b // b는 참조자료형
 const int b = 10;
 auto& a = b
 ~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -3231,10 +3223,45 @@ for (auto it = v.begin( ); it != v.end( ); ++it)
 ***
 
 # static_assert
-
   - 일반적인 assert는 컴파일 후 실행중에 문제가 있는지 잡아 주는데 비해서 static_assert는 컴파일 중에 잡아주기 때문에 실행전에 문제를 잡을 수 있게 해줌
   - 컴파일중에 잡을 수 있는것은 이걸로 다 잡자!
   - ex) 특정한 구조체의 크기가 50인 것으로 기준을 다 잡아 놨는데, 이 부분안에 다른 사람이 더 추가 하게 되면 크기가 커지니 그런것들을 방지 할 수 있음
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <string>
+
+struct StudentInfo
+{
+    char mStudentID[10];
+    char mName[10];
+    char mMajor[20];
+    unsigned int mAge;
+};
+
+struct TeacherInfo
+{
+    char mTeacherID[10];
+    char mName[10];
+    unsigned int mAge;
+    std::string mTeacherAccount;
+    std::string mTeacherCardNumber;
+};
+
+int main()
+{
+    enum { STRUCT_MAX_SIZE = 64 };
+
+    static_assert(sizeof(StudentInfo) <= STRUCT_MAX_SIZE,
+        "Struct size must be smaller than 64byte");
+
+    static_assert(sizeof(TeacherInfo) <= STRUCT_MAX_SIZE,
+        "Struct size must be smaller than 64byte"); // 컴파일 에러
+
+    return 0;
+}
+~~~
 
 ###### [static_assert](#static_assert)
 ###### [Top](#top)
@@ -3245,9 +3272,9 @@ for (auto it = v.begin( ); it != v.end( ); ++it)
 ***
 
 # default
-
   - 컴파일러가 특정한 생성자, 연산자 및 소멸자를 만들어 낼 수 있음
   - 그래서, 비어 있는 생성자나 소멸자를 구체화할 필요가 없음
+  - 또한, 기본 생성자, 연산자 및 소멸자를 더 분명하게 표시할 수 있음
   - 컴파일러가 기본적으로 만들어주는 것들을 사용해도 큰 문제가 없다는 것을 명시적으로 표시해 주는 용도로 사용!!!(컴파일러는 다른것이 없고 사람이 볼때가 달라진다)
 
 ~~~c++
@@ -3259,7 +3286,7 @@ public:
 	int num1 = 5;
 	int num2 = 10;
 
-	NumberClass() = default;
+	NumberClass() = default; // 기본생성자가 유효 하다는 것을 그냥 표시하는것
 	NumberClass(int n, int n2)
 		: num1(n)
 		, num2(n2)
@@ -3361,8 +3388,6 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
 <br/>
 
   - 보통은 한번 상속받은 자식 클래스에서 final을쓰는 것이 일반적인 상황이다
@@ -3399,8 +3424,6 @@ int main()
 
 }
 ~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -3447,6 +3470,7 @@ int main()
 
   - 부모가 가지고 있는 함수를 오버라이드를 한다는 뜻
   - 프로그래머가 실수로 부모의 함수를 오버라이드 하려고 했지만 실수로 인해 인자 자료형을 잘못 입력했을때, 그것은 컴파일러가 오버라이드가 아니라 부모함수 따로 자식 함수 따로로 생각하게 된다
+  - 그렇기 때문에 부모의 것을 override를 확실히 한다고 의도를 표현하는것
 
 ~~~c++
 #include <iostream>
@@ -3475,8 +3499,6 @@ int main()
 {
 }
 ~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
@@ -3509,8 +3531,6 @@ int main()
 {
 }
 ~~~
-
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <br/>
 
