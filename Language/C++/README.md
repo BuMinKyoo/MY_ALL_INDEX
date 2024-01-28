@@ -4432,6 +4432,9 @@ int main()
 
   - move
     - 포인터 소유권 옮기기
+    - 개체 A의 모든 멤버를 포기하고 그 소유권을 B에게 주는 방법
+    - 메모리 할당과 해제가 일어나지 않음
+    - 간단하게, A에 있는 모든 포인터를 B에게 대입하고 A에는 nullptr을 넣는다고 생각하자
     - 이 함수 한번으로 쉽게 다른 유니크 포인터에서 유니크 포인터로 소유권을 옮길 수 있게 된다
     - const 유니크포인터에는 사용 할 수 없다!
 
@@ -4462,6 +4465,27 @@ int main()
 	std::unique_ptr<Animal> myanimals = std::make_unique<Animal>(10);
 	std::unique_ptr<Animal> myanimals1(std::move(myanimals));
 }
+~~~
+
+<br/>
+
+  - unique_ptr의 비밀
+    - class로 만들어서 단지 필요 없는 것은 delete로 막고, 따로 소멸자를 호출해서 지워준다
+    - 생성자에서 new 소멸자에서 delete를 대신 해주는것뿐
+
+~~~c++
+template<typename T>
+class unique_ptr<T> final
+{
+public:
+	unique_ptr(T* ptr) : mPtr_(mptr) {}
+	~unique_ptr() { delete mPtr_; }
+	T* get() { return mPtr_; }
+	unique_ptr(const unique_ptr&) = delete;
+	unique_ptr& operator=(const unique_ptr&) = delete;
+private:
+		T* mPtr = nullptr;
+};
 ~~~
 
 ###### [스마트(Smart) 포인터](#스마트smart-포인터)
