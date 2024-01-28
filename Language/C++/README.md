@@ -70,22 +70,11 @@
 
 <br/>
   
-  - [unique_ptr](#unique_ptr)
-    - [유니크 포인터 선언하기](#유니크-포인터-선언하기)
-    - [유니크 포인터는 복사, 대입이 안된다](#유니크-포인터는-복사-대입이-안된다)
-    - [유니크 포인터를 사용하는 좋은 장소 3가지](#유니크-포인터를-사용하는-좋은-장소-3가지)
-  - [make_unique](#make_unique)
-    - [make_unique선언하기](#make_unique선언하기)
-    - [make_unique는 복사와, 대입이 불가능](#make_unique는-복사와-대입이-불가능)
-    - [reset](#reset)
-    - [get](#get)
-    - [release](#release)
-    - [move](#move)
-  - [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
-    - [선언하기](#선언하기)
-    - [공유 포인터 공유하기](#공유-포인터-공유하기)
-    - [포인터 재설정 하기](#포인터-재설정-하기)
-  - [weak_ptr 포인터(약한 포인터)](#weak_ptr-포인터약한-포인터)
+  - [스마트(Smart) 포인터](#스마트smart-포인터)
+    - [unique_ptr](#unique_ptr)
+    - [make_unique](#make_unique)
+    - [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+    - [weak_ptr 포인터(약한 포인터)](#weak_ptr-포인터약한-포인터)
 
 <br/>
 <br/>
@@ -3950,24 +3939,28 @@ int main()
 
 ***
 
-# unique_ptr
+# 스마트(Smart) 포인터
+  - [unique_ptr](#unique_ptr)
+  - [make_unique](#make_unique)
+  - [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+  - [weak_ptr 포인터(약한 포인터)](#weak_ptr-포인터약한-포인터)
 
-  - delete 해줄 필요가 없음
-  - 복사나 대입을 할 수 없기 때문에 주의!
-  - unique_ptr는 항상 범위와 함께 쓴다는것을 주의하기! scope를 벗어나는 순간 사라지는 스택처럼!
-
-    - [유니크 포인터 선언하기](#유니크-포인터-선언하기)
-    - [유니크 포인터는 복사, 대입이 안된다](#유니크-포인터는-복사-대입이-안된다)
-    - [유니크 포인터를 사용하는 좋은 장소 3가지](#유니크-포인터를-사용하는-좋은-장소-3가지)
-
-###### [unique_ptr](#unique_ptr)
+###### [스마트(Smart) 포인터](#스마트smart-포인터)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-# 유니크 포인터 선언하기
+# unique_ptr
+  - delete 해줄 필요가 없음
+  - 복사나 대입을 할 수 없기 때문에 주의!
+  - unique_ptr는 항상 범위와 함께 쓴다는것을 주의하기! scope를 벗어나는 순간 사라지는 스택처럼!
 
+<br/>
+
+  - 유니크 포인터 선언하기
+
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -3996,14 +3989,11 @@ int main()
 }
 ~~~
 
-###### [unique_ptr](#unique_ptr)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 유니크 포인터는  복사, 대입이 안된다
+  - 유니크 포인터는  복사, 대입이 안된다
 
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4034,16 +4024,12 @@ int main()
 }
 ~~~
 
-###### [unique_ptr](#unique_ptr)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 유니크 포인터를 사용하는 좋은 장소 3가지
+  - 유니크 포인터를 사용하는 좋은 장소 3가지
+    - 클래스에서 생성자, 소멸자
 
-  - 클래스에서 생성자, 소멸자
-
+#ConsoleApp.cpp
 ~~~c++
 // 원래 클래스 안에서 메모리 할당을 할 경우, 소멸자로 메모리 해체를 해줘야함
 #include <iostream>
@@ -4077,6 +4063,10 @@ int main()
 
 }
 ~~~
+
+<br/>
+
+#ConsoleApp.cpp
 ~~~c++
 // 메모리를 해제해주는 소멸자가 필요 없어 진다
 #include <iostream>
@@ -4109,12 +4099,11 @@ int main()
 }
 ~~~
 
-#### ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
 <br/>
 
   - 지역변수
 
+#ConsoleApp.cpp
 ~~~c++
 // 지연변수는 어차피 종료 전에 또는 그 해당 함수가 끝나기 전에 delete하여 메모리 할당을 해재해 주어야한다
 #include <iostream>
@@ -4148,6 +4137,7 @@ int main()
 }
 ~~~
 
+#ConsoleApp.cpp
 ~~~c++
 // 지역변수에 선언할때는 따로 메모리 할당을 애초에 고민하지 않아도 된다.
 #include <iostream>
@@ -4180,13 +4170,12 @@ int main()
 
   - 벡터안에서 포인터를 쓰거나 할때도 내부로 하나하나 메모리 할당을 해제 해 주지 않아도 되니 엄청 편해진다!!
 
-###### [unique_ptr](#unique_ptr)
+
+###### [스마트(Smart) 포인터](#스마트smart-포인터)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # make_unique
 
@@ -4195,13 +4184,7 @@ int main()
   - 둘 이상의 unique_ptr가 원시 포인터를 공유하지 못하게 하기 위해서 새로운 문법을 개발 하였음
   - make_unique가 등장함
 
-    - [make_unique선언하기](#make_unique선언하기)
-    - [make_unique는 복사와, 대입이 불가능](#make_unique는-복사와-대입이-불가능)
-    - [reset](#reset)
-    - [get](#get)
-    - [release](#release)
-    - [move](#move)
-
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4237,14 +4220,11 @@ int main()
 }
 ~~~
 
-###### [make_unique](#make_unique)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# make_unique선언하기
+  - make_unique선언하기
 
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4272,14 +4252,11 @@ int main()
 }
 ~~~
 
-###### [make_unique](#make_unique)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# make_unique는 복사와, 대입이 불가능
+  - make_unique는 복사와, 대입이 불가능
 
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4310,25 +4287,18 @@ int main()
 }
 ~~~
 
-###### [make_unique](#make_unique)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# make_unique배열만들기
+  - make_unique배열만들기
 
-//나중에 공부해서 작성하기
 
-###### [make_unique](#make_unique)
 
 <br/>
-<br/>
 
-# reset
+  - reset
+    - 원시포인터 소유권을 박탈하고, 다른 포인터를 가질 수 있게함
 
-  - 원시포인터 소유권을 박탈하고, 다른 포인터를 가질 수 있게함
-
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4358,17 +4328,13 @@ int main()
 }
 ~~~
 
-###### [make_unique](#make_unique)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# get
+  - get
+    - 원시 포인터 반환
+    - 이때는 포인터를 지우지 않는다는 규정하에 사용해야 한다!!
 
-  - 원시 포인터 반환
-  - 이때는 포인터를 지우지 않는다는 규정하에 사용해야 한다!!
-
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4400,17 +4366,13 @@ int main()
 }
 ~~~
 
-###### [make_unique](#make_unique)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# release
+  - release
+    - 원시 포인터 소유권 이전
+    - release를 하게 되면 아예 포인터를 옮겨주는 것으로 이해하면 된다. 따라서 release후에 해당 변수를 get하게 되면 아무것도 남지 않았으니 nullptr이 출력된다
 
-  - 원시 포인터 소유권 이전
-  - release를 하게 되면 아예 포인터를 옮겨주는 것으로 이해하면 된다. 따라서 release후에 해당 변수를 get하게 되면 아무것도 남지 않았으니 nullptr이 출력된다
-
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4440,18 +4402,14 @@ int main()
 }
 ~~~
 
-###### [make_unique](#make_unique)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# move
+  - move
+    - 포인터 소유권 옮기기
+    - 이 함수 한번으로 쉽게 다른 유니크 포인터에서 유니크 포인터로 소유권을 옮길 수 있게 된다
+    - const 유니크포인터에는 사용 할 수 없다!
 
-  - 포인터 소유권 옮기기
-  - 이 함수 한번으로 쉽게 다른 유니크 포인터에서 유니크 포인터로 소유권을 옮길 수 있게 된다
-  - const 유니크포인터에는 사용 할 수 없다!
-
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4480,7 +4438,7 @@ int main()
 }
 ~~~
 
-###### [make_unique](#make_unique)
+###### [스마트(Smart) 포인터](#스마트smart-포인터)
 ###### [Top](#top)
 
 <br/>
@@ -4489,25 +4447,17 @@ int main()
 ***
 
 # shared 포인터(공유 포인터)
-
   - 두개의 포인터를 소유하고있음
     - 데이터 포인터
     - 제어블록 포인터(몇번 참조했는지 세야하기 때문)
     - 참조 카운팅기반
       - 어떤 곳에도 참조되지 않으면 지워줌
 
-    - [선언하기](#선언하기)
-    - [공유 포인터 공유하기](#공유-포인터-공유하기)
-    - [포인터 재설정 하기](#포인터-재설정-하기)
-
-###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 선언하기
+  - 선언하기
 
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4528,14 +4478,11 @@ int main()
 }
 ~~~
 
-###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 공유 포인터 공유하기
+  - 공유 포인터 공유하기
 
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4559,14 +4506,11 @@ int main()
 
 ![image](https://user-images.githubusercontent.com/39178978/200856083-37a20fa2-0558-4cc7-9465-f1b4b680faca.png)
 
-###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
-###### [Top](#top)
-
-<br/>
 <br/>
 
-# 포인터 재설정 하기
+  - 포인터 재설정 하기
 
+#ConsoleApp.cpp
 ~~~c++
 #include <iostream>
 #include <memory>
@@ -4592,13 +4536,12 @@ int main()
 
 ![image](https://user-images.githubusercontent.com/39178978/200856294-190ba46a-b3ea-4e40-b950-d525e718d557.png)
 
-###### [shared 포인터(공유 포인터)](#shared-포인터공유-포인터)
+
+###### [스마트(Smart) 포인터](#스마트smart-포인터)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # weak_ptr 포인터(약한 포인터)
 
