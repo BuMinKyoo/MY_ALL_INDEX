@@ -4178,7 +4178,7 @@ int main()
 <br/>
 
 # make_unique
-
+  - 주어진 매개변수와 자료형으로 new 키워드를 호출해 줌
   - 유니크 포인터의 문제점과 C++14이후의 해결책(make_unique)
   - 복사나 대입이 안된다고 했지만, 따로 포인터를 만들어서 그 포인터를 각각의 유니크 포인터에 공유하는것은 가능하다
   - 둘 이상의 unique_ptr가 원시 포인터를 공유하지 못하게 하기 위해서 새로운 문법을 개발 하였음
@@ -4291,7 +4291,33 @@ int main()
 
   - make_unique배열만들기
 
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <memory>
 
+class Animal
+{
+public:
+	int m_age;
+
+	Animal(int age)
+		: m_age(age)
+	{
+
+	}
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::unique_ptr<Animal[]> ani = std::make_unique<Animal[]>(10);
+}
+~~~
 
 <br/>
 
@@ -4324,7 +4350,7 @@ int main()
 {
 	std::unique_ptr<Animal> myanimals = std::make_unique<Animal>(10);
 	myanimals.reset(new Animal(20)); // 새로운 포인터로 교체
-	myanimals.reset(); // nullptr로 교체
+	myanimals.reset(); // nullptr로 교체, myanimals = nullptr 와 같다
 }
 ~~~
 
