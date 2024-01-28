@@ -52,14 +52,17 @@
 
 <br/>
 
-  - [auto](#auto)
-  - [static_assert](#static_assert)
-  - [default](#default)
-  - [delete](#delete)
-  - [final](#final)
-  - [override](#override)
-  - [nullptr](#nullptr)
-  - [enum class](#enum-class)
+  - [새로운키워드](#새로운키워드)
+    - [auto](#auto)
+    - [static_assert](#static_assert)
+    - [default](#default)
+    - [delete](#delete)
+    - [final](#final)
+    - [override](#override)
+  - [새로운자료형](#새로운자료형)
+    - [nullptr](#nullptr)
+    - [고정 폭 정수형](#고정-폭-정수형)
+    - [enum class](#enum-class)
   - [unordered_map](#unordered_map)
   - [unordered_set](#unordered_set)
   - [범위기반 for반복문](#범위기반-for반복문)
@@ -3154,6 +3157,20 @@ int main()
 
 ***
 
+# 새로운키워드
+  - [auto](#auto)
+  - [static_assert](#static_assert)
+  - [default](#default)
+  - [delete](#delete)
+  - [final](#final)
+  - [override](#override)
+
+###### [새로운키워드](#새로운키워드)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 # auto
   - 자료형을 추론해줌
   - JavaScritp등의 언어에 있는 동적인 형과는 다름
@@ -3214,13 +3231,11 @@ for (auto it = v.begin( ); it != v.end( ); ++it)
 }
 ~~~
 
-###### [auto](#auto)
+###### [새로운키워드](#새로운키워드)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # static_assert
   - 일반적인 assert는 컴파일 후 실행중에 문제가 있는지 잡아 주는데 비해서 static_assert는 컴파일 중에 잡아주기 때문에 실행전에 문제를 잡을 수 있게 해줌
@@ -3263,13 +3278,11 @@ int main()
 }
 ~~~
 
-###### [static_assert](#static_assert)
+###### [새로운키워드](#새로운키워드)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # default
   - 컴파일러가 특정한 생성자, 연산자 및 소멸자를 만들어 낼 수 있음
@@ -3304,13 +3317,11 @@ int main()
 }
 ~~~
 
-###### [default](#default)
+###### [새로운키워드](#새로운키워드)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # delete
 
@@ -3344,13 +3355,11 @@ int main()
 }
 ~~~
 
-###### [delete](#delete)
+###### [새로운키워드](#새로운키워드)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # final
 
@@ -3458,13 +3467,11 @@ int main()
 }
 ~~~
 
-###### [final](#final)
+###### [새로운키워드](#새로운키워드)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
-***
 
 # override
 
@@ -3564,7 +3571,7 @@ int main()
 }
 ~~~
 
-###### [override](#override)
+###### [새로운키워드](#새로운키워드)
 ###### [Top](#top)
 
 <br/>
@@ -3572,23 +3579,54 @@ int main()
 
 ***
 
+# 새로운자료형
+  - [nullptr](#nullptr)
+  - [고정 폭 정수형](#고정-폭-정수형)
+  - [enum class](#enum-class)
+
+###### [새로운자료형](#새로운자료형)
+###### [Top](#top)
+
+<br/>
+<br/>
+
 # nullptr
 
   - null은 상수 0 이고, nullptr은 null포인터 상수라고 보면 된다
   - 포인터 에서는 언제나 nullptr을 사용하자!!!
+    - null과 nullptr을 사용한 한가지 예 차이가 있다면, 오버로딩된 함수의 인자가 정수 받는것과 포인터를 받는것이 있을때, 그 인자에 NULL을 넣으면 정수 함수가 실행되고, nullptr을 넣으면 포인터인자를 받는 함수가 실행된다
+    - 개발자의 의도를 더욱 드러낼 수 있다 
 
 ~~~c++
 int num = nullptr // 컴파일 에러
 int* num2 = nullptr // 컴파일 성공
 ~~~
 
-###### [nullptr](#nullptr)
+###### [새로운자료형](#새로운자료형)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
-***
+# 고정 폭 정수형
+- int8_t / uint8_t
+- int16_t / uint16_t
+- int32_t / uint32_t
+- int64_t / uint64_t
+- intptr_t / uintptr_t
+- 등등 더욱 많이 존재함
+- 가독성 향상을 위해 낡은 기존 자료형보다 이것들을 쓰자
+  - 메모리 활용면에서 더욱 아낄수도 있다
+
+~~~c++
+int8_t score = student->GetScore();
+~~~
+
+###### [새로운자료형](#새로운자료형)
+###### [Top](#top)
+
+<br/>
+<br/>
 
 # enum class
 
@@ -3624,7 +3662,7 @@ int main()
 }
 ~~~
 
-###### [enum class](#enum-class)
+###### [새로운자료형](#새로운자료형)
 ###### [Top](#top)
 
 <br/>
