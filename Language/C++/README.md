@@ -78,6 +78,15 @@
     - [weak_ptr 포인터(약한 포인터)](#weak_ptr-포인터약한-포인터)
 
 <br/>
+
+  - [이동 생성자 및 이동 대입 연산자](#이동-생성자-및-이동-대입-연산자)
+  - [constexpr](#constexpr)
+  - [람다 식(Lambda Expression)](#람다-식lambda-expression)
+  - [가변 인자 템플릿](#가변-인자-템플릿)
+  - [파일 시스템(Filesystem), 모듈(Module) 시스템](#파일-시스템filesystem-모듈module-시스템)
+  - [쓰레딩(Threading) 라이브러리](#쓰레딩threading-라이브러리)
+
+<br/>
 <br/>
 
 ***
@@ -4688,7 +4697,812 @@ int main()
   - 약한 참조로 참조되는 개체는 강한 참조 카운트가 0이 될때 소멸됨
   - 순한참조의 해결책
   - weak_ptr는 혼자 만들어질 수 없고, 공유 포인터가 있을때 만들어 낼 수 있다
-  - 나중에 따로 다시 공부하자
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::shared_ptr<Animal> myanimals = std::make_shared<Animal>();
+	std::weak_ptr<Animal> myweakanimals = myanimals; // 혼자 만들어 질 수 없다
+}
+~~~
+
+<br/>
+
+  - 약한 포인터 사용하기
+    - 사용하기 위해서는 약한 포인터에서 lock을 호출해 return값으로 공유 포인터를 내 뱉어서 사용하게 된다.
+    - 그러므로 lock을쓴다는 것은 강한 포인터 참조 카운트를 1 증가 시키게 된다 
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::shared_ptr<Animal> myanimals = std::make_shared<Animal>();
+	std::weak_ptr<Animal> myweakanimals = myanimals; // 혼자 만들어 질 수 
+
+	// 강한 참조 2개, 약한 참조 1개
+	std::shared_ptr<Animal> myanimals2 = myweakanimals.lock(); // lock을 통해 다시 shared_ptr로 만들어준다.
+}
+~~~
+
+<br/>
+
+  - 공유 포인터가 존재 하는지 확인하기
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <memory>
+
+class Animal
+{
+public:
+
+	void Print()
+	{
+		std::cout << "난 동물이야" << std::endl;
+	}
+};
+
+int main()
+{
+	std::shared_ptr<Animal> myanimals = std::make_shared<Animal>();
+	std::weak_ptr<Animal> myweakanimals = myanimals; // 혼자 만들어 질 수 
+
+	auto ptr = myweakanimals.lock(); // lock을 걸어서 사용해야함
+	if (ptr != nullptr)
+	{
+		ptr->Print();
+	}
+	else
+	{
+		std::cout << "동물이 죽었어요" << std::endl;
+	}
+}
+~~~
+
+<br/>
+
+  - 순환 참조의 예시
+
+#ConsoleApp.cpp
+~~~c+
+#include <iostream>
+#include <memory>
+
+class Cat
+{
+public:
+	Cat(std::string name) : mName{ name }
+	{
+		std::cout << mName << " cat constructor" << std::endl;
+	}
+	~Cat()
+	{
+		std::cout << mName << " cat destructor" << std::endl;
+	}
+	std::shared_ptr<Cat> mVar;
+private:
+	std::string mName;
+};
+
+int main()
+{
+	std::shared_ptr<Cat> kitty = std::make_shared<Cat>("kitty");
+	std::shared_ptr<Cat> nabi = std::make_shared<Cat>("nabi");
+
+	kitty->mVar = nabi;
+	nabi->mVar = kitty;
+
+	std::cout << "kitty count : " << kitty.use_count() << std::endl;
+	std::cout << "nabi count : " << nabi.use_count() << std::endl;
+}
+~~~
+
+<br/>
+
+  - weak_ptr을 사용하여 순환 참조 해결하기
+
+#ConsoleApp.cpp
+~~~c+
+#include <iostream>
+#include <memory>
+
+class Cat
+{
+public:
+	Cat(std::string name) : mName{ name }
+	{
+		std::cout << mName << " cat constructor" << std::endl;
+	}
+	~Cat()
+	{
+		std::cout << mName << " cat destructor" << std::endl;
+	}
+	std::weak_ptr<Cat> mVar;
+private:
+	std::string mName;
+};
+
+int main()
+{
+	std::shared_ptr<Cat> kitty = std::make_shared<Cat>("kitty");
+	std::shared_ptr<Cat> nabi = std::make_shared<Cat>("nabi");
+
+	kitty->mVar = nabi;
+	nabi->mVar = kitty;
+
+	std::cout << "kitty count : " << kitty.use_count() << std::endl;
+	std::cout << "nabi count : " << nabi.use_count() << std::endl;
+}
+~~~
 
 ###### [스마트(Smart) 포인터](#스마트smart-포인터)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 이동 생성자 및 이동 대입 연산자
+  - lvalue
+    - 단일 식을 넘어 지속되는 개체
+    - 지금까지 봐 온 많은 변수 자료형들
+      - 뭔가 저장해두고 나중에 꺼낼 수 있는것이면 다 lvalue라고 생각할 수 있다
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+int number = 10; // number 는 lvalue
+const int NAME_MAX = 20; // NAME_MAX 는 lvalue
+int* numberPtr = &number; // numberPtr 는 lvalue
+
+등등
+~~~
+
+<br/>
+
+  - rvalue
+    - 사용되는 단일 식을 넘어 지속되지 않는 일시적인 값
+      - 주소가 없는 개체
+      - 리터럴
+      - 열거형..
+      - 람다..
+      - 등등
+    - 즉, 임시적인 개체
+
+~~~c++
+int number = 10; // 10 는 rvalue
+
+int anotherNumber = 20;  // 20는 rvalue
+int result = number + anotherNumber; // number + anotherNumber는 rvalue
+
+등등
+~~~
+
+<br/>
+
+  - rvalue 참조(&&)
+    - c+11이후에 새로 나온 연산자
+    - 기능상 & 연산자와 비슷
+    - &연산자는 lvalue참조에 사용
+    - &&연산자는 rvalue참조에 사용
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+float CalculateAverage()
+{
+	float aFloat = 1.7f;
+	return aFloat;
+}
+
+int main()
+{
+	int number = 10;
+	int&& rNumber = number; // 에러, number는 lvalue이므로 rvalue 참조 불가
+	int&& rNumber1 = 10;
+	float&& rFloat = CalculateAverage();
+}
+~~~
+
+<br/>
+
+  - 이동 생성자
+    - 다른 개체 멤버 변수들의 소유권을 가져 옴
+    - 복사 생성자와 달리, 메모리 재할당을 하지 않음
+    - 복사 생성자보다 빠름
+    - 약간 얕은 복사와 비슷
+
+#ConsoleApp.cpp
+~~~c++
+MyString::MyString(MyString&& other)
+{
+  // ….
+}
+~~~
+
+<br/>
+
+  - 이동 대입 연산자
+    - 음..나중에 다시 공부하자
+
+<br/>
+
+  - rvalue 최적화
+    - 포인터 대신 개체 자체를 반환하는 함수
+      - 함수에서 rvalue를 반환하는 것은 실제 매우 느림
+      - 반환 값 최적화 라고 하는 컴파일러 최적화를 깨뜨림
+    - 베스트 프랙티스
+      - 기본적으로 그냥 개체를 반환
+      - 더 빨라진다고 입중된 경우에만 함수가 rvalue를 반환하도록 바꾸자
+
+<br/>
+
+  - 정리
+      - 이것을 사용하는 이유는, 함수에서 리턴값을 받거나, 복사 생성자같은 것을 사용할때 값들을 복사해서 받게 되는데, 이때 연산을 여러번 하게 된다. 따라서 느려지게 된다. 이것을 빠르게 하기 위해서 사용하게 되는 것이며, 메모리를 해제 할당 하지 않고, 복사하여 받을때 복사가 아닌, 포인터 주소를 그대로 가리키는 방법을 사용해서 속도를 높이게 된다
+
+###### [이동 생성자 및 이동 대입 연산자](#이동-생성자-및-이동-대입-연산자)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# constexpr
+  - 컴파일 시에 값 평가를 강제하기 위해서 템플릿 메타 프로그래밍을 남용함
+  - 이러지 않아도 컴파일러가 자발적으로 그렇게 해주는 경우도 있긴 했음
+  - constexpr가 프로그래머의 의도를 보여주는 더 나은 방법
+  - 우리의 의도는 컴파일 도중에 값을 평가하는 것임을 컴파일러에게 알려줌
+  - 컴파일러가 컴파일 도중에 변수들을 결정지어 줌
+  - 함수는 그럴려고 최대한 노력함
+
+<br/>
+
+  - 즉, 컴파일 중에 어떤 값이 결정되는것이, 실행중 결정되는 것보다 더 빠르게 프로그램을 돌릴수 있는 방법이기 때문에, 컴파일 도중에 “반드시” 값이 결정되게 하려면 constexpr키워드를 사용할것
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+constexpr int Factorial(int n)
+{
+	return n <= 1 ? 1 : (n * Factorial(n - 1));
+}
+
+int main()
+{
+	int value = 3;
+	int result1 = Factorial(value); // OK
+
+	// 컴파일러가 컴파일 도중에 평가하지 못한다면 에러를 발생시킨다.
+	constexpr int result2 = Factorial(value); // Error
+
+	constexpr int result3 = Factorial(3);  // OK
+
+	// 너무 많이 호출했기 때문에 컴파일러가 컴파일 도중에 평가할 수 없다고 말한것
+	constexpr int result3 = Factorial(30);  // Error
+}
+~~~
+
+<br/>
+
+  - constexpr활용하기
+    - 해쉬 함수에 활용할 수 있다
+      - 문자열 해쉬를 컴파일 도중에 만들 수 있다면
+      - 어떤 비교에 드는 런타임 비용은 언제나 O(1)
+
+###### [constexpr](#constexpr)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 람다 식(Lambda Expression)
+  - 이름이 없는 함수 개체
+  - 내포되는 함수
+  - 람다식 만들기
+    - [캡처블록](매개변수 선택사항) <지정자 선택사항> -> <반환형 선택사항> {  함수바디}
+
+<br/>
+
+  - 캡쳐블록
+    - 람다 식을 품는 범위안에 있는 변수를 람다 식에 넘겨줄때 사용
+    - 캡쳐의 종류
+      - “[ ]”
+        - 비어 있는. 캡처하지 않음
+      - “=”
+        - 값에 의한 캡처. 모든 외부 변수를 캡쳐함
+        - 람다 식 안에서 수정할 수 없음
+      - “&”
+        - 참조에 의한 캡쳐. 모든 외부 변수를 캡쳐함
+      - “<변수이름>”
+        - 특정 변수를 값으로 캡쳐
+        - 람다 식 안에서 수정할 수 없음
+      - “&<변수이름>”
+        - 특정 변수를 참조로 캡쳐
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+int main()
+{
+	// 캡처하지 않는 경우
+	// 방법 1
+	auto noCapture = []() { std::cout << "Hello, World!" << std::endl; };
+	noCapture();
+
+	// 방법2 바로 실행
+	[] { std::cout << "Hello, World!" << std::endl; }();
+
+	// 외부 변수를 사용할때는 컴파일 에러가 난다
+	float score1 = 80.f;
+	float score2 = 20.f;
+	auto max = []() { return score1 > score2 ? score1 : score2; }; // 컴파일 에러
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+int main()
+{
+	// 값에 의한 캡처
+	float score1 = 80.f;
+	float score2 = 20.f;
+	auto max = [=]() { return score1 > score2 ? score1 : score2; }; // 컴파일 에러
+
+	std::cout << max() << std::endl;
+
+	// 값을 바꾸려고 하면 컴파일 에러가 남
+	auto changeValue = [=]()
+		{
+			score1 = 100.f; // 컴파일 에러
+		};
+
+	changeValue();
+
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+int main()
+{
+	// 참조에 의한 캡처
+	float score1 = 80.f;
+	float score2 = 20.f;
+
+	auto changeValue = [&]()
+		{
+			score1 = 100.f;
+			score2 = 100.f;
+		};
+
+	changeValue(); // 이때 값이 바뀐다
+
+}
+~~~
+
+등등…여러 방법이 있음
+
+<br/>
+
+  - 매개변수 목록
+    - 선택 사항
+    - 빈 괄호를 생략할 수 있음
+      - auto noCapture = []() { std::cout << "Hello, World!" << std::endl; };
+      - auto noCapture = [] { std::cout << "Hello, World!" << std::endl; };
+
+<br/>
+
+  - 지정자
+    - 선택 사항
+    - mutable
+      - 값에 의해 캡쳐된 개체를 수정할 수 있게 함
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+int main()
+{
+	int value = 100;
+
+	auto foo = [value]() mutable {
+		value = 200;
+		std::cout << "value = " << value << std::endl; // 200
+	};
+
+	foo();
+
+	std::cout << "value = " << value << std::endl; // 100
+}
+~~~
+
+<br/>
+
+  - 반환형
+    - 선택사항
+    - 반환 형을 적지 않으면 반환문을 통해 유추해줌
+
+<br/>
+
+  - 람다 식의 장점
+    - 간단한 함수를 빠르게 작성할 수 있음
+  - 람다 식의 단점
+    - 디버깅하기 힘들어짐
+    - 함수 재사용성이 낮음
+    - 사람들은 보통 함수를 새로 만들기 전에 클래스에 있는 기존 함수를 찾아 봄
+    - 람다 함수는 눈에 잘 띄지 않아서 못 찾을 가능성이 높음
+    - 그럼 코드 중복이 발생..
+
+<br/>
+
+  - 베스트 프랙티스
+    - 기본적으로, 이름 있는 함수를 쓰자
+    - 자잘한 함수는 람다로 써도 괜찮음
+    - 허나 재사용할 수 있는 함수를 찾기 좀 어려움
+    - 정렬 함수 처럼 STL컨테이너에 매개변수로 전달할 함수들도 좋은 후보
+
+###### [람다 식(Lambda Expression)](#람다-식lambda-expression)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 가변 인자 템플릿
+  - 다양한 매개변수 개수와 자료형을 지원하는 클래스 또는 함수 템플릿
+  - 매개변수 목록에서 생략 부호(...)를 쓴다
+  - 활용법을 생각하기가 정말로 어려움
+  - 주로 인자 전달용. 예) std::make_unique()
+  - 몇몇 다른 아이디어들도 있음. 하지만 대부분 실용적이지는 않은듯..
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+// 가변인자 템플릿을 이용한 함수
+template<typename... Args>
+auto add(Args... args) {
+    return (args + ...);
+}
+
+int main() {
+    int sum = add(1, 2, 3, 4, 5);
+    std::cout << "합계: " << sum << std::endl;
+
+    double sum2 = add(1.5, 2.7, 3.2, 4.8);
+    std::cout << "합계: " << sum2 << std::endl;
+
+    return 0;
+}
+
+// 출력
+//합계: 15
+//합계 : 12.2
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/73d034eb-f4fb-467d-a2ba-ea1bfeb984ca)
+
+###### [가변 인자 템플릿](#가변-인자-템플릿)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 파일 시스템(Filesystem), 모듈(Module) 시스템
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/080e3f37-28db-469c-8c40-4643cdd39b80)
+
+<br/>
+
+  - 파일 시스템
+    - C++17의 새로운 라이브러리
+    - C++14나 그 전에는 파일 시스템과 다음과 같은 구성요소에 대해 연산을 할 방법이 없었음
+      - 경로
+      - 일반 파일
+      - 디렉터리
+    - 파일 읽기와 쓰기에 관한 라이브러리가 아님
+    - 파일 속성 변경, 디렉터리 순회, 파일 복사 등에 관한 라이브러리
+    - 이 모든걸 std::fs로 할 수 있음
+    - 그 전에는 OS에 있는 함수를 호출했었음
+
+<br/>
+
+  - 파일 시스템 연산
+    - 플랫폼 공통적인 방법으로 경로 합치기
+      - 어떤 OS이든 상관없이 같은 포맷으로 해줌
+    - 파일과 디렉터리를 복사, 이름 바꾸기, 삭제
+    - 디렉터리에서 파일, 디렉터리 목록 가져오기
+    - 파일 권한 읽기 및 설정
+    - 파일 상태 읽기 및 설정
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+int main()
+{
+    fs::path path1 = "D\\qqqqq";
+    fs::path path2 = "D\\wwwww";
+    path1 /= path2;
+
+    // 콘솔에 출력
+    std::cout << path1 << std::endl; // "D\\qqqqq\\D\\wwwww"
+
+    fs::path path3 = "D\\qqqqq";
+    fs::path path4 = "D\\wwwww";
+    path3 += path4;
+
+    // 콘솔에 출력
+    std::cout << path3 << std::endl; // "D\\qqqqqD\\wwwww"
+
+    return 0;
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+int main()
+{
+    fs::path originalTextPath = "D\\qqqqq.txt";
+    fs::path copiedTextPath = "D\\Copyqqqqq.txt";
+
+    fs::path originalDirPath = "D\\folder1";
+    fs::path copiedDirPath1 = "D\\Copyfolder1";
+    fs::path copiedDirPath2 = "D\\Copyfolder2";
+
+    fs::copy(originalTextPath, copiedTextPath); // 파일 복사
+    fs::copy(originalDirPath, copiedDirPath1); // 디렉터리 복사(비재귀적으로) -> 해당하는 폴더 만 복사한다
+    fs::copy(originalDirPath, copiedDirPath2, fs::copy_options::recursive); // 디렉터리 복사(재귀적으로)
+
+    return 0;
+}
+~~~
+
+  - 파일 또는 디렉터리 이름 바꾸기/ 이동하기
+    - rename
+  - 파일 또는 디렉터리 삭제
+    - remove
+  - 폴더 안에 있는 모든 것을 삭제
+    - remove_all
+  - 디렉터리 파일 목록 구하기
+    - recursive_directory_iterator
+  - 파일 속성(권한) 읽기
+    - status, permissions
+
+<br/>
+
+  - 모듈 시스템
+    - c++17까지도 여전히 c++ 표준으로 들어오지 않음
+    - 허나 비주얼 스튜디오에서 /experimental:module 플래그를 활성화 해서 사용할 수 있음
+    - 표준이 된다면
+      - 컴파일이 엄청나게 빨라짐
+      - .cpp와 .h파일로 나눌 필요가 없어짐(이건 컴파일 속도를 높이기 위한 것이었음)
+      - Java의 패키지처럼 작동
+    - 여전히 앞에 시련이 놓여 있음
+      - .cpp와 .h 둘다 있는 레거시 코드는 어떻게 처리하나요?
+      - 만약 #define을 너무 많이 쓰고 있으면?
+
+###### [파일 시스템(Filesystem), 모듈(Module) 시스템](#파일-시스템filesystem-모듈module-시스템)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 쓰레딩(Threading) 라이브러리
+  - c++표준이기 때문에, 여러 OS에서 공통으로 돌아간다고 생각할 수 있다
+  - c++11전까지 표준 멀티쓰레딩 라이브러리가 없었음
+  - OS마다 멀티 쓰레딩 구현이 달랐음
+    - 리눅스/유닉스 : POSIX 쓰레드
+    - 윈도우 쓰레드
+
+<br/>
+
+  - std::thread
+    - 표준 c++쓰레드
+    - 이동 가능
+    - 복사 불가능
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <string>
+#include <thread>
+
+void PrintMessage(const std::string& message)
+{
+    std::cout << message << std::endl;
+}
+
+int main()
+{
+   std::thread t1(PrintMessage, "Hello"); // 쓰레드 생성
+
+   // OS별로 쓰레드 ID를 다르게 표현함 그렇기 때문에 id는 숫자가 아닐 수 있다!
+   std::thread::id childThreadId = t1.get_id(); // 쓰레드 ID를 얻음
+   std::cout << "Child Thread ID: " << childThreadId << std::endl;
+
+   t1.join(); // 쓰레드가 종료될 때까지 기다림
+
+    return 0;
+}
+~~~
+
+<br/>
+
+  - 쓰레드 떼어 내기
+    - detach를 이용해서 메인 쓰레드에서 자식 쓰레드를 끊어버리면, 메인이 먼저 끝났다고 해서 에러가 발생하지 않는다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <string>
+#include <thread>
+
+void PrintMessage(const std::string& message)
+{
+    std::cout << message << std::endl;
+}
+
+int main()
+{
+   std::thread t1(PrintMessage, "Hello"); // 쓰레드 생성
+
+   t1.detach(); // 쓰레드 종료 대기하지 않음
+
+    return 0;
+}
+~~~
+
+<br/>
+
+  - 람다와 쓰레딩
+    - 간편한 것은 람다를 이용해서 하는것이 편할 수 있다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <string>
+#include <thread>
+
+int main()
+{
+    auto PrintMessage = [](const std::string& message)
+    {
+            std::cout << message << std::endl;
+    };
+
+   std::thread t1(PrintMessage, "Hello"); // 쓰레드 생성
+
+   t1.join();
+
+    return 0;
+}
+~~~
+
+<br/>
+
+  - this_thread
+    - 여러 도움이 함수들이 있다
+    - sleep_for : 쓰레드 실행 잠시 멈추기
+    - yield : 0초동안 잠드는것, 쓰레드 큐에서 맨 뒤로 가는거라고 생각할 수 있을지도..?
+
+<br/>
+
+  - std::mutex
+    - 쓰레드 동기화시 사용
+  - std::scoped_lock
+    - 뮤텍스를 사용할때, unlock을 하지 않으면 데드락이 발생하는데, 그것을 방지하기 위해서 나오게되었음. 범위를 벗어나면 알아서 unlock을 해주기 때문에 데드락이 생길 일이 거의 없다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+#include <mutex>
+#include <string>
+#include <thread>
+
+void PrintMessage(const std::string& message)
+{
+    static std::mutex sMutex;
+    {
+        std::scoped_lock<std::mutex> lock(sMutex);
+        std::cout << "Message from thread ID " << std::this_thread::get_id() << std::endl;
+    }
+    {
+        std::scoped_lock<std::mutex> lock(sMutex);
+        std::cout << message << std::endl;
+    }
+}
+int main()
+{
+    std::thread thread(PrintMessage, "Message from a child thread.");
+    PrintMessage("Message from a main thread.");
+    thread.join();
+    return 0;
+}
+~~~
+
+<br/>
+
+  - 조건변수
+    - std::condition_variable
+    - 이벤트 개체
+    - 신호를 받을 때까지 현재 쓰레드의 실행을 멈춤
+    - notify_one(), ontify_all()
+      - 멈춰놓은 쓰레드 하나 또는 전부를 다시 실행시킴
+    - wait(), wait_for(), wait_untill()
+      - 조건 변수의 조건을 충족시킬때까지 또는 일정 시간 동안 현재 쓰레드의 실행을 멈춤
+    - std::unique_lock을 사용해야 함
+      - 기본적으로 scoped lock
+      - 생성시에 lock을 잠그지 않을 수도 있음(두 번째 매개 변수로 std::defer_lock 을 전달할 것)
+      - std::recursive_mutex와 함께 써서 재귀적으로 잠글 수 있음
+      - 조건 변수에 쓸 수 있는 유일한 lock
+
+###### [쓰레딩(Threading) 라이브러리](#쓰레딩threading-라이브러리)
 ###### [Top](#top)
