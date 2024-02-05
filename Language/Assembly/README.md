@@ -217,6 +217,7 @@
     - 제어장치(control unit) : 어떤 명령어를 이해하고 실행하게 해준다
       - 명령 레지스터(IR, Instruction Register)
       - 프로그램 카운터(PC, Program Counter) : 다음에 실행할 명령어의 위치 주소값을 가지고 있는곳
+        - 따라서 32비트의 운영체제는 이런 레지스터들의 제일 큰 값이 4G정도 이므로 램이 그 크기를 넘으면 접근 할 수가 없다
 
 
 ![20231004_085609](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/f08f5bee-2310-4912-b4fe-239cd30d7ef3)
@@ -6553,7 +6554,7 @@ int main(void)
     - Windows API함수가 사용하는 호출 규약
       - WINAPI정의를 따라가 보면 __stdcall을 define해놓은것
     - Visual Basic은 stdcall만 지원
-    - 인자 전달 : 오른쪽 -> 인쪽
+    - 인자 전달 : 오른쪽 -> 왼쪽
     - 반환값 : cdecl과 동일
     - 스택 정리 : 함수 (callee)
       - 이것만 cdecl과 다르다 
