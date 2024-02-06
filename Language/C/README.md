@@ -202,7 +202,7 @@ a.exe //일반적으로 윈도우 콘솔에서의 실행파일
     - printf("%d", CHAR_BIT); -> char의 비트수
       - #include <limits.h> -> 이걸 써야함
     - CHAR_BIT는 가장작은 단위의 메모리가 된다. -> 바이트 단위의 표준이 되어 버림
-    - unsigned char(0~255), char(0~127), signed char(-127~127)
+    - unsigned char(0&#126;255), char(0&#126;127), signed char(-127&#126;127)
   - Short
     - 최소16비트인 정수(Char이상)
   - int
