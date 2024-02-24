@@ -134,7 +134,7 @@ Nuget검색으로 설치 하기
   - 코드 검색 : Ctrl + T
   - 파일검색 : Ctrl + Shift + T
   - 구성원 검색 : Alt + \
-  - 탐색모음 : F2 + tab + tab + 함수 검색 + enter
+  - 탐색모음 : ctrl + F2, tab, tab + 함수 검색 + enter
 
 ###### [단축키](#단축키)
 ###### [Top](#top)
