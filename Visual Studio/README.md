@@ -8,6 +8,7 @@
   - [Nuget종속성 버전 확인하기](#nuget종속성-버전-확인하기)
   - [단축키](#단축키)
   - [Nuget 패키지 검색 안될시](#nuget-패키지-검색-안될시)
+  - [원격디버깅](#원격디버깅)
 
 <br/>
 
@@ -155,3 +156,40 @@ Nuget검색으로 설치 하기
 
 ###### [Nuget 패키지 검색 안될시](#nuget-패키지-검색-안될시)
 ###### [Top](#top)
+
+***
+
+<br/>
+<br/>
+
+## 원격디버깅
+  - 1. 버전에 맞는 원격 디버거 다운로드
+    - RTM버전에 아닌 업데이트가 가장 높은 버전으로 다운로드 하기
+    - https://learn.microsoft.com/ko-kr/visualstudio/debugger/remote-debugging?view=vs-2022 
+  - 2. 다운로드한 원격 디버거를 테스트할 PC에 다운로드 하여 설치후, Remote Debugger실행
+    - 원격 디버거가 처음 실행될때는, 원격 디버깅 구성이 나오는데, 원격 디버깅 구성을 클릭
+    - 도구에서 암호 없이 디버깅을 원격으로 접근할 수 있게 설정 가능함
+  - 3. 비주얼 스튜디오 디버그 설정을 원격 window 디버거로 설정
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/b0c73aad-f89e-4790-9943-4b32c1867c65)
+
+  - 4. 프로젝트 속성으로 가서, 구성속성 - 디버깅 - 시작할 디버거 : 원격 window 디버거로 세팅하고, 세부 세팅을 시작함
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/6042368c-8150-4da1-917a-0e87d712a8e8)
+
+  - 5. 세부세팅
+    - 원격 명령 : 테스트 PC에서 실행할 실행파일의 위치, 자신의 프로젝트가 c:\test\Stone 에 있고 디버그시에 실행파일이 c:\test\Stone\ Stone.exe 가 생성된다면 c\test\Stone\Stone.exe 라고 적는다
+    - 작업 디렉터리 : 프로그램의 작업 경로를 적어주면 됩니다. 일반적으로 실행파일이 존재하는 경로를 명시합니다. c:\test\Stone
+    - 원격 서버 이름 : 테스트pc의 ip:포트 를 적어주면 된다
+    - 디버거 형식 : C/C++ 에서는 "네이티브 전용"
+    - 배포 디렉터리 : 테스트 PC에 디버깅에 필요한 파일들을 복사할 경로,. c:\test\Stone
+    - 배포할 추가 파일 : 추가로 배포할 파일
+  - 6. 프로젝트 구성 관리자에서, 배포에 체크 한다
+
+<br/>
+
+  - 디버깅 방법 참고 : http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=1959
+
+###### [원격디버깅](#원격디버깅)
+###### [Top](#top)
+
