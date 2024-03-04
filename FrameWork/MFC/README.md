@@ -218,6 +218,10 @@
 
 <br/>
 
+- [에러 후 dump파일 만들기](#에러-후-dump파일-만들기)
+
+<br/>
+
 - Toy프로젝트
   - [MFCSerialPort](https://github.com/BuMinKyoo/MFCSerialPort)
     - Rs232 시리얼통신, 프린터, QR코드 출력
@@ -10741,3 +10745,87 @@ BOOL CMFCApplication2Dlg::OnInitDialog()
 
 ***
 
+# 에러 후 dump파일 만들기
+  - pdb파일은 디버깅 시에 필요하며, 심볼 파일이라고도 불린다
+  - 이 파일에는 함수나 변수들의 이름과 위치, 소스파일, 소스라인 정보등이 담겨져 있어서 이러한 정보들을 이용하여 Visual Studio가 손쉽게(?) 실행파일과 소스파일을 연결 시킨다
+    - 디버그 모드로 빌드된 바이너리는 그 내부에 소스코드를 포함하고 있지 않다. 그래서 실행파일과 소스코드를 연결시켜주는 것이 필요하며 그것이 pdb가 된다. 따라서 디버그를 할때 pdb를 지우게 되면 디버그를 할 수 없게 된다. 다시 pdb를 만들어야 한다. 계속 진행한다면 어셈블리나, 스택에서도 주소값밖에 볼 수 없을것이다
+    - pdb파일에 해당 주소가 어떤 함수인지에 대한 내용이 있기 때문이고, 소스코드의 몇번째 라인인지에 대한 정보 또한 있기에, 한줄 한줄 스텝을 진행해가며 소스레벨에서 디버깅을 할 수 있는 것
+  - Debug 바이너리와 Release 바이너리
+    - 컴파일 최적화 옵션 때문인데 용량차이도 용량 차이이지만 최적화가 되어 있는 바이너리의 경우 소스레벨에서 제대로 된 디버깅이 되지 않는다. 코드가 최적화 되는 바람에 건너뛰는 라인들이 있기 때문
+
+<br/>
+
+  - 1. 먼저 pdb 파일이 빌드 시 생성되도록 프로젝트 설정을 바꿔야 한다
+    - a. C/C++ -> 일반 -> 디버그 정보 형식 에서 "프로그램 데이터베이스(/Zi)" 로 바꾼다.
+    - b. 링커 -> 디버깅 -> 디버그 정보 생성 에서 “공유 및 게시를 위한 최적화된 디버그 정보 생성”
+    - c. 링커 -> 일반 -> 증분 링크 사용을 아니요로 설정
+  - 2. pdb는 컴파일된 소스와 같은 버전이여야 한다, dump파일을 windbg나 비주얼 스튜디오를 사용해서 분석할 수 있다
+  - 3. dump파일을 비주얼 스튜디오에 드래그앤 드롭을 하면 시작할 수 있다,  
+
+<br/>
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/309745da-b116-473a-9b74-b47be3c0a505)
+
+<br/>
+
+  - 4. 기호 경로 설정을 통해서 dump파일의 위치를 잡아 놓을수 있으며, 로드되지 않았을때, 나중에 호출 스택을 클릭하여 재로드 할 수 있다
+  - 5. 네이티브 전용으로 디버그를 클릭하면, 해당 프로그램이 꺼진 곳의 호출스택을 보여주게 된다
+
+<br/>
+
+  - Minidump만들기
+
+#pch.h or stdafx.h
+~~~c++
+#include <DbgHelp.h>
+#pragma comment(lib, "DbgHelp")
+
+static LONG CALLBACK TopLevelExceptionFilterCallBack(EXCEPTION_POINTERS* exceptionInfo); // 정의
+
+LONG CALLBACK TopLevelExceptionFilterCallBack(EXCEPTION_POINTERS* exceptionInfo)
+{
+	MINIDUMP_EXCEPTION_INFORMATION dmpInfo = { 0 };
+	dmpInfo.ThreadId = ::GetCurrentThreadId(); // Thead ID
+	dmpInfo.ExceptionPointers = exceptionInfo;
+	dmpInfo.ClientPointers = FALSE;
+	CTime CurrentTime;
+	CurrentTime = CTime::GetCurrentTime();
+
+	CString Path = _T("C:\\Users\\user\\Desktop\\dump"); // 본인이 저장하고 싶은 경로
+	CString Name; // 저장하고 싶은 이름 포맷으로 변경 가능
+	Name.Format(_T("%s\\DeumpFile_%02d%02d%02d_%02d%02d%02d.dmp"), Path, CurrentTime.GetYear(), CurrentTime.GetMonth(), CurrentTime.GetDay(), CurrentTime.GetHour(), CurrentTime.GetMinute(), CurrentTime.GetSecond());
+	HANDLE hFile = CreateFile(Name, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL); // 덤프생성
+	BOOL bWrite = ::MiniDumpWriteDump(::GetCurrentProcess(), ::GetCurrentProcessId(), hFile, MiniDumpNormal, &dmpInfo, NULL, NULL);
+	return 0L;
+}
+~~~
+
+<br/>
+
+#App.cpp
+~~~c++
+BOOL CMFCApplication1App::InitInstance()
+{
+	CWinApp::InitInstance();
+	SetUnhandledExceptionFilter(TopLevelExceptionFilterCallBack);
+	return FALSE;
+}
+~~~
+
+<br/>
+
+  - Release 모드에서 pdb파일 생성하기
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/7e9752d7-a0fb-4cb8-af78-bc047addaeea)
+
+  - Release 모드에서는 기본적으로 속도 최적화가 On이기 때문에 중단점이 line by line으로 이동하지 않고, 훅훅 뛰어넘는다(Release 의 속도 최적화로 인해 발생한다)
+    - 프로젝트 구성속성 -> ‘C/C++’ -> 최적화 에서 바꿀 수 있다
+    - 하지만 이렇게 하면..Release 와 Debug와의 차이는 매크로가 들어가 있냐 아니냐의 차이정도밖에 되지 않아 진다., 따라서 이 설정값은 할지 말지 결정하면 되겠다
+
+###### [에러 후 dump파일 만들기](#에러-후-dump파일-만들기)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
