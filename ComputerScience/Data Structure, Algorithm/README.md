@@ -369,7 +369,96 @@ int main()
 ***
 
 # 주먹구구식 알고리듬, P vs NP 문제
+  - 주먹구구식(brute-force) 알고리듬
+    - 모든 가능한 경우의 수를 시도하는 알고리듬
+    - 좋은 알고리듬의 조건 중 ‘효율성’을 고려하지 않은 알고리듬
+    - 보통 가장 직관적인 문제 해결법
+    - 간단한 주먹구구식 알고리듬의 예
+      - 배열에서 어떤 값의 첫 번째/마지막 색인 찾기
+      - 배열에 들어있는 정수들의 합 또는 평균 구하기
+      - 배열에서 최솟값이나 최댓값 찾기
+      - char[ ]에 저장된 문자열 뒤집기(사본 생성 금지)
+      - 등 등
+    - 주먹구구식 알고리듬과 시간 복잡도
+      - O(N) 보다 시간 복잡도가 높은 알고리듬들이 많음
+      - 컴퓨터에서 실행하기에는 너무 느린 알고리듬들도 많음
+        - 알려진 최적화 방법이 없는 것들도 존재
+        - 반드시 나쁜 일은 아님
+        - 보안 분야가 이에 많이 의존
 
+<br/>
+
+  - P vs NP 문제
+    - 학문적으로 꽤 재밌는 논의가 있었던 부분
+    - 아직까지 풀리지 않은 미해결 수학 문제 7개 중 하나
+풀리면 21세기 사회에 가장 크게 공헌할 수 있는 문제 중 하나
+  - P분류(P class)
+    - 판정 문제들을 분류하는 방법 중 하나
+      - 판정 문제 : 입력 값에 대해 예/아니오 답을 내릴 수 있는 문제
+    - 결정론적 튜링 기계에서 다항식 시간 안에 풀 수 있는 모든 문제를 포함
+    - 결정론적 튜링 기계
+      - 튜링 기계 : 무언가를 계산하는 기계를 대표하는 가상의 장치
+        - 일반적인 컴퓨터 알고리듬을 수행할 수 있음
+      - 결정론적 튜링 기계란?
+        - 어떤 명령어 실행 뒤, 다음 실행할 명령어가 확정됨
+        - 코어 하나에서 명령어를 순서대로 실행한다 생각할 것
+        - 즉, 코어 하나에서 실행되는 다항식 시간 알고리듬이 있는 문제는 P
+  - NP분류(NP class)
+    - NP : 비결정적 다항식 시간
+      - Not P가 아님!!!, P와 NP는 반대적이나 이런게 아님
+    - 비결정론적 튜링 기계
+      - 어떤 명령어 실행 뒤, 다음 실행할 명령어가 확정되지 않음
+      - 여러 개의 다음 명령어를 병렬적으로 실행하는 기계
+
+<br/>
+
+  - 결정론적 튜링 기계에서의 NP문제
+    - 일단 답이 있으면 그 답이 맞는지를 다항식 시간안에 검증할 수 있음
+    - 푸는 데는 지수 시간이 걸릴 수도 있음
+
+<br/>
+
+  - 랜덤 접근 기계는 결정론적 튜링 기계(요즘 컴퓨터도 이와 같다!)
+    - 랜덤 접근 기계 : 레지스터를 갖춘 CPU1개
+    - 결정론적 튜링 기계
+      - 어떤 명령어 실행 즉시, 다음 실행할 명령어가 확정됨
+      - 코어 하나에서 명령어를 순서대로 실행한다 생각할 것
+    - 앞으로 별도 언급이 없으면 결정론적 튜링 기계를 의미
+      - NP문제를 일반적인 방법으로 풀기에는 좀 느림
+
+<br/>
+
+  - P문제는 결정론적 튜링 기계에서 다항식 시간 안에 풀 수 있는 모든 문제를 포함
+  - NP문제는
+    - 비결정론적 튜링 기계에서 해법을 다항식 시간안에 찾을 수 있는것
+    - 결정론적 튜링 기계에서 일단 답이 있으면 그 답이 맞는지를 다항식 시간안에 검증할 수 있음
+    - P가 풀 수 있는문제이기 때문에는 P문제라면, NP문제라고 할 수 있다
+
+<br/>
+
+  - NP-완전(NP-complete, NPC) 문제
+    - NP문제중 일부
+    - 모든 NP문제들은 NP-완전 문제로 환원 가능
+      - 그것도 다항식 시간 안에
+      - 여전히 NP문제이니 다항식 시간안에 답 검증 가능
+    - 최소 다른 NP문제들만큼 어려운 문제
+    - 따라서 NP중에서도 가장 어려운 문제라고 할 수 있음
+  - NP-난해(NP-hard) 문제
+    - 최소 NP-완전 문제만큼 어려운 문제들
+    - NP가 아닌 문제도 있음
+      - 즉, 다항식 시간 안에 답 검증이 불가능한 문제
+      - 당연히 NP보다 복잡도가 높은 문제
+
+<br/>
+
+  - P = NP vs P != NP
+    - NP-완전 문제는 NP 문제 중 가장 어려운 문제
+    - NP-완전 문제 중 하나라도 다항식 시간 안에 풀 수 있다면?
+      - 이 문제는 P가 됨
+      - 모든 NP문제를 NP-완전 문제로 다항식 시간 안에 환원할 수 있음
+      - 따라서 모든 NP 문제가 P가 됨(P = NP)
+    - P = NP가 되면 디지털 사회에 미치는 여파는?
+      - 느려서 못 풀던 그 많은 문제를 효율적으로 풀 수 있음
 
 ###### [주먹구구식 알고리듬, P vs NP 문제](#주먹구구식-알고리듬-p-vs-np-문제)
 ###### [Top](#top)
@@ -380,7 +469,67 @@ int main()
 ***
 
 # 탐색 알고리듬, 이진 탐색
+  - 탐색 알고리듬
+    - 어떤 데이터 구조 안에 저장되어 있는 정보를 구해오는 알고리듬
+    - 매우 다양한 것이 여기에 포함됨
+      - 배열에서 제일 큰 값 찾기
+      - 데이터베이스에서 레코드 하나 읽어오기
+      - 배낭 문제
+      - 등
+    - 대표적인 탐색 알고리듬
+      - 선형(linear) 탐색 알고리듬 O(N)
+      - 해시 맵을 이용한 탐색 O(1)
+  - 이진 탐색 알고리듬
+    - 정렬된 배열에서 어떤 값의 위치를 찾는 알고리듬
+    - 한 단계 진행할 때마다 탐색범위를 절반으로 줄임
+      - 이진 이라는 이름이 탄생한 이유
+    - 분할 정복 알고리듬 중 하나
+      - 정복이라 하기에는 모든 문제 영역을 방문하지 않음
+    - 재귀 함수로 쉽게 작성 가능
+  - 정렬된 데이터와 알고리듬
+    - 정렬된 데이터에 사용할 수 있는 효율적인 알고리듬이 많음
+    - 정렬되지 않은 배열은?
+      - 정렬 알고리듬을 사용하여 정렬 가능
+      - 일단 정렬하면 효율적 알고리듬 사용 가능
+      - 하지만 배열에 새 요소를 추가하면 다시 정렬해야 함
+        - 배보다 배꼽이 커질 수도 있음
+       - 정렬 알고리듬이 이진 탐색보다 시간 복잡도가 높음
+  - 정렬 후 이진 탐색 vs 선형 탐색
+    - 배열이 안 바뀌고, 같은 배열을 탐색할 일이 많다면 정렬후 이진탐색으로
+    - 배열이 자주 바뀌는 경우는 정렬 하지 않고 선형 탐색으로
 
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+// 이진 탐색
+int binarySearch(int* arr, int start, int end, int target)
+{
+    if (start <= end)
+    {
+        int mid = start + (end - start) / 2;
+
+        if (arr[mid] == target)
+            return mid;
+        else if (arr[mid] > target)
+            return binarySearch(arr, start, mid - 1, target);
+        else
+            return binarySearch(arr, mid + 1, end, target);
+    }
+
+    return -1;
+}
+
+int main()
+{
+    int num[] = { 0,1,2,3,4,5,6,7,8,9,10 };
+
+    int n = binarySearch(num, 0, 10, -1);
+    std::cout << n << std::endl;
+}
+~~~
 
 ###### [탐색 알고리듬, 이진 탐색](#탐색-알고리듬-이진-탐색)
 ###### [Top](#top)
@@ -391,7 +540,527 @@ int main()
 ***
 
 # 정렬 알고리듬(버블,선택,삽입,퀵,병합,힙)
+  - 목록 안에 저장된 요소들을 특정한 순서대로 재배치하는 알고리듬
+  - 정렬을 하는 이유
+    - 좀 더 효율적인 알고리듬을 사용하기 위해
+    - 사람이 읽기 편하도록
+    - 등
+  - 입력 데이터는 일반적으로 배열 같은 데이터 구조에 저장
+    - 아무 위치로의 임의 접근을 허용
+    - 연결 리스트를 사용하면 처음 혹은 끝부터 차례대로 훑어야 함
+  - 흔히 사용하는 순서 : 숫자 순서, 사전 순서
+  - 정렬 방향 : 오름차순, 내림차순
+  - 다양한 정렬 알고리듬이 있음
+    - 시간 복잡도 차이
+    - 메모리 사용량 차이
+    - 안정성 차이
+      - 안전성(safety)이 아님!
+      - 똑같은 키(key)를 가진 데이터들의 순서가 바뀌지 않느냐 여부
+    - 직렬 vs 병렬 차이
 
+<br/>
+
+  - 안정성을 잘 모르는 이유
+    - 같은 키를 가진 데이터의 순서가 바뀌어도 문제가 아닌 경우가 보통
+    - 그래서 잘 모르고 생각도 안 하는 부분
+    - 심지어는 이렇게 잘못 생각하기도 함
+      - 모든 정렬 알고리듬은 같은 키를 가진 데이터의 순서를 안 바꾼다
+    - 이 때문에 버그가 나도 못 고치는 경우가 있음
+    - 진실
+      - 어떤 정렬 알고리듬은 안정성을 보장
+      - 어떤 정렬 알고리듬은 보장 안 함
+  - 안정성이 문제가 되는 경우
+    - 1. 정렬의 기준이 되는 정렬 키(sort key)와 실제 데이터가 다름
+    - 2. 구조체/클래스의 일부 멤버만 정렬 키로 사용
+
+<br/>
+
+  - 대표적인 정렬 알고리듬
+    - 버블 정렬
+      - 언제라도 구현할 수 있어야 함
+    - 선택 정렬
+      - 언제라도 구현할 수 있어야 함
+    - 퀵 정렬
+      - 언제라도 설명할 수 있어야 함
+    - 병합 정렬
+      - 이해하는 정도면 충분
+    - 힙 정렬
+      - 이해하는 정도면 충분
+    - 삽입 정렬
+  - 정렬 알고리듬은 아무리 빨라도…
+    - 배열을 비교/정렬하려면 모든 요소를 최소 한 번씩은 방문해야 함
+    - 배열의 모든 요소를 방문하는 것은 O(N)
+    - 따라서 정렬 알고리듬은 아무리 빨라도 O(N)보다 느림
+    - 흔히 보는 시간 복잡도 중 O(N)다음으로 느린 것은? : NlogN
+  - 정렬 알고리듬 비교
+    - 퀵의 경우는 스택 메모리를 사용하기 때문에 메모리 할당과 해체가 공짜로 일어난다. 그래서 병합,힙 알고리듬보다 더 빠르다. 퀵은 거의 O(1)으로 돌아간다고 생각할 수 있다
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/d5c3a20f-c4aa-4648-8b3b-a8142471c479)
+
+<br/>
+
+  - 상황에 따른 정렬 알고리듬 선택
+    - 기본적인 상황 : 퀵 정렬
+      - C도 qsort()함수를 기본 제공
+    - 간단히 구현할 때 : 버블 정렬
+      - 구현이 매우 쉬움
+      - 10년 안써도 까먹을 수 없을 정도
+    - 어떤 경우에도 느려지면 안 될 때 : 병합 또는 힙 정렬
+      - 평균은 퀵 정렬 보다 느림
+      - 최악의 경우 여전히 O(N log N)
+    - 특수한 상황에 적합한 정렬 알고리듬도 존재
+      - 예 :  기수(radix)정렬
+
+<br/>
+
+  - 버블(bubble) 정렬
+    - 가장 간단한 알고리듬 중 하나
+      - 기본기 중의 기본기
+      - 스스로 이 알고리듬을 고안하지 못해도 됨
+      - 하지만 한 번 이해하면 언제라도 작성 가능해야 함
+    - 이웃 요소 둘을 비교해서 올바른 순서로 고치는 과정을 반복
+    - 한번 목록을 순회할 때마다 가장 큰 값이 제일 위로 올라가
+      - 기포가 수면으로 떠오르는 모습을 닮았다고 해서 버블 정렬
+      - 큰 기포일수록 수면으로 더 빨리 떠오름
+    - 버블 정렬의 시간 복잡도
+      - N - 1회(N : 요소 수)
+    - 버블 정렬의 공간 복잡도
+      - 새로 만든 목록이 없기 때문에 O(1)
+    - 버블 정렬의 안정성
+      - 값이 같은 경우 순서를 바꾸지 않음, 따라서 정렬 후에도 순서가 유지가 되기 때문에, 안정성 : O
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+int main()
+{
+    int array[] = { 10, 9, 8, 4, 5, 3, 7, 1, 2, 6 };
+	int arraySize = sizeof(array) / sizeof(array[0]);
+
+	for (int i = 0; i < arraySize - 1; i++)
+	{
+		for (int j = 0; j < arraySize - i - 1; j++)
+		{
+			if (array[j] > array[j + 1])
+			{
+				int temp = array[j];
+				array[j] = array[j + 1];
+				array[j + 1] = temp;
+			}
+		}
+	}
+
+	for (int i = 0; i < arraySize; i++)
+	{
+		// 콘솔에 출력하기
+		std::cout << array[i] << " ";
+	}
+}
+~~~
+
+<br/>
+
+  - 선택(selection) 정렬
+    - 역시 가장 간단한 정렬 알고리듬 중 하나
+    - 목록을 총 N-1번 훑으면서 다음 과정을 반복
+      - 첫 번째는 요소0부터 훑으면서 최솟값을 찾아 요소 0과 교환
+      - 두 번째는 요소1부터 훑으면서 최솟값을 찾아 요소 1과 교환
+      - 세 번째는 요소2부터 훑으면서 최솟값을 찾아 요소 2과 교환
+      - N-1 번째까지 반복…
+    - 최솟값을 찾아 선택한다고 해서 선택 정렬
+    - 시간/공간 복잡도 : 버블 정렬과 동일
+    - 안정성 : 보장 안됨
+      - 예) 같은 3이라는 숫자가 4번째 인덱스 7번째 인덱스에 있지만, 정렬을 하면서 7번째에 있는 인덱스 3숫자가 4번째 인덱스 보다 작은 인덱스로 이동하게 될 수도 있다
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+int main()
+{
+	// 최소값으로 정렬하기
+    int array[] = { 10, 9, 8, 4, 5, 3, 7, 1, 2, 6 };
+	int arraySize = sizeof(array) / sizeof(array[0]);
+
+	int inMinIndex = 0;
+	for (int i = 0; i < arraySize - 1; i++)
+	{
+		inMinIndex = i;
+
+		for (int j = i + 1; j < arraySize; j++)
+		{
+			if (array[j] < array[inMinIndex])
+			{
+				inMinIndex = j;
+			}
+		}
+
+		// 최소값과 현재 위치의 값을 교환
+		int temp = array[i];
+		array[i] = array[inMinIndex];
+		array[inMinIndex] = temp;
+	}
+
+	for (int i = 0; i < arraySize; i++)
+	{
+		// 콘솔에 출력하기
+		std::cout << array[i] << " ";
+	}
+}
+~~~
+
+<br/>
+
+  - 삽입(insertion)정렬
+    - 역시 간단한 정렬 알고리듬 중 하나
+    - 버블 정렬, 선택 정렬보다 구현은 아주 조금 힘듦
+    - 목록을 차례대로 훑으로면서 다음 과정을 반복
+      - 현재 위치의 요소를 뽑음
+      - 이걸 과거에 방문했던 요소들 중에 어디 사이에 넣어야 정렬이 유지되는지 판단
+      - 그 위치에 삽입
+      - 삽입으로 인해 다른 요소들을 오른쪽으로 밀어야(shift) 할 수도 있음
+    - 외부 반복문의 반복 횟수는 고정
+      - 모든 요소를 방문함
+      - 정해진 횟수기 때문에 for문이 적합
+    - 내부 반복문의 반복 횟수는 가변적
+      - 필요한 만큼까지만 오른쪽으로 미는 방식
+      - 정해지지 않은 횟수이니 while문이 더 적합
+    - 시간/공간 복잡도 : 버블 정렬과 동일
+    - 안정성 : 보장 됨
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+int main()
+{
+	// 최소값으로 정렬하기
+    int array[] = { 10, 9, 8, 4, 5, 3, 7, 1, 2, 6 };
+	int arraySize = sizeof(array) / sizeof(array[0]);
+
+	for (int i = 1; i < arraySize; i++)
+	{
+		int key = array[i];
+		int j = i - 1;
+
+		while (j >= 0 && array[j] > key)
+		{
+			int temp = array[j];
+			array[j] = array[j + 1];
+			array[j + 1] = temp;
+
+			j--;
+		}
+	}
+
+	for (int i = 0; i < arraySize; i++)
+	{
+		// 콘솔에 출력하기
+		std::cout << array[i] << " ";
+	}
+}
+~~~
+
+<br/>
+
+  - 퀵(quick) 정렬
+    - 실무에서 가장 많이 사용하는 정렬
+      - 일반적/범용적으로 가장 빠름
+    - 진정한 분할 정복 알고리듬
+      - 모든 요소를 방문함
+      - 복잡도에 log가 있다는 것에서 눈치챌 수 있음
+    - 어떤 값(pivot)을 기준으로 목록을 하위 목록으로 2개로 나눔
+      - 목록을 나누는 기준은 pivot보다 작냐/크냐
+      - 이 과정을 재귀적으로 반복
+      - 재귀 단계가 깊어질 때마다 새로운 pivot 값을 뽑음
+    - 퀵 정렬의 시간 복잡도
+      - 각 단계마다 방문하는 요소 수 : O(N)
+      - 총 몇 개의 단계?
+        - 매 단계에서 좌우가 균등하게 나뉘면
+          - O(log N)
+        - 매 단계 모든 요소가 한쪽으로 몰리면
+          - O(N)
+      - 평균 : O(N log N)
+      - 최악 : O(N²)
+    - 최악의 상황 피하기?
+      - 제일 끝이 아닌 다른 위치를 기준값으로 뽑음
+      - 기준값 위치의 예
+        - 왼쪽
+        - 오른쪽
+        - (왼쪽 + 오른쪽) / 2
+      - 어느 경우에도 최악의 상황은 있음
+    - O(N²)을 절대로 허용할 수 없다면?
+      - 다른 정렬을 사용할 것
+      - 평균 속도 vs 최악의 상황 사이의 균형
+    - 여러가지 분할법
+      - 왼쪽-> 오른쪽 : 로무토 분할법
+      - 왼쪽-> 오른쪽, 오른쪽 -> 왼쪽 번갈아 진행 : 호어 분할법
+        - 어떤 값을 기준값으로 선택해도 잘 작동
+        - 하지만 중간 값을 피벗으로 사용하면 더 빠르게 만들 수있다
+    - 퀵 정렬의 공간 복잡도
+      - 재귀적으로 함수를 호출
+      - 실제 원본 배열을 고침 : O(1)
+      - 함수 호출 깊이만큼 스택 메모리 사용
+        - O(log N)
+        - 스택 메모리라 할당/해제가 매우 빠름
+      - 한 함수 내에서 재귀 함수를 두번 호출
+       - 두 번째 호출은 꼬리 재귀를 통해 피할 수 있음
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+// 로무토 분할법
+// 피봇값이 맨 오른쪽
+#include <iostream>
+
+void quicksort(int nums[], int left, int right)
+{
+	if (left >= right)
+	{
+		return;
+	}
+
+	int pivot = right;
+	int basePoint = left;
+
+	for (int i = left; i < right; i++)
+	{
+		if (nums[pivot] > nums[i])
+		{
+			int temp = nums[i];
+			nums[i] = nums[basePoint];
+			nums[basePoint] = temp;
+			basePoint++;
+		}
+	}
+
+	int temp = nums[pivot];
+	nums[pivot] = nums[basePoint];
+	nums[basePoint] = temp;
+	pivot = basePoint;
+
+	quicksort(nums, left, pivot - 1);
+	quicksort(nums, pivot + 1, right);
+}
+
+void quickLomuto(int arr[], int size)
+{
+	quicksort(arr, 0, size - 1);
+}
+
+
+int main()
+{
+	// 최소값으로 정렬하기
+    int array[] = { 6, 2, 8, 3, 1, 4, 9, 5, 7, 0 };
+	int arraySize = sizeof(array) / sizeof(array[0]);
+
+	// 정렬하기
+	quickLomuto(array, arraySize);
+
+	for (int i = 0; i < arraySize; i++)
+	{
+		// 콘솔에 출력하기
+		std::cout << array[i] << " ";
+	}
+}
+~~~
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+//호어 분할법
+// 피봇값이 맨 왼쪽
+#include <iostream>
+
+void quicksort(int arr[], int start, int end)
+{
+	if (start >= end)
+		return;
+
+	int pivot = start;
+	int low = start + 1;
+	int high = end;
+
+	while (low <= high)
+	{
+		while (arr[pivot] >= arr[low] && low <= end)
+		{
+			low++;
+		}
+
+		while (arr[pivot] <= arr[high] && high >= (start + 1))
+		{
+			high--;
+		}
+
+		if (low < high)
+		{
+			int temp = arr[low];
+			arr[low] = arr[high];
+			arr[high] = temp;
+		}
+	}
+
+	int temp2 = arr[high];
+	arr[high] = arr[pivot];
+	arr[pivot] = temp2;
+	pivot = high;
+
+	quicksort(arr, start, pivot - 1);
+	quicksort(arr, pivot + 1, end);
+}
+
+
+void quickHoare(int arr[], int size)
+{
+	quicksort(arr, 0, size - 1);
+}
+
+
+int main()
+{
+	// 최소값으로 정렬하기
+    int array[] = { 6, 2, 8, 3, 1, 4, 9, 5, 7, 0 };
+	int arraySize = sizeof(array) / sizeof(array[0]);
+
+	// 정렬하기
+	quickHoare(array, arraySize);
+
+	for (int i = 0; i < arraySize; i++)
+	{
+		// 콘솔에 출력하기
+		std::cout << array[i] << " ";
+	}
+}
+~~~
+
+<br/>
+
+~~~c++
+//호어 분할법
+// 피봇값이 맨 왼쪽
+// 피봇값이 중간값을 이용한 속도 개선
+#include <iostream>
+
+void quicksort(int arr[], int start, int end)
+{
+	if (start >= end)
+		return;
+
+	////////
+	int samples[3] = { start, (start + end) / 2, end };
+
+	if (arr[samples[0]] > arr[samples[1]])
+	{
+		int temp = samples[0];
+		samples[0] = samples[1];
+		samples[1] = temp;
+	}
+	if (arr[samples[1]] > arr[samples[2]]) {
+
+		int temp = samples[1];
+		samples[1] = samples[2];
+		samples[2] = temp;
+	}
+	if (arr[samples[0]] > arr[samples[1]]) {
+
+		int temp = samples[0];
+		samples[0] = samples[1];
+		samples[1] = temp;
+	}
+
+	int temp3 = arr[samples[1]];
+	arr[samples[1]] = arr[start];
+	arr[start] = temp3;
+	////////
+
+	int pivot = start;
+	int low = start + 1;
+	int high = end;
+
+	while (low <= high)
+	{
+		while (arr[pivot] >= arr[low] && low <= end)
+		{
+			low++;
+		}
+
+		while (arr[pivot] <= arr[high] && high >= (start + 1))
+		{
+			high--;
+		}
+
+		if (low < high)
+		{
+			int temp = arr[low];
+			arr[low] = arr[high];
+			arr[high] = temp;
+		}
+	}
+
+	int temp2 = arr[high];
+	arr[high] = arr[pivot];
+	arr[pivot] = temp2;
+	pivot = high;
+
+	quicksort(arr, start, pivot - 1);
+	quicksort(arr, pivot + 1, end);
+}
+
+void quickHoare(int arr[], int size)
+{
+	quicksort(arr, 0, size - 1);
+}
+
+int main()
+{
+	int array[] = { 8, 2, 4, 1, 3, 10, 1, 1, 6, 5 };
+	int arraySize = sizeof(array) / sizeof(array[0]);
+
+	// 정렬하기
+	quickHoare(array, arraySize);
+
+	for (int i = 0; i < arraySize; i++)
+	{
+		// 콘솔에 출력하기
+		std::cout << array[i] << " ";
+	}
+}
+~~~
+
+<br/>
+
+  - 병합(merge)정렬
+    - 1. 입력 배열을 재귀적으로 반씩 나눠 요소수가 1인 배열들을 만듦
+      - 요소수가 1이니 정렬된 배열
+      - 정확히 반씩 나누니 재귀 깊이는 O(log N)
+    - 2. 재귀 반대 방향으로 배열을 계속 합침
+      - 이때 정렬된 상태를 유지해야 함
+      - 각 재귀 단계마다 방문하는 요소수는 O(N)
+    - 3. 제일 상위 단계까지 합치면 정렬 끝
+
+<br/>
+
+  - 병합정렬 예제 추가하기
+
+<br/>
+
+  - 힙(heap) 정렬
+    - 힙은 트리(tree)에 기반한 자료 구조
+      - 우선순위 큐의 효율적인 구현 방법 중 하나
+    - 힙 정렬은 힙이 사용하는 정렬 알고리듬
+      - 언제나 부모의 키가 자식의 키와 같거나 큼
+      - 이 자료구조에 데이터를 저장하는 순간 정렬이 됨
+      - 즉, 정렬 안 된 데이터를 힙에 한 번 넣었다 빼면 끝
+<br/>
+
+  - 힙정렬 예제 추가하기
 
 ###### [정렬 알고리듬(버블,선택,삽입,퀵,병합,힙)](#정렬-알고리듬버블선택삽입퀵병합힙)
 ###### [Top](#top)
