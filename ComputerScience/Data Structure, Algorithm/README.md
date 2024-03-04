@@ -2021,7 +2021,79 @@ public class BinarySearchTree
 ***
 
 # 트라이(Trie), 공간분할 트리
+  - 이진트리
+    - 각 노드의 연결이 키에 따라 결정
+    - 노드가 그 키를 저장
+  - 트라이
+    - 탐색 트리 중 하나
+    - 다른 이름
+      - digital tree
+      - prefix tree
+    - 노드가 키 전체를 저장하지 않음
+      - 그 노드 위치 자체가 키를 결정
+    - 어떤 집합 안에서 특정한 키를 찾을 때 사용
+    - 키는 문자열인 경우가 보통
+    - 노드 사이의 연결이 한 글자로 결정됨
+      - 키 전부가 아님
+  - 트라이의 용도
+    - 사전 데이터의 저장
+      - 용량을 더 차지할 수는 있지만, 탐색 속도가 향상 된다
+    - 해시 테이블 대신 사용 가능
+      - 충돌이 없음
+      - 해시 테이블보다 최악의 경우에 더 빠름 -> O(k)
+      - 허나 평균 O(1)이 아님
+      - 표현하기 어려운 데이터 형도 있음 -> float
+    - 트라이를 이용해서 자동완성 기능 같은것을 구현하기 쉽다
 
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/c7c489f3-075d-49ed-a9c0-a9da78db635f)
+
+<br/>
+
+  - 공간 분할 트리
+    - 물체 그리기 요청 방법1 : 모두 요청
+      - 모든 물체를 그려달라 함
+      - 그래픽 카드가 모든 물체를 화면에 투영
+        - 화면 밖에 있는 물체는 안 그려짐
+        - 안/밖 판단을 하려면 여전히 투영 필요
+      - 그래픽 프로그래밍에서 종종 병목점
+    - 물체 그리기 요청 방법2 : 적당히 추려서 요청
+      - 화면에 확실히 안 나올 물체들을 추려버림
+        - 경계상자, 경계 구 등을 이용
+      - 안 추려진 물체들만 그래픽 카드에 요청
+        - 이것만 그래픽 카드가 화면에 투영
+      - 여전히 모든 물체에 대해 투영 연산
+        - 하지만 CPU에서 연산
+        - 간단한 모양을 사용
+    - 어떻게 하면 효율적일까? 아이디어!
+      - 모든 물체를 계산해야 했던 이유
+        - 2D배열을 훑는 것과 마찬가지
+        - 이것을 트리로 표현하면됨 -> 쿼드 트리
+    - 쿼드 트리(quadtree)
+      - 사분 트리라고도 함
+      - 재귀적으로 2D공간을 분할
+      - 각 노드가 4개의 자식을 가짐
+        - 왼쪽 위, 오른쪽 위, 왼쪽 아래, 오른쪽 아래
+        - 현재 노드를 4개의 하위 사각 영역으로 나눔
+      - 공간분할 트리!
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/fed60718-cbdd-4e14-aaba-fdda43e83836)
+
+<br/>
+
+  - 옥 트리(octree)
+    - 재귀적으로 3D공간을 분할
+    - 각 노드가 8개의 자식을 가짐
+      - 쿼드 트리의 4자식 x 앞/뒤
+      - 현재 노드를 8개의 하위 상자로 나눔
+    - 3D프로그램에 종종 사용
+      - 마인크래프트 같은 게임
+      - 글로벌 일루미네이션효과
+      - 등
+  - 기타 공간분할 트리
+    - BSP(이진 공간 분할 트리)
+    - R 트리
+    - k-d 트리
+    - 등
 
 ###### [트라이(Trie), 공간분할 트리](#트라이trie-공간분할-트리)
 ###### [Top](#top)
@@ -2032,7 +2104,177 @@ public class BinarySearchTree
 ***
 
 # 깊이 우선 탐색, 너비 우선 탐색, 미니맥스
+  - 깊이 우선 탐색
+    - 한 우물부터 깊이 판다
+    - 깊이 우선 탐색이라고 한다(DFS, Depth-First Search)
+    - 왼쪽부터 가도 되고, 오른쪽 부터 가도 됨
+    - 중위 순회와 매우 비슷
+      - 하지만 중위 순회는 왼쪽 끝부터 가지면 DFS는 루트부터 가니까 조금 다르긴 함
+      - 재귀 함수로 쉽게 작성할 수 있음
+      - 비 재귀적으로도 가능(스택 자료 구조)
+      - 중위 순회도 깊이 우선 탐색 기법 중 하나
+    - 간단한 ‘미로 탈출하기’ 전략
 
+~~~c#
+// 깊이 우선 탐색
+namespace ConsoleApp1
+{
+    public class Program
+    {
+        public static void DFS(TreeNode node)
+        {
+            if (node == null)
+                return;
+
+            // 현재 노드 처리 (예: 출력)
+            Console.WriteLine(node.Value);
+
+            // 모든 자식에 대해 DFS 재귀 호출
+            foreach (var child in node.Children)
+            {
+                DFS(child);
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            // 트리 구성 예제
+            var root = new TreeNode(1);
+            var child1 = new TreeNode(2);
+            var child2 = new TreeNode(3);
+            root.AddChild(child1);
+            root.AddChild(child2);
+            var child1_1 = new TreeNode(4);
+            var child1_2 = new TreeNode(5);
+            child1.AddChild(child1_1);
+            child1.AddChild(child1_2);
+
+            // DFS 실행
+            DFS(root);
+        }
+    }
+
+    public class TreeNode
+    {
+        public int Value { get; set; }
+        public List<TreeNode> Children { get; set; }
+
+        public TreeNode(int value)
+        {
+            this.Value = value;
+            this.Children = new List<TreeNode>();
+        }
+
+        // 자식 노드 추가 메소드
+        public void AddChild(TreeNode child)
+        {
+            Children.Add(child);
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 너비 우선 탐색
+    - 여러 우물을 동시에 같은 깊이로
+    - 현재 깊이의 이웃 노드들을 우선 방문
+      - 어느 한 가지부터 깊게 보지 않음
+      - 현재 노드보다 얕은 노드는 모두 방문했음
+    - 최단 경로 찾기에 적합
+
+~~~c#
+// 너비 우선 탐색
+using System;
+using System.Collections.Generic;
+
+public class Program
+{
+    public static void BFS(TreeNode root)
+    {
+        if (root == null)
+            return;
+
+        Queue<TreeNode> queue = new Queue<TreeNode>();
+        queue.Enqueue(root);
+
+        while (queue.Count > 0)
+        {
+            TreeNode current = queue.Dequeue();
+            Console.WriteLine(current.Value);
+
+            foreach (var child in current.Children)
+            {
+                queue.Enqueue(child);
+            }
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        // 트리 구성 예제
+        var root = new TreeNode(1);
+        var child1 = new TreeNode(2);
+        var child2 = new TreeNode(3);
+        root.AddChild(child1);
+        root.AddChild(child2);
+        var child1_1 = new TreeNode(4);
+        var child1_2 = new TreeNode(5);
+        child1.AddChild(child1_1);
+        child1.AddChild(child1_2);
+
+        // BFS 실행
+        BFS(root);
+    }
+}
+~~~
+
+<br/>
+
+  - 깊이 우선 vs 너비 우선
+    - 깊이 우선 탐색(DFS)
+      - 자식부터 검색
+      - 관련 자료구조 : 스택
+      - 장점
+        - 재귀 함수 호출로 간단히 구현 가능
+        - 보통 BFS보다 메모리 사용량이 적음
+        - 캐시 메모리에 좀 더 친화적
+        - 병렬처리에 더 적합
+    - 너비 우선 탐색(BFS)
+      - 이웃부터 탐색
+      - 관련 자료구조 : 큐
+      - 장점
+        - 언제나 최소 깊이의 결과를 찾음
+        - 깊이가 무한인 트리에도 사용 가능
+
+<br/>
+
+  - 미니맥스(minimax)
+    - 최악의 경우 발생할 수 있는 손실을 최소화하려는 규칙
+    - 게임이론, 결정이론, 통계학, 철학 등에서 널리 사용
+    - 최초의 AI체스 월드 챔피언 Deep Blue가 사용한 알고리듬
+      - 현재 챔피언은 기계학습 알고리듬
+      - 여전히 미니맥스에 기초한 체스 AI도 상위권
+    - 제로섬(zero-sum) 게임의 결정 알고리듬으로 적합
+      - n명이 참가하는 제로섬 게임이론에서 시작한 알고리듬
+      - 여전히 어떤 제로섬 게임에도 적용하기 적합
+  - 미니맥스 알고리듬의 가정
+    - 1. 상대방도 최적의 결정을 내림
+      - 상대방도 이기는 게 목표
+      - 랜덤하게 플레이하지 않음
+    - 2. 게임이 순수히 전략적이여야 함
+      - 운 같은 요소가 없어야 함
+      - 따라서 포커나 브루마블 같은 게임에는 비적합
+      - 그러나 운 까지도 고려하는 변형 알고리듬도 있음
+  - 게임 트리를 전부 훑을 수 없는 경우
+    - 특정 깊이 까지만 게임 트리를 만듦
+      - 예 : 현재부터 깊이 3까지만
+      - 3개의 수를 내다보는 것과 마찬가지 이야기
+    - 마지막 깊이에서 점수를 계산해야 함
+      - 확실히 승/패가 결정 안 난 상황
+      - 근사치를 구함
+      - 현재 보드 상태가 나에게 얼마나 유리한가
+  - 나중에 추가로 더 공부해보기
 
 ###### [깊이 우선 탐색, 너비 우선 탐색, 미니맥스](#깊이-우선-탐색-너비-우선-탐색-미니맥스)
 ###### [Top](#top)
