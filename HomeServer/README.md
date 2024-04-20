@@ -191,7 +191,7 @@
     - 라우터는 그냥 엑세스 포인터가 되어야 함(고정으로 되어야 되니까 DHCP서버의 범위 밖에 있는것이 좋음)
     - lan디바이스를 한개만 더 만들어서 거기에 pfsense WAN, LAN을 각각 연결 
     - pfsense의 게이트 웨이에 나머지 장비가 연결되어야함
-  - proxmox root차단 sshd(아직 안함)
+  - proxmox root차단 sshd
   - 윈도우11
     - https://it-svr.com/proxmox-8eseo-windou-11-seolcihagi/ 
 
