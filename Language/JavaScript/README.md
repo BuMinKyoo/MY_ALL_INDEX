@@ -657,13 +657,13 @@ console.log(arrarr)
 ***
 
 # 배열(array)
-    - [push, pop, unshift, shift](#push-pop-unshift-shift)
-    - [splice](#splice)
-    - [concat](#concat)
-    - [filer함수](#filer함수)
-    - [map함수](#map함수)
-    - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
-    - [스프레드 문법 추가](#스프레드-문법-추가)
+  - [push, pop, unshift, shift](#push-pop-unshift-shift)
+  - [splice](#splice)
+  - [concat](#concat)
+  - [filer함수](#filer함수)
+  - [map함수](#map함수)
+  - [배열 얕은 복사와 깊은 복사(스프레드 ...)](#배열-얕은-복사와-깊은-복사스프레드-)
+  - [스프레드 문법 추가](#스프레드-문법-추가)
 
 ~~~JavaScript
 const fruits = ["apple", "banana", "orange"];
