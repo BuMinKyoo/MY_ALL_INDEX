@@ -14,7 +14,7 @@
     - [Symbol](#symbol)
     - [배열](#배열)
     - [객체](#객체)
-    - [Set](#set)
+    - [new Set](#new-set)
   - [비교연산자](#비교연산자)
   - [템플릿 문자열](#템플릿-문자열)
   - [prompt,confirm,자료형변환](#promptconfirm자료형변환)
@@ -233,7 +233,7 @@ get();
   - [Symbol](#symbol)
   - [배열](#배열)
   - [객체](#객체)
-  - [Set](#set)
+  - [new Set](#new-set)
 
 ###### [자료형,변수](#자료형변수)
 ###### [Top](#top)
@@ -438,32 +438,6 @@ console.log(person);
 
 <br/>
 <br/>
-
-# Set
-  - 고유한 식별자를 만들때 사용하게 된다
-  - console.log(symbol1.description === symbol2.description) 이렇게 스트링값 자체를 비교하면 true가 나오게 된다
-
-~~~JavaScritp
-const symbol1 = Symbol('aa');
-const symbol2 = Symbol('aa');
-
-console.log(symbol1 === symbol2);  // false
-~~~
-
-<br/>
-
-  - Symbol.for
-    - 만든 symbol의 고유한 식별자가 같은 것으로 만들기 위해서
-
-~~~JavaScritp
-const symbol1 = Symbol.for('aa');
-const symbol2 = Symbol.for('aa');
-
-console.log(symbol1 === symbol2);  // false
-~~~
-
-###### [자료형,변수](#자료형변수)
-###### [Top](#top)
 
 # new Set
   - 중복이 허용되지 않는 객체이다(일반 객체랑은 다르며 전혀 다른것으로 봐야 한다)
