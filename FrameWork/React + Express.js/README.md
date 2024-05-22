@@ -42,7 +42,116 @@ express
 ***
 
 # React 컴포넌트 생성, props 사용
-  - 
+  - 기본적인 컴포넌트 생성
+
+#App.js
+~~~javascript
+import logo from './logo.svg';
+import './App.css';
+
+function Header(){
+  return (
+    <header>
+      <h1><a href='/'>WEB</a></h1>
+    </header>
+  )
+}
+
+function Nav(){
+  return (
+    <nav>
+      <ol>
+        <li><a href='/read/1'>html</a></li>
+        <li><a href='/read/2'>css</a></li>
+        <li><a href='/read/3'>js</a></li>
+      </ol>
+    </nav>
+  )
+}
+
+function Article(){
+  return (
+    <article>
+      <h2>Welcome</h2>
+      Hello, WEB
+    </article>
+  )
+}
+
+function App() {
+  return (
+    <div>
+      <Header></Header>
+      <Nav></Nav>
+      <Article></Article>
+    </div>
+  );
+}
+
+export default App;
+~~~
+
+<br/>
+
+  - props 사용하기
+
+#App.js
+~~~javascript
+import logo from './logo.svg';
+import './App.css';
+
+// props안에는 속성이 들어오게 된다
+function Header(props){
+  console.log('props', props, props.title);
+  return (
+    <header>
+      <h1><a href='/'>{props.title}</a></h1>
+    </header>
+  )
+}
+
+function Nav(props){
+  const lis = [];
+  props.topics.forEach(element => {
+    lis.push(<li key={element.id}><a href={'/read/' + element.id}>{element.title}</a></li>);
+  });
+
+  return (
+    <nav>
+      <ol>
+        {lis}
+      </ol>
+    </nav>
+  )
+}
+
+function Article(props){
+  return (
+    <article>
+      <h2>{props.title}</h2>
+      {props.body}
+    </article>
+  )
+}
+
+function App() {
+  const topics = [
+    {id:1, title:'html', desc:'html is...'},
+    {id:2, title:'css', desc:'css is...'},
+    {id:3, title:'js', desc:'js is...'}
+  ]
+
+  return (
+    <div>
+      <Header title="REACT"></Header>
+      <Nav topics={topics}></Nav>
+      <Article title="Welcome" body="Hello, WEB"></Article>
+    </div>
+  );
+}
+
+export default App;
+~~~
 
 ###### [React 컴포넌트 생성, props 사용](#react-컴포넌트-생성-props-사용)
 ###### [Top](#top)
@@ -53,7 +162,77 @@ express
 ***
 
 # event사용하기
-  - 
+  - 버튼 클릭시에 event를 발생시키는 등, 다양한 event를 사용할 수 있다
+
+#App.js
+~~~javascript
+import logo from './logo.svg';
+import './App.css';
+
+// props안에는 속성이 들어오게 된다
+function Header(props){
+  console.log('props', props, props.title);
+  return (
+    <header>
+      <h1><a href='/' onClick={function(event){ // onClick={function(event)을 onClick={(event)=>로 바꿀 수 있다
+        event.preventDefault(); // a태그의 기본 동작을 막는다
+        props.onChangeMode(); // App.js의 onChangeMode 함수를 실행한다
+      }}>{props.title}</a></h1>
+    </header>
+  )
+}
+
+function Nav(props){
+  const lis = [];
+  props.topics.forEach(element => {
+    lis.push(<li key={element.id}>
+      <a id={element.id} href={'/read/' + element.id} onClick={event=>{
+      event.preventDefault();
+      props.onChangeMode(event.target.id); // App.js의 onChangeMode 함수를 실행한다
+    }}>{element.title} </a>
+    </li>);
+  });
+
+  return (
+    <nav>
+      <ol>
+        {lis}
+      </ol>
+    </nav>
+  )
+}
+
+function Article(props){
+  return (
+    <article>
+      <h2>{props.title}</h2>
+      {props.body}
+    </article>
+  )
+}
+
+function App() {
+  const topics = [
+    {id:1, title:'html', desc:'html is...'},
+    {id:2, title:'css', desc:'css is...'},
+    {id:3, title:'js', desc:'js is...'}
+  ]
+
+  return (
+    <div>
+      <Header title="WEB" onChangeMode={function(){ // App.js의 onChangeMode 함수 // onChangeMode={function()을 onChangeMode={()=> 로 바꿀 수 있다
+        alert('header');
+      }}></Header>
+      <Nav topics={topics} onChangeMode={(id)=>{
+        alert(id);
+      }}></Nav>
+      <Article title="Welcome" body="Hello, WEB"></Article>
+    </div>
+  );
+}
+
+export default App;
+~~~
 
 ###### [event사용하기](#event사용하기)
 ###### [Top](#top)
@@ -64,9 +243,280 @@ express
 ***
 
 # State
-  - 
+  - 아래와 같은 코드에서 App()함수안의 Nav에서 mode = 'read';바꾸지만, 클릭시 화면에 변경되지 않거나 에러가 나는 이유는, App()함수가 다시 실행되지 않기 때문이다. 이런경우에는 State를 사용하여야 한다
 
-###### State](#state)
+#App.js
+~~~javascript
+import logo from './logo.svg';
+import './App.css';
+
+// props안에는 속성이 들어오게 된다
+function Header(props){
+  console.log('props', props, props.title);
+  return (
+    <header>
+      <h1><a href='/' onClick={function(event){ // onClick={function(event)을 onClick={(event)=>로 바꿀 수 있다
+        event.preventDefault(); // a태그의 기본 동작을 막는다
+        props.onChangeMode(); // App.js의 onChangeMode 함수를 실행한다
+      }}>{props.title}</a></h1>
+    </header>
+  )
+}
+
+function Nav(props){
+  const lis = [];
+  props.topics.forEach(element => {
+    lis.push(<li key={element.id}>
+      <a id={element.id} href={'/read/' + element.id} onClick={event=>{
+      event.preventDefault();
+      props.onChangeMode(event.target.id); // App.js의 onChangeMode 함수를 실행한다
+    }}>{element.title} </a>
+    </li>);
+  });
+
+  return (
+    <nav>
+      <ol>
+        {lis}
+      </ol>
+    </nav>
+  )
+}
+
+function Article(props){
+  return (
+    <article>
+      <h2>{props.title}</h2>
+      {props.body}
+    </article>
+  )
+}
+
+function App() {
+  const mode = 'welcome';
+  const topics = [
+    {id:1, title:'html', desc:'html is...'},
+    {id:2, title:'css', desc:'css is...'},
+    {id:3, title:'js', desc:'js is...'}
+  ]
+
+  let content = null;
+  if(mode === 'welcome'){
+    content = <Article title="Welcome" body="Hello, WEB"></Article>
+  }
+  else if(mode === 'read'){
+    content = <Article title="Read" body="Read, WEB"></Article>
+  }
+
+  return (
+    <div>
+      <Header title="WEB" onChangeMode={function(){ // App.js의 onChangeMode 함수 // onChangeMode={function()을 onChangeMode={()=> 로 바꿀 수 있다
+        mode = 'welcome';
+      }}></Header>
+      <Nav topics={topics} onChangeMode={(id)=>{
+        mode = 'read';
+      }}></Nav>
+      {content}
+    </div>
+  );
+}
+
+export default App;
+~~~
+
+<br/>
+
+  - useState를 import 한다
+    - 첫번째 원소 : useState로 보관한 데이터
+    - 두번째 원소 : 데이터를 변경하기 위한 함수 실행
+
+#App.js
+~~~javascript
+import logo from './logo.svg';
+import './App.css';
+import { useState } from 'react';
+
+// props안에는 속성이 들어오게 된다
+function Header(props){
+  console.log('props', props, props.title);
+  return (
+    <header>
+      <h1><a href='/' onClick={function(event){ // onClick={function(event)을 onClick={(event)=>로 바꿀 수 있다
+        event.preventDefault(); // a태그의 기본 동작을 막는다
+        props.onChangeMode(); // App.js의 onChangeMode 함수를 실행한다
+      }}>{props.title}</a></h1>
+    </header>
+  )
+}
+
+function Nav(props){
+  const lis = [];
+  props.topics.forEach(element => {
+    lis.push(<li key={element.id}>
+      <a id={element.id} href={'/read/' + element.id} onClick={event=>{
+      event.preventDefault();
+      props.onChangeMode(event.target.id); // App.js의 onChangeMode 함수를 실행한다
+    }}>{element.title} </a>
+    </li>);
+  });
+
+  return (
+    <nav>
+      <ol>
+        {lis}
+      </ol>
+    </nav>
+  )
+}
+
+function Article(props){
+  return (
+    <article>
+      <h2>{props.title}</h2>
+      {props.body}
+    </article>
+  )
+}
+
+function App() {
+  // const _mode = useState('welcome');
+  // const mode = _mode[0];
+  // const setMode = _mode[1];
+  // 위의 3줄은 아래 한 줄로 대체 가능하다
+  const [mode, setMode] = useState('welcome');
+
+  const topics = [
+    {id:1, title:'html', desc:'html is...'},
+    {id:2, title:'css', desc:'css is...'},
+    {id:3, title:'js', desc:'js is...'}
+  ]
+
+  let content = null;
+  if(mode === 'welcome'){
+    content = <Article title="Welcome" body="Hello, WEB"></Article>
+  }
+  else if(mode === 'read'){
+    content = <Article title="Read" body="Read, WEB"></Article>
+  }
+
+  return (
+    <div>
+      <Header title="WEB" onChangeMode={function(){ // App.js의 onChangeMode 함수 // onChangeMode={function()을 onChangeMode={()=> 로 바꿀 수 있다
+        setMode('welcome');
+      }}></Header>
+      <Nav topics={topics} onChangeMode={(id)=>{
+        setMode('read');
+      }}></Nav>
+      {content}
+    </div>
+  );
+}
+
+export default App;
+~~~
+
+<br/>
+
+  - 최종코드
+
+#App.js
+~~~javascript
+import logo from './logo.svg';
+import './App.css';
+import { useState } from 'react';
+
+// props안에는 속성이 들어오게 된다
+function Header(props){
+  //console.log('props', props, props.title);
+  return (
+    <header>
+      <h1><a href='/' onClick={function(event){ // onClick={function(event)을 onClick={(event)=>로 바꿀 수 있다
+        event.preventDefault(); // a태그의 기본 동작을 막는다
+        props.onChangeMode(); // App.js의 onChangeMode 함수를 실행한다
+      }}>{props.title}</a></h1>
+    </header>
+  )
+}
+
+function Nav(props){
+  const lis = [];
+  props.topics.forEach(element => {
+    lis.push(<li key={element.id}>
+      <a id={element.id} href={'/read/' + element.id} onClick={event=>{
+      event.preventDefault();
+      props.onChangeMode(event.target.id); // App.js의 onChangeMode 함수를 실행한다
+    }}>{element.title} </a>
+    </li>);
+  });
+
+  return (
+    <nav>
+      <ol>
+        {lis}
+      </ol>
+    </nav>
+  )
+}
+
+function Article(props){
+  return (
+    <article>
+      <h2>{props.title}</h2>
+      {props.body}
+    </article>
+  )
+}
+
+function App() {
+  // const _mode = useState('welcome');
+  // const mode = _mode[0];
+  // const setMode = _mode[1];
+  // 위의 3줄은 아래 한 줄로 대체 가능하다
+  const [mode, setMode] = useState('welcome');
+  const [id, setId] = useState(null);
+
+  const topics = [
+    {id:1, title:'html', desc:'html is...'},
+    {id:2, title:'css', desc:'css is...'},
+    {id:3, title:'js', desc:'js is...'}
+  ]
+
+  let content = null;
+  if(mode === 'welcome'){
+    content = <Article title="Welcome" body="Hello, WEB"></Article>
+  }
+  else if(mode === 'read'){
+    let title, body = null;
+    console.log('id', id);
+
+    for(let i = 0; i < topics.length; i++){
+      if(topics[i].id === Number(id)){
+        title = topics[i].title;
+        body = topics[i].desc;
+      }
+    }
+
+    content = <Article title={title} body={body}></Article>
+  }
+
+  return (
+    <div>
+      <Header title="WEB" onChangeMode={function(){ // App.js의 onChangeMode 함수 // onChangeMode={function()을 onChangeMode={()=> 로 바꿀 수 있다
+        setMode('welcome');
+      }}></Header>
+      <Nav topics={topics} onChangeMode={(_id)=>{
+        setMode('read');
+        setId(_id);
+      }}></Nav>
+      {content}
+    </div>
+  );
+}
+
+export default App;
+~~~
+
+###### [State](#state)
 ###### [Top](#top)
 
 <br/>
@@ -75,7 +525,43 @@ express
 ***
 
 # express설치
-  - 
+  - 1. nodejs설치
+  - 2. server.js파일 생성 및 코드 넣기
+  - 3. npm init -y
+  - 4. npm install express
+  - 5. npm install cors
+
+#server.js
+~~~#
+const express = require('express');
+const path = require('path');
+const app = express();
+const port = 3000; // 포트 설정
+
+// express.json() 은 유저가 보낸 array/object 데이터를 출력해보기 위해 사용
+// cors는 다른 도메인주소끼리 ajax 요청 주고받을 때 필요
+app.use(express.json());
+const cors = require('cors');
+app.use(cors());
+
+app.use(express.static(path.join(__dirname, 'my-app/build')));
+
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, '/my-app/build/index.html'));
+  });
+
+// 리액트가 라우팅하게 전권을 넘기고 싶다면 사용하기(가장 마지막에 위치해야함)
+// react-router-dom설치 필요
+// app.get('*', function (req, res) {
+//     res.sendFile(path.join(__dirname, '/react-project/build/index.html'));
+// });
+
+app.listen(port, function () {
+  console.log('listening on 3000')
+});
+~~~
+
+![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/ce92daeb-8e1a-4f27-8e87-c7eef37c3a66)
 
 ###### [express설치](#express설치)
 ###### [Top](#top)
