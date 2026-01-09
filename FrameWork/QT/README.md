@@ -9,9 +9,9 @@
 ***
 
 # MFC메모리 누수 확인
-
-    - [ON_COMMAND_RANGE](#on_command_range)
-    - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
+   
+   - [ON_COMMAND_RANGE](#on_command_range)
+   - [WM_CTLCOLOR (컨트롤의 글꼴, 배경색 변경)](#wm_ctlcolor-컨트롤의-글꼴-배경색-변경)
 
 ~~~c++
 #include <crtdbg.h>
