@@ -32,6 +32,11 @@
 <br/>
 <br/>
 
+- [c++포인터연습](#c포인터연습)
+
+<br/>
+<br/>
+
 ***
 
 # 알고리듬이란, 효율성
@@ -3122,6 +3127,233 @@ namespace ConsoleApp1
   - 등등 그 외의 수많은 알고리듬이 존재한다
 
 ###### [그래프 알고리즘 다른것들](#그래프-알고리즘-다른것들)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# c++포인터연습
+
+<br/>
+
+#ConsoleApp.cpp
+~~~c++
+#include <iostream>
+
+class Node
+{
+public:
+	int num;
+	Node* Next;
+
+	Node(int N)
+		:Next(NULL)
+		,num(N)
+	{ }
+};
+
+// 단일 포인터 앞에 데이터 추가
+Node* OnePointAheadInsertData(Node* phead, int N)
+{
+	Node* newNode = new Node(N);
+
+	newNode->Next = phead;
+
+	return newNode;
+}
+
+// 이중 포인터 앞에 데이터 추가
+void TwoPointAheadInsertData(Node** phead, int N)
+{
+	Node* newNode = new Node(N);
+
+	newNode->Next = (*phead);
+	*phead = newNode;
+
+	return;
+}
+
+// 단일 포인터 뒤에 데이터 추가
+Node* OnePointBackInsertData(Node* phead, int N)
+{
+	Node* newNode = new Node(N);
+	Node* p = phead;
+
+	if (p == NULL)
+	{
+		p = newNode;
+		return p;
+	}
+
+	while (p->Next != NULL)
+	{
+		p = p->Next;
+	}
+
+	p->Next = newNode;
+
+	return phead;
+}
+
+// 이중 포인터 뒤에 데이터 추가
+void TwoPointBackInsertData(Node** phead, int N)
+{
+	Node* newNode = new Node(N);
+
+	if ((*phead) == NULL)
+	{
+		*phead = newNode;
+		return;
+	}
+
+	while ((*phead)->Next != NULL)
+	{
+		phead = &((*phead)->Next);
+	}
+
+	(*phead)->Next = newNode;
+}
+
+// 단일 포인터 인덱스에 추가하기
+Node* OnePointIndexInsertData(Node* phead, int N, int index)
+{
+	Node* newNode = new Node(N);
+	Node* p = phead;
+
+	if (p == NULL)
+	{
+		p = newNode;
+		return p;
+	}
+	else if (index == 0)
+	{
+		newNode->Next = p;
+
+		return newNode;
+	}
+	else
+	{
+		for (int i = 0; i < index - 1; i++)
+		{
+			p = p->Next;
+		}
+
+		newNode->Next = p->Next;
+		p->Next = newNode;
+
+		return phead;
+	}
+}
+
+// 이중 포인터 인덱스에 추가하기
+void TwoPointIndexInsertData(Node** phead, int N, int index)
+{
+	Node* newNode = new Node(N);
+	Node** p = phead;
+
+	if ((*p) == NULL)
+	{
+		*p = newNode;
+	}
+	else if (index == 0)
+	{
+		newNode->Next = *p;
+		*p = newNode;
+	}
+	else
+	{
+		for (int i = 0; i < index - 1; i++)
+		{
+			p = &((*p)->Next);
+		}
+
+		newNode->Next = (*p)->Next;
+		(*p)->Next = newNode;
+	}
+}
+
+// 단일 포인터 인덱스 지우기
+Node* OnePointIndexDeleteData(Node* phead, int index)
+{
+	Node* p = phead;
+
+	if (index == 0)
+	{
+		Node* temp = p;
+		p = p->Next;
+		free(temp);
+		return p;
+	}
+	else
+	{
+		for (int i = 0; i < index - 1; i++)
+		{
+			p = p->Next;
+		}
+
+		Node* temp = p->Next;
+		p->Next = temp->Next;
+		free(temp);
+
+		return phead;
+	}
+}
+
+// 이중 포인터 인덱스 지우기
+void TwoPointIndexDeleteData(Node** phead, int index)
+{
+	Node** p = phead;
+
+	if (index == 0)
+	{
+		Node* temp = *p;
+		*p = (*p)->Next;
+		free(temp);
+	}
+	else
+	{
+		for (int i = 0; i < index - 1; i++)
+		{
+			p = &((*p)->Next);
+		}
+
+		Node* temp = (*p)->Next;
+		(*p)->Next = temp->Next;
+		free(temp);
+	}
+}
+
+void PrintAllNode(Node* phead)
+{
+	while (phead != NULL)
+	{
+		printf("%d\n", phead->num);
+		phead = phead->Next;
+	}
+}
+
+int main()
+{
+	Node* head = NULL;
+
+	Node* list = OnePointBackInsertData(head, 1);
+	list = OnePointBackInsertData(list, 2);
+	list = OnePointBackInsertData(list, 3);
+	list = OnePointBackInsertData(list, 4);
+
+	TwoPointIndexInsertData(&list, 10, 0);
+	TwoPointIndexInsertData(&list, 20, 2);
+	TwoPointIndexInsertData(&list, 30, 4);
+
+	TwoPointIndexDeleteData(&list, 2);
+
+	PrintAllNode(list);
+}
+~~~
+
+###### [c++포인터연습](#c포인터연습)
 ###### [Top](#top)
 
 <br/>
