@@ -1163,6 +1163,8 @@ namespace WpfApp1
         static CustomControl1()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1), new FrameworkPropertyMetadata(typeof(CustomControl1)));
+			// 해당 부분은 현재 cs파일이 Generic.xaml을 확인해서 CustomControl1 스타일과 자동으로 연동 되도록한다
+			// 그래서 다른 디자인 같은 경우는  x:Key 을 지정하는 부분이 있지만 커스텀컨트롤은 지정하면 안된다.(알아서 맞는거를 찾아서 연결해줌)
         }
     }
 }
