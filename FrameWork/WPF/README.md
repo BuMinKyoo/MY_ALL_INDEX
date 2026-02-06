@@ -73,6 +73,7 @@
 <br/>
 
   - [MVVM패턴](#mvvm패턴)
+    - [DataContext상속 및 위치 관련 및 시각트리](#DataContext상속-및-위치-관련-및-시각트리)
     - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
     - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
     - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
@@ -3319,6 +3320,7 @@ namespace WpfApp2
 
 <br/>
 
+  - [DataContext상속 및 위치 관련 및 시각트리](#DataContext상속-및-위치-관련-및-시각트리)
   - [MainView.xaml에 ViewModel 고정문제](#mainViewxaml에-viewmodel-고정문제)
   - [MainView.xaml에 ViewModel 사용을 위한 ResourceDictionary의 DataTemplate의 DataType사용의 문제](#mainviewxaml에-viewmodel-사용을-위한-resourcedictionary의-datatemplate의-datatype사용의-문제)
   - [ViewCache를 만들어 캐시하기](#viewcache를-만들어-캐시하기)
@@ -3333,6 +3335,619 @@ namespace WpfApp2
   - [ViewModel To ViewModel 데이터교환(IOC,DI)_Store를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_store를-활용한-이벤트)
   - [ViewModel To ViewModel 데이터교환(IOC,DI)_EventHandler를 활용한 이벤트](#viewmodel-to-viewmodel-데이터교환iocdi_eventhandler를-활용한-이벤트)
   - [ViewModel To ViewModel 데이터교환(IOC,DI)_WeakReferenceMessenger](#viewmodel-to-viewmodel-데이터교환iocdi_weakreferencemessenger)
+
+###### [MVVM패턴](#mvvm패턴)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DataContext상속 및 위치 관련 및 시각트리
+  - DataContext을 놓아 두는 위치에 관련된 부분
+
+<br/>
+
+  - MainWindow에 DataContext가 있는 경우 UserControl도 MainWindow에있는 함수를 이용한다 -> 왜? -> binding은 DataContext를 한 객체 안으로 들어가 확인하기 때문이고 DataContext는 상속되기 때문에 자식에서 따로 다시 DataContext를 사용하지 않으면 부모의 DataContext를 바라보게 된다 
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="MainWindowBTN" Command="{Binding BtnClick}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindowViewModel.cs
+~~~c#
+using System.Windows;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("MainWindow");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="30" Content="UserControl" Command="{Binding BtnClick}"/>
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl1.cs
+~~~c#
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class UserControl1 : UserControl
+    {
+        public UserControl1()
+        {
+            InitializeComponent();
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("UserControl");
+        }
+    }
+}
+~~~
+
+<br/>
+
+![image](https://github.com/user-attachments/assets/2694579a-479c-4241-8912-e75e9b69ea0f)
+
+<br/>
+
+  - 두개다 결과는 MainWindow에 있는 MessageBox.Show("MainWindow") 를 실행하게 된다
+
+<br/>
+
+  - 이 상황에서 자식인 UserControl1이 따로 본인의 DataContext를 아래와 같이 지정하게 되면 본인의 비하인드에 있는 MessageBox.Show("UserControl")를 실행한다
+#UserControl1.cs
+~~~c#
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class UserControl1 : UserControl
+    {
+        public UserControl1()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("UserControl");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 다시 돌아가서, 부모쪽에 datacontext가 있고, 자식에는 없지만, 자식이 본인의 값들을 mvvm으로 연결하기 위해서 datacontext없이 시각 트리를 사용하여 연결 하기도 한다
+  - Command="{Binding BtnClick, RelativeSource={RelativeSource AncestorType=UserControl}} 처럼 시각 트리를 사용하여 연결함(본인을 포함한 본인의 상위에 있는 UserControl에서 BtnClick을 가져오라는 뜻)
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="MainWindowBTN" Command="{Binding BtnClick}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("MainWindow");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="30" Content="UserControl" Command="{Binding BtnClick, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class UserControl1 : UserControl
+    {
+        public UserControl1()
+        {
+            InitializeComponent();
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("UserControl");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - Command="{Binding BtnClick, RelativeSource={RelativeSource AncestorType=UserControl, AncestorLevel=1}}" 본인을 포함한 위의 첫번째 만나는 UserControl안에 있는 BtnClick을 참조 하겠다
+  - AncestorLevel이 2명 두번째 만나는 것을 참조 하겠다는 의미
+  - 아래와 같은 코드 일 경우는
+  - MainWindow는 MainWindow, UserControl1은 MainWindow, UserControl2는 UserControl1의 지정한 BtnClick을 바라본다
+  - Command="{Binding DataContext.BtnClick, RelativeSource={RelativeSource AncestorType=UserControl, AncestorLevel=2}}"
+  - Command="{Binding DataContext.BtnClick1, RelativeSource={RelativeSource AncestorType=UserControl, AncestorLevel=1}}" 본인을 포함한 UserControl을 1개 만큼 가서 거기에 소속된 DataContext로 들어가 거기에 있는 BtnClick1를 실행 하는것, 한마디로 DataContext를 최상위 부모만 했으면, 이건 자식들도 부모의 DataContext를 상속 받기 때문에 무조건 부모의 데이터를 가져오게 된다
+  - Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=2}, Path=BtnClick}" /> 도 같은 의미
+  - Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=2}, Path=DataContext.BtnClick}" /> 도 같은 의미가 된다
+
+<br/>
+
+![image](https://github.com/user-attachments/assets/acaeed5b-2b46-49f2-bb3a-ff4fe00fc380)
+
+<br/>
+
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="MainWindowBTN" Command="{Binding BtnClick}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("MainWindow");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl" Command="{Binding BtnClick}"/>
+        <local:UserControl2/>
+    </StackPanel>
+</UserControl>
+
+~~~
+
+<br/>
+
+#UserControl1.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class UserControl1 : UserControl
+    {
+        public UserControl1()
+        {
+            InitializeComponent();
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("UserControl");
+        }
+    }
+}
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Button Width="100" Height="30" Content="UserControl2" Command="{Binding BtnClick, RelativeSource={RelativeSource AncestorType=UserControl, AncestorLevel=2}}" />
+    </Grid>
+</UserControl>
+~~~
+
+<br/>
+
+#UserControl2.xaml.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// UserControl2.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class UserControl2 : UserControl
+    {
+        public UserControl2()
+        {
+            InitializeComponent();
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("UserControl2");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 마지막 테스트와 결과는 아래와 같다
+
+<br/>
+
+  - MainWindow는 반응 없음
+#MainWindow.xaml
+~~~c#
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="MainWindowBTN" Command="{Binding BtnClick}"/>
+        <local:UserControl1/>
+    </StackPanel>
+</Window>
+
+~~~
+
+<br/>
+
+#MainWindow.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick1
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("MainWindow");
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - UserControl1은 반응 없음
+#UserControl1.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Width="100" Height="30" Content="UserControl" Command="{Binding BtnClick}"/>
+        <local:UserControl2/>
+    </StackPanel>
+</UserControl>
+
+~~~
+
+<br/>
+
+#UserControl1.xaml.cs
+~~~c#
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace WpfApp1
+{
+    public partial class UserControl1 : UserControl
+    {
+        public UserControl1()
+        {
+            InitializeComponent();
+
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick1
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("UserControl");
+        }
+    }
+}
+
+~~~
+
+<br/>
+
+#UserControl2.xaml
+~~~c#
+<UserControl x:Class="WpfApp1.UserControl2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <!--<Button Width="100" Height="30" Content="UserControl2" Command="{Binding BtnClick, RelativeSource={RelativeSource AncestorType=UserControl, AncestorLevel=2}}" />-->
+        <Button Width="100" Height="30" Content="UserControl2" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.BtnClick1}" />
+    </Grid>
+</UserControl>
+
+~~~
+
+<br/>
+
+  - UserControl2은 MainWindow를 출력
+#UserControl2.xaml.cs
+~~~c#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// UserControl2.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class UserControl2 : UserControl
+    {
+        public UserControl2()
+        {
+            InitializeComponent();
+        }
+
+        private Command m_BtnClick;
+        public ICommand BtnClick1
+        {
+            get { return m_BtnClick = new Command(OneClickEvent); }
+        }
+
+        private void OneClickEvent(object obj)
+        {
+            MessageBox.Show("UserControl2");
+        }
+    }
+}
+
+~~~
+
+<br/>
+
 
 ###### [MVVM패턴](#mvvm패턴)
 ###### [Top](#top)
