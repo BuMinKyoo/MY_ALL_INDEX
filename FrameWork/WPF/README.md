@@ -6905,6 +6905,7 @@ namespace WpfApp2
  - 만약 서비스를, services.AddSingleton<INavigationService, NavigationService>(); 이렇게 등록한다면, 이 뜻은 다음과 같다.
    - INavigationService는 서비스의 인터페이스이며, NavigationService는 이 인터페이스를 구현하는 구체적인 클래스. 의존성 주입에서는 인터페이스를 통해 서비스를 요청하고, 구현 클래스의 인스턴스가 제공된다
    - App.xaml에서 리소스를 전체 등록하려면, Startup 이벤트를 만들고 비하인드에서, 아래 코드와 같이 해당 윈도우를 실행하는 코드를 넣어 주어야 한다
+   - AddSingleton이 아니라 AddTransient를 사용한다면 요청할때마다 새로운 객체를 생성한다는 것이다, 따라서 사실은 ViewModel같은 경우는 AddSingleton이 아닌 AddTransient을 사용하는것이 정석이다. 왜냐하면, 뷰모델을 다시 만들었을때 전에 있는 상태가 그대로 유지되면 안되는 경우가 많기 때문이다.
 
 ![image](https://github.com/BuMinKyoo/MY_ALL_INDEX/assets/39178978/383554d2-d12c-4eb7-ba06-df5f8e8ffdf3)
 
@@ -6976,6 +6977,12 @@ namespace WpfApp2
             services.AddSingleton<UserControl1VIewModel>();
             services.AddSingleton<UserControl2VIewModel>();
             services.AddSingleton<UserControl3VIewModel>();
+
+			// ViewModels -> AddTransient이 일반적으로 사용되니 참고. 부를때마다 다시 생성하는것
+            // services.AddTransient<MainWindowViewModel>();
+            // services.AddTransient<UserControl1VIewModel>();
+            // services.AddTransient<UserControl2VIewModel>();
+            // services.AddTransient<UserControl3VIewModel>();
 
             // Views
             services.AddSingleton(s => new MainWindow()
@@ -7657,6 +7664,11 @@ namespace WpfApp1
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<UserControl1ViewModel>();
             services.AddSingleton<UserControl2ViewModel>();
+
+			// ViewModels -> AddTransient이 일반적으로 사용되니 참고. 부를때마다 다시 생성하는것
+            // services.AddSingleton<MainWindowViewModel>();
+            // services.AddSingleton<UserControl1ViewModel>();
+            // services.AddSingleton<UserControl2ViewModel>();
 
             // Views
             services.AddSingleton(s => new MainWindow()
