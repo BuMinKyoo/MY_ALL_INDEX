@@ -31,6 +31,7 @@
   - [파일스트림](#파일스트림)
   - [예외](#예외)
   - [식 본문 메서드](#식-본문-메서드)
+  - [객체 초기화 식](#객체-초기화-식)
 
 <br/>
 <br/>
@@ -2189,4 +2190,53 @@ public static void SetUpdateNotifyProcessByRedis(NotifyRequest request)
 
 ###### [식 본문 메서드](#식-본문-메서드)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 객체 초기화 식
+  - 객체 생성후, 내부에 있는 변수를 초기화 하는 문법
+  - 아래 예시에서는 람다식을 사용해서 Action변수를 초기화 했음, 해당 내용의 함수를 담아내서 출력함
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car(5)
+            {
+                action = (str1, str2) =>
+                {
+                    Console.WriteLine(str1 + str2);
+                }
+            };
+
+            car.action("민규", "바보");
+        }
+
+        
+    }
+
+    public class Car
+    {
+        int Num;
+        public Action<string, string>? action;
+
+        public Car(int num)
+        {
+            this.Num = num;
+        }
+    }
+}
+
+// 민규 바보
+~~~
+
+###### [객체 초기화 식](#객체-초기화-식)
+###### [Top](#top)
+
 
