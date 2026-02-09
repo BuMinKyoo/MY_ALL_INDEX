@@ -30,6 +30,7 @@
   - [파일입출력](#파일입출력)
   - [파일스트림](#파일스트림)
   - [예외](#예외)
+  - [식 본문 메서드](#식-본문-메서드)
 
 <br/>
 <br/>
@@ -2172,3 +2173,20 @@ static void Main(string[] args)
 
 ###### [예외](#예외)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 식 본문 메서드
+  - 메서드 몸통을 한 줄 식(expression)으로 줄여 쓰는 문법
+
+~~~c#
+public static void SetUpdateNotifyProcessByRedis(NotifyRequest request)
+    => OnUpdateNotifyProcessByRedis?.Invoke(request);
+~~~
+
+###### [식 본문 메서드](#식-본문-메서드)
+###### [Top](#top)
+
