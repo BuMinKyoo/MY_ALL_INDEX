@@ -43,6 +43,8 @@
   - [readonly](#readonly)
   - [Tuple](#Tuple)
   - [interface](#interface)
+  - [record](#record)
+  - [무명형식](#무명형식)
 
 
 
@@ -2982,5 +2984,36 @@ namespace ConsoleApp1
 ###### [Tuple](#Tuple)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
-  - [interface](#interface)
+***
+
+# 무명형식
+  - 클래스를 미리 정의하지 않고, 소스 코드 안에서 즉석으로 객체를 만들어내는 방식입니다. 주로 데이터를 잠깐 묶어서 전달하거나, LINQ 쿼리 결과를 받을 때 사용
+
+<br/>
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 무명 형식 객체 생성
+            // new { ... } 키워드를 사용하며, 타입 이름을 명시하지 않음. 이때 변수의 타입은 컴파일러가 알아서 결정하므로 반드시 var 키워드를 써야 합
+            var user = new { Name = "홍길동", Age = 30, IsActive = true };
+
+            Console.WriteLine($"이름: {user.Name}, 나이: {user.Age}");
+        }
+    }
+}
+~~~
+
+###### [record](#record)
+###### [Top](#top)
+
+  - [무명형식](#무명형식)
