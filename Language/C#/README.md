@@ -200,23 +200,136 @@ Case (상수 <int,long,char,bool,string> -> string은 C#전용) :
 ~~~
 
 ~~~c#
-ex)
-switch(input)
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 일반 스위치문
+            int priority = 1;
+
+            switch (priority)
             {
                 case 1:
-                    Console.WriteLine("1번");
+                    Console.WriteLine("높음");
                     break;
                 case 2:
-                case 3:
-                    Console.WriteLine("2번");
-                    break;
-                case 4:
-                    Console.WriteLine("3번");
+                    Console.WriteLine("보통");
                     break;
                 default:
-		                Console.WriteLine("5번");
-	                  break;
-	}
+                    Console.WriteLine("기타");
+                    break;
+            }
+
+            // 스위치 식
+            // case, break 대신 => 화살표를 사용하며, default는 _ (언더바)로 표기
+            string status = "Error";
+
+            string message = status switch
+            {
+                "Success" => "작업 성공",
+                "Error" => "오류 발생",
+                "Loading" => "로딩 중...",
+                _ => "알 수 없는 상태" // default 역할
+            };
+
+            // 패턴매칭
+            // 타입(Type)을 직접 검사할 수 있다는 것
+            object control = new System.Windows.Controls.Button();
+
+            switch (control)
+            {
+                case System.Windows.Controls.Button btn:
+                    btn.Content = "클릭됨";
+                    break;
+                case System.Windows.Controls.TextBox tb:
+                    tb.Text = "입력 완료";
+                    break;
+                case null:
+                    Console.WriteLine("null 객체입니다.");
+                    break;
+            }
+
+            object data = "Hello C#";
+
+            switch (data)
+            {
+                case string s: // data가 string 타입이면 s 변수에 할당
+                    Console.WriteLine($"문자열입니다. 길이는 {s.Length}입니다.");
+                    break;
+
+                case int i: // data가 int 타입이면 i 변수에 할당
+                    Console.WriteLine($"정수입니다. 값은 {i}입니다.");
+                    break;
+
+                case null:
+                    Console.WriteLine("데이터가 null입니다.");
+                    break;
+
+                default:
+                    Console.WriteLine("알 수 없는 타입입니다.");
+                    break;
+            }
+
+
+            // when절
+            int age = 25;
+
+            string category = age switch
+            {
+                // 스위치 식 + when절 사용
+                int n when n < 13 => "어린이",
+                int n when n < 20 => "청소년",
+                int n when n >= 20 => "성인",
+                _ => "미분류"
+            };
+
+            // 다중패턴
+            // switch 문이나 식에서 관계 연산자(>, <, >=, <=)와 논리 연산자(and, or, not)를 사용하여 조건을 아주 정교하게 조합할 수 있는 기능
+
+            int temperature = 25;
+
+            string weather = temperature switch
+            {
+                < 0 => "영하",
+                < 15 => "쌀쌀함",
+                < 30 => "적당함",
+                _ => "더움"
+            };
+
+            int score = 85;
+
+            string grade = score switch
+            {
+                >= 90 => "A",
+                >= 80 and < 90 => "B", // 80점 이상 90점 미만
+                >= 70 and < 80 => "C",
+                _ => "F"
+            };
+
+            char grade = 'A';
+
+            bool isPassing = grade switch
+            {
+                'A' or 'B' or 'C' => true,
+                'D' or 'F' => false,
+                _ => throw new ArgumentException("유효하지 않은 등급")
+            };
+
+            object? data = GetData();
+
+            string result = data switch
+            {
+                null => "데이터 없음",
+                not string => "문자열이 아님",
+                _ => "올바른 문자열 데이터"
+            };
+        }
+    }
+}
 ~~~
 
 ###### [Switch(표현식)](#switch표현식)
