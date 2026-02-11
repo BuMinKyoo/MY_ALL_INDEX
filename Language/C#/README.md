@@ -36,15 +36,16 @@
   - [null조건부 연산자](#null조건부-연산자)
   - [null병합 연산자](#null병합-연산자)
   - [null병합 할당연산자](#null병합-할당연산자)
-  - [Parse,TryParse](#ParseTryParse)
+  - [Parse,TryParse](#parsetryparse)
   - [params 가변인수](#params-가변인수)
   - [명명된 인수](#명명된-인수)
   - [sealed](#sealed)
   - [readonly](#readonly)
-  - [Tuple](#Tuple)
+  - [Tuple](#tuple)
   - [interface](#interface)
   - [record](#record)
   - [무명형식](#무명형식)
+  - [Range 연산자](#range-연산자)
 
 
 
@@ -3016,4 +3017,62 @@ namespace ConsoleApp1
 ###### [record](#record)
 ###### [Top](#top)
 
-  - [무명형식](#무명형식)
+
+<br/>
+<br/>
+
+***
+
+# Range 연산자
+  - C#에서 .. (Range 연산자)를 사용한 슬라이싱은 배열이나 리스트의 특정 부분을 아주 쉽고 직관적으로 추출해줌
+  - [시작..끝] 형태를 사용하며, 시작 인덱스는 포함하고 끝 인덱스는 포함하지 않습니다
+  - ^ 기호는 "뒤에서부터 몇 번째" 를 의미
+
+<br/>
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int[] numbers = { 0, 10, 20, 30, 40, 50, 60 };
+
+            // 인덱스 1번부터 4번 앞(3번)까지 가져오기
+            var slice1 = numbers[1..4];
+            // 결과: { 10, 20, 30 }
+
+            // 인덱스 3번부터 끝까지 가져오기
+            var slice2 = numbers[3..];
+            // 결과: { 30, 40, 50, 60 }
+
+            // 처음부터 3번 앞까지 가져오기
+            var slice3 = numbers[..3];
+            // 결과: { 0, 10, 20 }
+
+
+            // ^ 기호는 "뒤에서부터 몇 번째" 를 의미
+            string[] fruits = { "사과", "바나나", "포도", "딸기", "수박" };
+
+            // 처음부터 마지막 1개를 제외하고 가져오기
+            var slice4 = fruits[..^1];
+            // 결과: { "사과", "바나나", "포도", "딸기" }
+
+            // 뒤에서 3번째부터 끝까지 가져오기
+            var slice5 = fruits[^3..];
+            // 결과: { "포도", "딸기", "수박" }
+
+            // 뒤에서 3번째부터 뒤에서 1번째 앞까지 (즉, 뒤에서 3, 2번째)
+            var slice6 = fruits[^3..^1];
+            // 결과: { "포도", "딸기" }
+        }
+    }
+}
+~~~
+
+###### [Range 연산자](#range-연산자)
+###### [Top](#top)
+
