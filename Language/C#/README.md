@@ -32,6 +32,10 @@
   - [예외](#예외)
   - [식 본문 메서드](#식-본문-메서드)
   - [객체 초기화 식](#객체-초기화-식)
+  - [? null가능 연산자](#?-null가능-연산자)
+  - [null조건부 연산자](#null조건부-연산자)
+  - [null병합 연산자](#null병합-연산자)
+  - [null병합 할당연산자](#null병합-할당연산자)
 
 <br/>
 <br/>
@@ -2237,6 +2241,220 @@ namespace ConsoleApp1
 ~~~
 
 ###### [객체 초기화 식](#객체-초기화-식)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ? null가능 연산자
+  - null가능한지 아닌지 표현하는 문법
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int? age = null;
+        }
+    }
+    public class User
+    {
+        public string Name { get; set; }  // null이 아니어야 함
+        public string? Bio { get; set; }  // null일 수도 있음 (의도적 허용)
+        void PrintUser(string? input)
+        {
+            // input이 null일 수 있으므로 바로 Length를 쓰면 컴파일러가 경고를 줌
+            if (input != null)
+            {
+                Console.WriteLine(input.Length); // 안전
+            }
+        }
+    }
+}
+~~~
+
+###### [? null가능 연산자](#?-null가능-연산자)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# null조건부 연산자
+  - C#에서 Null 조건부 연산자(?., ?[]) 는 객체가 null인지 매번 if문으로 확인하지 않고도 멤버에 안전하게 접근할 수 있게 해준다
+  - 객체 뒤에 ?.을 붙이면, 이 객체가 null이 아니면 다음 멤버를 실행하고, null이면 즉시 null을 반환해라
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            User? user = null;
+
+            // 기존 방식 (장황함)
+            if (user != null)
+            {
+                string name1 = user.Name;
+            }
+
+            // ?. 사용 방식 (간결함)
+            string? name = user?.Name;
+        }
+        public class User
+        {
+            public string Name { get; set; } = string.Empty;
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 맴버 체이닝
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // Address가 null이거나 City가 null이어도 에러 없이 null을 반환합니다.
+            string? city = person?.Address?.City;
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 컬렉션 및 인덱서 접근
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            List<string>? names = GetNames();
+
+            // names가 null이면 접근하지 않고 null 반환
+            string? first = names?[0];
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 이벤트 핸들러 호출
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 기존 방식
+            if (OnDataChanged != null)
+            {
+                OnDataChanged(this, EventArgs.Empty);
+            }
+
+            // ?. 사용 방식 (스레드 안전성까지 확보됨)
+            OnDataChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+}
+~~~
+
+
+###### [null조건부 연산자](#null조건부-연산자)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# null병합 연산자
+  - Null 병합 연산자(??) 는 왼쪽 피연산자가 null이 아니면 그 값을 반환하고, null이면 오른쪽 피연산자를 반환하는 연산자
+  - 결과값 = 왼쪽값 ?? 오른쪽값(왼쪽값이 null이 아님: 결과값 = 왼쪽값, 왼쪽값이 null임: 결과값 = 오른쪽값)
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            string? input = null;
+            string message = input ?? "기본 메시지";
+
+            Console.WriteLine(message); // 출력: "기본 메시지"
+
+            input = "안녕하세요";
+            message = input ?? "기본 메시지";
+
+            Console.WriteLine(message); // 출력: "안녕하세요"
+
+            // user가 null이거나, Address가 null이면 "주소 없음"을 반환
+            string city = user?.Address?.City ?? "주소 없음";
+        }
+    }
+}
+~~~
+
+###### [null병합 연산자](#null병합-연산자)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# null병합 할당연산자
+  - 변수가 null일 때만 값을 할당
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int? number = null;
+            number ??= 42;
+            Console.WriteLine($"The number is: {number}"); //42
+
+            int? number2= 10;
+            number2 ??= 42;
+            Console.WriteLine($"The number2 is: {number2}"); //10
+        }
+    }
+}
+~~~
+
+###### [null병합 할당연산자](#null병합-할당연산자)
 ###### [Top](#top)
 
 
