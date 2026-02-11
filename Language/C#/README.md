@@ -36,6 +36,18 @@
   - [null조건부 연산자](#null조건부-연산자)
   - [null병합 연산자](#null병합-연산자)
   - [null병합 할당연산자](#null병합-할당연산자)
+  - [Parse,TryParse](#ParseTryParse)
+  - [params 가변인수](#params-가변인수)
+
+
+
+
+
+
+
+
+
+
 
 <br/>
 <br/>
@@ -2570,4 +2582,124 @@ namespace ConsoleApp1
 ###### [null병합 할당연산자](#null병합-할당연산자)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
+***
+
+# Parse,TryParse
+  - Parse (예외 발생 가능)
+    - 문자열이 해당 타입으로 완벽하게 변환될 것이라고 확신할 때 사용합니다. 변환에 실패하면 예외(Exception)가 발생하며 프로그램이 중단될 수 있습니다.
+  - TryParse (안전한 변환)
+    - 변환 가능 여부를 bool 값(true/false)으로 반환하고, 실제 변환된 값은 out 키워드를 통해 내보냅니다. 실패해도 예외가 발생하지 않아 성능상 이점이 크고 코드가 안정적입니다.
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+
+            // Parse (예외 발생 가능)
+            string input = "123";
+
+            try
+            {
+                int number = int.Parse(input);
+                Console.WriteLine($"성공: {number}");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("숫자 형식이 아닙니다.");
+            }
+
+
+            // TryParse (안전한 변환)
+            string input2 = "abc";
+
+            // 변환 성공 시 success는 true, 결과값은 result에 담김
+            if (int.TryParse(input2, out int result))
+            {
+                Console.WriteLine($"성공: {result}");
+            }
+            else
+            {
+                Console.WriteLine("변환 실패: 안전하게 로그를 남기거나 사용자에게 알림");
+            }
+
+        }
+    }
+}
+~~~
+
+###### [Parse,TryParse](#ParseTryParse)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# params 가변인수
+  - params 키워드는 매개변수의 개수를 미리 정하지 않고 가변적으로 받을 때 사용
+  - 메서드 정의 시 마지막 매개변수 앞에 params를 붙입니다
+  - 메서드 선언에서 params는 반드시 마지막 자리에 위치해야 합니다
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 호출할 때: 개수 제한 없이 나열 가능
+            PrintNumbers(1, 2, 3);
+            PrintNumbers(10, 20, 30, 40, 50);
+            PrintNumbers(); // 아무것도 안 보내도 됨 (빈 배열 전달)
+
+        }
+
+        static public void PrintNumbers(params int[] numbers)
+        {
+            foreach (int n in numbers)
+            {
+                Console.Write(n + " ");
+            }
+        }
+
+        static public void PrintNumbers(params int numbers)  // 이거 안됨 컬랙션 형식 이여야함
+        {
+            foreach (int n in numbers)
+            {
+                Console.Write(n + " ");
+            }
+        }
+
+        // (X) 잘못된 예
+        // public void Wrong(params int[] nums, string name) // params가 마지막이 아님
+
+        // (O) 올바른 예
+        public void Correct(string name, params int[] nums)
+        {
+            Console.WriteLine($"{name}님이 보낸 숫자: {nums.Length}개");
+        }
+
+        public void Log(string level, params object[] args)
+        {
+            string message = string.Join(" | ", args);
+            Console.WriteLine($"[{level}] {message}");
+        }
+    }
+}
+~~~
+
+###### [params 가변인수](#params-가변인수)
+###### [Top](#top)
+
+
+  - [params 가변인수](#params-가변인수)
