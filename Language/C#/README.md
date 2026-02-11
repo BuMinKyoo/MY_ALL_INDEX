@@ -38,8 +38,11 @@
   - [null병합 할당연산자](#null병합-할당연산자)
   - [Parse,TryParse](#ParseTryParse)
   - [params 가변인수](#params-가변인수)
-
-
+  - [명명된 인수](#명명된-인수)
+  - [sealed](#sealed)
+  - [readonly](#readonly)
+  - [Tuple](#Tuple)
+  - [interface](#interface)
 
 
 
@@ -706,9 +709,8 @@ static void Main(string[] args)
     - 클래스에 함수를 추가하지 못할 때 사용(마치 그 클래스가 가지고 있는 함수 인것 마냥 쓰게 해줌)
     - 기존 정의된 메서드와 동일한 이름을 갖는 확정 매서드가 있다면, 기존 정의된 매서드가 실행 되게 된다
     - 정적 클래스에서만 사용 가능하다
-    - 정적 함수를 만든다, 정적 함수에서만 사용 가능
-      - 확장 메서드의 첫번째 인자는 함수에 넣고자 했던 클래스 이름을 적는다
-      - 첫번째 인자는 반드시 this를 붙인다
+    - 메서드 자체도 static 메서드여야 합니다
+      - 첫 번째 매개변수 앞에 this 키워드를 붙여서 어떤 타입을 확장할지 지정합니다.
 
 ~~~c#
 namespace ConsoleApp9
@@ -2702,4 +2704,283 @@ namespace ConsoleApp1
 ###### [Top](#top)
 
 
-  - [params 가변인수](#params-가변인수)
+<br/>
+<br/>
+
+***
+
+# 명명된 인수
+  - 정의에 정의된 매개변수의 순서를 지킬 필요 없이, 이름: 값 형태로 호출
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 1. 기존 방식 (순서대로 입력)
+            SetDeviceConfig("127.0.0.1", 8080, true);
+
+            // 2. 명명된 인수 방식 (이름 지정)
+            SetDeviceConfig(port: 8080, ip: "127.0.0.1", useSsl: true);
+            SetDeviceConfig("127.0.0.1", port: 8080, useSsl: true);
+        }
+
+        static void SetDeviceConfig(string ip, int port, bool useSsl)
+        {
+            // 장비 설정 로직
+        }
+    }
+}
+~~~
+
+###### [명명된 인수](#명명된-인수)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# sealed
+  - 상속을 방지 하거나 오버라이딩을 방지 하는것
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+
+        }
+
+        // sealed 클래스 (상속 방지)
+        sealed class FinalBase
+        {
+            public void Show() => Console.WriteLine("봉인된 클래스");
+        }
+
+
+
+
+        // sealed 메서드 (오버라이딩 방지)
+        class Base
+        {
+            public virtual void Work() => Console.WriteLine("기본 작업");
+        }
+
+        class Mid : Base
+        {
+            // Mid를 상속받는 클래스부터는 Work를 수정할 수 없음
+            public sealed override void Work() => Console.WriteLine("중간 단계에서 고정된 작업");
+        }
+
+        class Child : Mid
+        {
+            // 오류 발생: 'Child.Work()': 상속된 멤버는 봉인되어 있으므로 재정의할 수 없습니다.
+            // public override void Work() { } 
+        }
+    }
+}
+~~~
+
+###### [sealed](#sealed)
+###### [Top](#top)
+
+
+<br/>
+<br/>
+
+***
+
+# readonly
+  - 클래스가 인스턴스화될 때 값이 결정되어야 하며, 그 이후에는 수정할 수 없습니다
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+
+        }
+
+        public class Logger
+        {
+            // 1. 선언과 동시에 초기화 가능
+            private readonly string _logPath = "C:\\Logs";
+            private readonly int _maxSize;
+
+            public Logger(int maxSize)
+            {
+                // 2. 생성자 안에서 초기화 가능
+                _maxSize = maxSize;
+            }
+
+            public void UpdatePath()
+            {
+                // _logPath = "D:\\Logs"; // 컴파일 에러! (생성자 밖에서 수정 불가)
+            }
+        }
+
+    }
+}
+~~~
+
+###### [readonly](#readonly)
+###### [Top](#top)
+
+
+<br/>
+<br/>
+
+***
+
+# Tuple
+  - 여러 개의 데이터를 하나로 묶어서 전달할 때 사용하는 아주 가벼운 데이터 구조
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 1. 선언 및 초기화
+            var person = ("홍길동", 25);
+
+            // 2. 기본적으로 Item1, Item2... 이름으로 접근
+            Console.WriteLine(person.Item1); // 홍길동
+            Console.WriteLine(person.Item2); // 25
+
+            // 3. 명명된 튜플 요소
+            // 선언할 때 이름을 지정
+            var user = (Name: "이순신", Age: 30);
+
+            Console.WriteLine(user.Name); // 이순신
+            Console.WriteLine(user.Age);  // 30
+
+            // 4.튜플 분해(Deconstruction)
+            var (name, age) = ("강감찬", 40);
+
+            Console.WriteLine(name); // 강감찬
+            Console.WriteLine(age);  // 40
+
+            // 일부 값만 필요할 때는 버림(_) 사용 가능
+            var (title, _) = ("C# 강의", 10000);
+
+
+            // 5. switch 식과의 조합 (Pattern Matching)
+            string state = "Online";
+            string priority = "High";
+
+            string action = (state, priority) switch
+            {
+                ("Online", "High") => "즉시 대응",
+                ("Online", "Low") => "순차 대응",
+                ("Offline", _) => "연결 확인 필요",
+                _ => "알 수 없는 상태"
+            };
+
+
+            // 메서드에서 여러 값 반환하기
+            var stats = GetStats(new List<int> { 1, 2, 3 });
+            Console.WriteLine($"합계: {stats.Sum}, 개수: {stats.Count}");
+        }
+
+        static public (int Sum, int Count) GetStats(List<int> numbers)
+        {
+            int sum = 0;
+            foreach (var n in numbers) sum += n;
+
+            return (sum, numbers.Count); // 튜플 반환
+        }
+    }
+}
+~~~
+
+###### [Tuple](#Tuple)
+###### [Top](#top)
+
+
+<br/>
+<br/>
+
+***
+
+# interface
+  - 구현이 없이, 상속을 위한 것
+  - 하지만 C# 8.0부터 인터페이스 안에서 구현도 가능함
+  - 한정자도 원래 public만 가능했지만 private와 같은 다른 한정자도 가능하게 됨 private의 사용 용도는 인터페이스 내부에서만 공통으로 사용되는 로직
+  - 기본적으로 public 속성
+
+<br/>
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            IControl Control = new AudioPlayer();
+            Control.LogInfo("재생 오류 발생");
+            Control.LogError("aaaa");
+        }
+    }
+
+    interface IControl
+    {
+        void Play(); // 기본적으로 public 속성
+        //private void Stop(); // 에러
+
+        void Stop2() { Console.WriteLine("구현!!"); } // C# 8.0부터 인터페이스 안에서 구현도 가능함
+
+        // 외부에서 호출할 공개 메서드
+        void LogError(string msg) => Log("Error", msg);
+        void LogInfo(string msg) => Log("Info", msg);
+
+        // 인터페이스 내부에서만 공통으로 사용되는 로직 (private 가능!)
+        private void Log(string level, string msg)
+        {
+            Console.WriteLine($"[{level}] {DateTime.Now}: {msg}");
+        }
+    }
+
+    class AudioPlayer : IControl
+    {
+        // (X) 에러: 인터페이스 멤버는 private으로 구현할 수 없음
+        // private void Play() { ... } 
+
+        // (O) 반드시 public으로 선언해야 함
+        public void Play()
+        {
+            Console.WriteLine("재생합니다.");
+        }
+
+        public void LogError(string msg) // 오버라이드 가능
+        {
+            Console.WriteLine("오디오 플레이어 오류: " + msg);
+        }
+    }
+}
+~~~
+
+###### [Tuple](#Tuple)
+###### [Top](#top)
+
+
+  - [interface](#interface)
