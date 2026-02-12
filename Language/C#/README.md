@@ -51,6 +51,7 @@
   - [delegate](#delegate)
   - [익명 매소드](#익명-매소드)
   - [이벤트 핸들러](#이벤트-핸들러)
+  - [Action,Func,delegate,event](#actionfuncdelegateevent)
 
 
 <br/>
@@ -3677,5 +3678,67 @@ namespace ConsoleApp1
 ###### [이벤트 핸들러](#이벤트-핸들러)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
-  - [이벤트 핸들러](#이벤트-핸들러)
+***
+
+# Action,Func,delegate,event
+
+<br/>
+
+  - Delegate : 함수 포인터의 원조
+    - 가장 원초적인 형태
+  - Action : 바로쓰는 대리자
+    - 미리 정의된 대리자일 뿐
+    - Action<int>는 내부적으로 public delegate void Action<T>(T obj) 와 똑같다
+    - 별도의 delegate 선언문 없이 바로 변수처럼 쓸 수 있어 편리
+    - Action은 void인것, func는 리턴값이 있는
+  - Event : 캡슐화된 대리자
+    - event는 대리자 변수 앞에 붙는 접근 제한 키워드
+    - 대리자만 쓰면(public Action MyDel;): 외부에서 MyDel = null;로 초기화하거나 MyDel.Invoke()로 호출할 수 있어 위험
+    - 이벤트를 쓰면(public event Action MyEvent;): 외부에서는 오직 +=, -=(구독/해지)만 가능하며, 호출(Invoke)은 오직 그 클래스 내부에서만 가능
+
+~~~c#
+public delegate void MyDelegate(int value); // 설계도 선언
+MyDelegate del = (x) => Console.WriteLine(x); // 객체 생성
+~~~
+
+<br/>
+
+  - Action과 Event
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 외부 클래스에서 사용 시
+            var m = new Messenger();
+
+            m.OnAction = null;     // (O) 가능. 기존 구독자 다 날려버릴 수 있음 (위험!)
+            m.OnAction.Invoke(""); // (O) 가능. 외부에서 강제로 이벤트를 터뜨릴 수 있음
+
+            m.OnEvent = null;      // (X) 컴파일 에러! 외부에서 초기화 불가
+            m.OnEvent.Invoke("");  // (X) 컴파일 에러! 외부에서 발생 불가 (클래스 내부만 가능)
+            m.OnEvent += (s) => { }; // (O) 오직 구독만 가능
+        }
+    }
+
+    public class Messenger
+    {
+        // 1. 대리자 필드 (위험)
+        public Action<string>? OnAction;
+
+        // 2. 이벤트 (권장/안전)
+        public event Action<string>? OnEvent;
+    }
+}
+~~~
+
+###### [Action,Func,delegate,event](#actionfuncdelegateevent)
+###### [Top](#top)
