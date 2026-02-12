@@ -50,6 +50,7 @@
   - [where 제약 조건](#where-제약-조건)
   - [delegate](#delegate)
   - [익명 매소드](#익명-매소드)
+  - [이벤트 핸들러](#이벤트-핸들러)
 
 
 <br/>
@@ -3369,7 +3370,6 @@ namespace ConsoleApp1
 ###### [delegate](#delegate)
 ###### [Top](#top)
 
-
 <br/>
 <br/>
 
@@ -3514,4 +3514,168 @@ namespace ConsoleApp1
 ###### [익명 매소드](#익명-매소드)
 ###### [Top](#top)
 
-  - [익명 매소드](#익명-매소드)
+<br/>
+<br/>
+
+***
+
+# 이벤트 핸들러
+
+<br/>
+
+  - 옛날 방식
+
+~~~c#
+using System;
+using static ConsoleApp1.Program;
+
+namespace ConsoleApp1
+{
+    // "반환값은 없고, string 하나를 받는 함수"를 대리자로 정의
+    public delegate void MyMessageDelegate(string message);
+
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Messenger messenger = new Messenger();
+
+            // 람다 식을 사용하여 이벤트 구독
+            messenger.MessageReceived += (msg) =>
+            {
+                Console.WriteLine($"[수신 완료]: {msg}");
+            };
+
+            // 테스트
+            messenger.Send("안녕하세요, 대리자 이벤트입니다!");
+        }
+    }
+    
+    public class Messenger
+    {
+        // 정의한 델리게이트를 타입으로 이벤트 선언
+        public event MyMessageDelegate? MessageReceived;
+
+        public void Send(string msg)
+        {
+            Console.WriteLine($"메시지 전송 중: {msg}");
+
+            // 이벤트 발생! (구독자가 있을 때만 호출)
+            MessageReceived?.Invoke(msg);
+        }
+    }
+}
+~~~
+
+<br/>
+
+  - 현대방식
+    - (object sender, T e) 구조는 닷넷 전체의 약속입니다. 누가 봐도 "첫 번째 인자는 보낸 놈, 두 번째는 데이터구나"라고 알 수 있음
+    - 더 기능을 추가하고 싶을때 MessageEventArgs이것만 아래 부분에 더 추가해서 쓰면됨
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    // 1. 데이터를 담을 클래스 정의 (EventArgs 상속)
+    public class MessageEventArgs : EventArgs
+    {
+        public string Message { get; }
+        public MessageEventArgs(string message) => Message = message;
+    }
+
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var messenger = new Messenger();
+
+            // 2. 표준 (sender, e) 형식의 람다 식 사용
+            messenger.MessageReceived += (sender, e) =>
+            {
+                // e.Message를 통해 데이터를 가져옴
+                Console.WriteLine($"[수신 완료]: {e.Message}");
+            };
+
+            messenger.Send("안녕하세요, 현대적인 이벤트 방식입니다!");
+        }
+    }
+
+    public class Messenger
+    {
+        // 3. 별도의 delegate 선언 없이 EventHandler<T> 사용
+        public event EventHandler<MessageEventArgs>? MessageReceived;
+
+        public void Send(string msg)
+        {
+            Console.WriteLine($"메시지 전송 중: {msg}");
+
+            // 4. 관례에 따라 'this(나 자신)'와 '데이터'를 함께 보냄
+            MessageReceived?.Invoke(this, new MessageEventArgs(msg));
+        }
+    }
+}
+~~~
+
+<br/>
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    // 1. 데이터를 담을 클래스 정의 (EventArgs 상속)
+    public class MessageEventArgs : EventArgs
+    {
+        public string Message { get; }
+        public MessageEventArgs(string message) => Message = message;
+    }
+
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var messenger = new Messenger();
+
+            // 구독자 1: 로그 담당
+            messenger.MessageReceived += (s, e) => Console.WriteLine($"[로그] {e.Message}");
+
+            // 구독자 2: 알림창 담당 (WPF라면 MessageBox)
+            messenger.MessageReceived += (s, e) => Console.WriteLine($"[알림] 메시지가 왔어요!");
+
+            // 구독자 3: 다른 클래스의 메서드 연결
+            AlarmSystem alarm = new AlarmSystem();
+            messenger.MessageReceived += alarm.OnMessageAlert;
+
+            messenger.Send("모두에게 전달!");
+            // 결과: 로그, 알림, 알람 시스템 세 곳이 순서대로 실행됨
+        }
+    }
+
+    public class Messenger
+    {
+        // 3. 별도의 delegate 선언 없이 EventHandler<T> 사용
+        public event EventHandler<MessageEventArgs>? MessageReceived;
+
+        public void Send(string msg)
+        {
+            Console.WriteLine($"메시지 전송 중: {msg}");
+
+            // 4. 관례에 따라 'this(나 자신)'와 '데이터'를 함께 보냄
+            MessageReceived?.Invoke(this, new MessageEventArgs(msg));
+        }
+    }
+
+    public class AlarmSystem
+    {
+        public void OnMessageAlert(object sender, MessageEventArgs e) => Console.WriteLine("삐익!");
+    }
+}
+~~~
+
+###### [이벤트 핸들러](#이벤트-핸들러)
+###### [Top](#top)
+
+
+  - [이벤트 핸들러](#이벤트-핸들러)
