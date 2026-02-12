@@ -46,6 +46,7 @@
   - [record](#record)
   - [무명형식](#무명형식)
   - [Range 연산자](#range-연산자)
+  - [Indexer](#indexer)
 
 
 
@@ -3017,7 +3018,6 @@ namespace ConsoleApp1
 ###### [record](#record)
 ###### [Top](#top)
 
-
 <br/>
 <br/>
 
@@ -3076,3 +3076,81 @@ namespace ConsoleApp1
 ###### [Range 연산자](#range-연산자)
 ###### [Top](#top)
 
+
+<br/>
+<br/>
+
+***
+
+# Indexer
+  - 객체를 마치 배열처럼 인덱스([])를 사용하여 접근할 수 있게 해주는 기능
+  - 인덱서는 프로퍼티와 비슷하게 get과 set을 가지지만, 이름 대신 this 키워드를 사용
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 사용 예시
+            var coll = new MyCollection();
+            coll[0] = 100; // set 호출
+            int value = coll[0]; // get 호출
+
+            var dict = new DictionaryLike();
+            dict["Apple"] = "사과";
+            Console.WriteLine(dict["Apple"]); // 출력: 사과
+
+
+            // 2차원 인덱서
+            var m = new Matrix();
+            m[1, 2] = 50;
+        }
+    }
+
+    class MyCollection
+    {
+        private int[] data = new int[10];
+
+        // 인덱서 정의
+        public int this[int index]
+        {
+            get => data[index];
+            set => data[index] = value;
+        }
+    }
+
+    class DictionaryLike
+    {
+        private Dictionary<string, string> storage = new();
+
+        public string this[string key]
+        {
+            get => storage.ContainsKey(key) ? storage[key] : "Not Found";
+            set => storage[key] = value;
+        }
+    }
+
+    class Matrix
+    {
+        private int[,] _grid = new int[3, 3];
+
+        public int this[int row, int col]
+        {
+            get => _grid[row, col];
+            set => _grid[row, col] = value;
+        }
+    }
+}
+~~~
+
+###### [Indexer](#indexer)
+###### [Top](#top)
+
+
+
+
+  - [Indexer](#indexer)
