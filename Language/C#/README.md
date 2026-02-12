@@ -48,13 +48,8 @@
   - [Range 연산자](#range-연산자)
   - [Indexer](#indexer)
   - [where 제약 조건](#where-제약-조건)
-
-
-
-
-
-
-
+  - [delegate](#delegate)
+  - [익명 매소드](#익명-매소드)
 
 
 <br/>
@@ -3252,4 +3247,271 @@ namespace ConsoleApp1
 ###### [Top](#top)
 
 
-  - [where 제약 조건](#where-제약-조건)
+<br/>
+<br/>
+
+***
+
+# delegate
+  - 함수를 담는 변수 또는 함수의 주소를 저장하는 포인터
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        delegate int MyDelegate(int a, int b);
+
+        static void Main(string[] args)
+        {
+            // 2. 참조: 변수에 함수를 담음
+            MyDelegate del = Add;
+
+            // 3. 실행: 변수를 호출하면 연결된 함수가 실행됨
+            int result = del(10, 5); // 결과: 15
+
+            del = Sub;
+            Console.WriteLine(del(10, 5)); // 결과: 5
+        }
+
+        static int Add(int x, int y) => x + y;
+        static int Sub(int x, int y) => x - y;
+    }
+}
+~~~
+
+<br/>
+
+  - 대리자연산
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        delegate void Notify();
+
+        static void Main(string[] args)
+        {
+            // 대리자 생성
+            Notify handler = SendEmail;
+
+            // 함수 추가 (Chain)
+            handler += SendSms;
+            handler += Log;
+
+            // 한 번의 호출로 연결된 모든 함수가 순서대로 실행됨
+            handler();
+
+            // 함수 제거
+            handler -= SendEmail;
+            handler(); // SMS와 로그만 실행됨
+        }
+
+        static void SendEmail() => Console.WriteLine("이메일 발송");
+        static void SendSms() => Console.WriteLine("SMS 발송");
+        static void Log() => Console.WriteLine("로그 기록");
+    }
+}
+~~~
+
+<br/>
+
+  - 표준 대리자: Func와 Action
+    - Action<...>: 반환값이 없는(void) 함수용
+    - Func<..., TResult>: 반환값이 있는 함수용 (마지막 파라미터가 반환 타입)
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // int 2개를 받아 void를 반환하는 함수
+            Action<int, int> printSum = (a, b) => Console.WriteLine(a + b);
+
+            // int 2개를 받아 string을 반환하는 함수
+            Func<int, int, string> getResult = (a, b) => $"결과는 {a + b}";
+        }
+    }
+}
+~~~
+
+<br>
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        // 1. 고전적인 방식 (커스텀 델리게이트 선언)
+        delegate void PrintDelegate(string message);
+
+        // 2. 현대적인 방식 (표준 Action 사용)
+        Action<string> del2 = (msg) => Console.WriteLine(msg);
+
+        static void Main(string[] args)
+        {
+            PrintDelegate del1 = (msg) => Console.WriteLine(msg);
+        }
+
+        // 직접 action과 같은 것을 만든다면 이런식
+        public delegate void MyAction<T>(T obj);
+
+        public delegate void MyAction<T1, T2>(T1 arg1, T2 arg2);
+    }
+}
+~~~
+
+###### [delegate](#delegate)
+###### [Top](#top)
+
+
+<br/>
+<br/>
+
+***
+
+# 익명 매소드
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        // 1. 델리게이트 선언
+        delegate void MyDelegate(string message);
+
+        static void Main(string[] args)
+        {
+            // 2. 익명 메서드 방식으로 대리자 할당
+            MyDelegate del = delegate (string msg)
+            {
+                Console.WriteLine($"출력: {msg}");
+            };
+
+            // 3. 호출
+            del("안녕하세요!");
+        }
+    }
+}
+~~~
+
+<br/>
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        // 1. 델리게이트 선언
+        delegate void MyDelegate(string message);
+
+        static Action<int, int>? MyAction;
+
+        static void Main(string[] args)
+        {
+            // 2. 익명 메서드 방식으로 대리자 할당
+            MyDelegate del = delegate (string msg)
+            {
+                Console.WriteLine($"출력: {msg}");
+            };
+
+
+            MyAction = delegate (int a, int b)
+            {
+                Console.WriteLine($"{a}{b}");
+            };
+
+            // 3. 호출
+            del("안녕하세요!");
+        }
+    }
+}
+~~~
+
+<br/>
+
+   - 델리게이트 다양하게 쓰는것
+   - 익명 매서드와의 문법 차이
+   - 람다와의 문법 차이
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        // 1. 델리게이트 선언
+        delegate void MyDelegate(string message);
+
+        static Action<int, int>? MyAction;
+
+        delegate int SquareDelegate(int x);
+
+        static Func<int, int, string>? MyFunc;
+
+        static void Main(string[] args)
+        {
+            // 2. 익명 메서드 방식으로 대리자 할당
+            MyDelegate del = delegate (string msg)
+            {
+                Console.WriteLine($"출력: {msg}");
+            };
+
+
+            MyAction = delegate (int a, int b)
+            {
+                Console.WriteLine($"{a}{b}");
+            };
+
+            // 3. 호출
+            del("안녕하세요!");
+
+
+            // 1. 익명 메서드 방식
+            SquareDelegate sq1 = delegate (int x) { return x * x; };
+
+            // 2. 람다 식 방식
+            SquareDelegate sq2 = x => x * x;
+
+            // 익명 매서드
+            MyFunc = delegate (int a, int b)
+            {
+                string str = a.ToString() + b.ToString();
+                return str;
+            };
+
+            // 람다식
+            MyFunc = (int a, int b) =>
+            {
+                string str = a.ToString() + b.ToString();
+                return str;
+            };
+
+            // 위의 타입을 생략할 수 있음
+            MyFunc = (a, b) =>
+            {
+                string str = a.ToString() + b.ToString();
+                return str;
+            };
+
+            // 한줄로 줄이기
+            MyFunc = (a, b) => a.ToString() + b.ToString();
+        }
+    }
+}
+~~~
+
+###### [익명 매소드](#익명-매소드)
+###### [Top](#top)
+
+  - [익명 매소드](#익명-매소드)
