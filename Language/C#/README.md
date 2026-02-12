@@ -47,6 +47,7 @@
   - [무명형식](#무명형식)
   - [Range 연산자](#range-연산자)
   - [Indexer](#indexer)
+  - [where 제약 조건](#where-제약-조건)
 
 
 
@@ -3151,6 +3152,68 @@ namespace ConsoleApp1
 ###### [Top](#top)
 
 
+<br/>
+<br/>
+
+***
+
+# where 제약 조건
+  - 제네릭(Generic) 클래스나 메서드를 정의할 때, 타입 파라미터(T)에 들어올 수 있는 데이터 타입을 제한하는 문법(오직 제네릭 에서만 쓸 수 있음)
+  - 인덱서는 프로퍼티와 비슷하게 get과 set을 가지지만, 이름 대신 this 키워드를 사용
+
+<br/>
+
+  - where T : struct	값 타입	int, float, enum 등만 가능 (null 불가)
+  - where T : class	참조 타입	클래스, 인터페이스, 델리게이트 등만 가능
+  - where T : notnull	Null 불가	C# 8.0+ 부터 지원. Null이 아닌 모든 타입
+  - where T : new()	기본 생성자	new T()로 인스턴스를 생성할 수 있어야 함
+  - where T : 부모클래스	기반 클래스	특정 클래스 또는 그 자식 클래스여야 함
+  - where T : 인터페이스	인터페이스	특정 인터페이스를 구현한 타입이어야 함
+
+<br/>
+
+~~~c#
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+
+        }
+    }
+
+    public class Repository<T> where T : class
+    {
+        // T는 반드시 참조 타입(클래스)이어야 함
+    }
+
+    public class test1<T>
+    {
+        public interface IEntity { int Id { get; } }
+
+        public void PrintId<T>(T item) where T : IEntity
+        {
+            // T가 IEntity임을 알기에 .Id에 접근 가능
+            Console.WriteLine(item.Id);
+        }
+
+        public T CreateInstance<T>() where T : new()
+        {
+            return new T(); // 기본 생성자가 보장되므로 가능
+        }
+    }
+
+    // T는 클래스여야 하고, IComparable을 구현해야 하며, 기본 생성자가 있어야 함
+    public class DataHandler<T> where T : class, IComparable, new()
+    {
+
+    }
+}
+~~~
+
+###### [where 제약 조건](#where-제약-조건)
+###### [Top](#top)
 
 
-  - [Indexer](#indexer)
+  - [where 제약 조건](#where-제약-조건)
