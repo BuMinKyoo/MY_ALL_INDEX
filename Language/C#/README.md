@@ -52,6 +52,8 @@
   - [익명 매소드](#익명-매소드)
   - [이벤트 핸들러](#이벤트-핸들러)
   - [Action,Func,delegate,event](#actionfuncdelegateevent)
+  - [람다식](#람다식)
+  - [식=> 으로 구현하기](#식-으로-구현하기)
 
 
 <br/>
@@ -3742,3 +3744,162 @@ namespace ConsoleApp1
 
 ###### [Action,Func,delegate,event](#actionfuncdelegateevent)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 람다식
+  - Delegate : 함수 포인터의 원조
+    - 가장 원초적인 형태
+  - Action : 바로쓰는 대리자
+    - 미리 정의된 대리자일 뿐
+    - Action<int>는 내부적으로 public delegate void Action<T>(T obj) 와 똑같다
+    - 별도의 delegate 선언문 없이 바로 변수처럼 쓸 수 있어 편리
+    - Action은 void인것, func는 리턴값이 있는
+  - Event : 캡슐화된 대리자
+    - event는 대리자 변수 앞에 붙는 접근 제한 키워드
+    - 대리자만 쓰면(public Action MyDel;): 외부에서 MyDel = null;로 초기화하거나 MyDel.Invoke()로 호출할 수 있어 위험
+    - 이벤트를 쓰면(public event Action MyEvent;): 외부에서는 오직 +=, -=(구독/해지)만 가능하며, 호출(Invoke)은 오직 그 클래스 내부에서만 가능
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // 1. 인자가 없는 경우
+            Action greet = () => Console.WriteLine("Hello!");
+
+            // 2. 인자가 하나인 경우 (타입 생략 가능)
+            Action<string> printMsg = (msg) => Console.WriteLine(msg);
+
+            // 3. 인자가 여러 개인 경우
+            Action<string, int> printInfo = (name, age) =>
+            {
+                Console.WriteLine($"이름: {name}, 나이: {age}");
+            };
+
+            // 호출
+            greet();
+            printMsg("람다 공부 중!");
+            printInfo("제미니", 1);
+
+            ////////////////////////////////////
+
+            // 1. 인자 2개(int, int)를 받아 int를 반환
+            Func<int, int, int> add = (a, b) => a + b;
+
+            // 2. 인자 1개(string)를 받아 int(길이)를 반환
+            Func<string, int> getLength = s => s.Length;
+
+            // 3. 복잡한 로직 (중괄호와 return 사용)
+            Func<int, string> checkEven = (n) =>
+            {
+                if (n % 2 == 0) return "짝수";
+                else return "홀수";
+            };
+
+            // 호출
+            int result = add(10, 20); // 30
+            int len = getLength("C# Lambda"); // 9
+            string type = checkEven(5); // "홀수"
+        }
+    }
+}
+~~~
+
+###### [람다식](람다식)
+###### [Top](#top)
+
+
+<br/>
+<br/>
+
+***
+
+# 식=> 으로 구현하기
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+
+        }
+    }
+
+
+    // 변수(속성)를 식으로 구현하기
+    public class Player
+    {
+        public string FirstName { get; set; } = "Gemini";
+        public string LastName { get; set; } = "AI";
+
+        // 기존 방식 (기존의 Property)
+        public string FullNameOld { get { return FirstName + " " + LastName; } }
+
+        // 식 본문 멤버 방식 (식으로 구현)
+        public string FullName => $"{FirstName} {LastName}";
+    }
+
+    // 함수(메서드)를 식으로 구현하기
+    public class MathTools
+    {
+        // 기존 방식
+        public int AddOld(int a, int b)
+        {
+            return a + b;
+        }
+
+        // 식 본문 멤버 방식 (함수를 식으로 구현)
+        public int Add(int a, int b) => a + b;
+
+        // void 함수도 가능
+        public void PrintSum(int a, int b) => Console.WriteLine(a + b);
+    }
+
+    // 인덱서(Indexer)를 식으로 구현하기
+    public class DataBox
+    {
+        private string[] _data = { "Apple", "Banana", "Cherry" };
+
+        // 기존 방식
+        public string this[int index]
+        {
+            get { return _data[index]; }
+        }
+
+        // 식 본문 멤버 방식 (인덱서를 식으로 구현)
+        public string this[int index] => _data[index]; // 지금은 똑같은 인덱서가 위에 있기 때문에 에러남
+    }
+
+
+    //생성자와 종료자를 식으로 구현하기
+    public class Logger
+    {
+        private string _name;
+
+        // 생성자를 식으로 구현
+        public Logger(string name) => _name = name;
+
+        // 종료자(Destructor)를 식으로 구현
+        ~Logger() => Console.WriteLine("객체 소멸");
+    }
+}
+~~~
+
+###### [식=> 으로 구현하기](#식-으로-구현하기)
+###### [Top](#top)
+
+
+  - [식=> 으로 구현하기](#식-으로-구현하기)
+
