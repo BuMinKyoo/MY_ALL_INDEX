@@ -2308,6 +2308,42 @@ static void Main(string[] args)
 }
 ~~~
 
+<br/>
+
+  - 예외 필터
+    - catch 블록이 실행되기 전에 특정 조건을 만족하는지 먼저 검사하여 예외를 처리할지 결정하는 기능
+    - 같은 타입의 에러라도 내부 상태값에 따라 처리를 다르게 하고 싶을 때 사용
+
+~~~c#
+try
+{
+    // 웹 API 호출
+}
+catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
+{
+    // 401 에러일 때만: 로그인 페이지로 이동
+}
+catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+{
+    // 403 에러일 때만: "권한 없음" 메시지 출력
+}
+~~~
+
+<br/>
+
+bool isRetryEnabled = true;
+
+try
+{
+    ConnectToSensor();
+}
+catch (TimeoutException) when (isRetryEnabled)
+{
+    // 재시도 옵션이 켜져 있을 때만 예외를 잡아서 재시도함
+    RetryConnection();
+}
+// isRetryEnabled가 false라면 이 catch문은 무시되고 프로그램이 멈추거나 상위로 전파됨
+
 ###### [예외](#예외)
 ###### [Top](#top)
 
