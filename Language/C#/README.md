@@ -54,6 +54,7 @@
   - [Action,Func,delegate,event](#actionfuncdelegateevent)
   - [람다식](#람다식)
   - [식=> 으로 구현하기](#식-으로-구현하기)
+  - [LINQ](#linq)
 
 
 <br/>
@@ -3901,5 +3902,75 @@ namespace ConsoleApp1
 ###### [Top](#top)
 
 
-  - [식=> 으로 구현하기](#식-으로-구현하기)
+<br/>
+<br/>
+
+***
+
+# LINQ
+  - 문법으로 매서드 구문, 쿼리구문 2가지가 있다
+
+~~~c#
+// 매서드 구문
+var result = numbers.Where(n => n > 5).OrderBy(n => n);
+
+// 쿼리구문
+var result = from n in numbers
+             where n > 5
+             orderby n
+             select n;
+~~~
+
+<br/>
+
+~~~c#
+using System;
+
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            List<User> users = new List<User>
+            {
+                new User { Name = "김철수", Age = 25, Grade = "Normal" },
+                new User { Name = "이영희", Age = 32, Grade = "VIP" },
+                new User { Name = "박지성", Age = 45, Grade = "VIP" },
+                new User { Name = "최민수", Age = 19, Grade = "Normal" },
+                new User { Name = "정소민", Age = 28, Grade = "Normal" }
+            };
+
+            // Where : 원하는 데이터만 쏙쏙 골라냅니다
+            var result = users.Where(u => u.Age >= 30).ToList();
+
+            // Select : 전체 객체 중에서 필요한 필드만 뽑거나, 형태를 바꿉니다
+            var result1 = users.Select(u => u.Name).ToList();
+
+            // OrderBy : 특정 기준에 따라 데이터를 정렬
+            var result3 = users.OrderBy(u => u.Age).ToList();
+
+            // FirstOrDefault : 조건에 맞는 첫 번째 데이터를 찾습니다. 없으면 null을 반환합니다
+            var vip = users.FirstOrDefault(u => u.Grade == "VIP");
+
+            // GroupBy : 데이터를 특정 기준에 따라 묶음으로 나눕니다
+            var groups = users.GroupBy(u => u.Grade);
+
+            // 나머지는 하면서 추가하기
+        }
+    }
+
+    public class User
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Grade { get; set; } // "VIP", "Normal"
+    }
+}
+~~~
+
+###### [LINQ](#linq)
+###### [Top](#top)
+
+  - [LINQ](#linq)
 
