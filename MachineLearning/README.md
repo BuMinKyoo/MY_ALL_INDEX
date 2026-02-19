@@ -109,6 +109,61 @@
     - Gradient descent는 모든 데이터를 한 스텝에 계산 해야하기 때문에 느리다, 따라서 SGD방법이 나오게 된다.(또한 로컬 미니엄으로 부터 탈출의 기회가 되시도 한다)
     - 랜덤하게 데이터 하나씩 뽑아서 loss를 만든다
 
+<br/>
+
+  - mini-batch SGD
+    - SGD는 하나씩 보는 것이지만, mini-batch SGD는 2개 이상씩 데이터를 이용해서 보는것
+    - 그런데, GPU는 병렬 연산을 가능하게 하므로 여러 데이터에 대해서도 빠름
+  - Epoch, Batch size
+    - 총 Epoch수 (전체 데이터를 몇 번 반복해서 볼거냐)
+    - Batch size (몇 개씩 볼거냐)
+    - Learning rate (얼만큼 갈거냐)
+  - parameter, hyperparameter
+    - 파라미터(AI가 스스로 알아내는 변수)
+      - weights
+      - bias
+      - 등등
+    - 하이퍼파라미터(내가 정해줘야 하는 변수)
+      - Epoch, batch size
+      - Initial weight값
+      - learning rate, learning rate scheduling
+      - model architecture(layer수, node수, activation함수 등)
+      - loss 함수 뭐 쓸지
+      - 최적화 기법 뭐 쓸지
+  - Momentum
+    - 그라디언트를 누적함으로써 관성을 가지게 한다
+  - RMSprop
+    - Learning rate를 각 파라미터 별로 다르게 준것
+    - 경사 보고 가파른 쪽은 좀 조심조심하고, 완만한 쪽은 과감하게한다
+  - Adam(Adaptive Moment Estimation)
+    - ??
+
+<br/>
+
+  - Training vs Test( vs Validation)
+    - Test 데이터가 학습 때 사용되면 안됨
+      - AI가 처음 보는 data에 대해서도 답을 잘 하는지 확인하기 위해
+    - 그런데, train 데이터만으로 학습하자니 몇 epoch에서 학습을 멈춰야 할지 모른다
+      - train loss를 계속 줄이는 게 능사가 아님, 그래서 validation(모의 tset)
+    - 파라미터 학습을 위한 data vs 최종적으로 학습된 모델 테스트용 data ( vs 하이퍼파라미터 선택을 위한 data)
+
+<br/>
+
+  - K-fold Cross Validation(교차 검증)
+    - training data가 적어서 일부를 validation으로 쓰기 곤란할 때
+    - 각기 다른 train, validation조합의 데이터로 여러개의 모델을 만들어서 평균 val loss를 구하자
+    - 가장 val loss평균이 작은 hyperparameter set을 고르는 데 사용 가능
+
+<br/>
+
+
+
+
+
+
+
+
+
 
 
 
