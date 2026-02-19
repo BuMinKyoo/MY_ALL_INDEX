@@ -109,7 +109,7 @@
     - Gradient descent는 모든 데이터를 한 스텝에 계산 해야하기 때문에 느리다, 따라서 SGD방법이 나오게 된다.(또한 로컬 미니엄으로 부터 탈출의 기회가 되시도 한다)
     - 랜덤하게 데이터 하나씩 뽑아서 loss를 만든다
 
-<br/>
+<br>
 
   - mini-batch SGD
     - SGD는 하나씩 보는 것이지만, mini-batch SGD는 2개 이상씩 데이터를 이용해서 보는것
@@ -138,7 +138,7 @@
   - Adam(Adaptive Moment Estimation)
     - ??
 
-<br/>
+<br>
 
   - Training vs Test( vs Validation)
     - Test 데이터가 학습 때 사용되면 안됨
@@ -147,28 +147,30 @@
       - train loss를 계속 줄이는 게 능사가 아님, 그래서 validation(모의 tset)
     - 파라미터 학습을 위한 data vs 최종적으로 학습된 모델 테스트용 data ( vs 하이퍼파라미터 선택을 위한 data)
 
-<br/>
+<br>
 
   - K-fold Cross Validation(교차 검증)
     - training data가 적어서 일부를 validation으로 쓰기 곤란할 때
     - 각기 다른 train, validation조합의 데이터로 여러개의 모델을 만들어서 평균 val loss를 구하자
     - 가장 val loss평균이 작은 hyperparameter set을 고르는 데 사용 가능
 
-<br/>
+<br>
 
   - 인공 신경망 수식  
 <img width="805" height="503" alt="image" src="https://github.com/user-attachments/assets/5a5cc26d-c0a4-42cb-b03e-3dd531e15fc5" />
 
-<br/>
+<br>
 
   - 모델을 좀 복잡하게 만들어 보니 MLP는 행렬 곱하고, 벡터 더하고, activation의 반복
     - 그냥 깊게 깊게 만들면 엄청 복잡한 함수도 나타낼 수 있을거 같지만, linear activation만 쓰면 아무리 깊게 만들어도 FC layer한층 그 이하의 표현력만 가질 수 있음
     - xW + b 로는 입력과 출력 간의 선형적 관계만을 나타냄
     - 따라서, non-linear activation은 중요하다
 
+<br>
 
-
-
+  - backpropagation
+    - 어렵...
+    - 그냥 여러 값들을 어떻게 찾아나가야 할지에 대한것..나중에 다시 이해해보기
 
 
 
