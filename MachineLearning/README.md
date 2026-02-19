@@ -156,7 +156,15 @@
 
 <br/>
 
+  - 인공 신경망 수식  
+<img width="805" height="503" alt="image" src="https://github.com/user-attachments/assets/5a5cc26d-c0a4-42cb-b03e-3dd531e15fc5" />
 
+<br/>
+
+  - 모델을 좀 복잡하게 만들어 보니 MLP는 행렬 곱하고, 벡터 더하고, activation의 반복
+    - 그냥 깊게 깊게 만들면 엄청 복잡한 함수도 나타낼 수 있을거 같지만, linear activation만 쓰면 아무리 깊게 만들어도 FC layer한층 그 이하의 표현력만 가질 수 있음
+    - xW + b 로는 입력과 출력 간의 선형적 관계만을 나타냄
+    - 따라서, non-linear activation은 중요하다
 
 
 
