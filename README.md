@@ -56,7 +56,7 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 
 ***
 
-### [MachineLearning](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/MachineLearning)
+### [AI](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/AI)
 
 <br/>
 
