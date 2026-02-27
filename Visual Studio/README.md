@@ -130,18 +130,18 @@ Nuget검색으로 설치 하기
     - cpp 및 h이동 : Ctrl + K + O
     - 뷰 디자이너  보기 : Shift + F7
     - 소스 보기 : F7
-    - 커서 앞으로 이동 : Ctrl + Shift + -
-    - 커서 뒤로 이동 : Ctrl + -
-    - 현재 파일 단어 검색 : Ctrl + F
-    - 전체 파일 단어 검색 : Ctrl + Shift + F
-    - 주석 펴기/닫기 : Ctrl + m + m
-    - 정의로 이동 : Ctrl + 마우스 좌클릭
-    - 여러줄 주석 처리 : Ctrl + K + C
-    - 여러줄 주석 풀기 : Ctrl + K + U
-    - 중단점 : F9
-    - 중단점끼리 건너뛰기 / 디버그실행 : F5
-    - 한줄디버그 : F10
-    - 한줄디버그(안쪽으로 들어가기) : F11
+    - 커서 앞으로 이동 : Ctrl + Shift + - // VScode : Alt + 오른쪽 화살표
+    - 커서 뒤로 이동 : Ctrl + -   // VScode : Alt + 왼쪽 화살표
+    - 현재 파일 단어 검색 : Ctrl + F // VScode : 동일함
+    - 전체 파일 단어 검색 : Ctrl + Shift + F // VScode : 동일함 
+    - 주석 펴기/닫기 : Ctrl + m + m  // VScode : Ctrl + Shift + [ , Ctrl + Shift + \]
+    - 정의로 이동 : Ctrl + 마우스 좌클릭 // VScode : 동일
+    - 여러줄 주석 처리 : Ctrl + K + C // VScode : 동일
+    - 여러줄 주석 풀기 : Ctrl + K + U // VScode : 동일
+    - 중단점 : F9 // VScode : 동일
+    - 중단점끼리 건너뛰기 / 디버그실행 : F5 // VScode : 동일
+    - 한줄디버그 : F10 // VScode : 동일
+    - 한줄디버그(안쪽으로 들어가기) : F11 // VScode : 동일
     - CodeRush설치 후, Code Places열기 단축기 Alt + m 으로 변경
 
 <img width="803" height="598" alt="image" src="https://github.com/user-attachments/assets/712b75c4-1447-4d0d-aad6-39f33b92596e" />
