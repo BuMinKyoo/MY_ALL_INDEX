@@ -128,8 +128,8 @@ Nuget검색으로 설치 하기
 ## 단축키
   - 비주얼 스튜디오 2022단축키
     - cpp 및 h이동 : Ctrl + K + O
-    - 뷰 디자이너  보기 : Shift + F7
-    - 소스 보기 : F7
+    - 뷰 디자이너  보기 : Shift + F7 // VScode : 없음
+    - 소스 보기 : F7 // VScode : 없음
     - 커서 앞으로 이동 : Ctrl + Shift + - // VScode : Alt + 오른쪽 화살표
     - 커서 뒤로 이동 : Ctrl + -   // VScode : Alt + 왼쪽 화살표
     - 현재 파일 단어 검색 : Ctrl + F // VScode : 동일함
