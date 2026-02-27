@@ -138,6 +138,10 @@ Nuget검색으로 설치 하기
     - 정의로 이동 : Ctrl + 마우스 좌클릭
     - 여러줄 주석 처리 : Ctrl + K + C
     - 여러줄 주석 풀기 : Ctrl + K + U
+    - 중단점 : F9
+    - 중단점끼리 건너뛰기 / 디버그실행 : F5
+    - 한줄디버그 : F10
+    - 한줄디버그(안쪽으로 들어가기) : F11
     - CodeRush설치 후, Code Places열기 단축기 Alt + m 으로 변경
 
 <img width="803" height="598" alt="image" src="https://github.com/user-attachments/assets/712b75c4-1447-4d0d-aad6-39f33b92596e" />
