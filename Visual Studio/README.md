@@ -127,15 +127,20 @@ Nuget검색으로 설치 하기
 
 ## 단축키
   - 비주얼 스튜디오 2022단축키
-  - cpp 및 h이동 : Ctrl + K + O
-  - 뷰 디자이너  보기 : Shift + F7
-  - 소스 보기 : F7
-  -  커서 앞으로 이동 : Ctrl + Shift + -
-  - 커서 뒤로 이동 : Ctrl + -
-  - 코드 검색 : Ctrl + T
-  - 파일검색 : Ctrl + Shift + T
-  - 구성원 검색 : Alt + \
-  - 탐색모음 : ctrl + F2, tab, tab + 함수 검색 + enter
+    - cpp 및 h이동 : Ctrl + K + O
+    - 뷰 디자이너  보기 : Shift + F7
+    - 소스 보기 : F7
+    - 커서 앞으로 이동 : Ctrl + Shift + -
+    - 커서 뒤로 이동 : Ctrl + -
+    - 현재 파일 단어 검색 : Ctrl + F
+    - 전체 파일 단어 검색 : Ctrl + Shift + F
+    - 주석 펴기/닫기 : Ctrl + m + m
+    - 정의로 이동 : Ctrl + 마우스 좌클릭
+    - 여러줄 주석 처리 : Ctrl + K + C
+    - 여러줄 주석 풀기 : Ctrl + K + U
+    - CodeRush설치 후, Code Places열기 단축기 Alt + m 으로 변경
+
+<img width="803" height="598" alt="image" src="https://github.com/user-attachments/assets/712b75c4-1447-4d0d-aad6-39f33b92596e" />
 
 ###### [단축키](#단축키)
 ###### [Top](#top)
