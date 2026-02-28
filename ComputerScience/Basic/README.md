@@ -1876,6 +1876,17 @@ VirtualProtect사용예제는 MFC예제를 참고하기
       - 서버 규칙 : SERVER_TRAFFIC_SECRET_0 -> 서버가 클라이언트로 보낼때 쓰는 키 / CLIENT_TRAFFIC_SECRET_0 -> 클라이언트가 보낸 데이터 복호화는 이걸로
     - HKDF는 단방향이기 때문에 해커가 여러 대칭키중에서 하나를 뚫어내도, 마스터키를 알수 없기 때문에 다른 키또한 알수 없다.
 
+<img width="1251" height="150" alt="image" src="https://github.com/user-attachments/assets/4d2a1023-a8d8-4792-9c1a-41334a33c487" />
+
+<br/>
+
+  - 32바이트 Client Random난수 꼬리표 와이어샤크에서 확인하기
+    - Transport Layer Security -> TLSv1.3 Record Layer -> Handshake Protocol: Server Hello 안을 펼쳐보면 Random 항목이 있습니다
+  - 디피-헬만 공개 재료 (Key Share)
+    -  Server Hello 패킷의 맨 아래쪽 Extension 항목들을보면 있음
+
+
+
 ###### [암호기술](#암호기술)
 ###### [Top](#top)
 
