@@ -142,7 +142,7 @@ Nuget검색으로 설치 하기
     - 중단점끼리 건너뛰기 / 디버그실행 : F5 // VScode : 동일
     - 한줄디버그 : F10 // VScode : 동일
     - 한줄디버그(안쪽으로 들어가기) : F11 // VScode : 동일
-    - CodeRush설치 후, Code Places열기 단축기 Alt + m 으로 변경
+    - CodeRush설치 후, Code Places열기 단축기 Alt + m 으로 변경 //  VScode : CodeMap설치 Alt + p
 
 <img width="803" height="598" alt="image" src="https://github.com/user-attachments/assets/712b75c4-1447-4d0d-aad6-39f33b92596e" />
 
