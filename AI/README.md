@@ -147,6 +147,10 @@
   - mini-batch SGD
     - SGD는 하나씩 보는 것이지만, mini-batch SGD는 2개 이상씩 데이터를 이용해서 보는것
     - 그런데, GPU는 병렬 연산을 가능하게 하므로 여러 데이터에 대해서도 빠름
+    - 그래서 어떻게 보면, Gradient descent는 전체 데이터를 하나씩 넣어 그 방향으로 한번 가는거고, SGD는 데이터를 하나만 골라 한번 가는것이고, mini-batch SGD는 그 중간 이라고 할 수 있다
+
+<br/>
+
   - Epoch, Batch size
     - 총 Epoch수 (전체 데이터를 몇 번 반복해서 볼거냐)
     - Batch size (몇 개씩 볼거냐)
@@ -163,13 +167,23 @@
       - model architecture(layer수, node수, activation함수 등)
       - loss 함수 뭐 쓸지
       - 최적화 기법 뭐 쓸지
+
+<br/>
+
   - Momentum
     - 그라디언트를 누적함으로써 관성을 가지게 한다
+
+<br/>
+
   - RMSprop
     - Learning rate를 각 파라미터 별로 다르게 준것
     - 경사 보고 가파른 쪽은 좀 조심조심하고, 완만한 쪽은 과감하게한다
+
+<br/>
+
   - Adam(Adaptive Moment Estimation)
-    - ??
+    - 방향은 관성을 가지게
+    - 보폭은 가파른 쪽은 조심조심, 완만한쪽은 가감하게(평준화를 통해 공평하게 탐색)
 
 <br>
 
