@@ -158,22 +158,25 @@
 
 <br/>
 
-  - Epoch, Batch size
-    - 총 Epoch수 (전체 데이터를 몇 번 반복해서 볼거냐)
-    - Batch size (몇 개씩 볼거냐)
-    - Learning rate (얼만큼 갈거냐)
   - parameter, hyperparameter
     - 파라미터(AI가 스스로 알아내는 변수)
       - weights
       - bias
       - 등등
     - 하이퍼파라미터(내가 정해줘야 하는 변수)
-      - Epoch, batch size
+      - Epoch
+        - 전체 데이터를 몇 번 반복해서 볼거냐
+      - batch size
+        - 몇 개씩 볼거냐
       - Initial weight값
+        - 초기값 어떻게 정할꺼냐
       - learning rate, learning rate scheduling
+        - 얼만큼 갈거냐
       - model architecture(layer수, node수, activation함수 등)
       - loss 함수 뭐 쓸지
       - 최적화 기법 뭐 쓸지
+        - 모델이 데이터 예측을 끝내고 정답과 비교해서 오차(Loss)를 구하고 나면, 이 오차를 최소화하기 위해 신경망 내부의 수많은 가중치(W)와 편향(B)을 어떻게 수정할지 결정하는 내비게이션 역할
+        - Gradient descent, SGD, mini-batch SGD, Adam, RMSprop, Momentum 등
 
 <br/>
 
@@ -241,6 +244,7 @@
     - 그냥 깊게 깊게 만들면 엄청 복잡한 함수도 나타낼 수 있을거 같지만, linear activation만 쓰면 아무리 깊게 만들어도 FC layer한층 그 이하의 표현력만 가질 수 있음
     - xW + b 로는 입력과 출력 간의 선형적 관계만을 나타냄
     - 따라서, non-linear activation은 중요하다
+    - linear activation은 복잡한 패턴을 학습할 수 없기 때문에 은닉층에는 쓰지 않는다
 
 <br>
 
