@@ -176,7 +176,8 @@
       - loss 함수 뭐 쓸지
       - 최적화 기법 뭐 쓸지
         - 모델이 데이터 예측을 끝내고 정답과 비교해서 오차(Loss)를 구하고 나면, 이 오차를 최소화하기 위해 신경망 내부의 수많은 가중치(W)와 편향(B)을 어떻게 수정할지 결정하는 내비게이션 역할
-        - Gradient descent, SGD, mini-batch SGD, Adam, RMSprop, Momentum 등
+          - Gradient descent, SGD = 배치 사이즈
+          - mini-batch SGD, Adam, RMSprop, Momentum
 
 <br/>
 
