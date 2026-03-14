@@ -511,18 +511,32 @@ $Loss = (5 - W - B)^2$
   - backpropagation
     - 결국 AI는 모든 loss에 대해서 편미분을 해서 그라디언트를 구하고 그것을 통해서 웨이트 바이어스를 업데이트 하는건데, 깊은 층에 weight에 대한 편미분을 하는것이 꽤나 까다롭다. 그것을 하기 위한 방법
    
-
+<img width="781" height="546" alt="Image" src="https://github.com/user-attachments/assets/fdc4cab6-998d-4090-908a-9e0d9e1ade3b" />
 
 <br/>
 
   - sigmoid
-    - 기본적인 이분법의 환경에서는 정도라는것을 판단할 수 없으며, 0또는 1 처럼 맞다 아니다 만 판단가능하게됨
-    - unit step function을 조금 부드럽게 만들어보자
-    - 전구간 미분 가능
-    - 좀더 부드러운 분류가 가능
-    - 확률로도 해석 가능
+    - non-linear activation으로 이진 분류 문제 풀기
+      - step1. 데이터 모으기
+      - step2. 모델 만들기
+        - unit step function 이용해서 분류해 보자 -> 계단식으로 되어 있어서~ 이하면 0, ~ 이상이면 1 이렇게 되는거
+        - hidden layer 없이 unit step function을 activation으로 사용하면 퍼셉트론이라 함
+      - step3. 모델 학습 시키기
+        - 분류경계가 선형이 된다!, 경계가 선형이면 선형 분류
+      - step4. 모델 테스트 하기
+        - 3D로 표현되는 것 확인
+      - 기본적인 이분법의 환경에서는 정도라는것을 판단할 수 없으며, 0또는 1 처럼 맞다 아니다 만 판단가능하게됨
+        - 미분불가(gradient descent 못씀)
+        - 너무빡빡하게 분류함 
+    - unit step function을 조금 부드럽게 만들어보자 -> 이렇게 만든것이 sigmoid!
+      - 전구간 미분 가능(gradient descent 가능)
+      - 좀더 부드러운 분류가 가능
+      - 확률로도 해석 가능
+      - 가장 멈리 찢어 놓는 합리적인 분류 경계 선을 찾게 됨
 
-
+검정색 : unit step function을
+파란색 : sigmoid  
+<img width="682" height="300" alt="Image" src="https://github.com/user-attachments/assets/be037f14-b1e9-4d6d-b9e7-7192e27ee601" />
 
 
 
