@@ -718,6 +718,11 @@ for(int i = 0; i < 5; i++)
         - 테스트 때는 애네들을 평균내서 사용하자
       - Regularization
         - loss에 weight의 크기를 더해서 같이 고려하려 함
+        - Regularization은 모델의 Loss에 Weight의 크기를 추가하여 Weight가 너무 커지는 것을 방지하고 모델의 복잡도를 줄여 Overfitting을 막는 방법
+        - L1 : 크기에 상관없이 동일한 힘으로 줄임
+        - L2 : 작은 웨이트는 살살, 큰 웨이트는 강하게 줄임
+        - MAP(Maximum A Posteriori) : MAP를 최대화하는 것은 Likelihood 와 Posteriori를 동시에 고려하는 것
+
 
 
 
