@@ -1,6 +1,7 @@
 ###### Top
 
 - [AI기초공부](#ai기초공부)
+- [torch](#torch)
 
 <br/>
 <br/>
@@ -723,10 +724,165 @@ for(int i = 0; i < 5; i++)
         - L2 : 작은 웨이트는 살살, 큰 웨이트는 강하게 줄임
         - MAP(Maximum A Posteriori) : MAP를 최대화하는 것은 Likelihood 와 Posteriori를 동시에 고려하는 것
 
-
-
-
-
-
 ###### [AI기초공부](#ai기초공부)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# torch
+
+~~~py
+# 행렬에 대한 인덱싱과 슬라이싱
+A=torch.tensor([[1,2,3],[4,5,6],[7,8,9]])
+print(A[0]) # 하나만 쓰면 행에 대한 인덱싱 (리스트 속 리스트 생각)
+print(A[-1])
+print(A[1:])
+print(A[:])
+print(A[0][2])
+print(A[0,2]) # 2차원 행렬도 동일한데, 리스트와 달리 이런 것도 됨
+B=[[1,2,3,4], [5,6,7,8]]
+print(B)
+print(B[0][2])
+# print(B[0,2]) # error!
+print(A[1,:]) # 1 행, 전부
+print(A[1,0:3:2])
+print(A[:,2]) # 전부, 2번째 열
+print(A[:][2])
+
+tensor([1, 2, 3])
+tensor([7, 8, 9])
+tensor([[4, 5, 6],
+        [7, 8, 9]])
+tensor([[1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]])
+tensor(3)
+tensor(3)
+[[1, 2, 3, 4], [5, 6, 7, 8]]
+3
+tensor([4, 5, 6])
+tensor([4, 6])
+tensor([3, 6, 9])
+tensor([7, 8, 9])
+~~~
+
+<br/>
+
+~~~py
+# 3차원 행렬 인덱싱
+A=torch.tensor([ [[0,1,2,3],[4,5,6,7],[8,9,10,11]] ,
+                 [[12,13,14,15],[16,17,18,19],[20,21,22,23]] ])
+print(A)
+print(A.shape)
+print(A[0,1,2])
+
+a=torch.tensor([[[[[1,2,3,4]]]]]) # 대괄호가 하나 늘어나면 왼쪽에 shape 값이 추가 된다.
+print(a.shape)
+
+tensor([[[ 0,  1,  2,  3],
+         [ 4,  5,  6,  7],
+         [ 8,  9, 10, 11]],
+
+        [[12, 13, 14, 15],
+         [16, 17, 18, 19],
+         [20, 21, 22, 23]]])
+torch.Size([2, 3, 4])
+tensor(6)
+torch.Size([1, 1, 1, 1, 4])
+~~~
+
+<br/>
+
+~~~py
+A=torch.tensor([[1,2,3],[4,5,6],[7,8,9]])
+A[[0,1,1,0],[0,1,2,1],[3,3,2,1]]
+
+tensor([ 3, 19, 22,  5])
+~~~
+
+<br/>
+
+~~~py
+# tensor로 인덱싱
+a=torch.tensor([1,2,3,4,5])
+A=a[2]
+print(A)
+A=a[ torch.tensor(2) ] # torch.tensor를 안에다가?
+print(A)
+A=a[ torch.tensor([2,3,4]) ]
+print(A)
+A=a[ torch.tensor([[2,2,2],[3,3,3]]) ]
+print(A) # 인덱싱된 애들로 2행 3열짜리 행렬을 만든다
+
+a=torch.tensor([[1,2,3],[4,5,6]])
+print(a[ torch.tensor(0) ])
+A=a[ torch.tensor([[0,1],[1,1]]) ]
+print(A.shape) # 예를 들어, a[0] = tensor([1,2,3])과 같이 1차원 텐서이므로 한 차원이 뒤에 늘어나서 2,2, "3" 이 된다!
+print(A)
+
+# segmentation 결과 그림 보여줄 때 사용!
+b=torch.tensor([[225,255,0],[255,0,0],[0,0,255],[255,0,255],[70,80,75],[0,0,4],[60,100,255]])
+import matplotlib.pyplot as plt
+plt.imshow(b[ torch.tensor([[0,2],[1,2]]) ])
+
+tensor(3)
+tensor(3)
+tensor([3, 4, 5])
+tensor([[3, 3, 3],
+        [4, 4, 4]])
+tensor([1, 2, 3])
+torch.Size([2, 2, 3])
+tensor([[[1, 2, 3],
+         [4, 5, 6]],
+
+        [[4, 5, 6],
+         [4, 5, 6]]])
+~~~
+
+<br/>
+
+~~~py
+A=torch.tensor([[1,2,6],[3,4,7],[5,6,2],[7,8,9]])
+print(A)
+print(A.shape)
+
+# 1. A[몇 번째 행이냐, 몇 번째 열이냐]
+print(A[0,1])
+# 2-1. A[[몇 번째 행이냐,몇 번째 행이냐], [몇 번째 열이냐,몇 번째 열이냐]]
+print(A[ [0,2,3,1,2], [1,1,0,0,0] ])
+# 2-2. A[ [[몇 번째 행이냐], [몇 번째 행이냐]], [[몇 번째 열이냐], [몇 번째 열이냐]] ] => 결과가 행렬 형태가 되도록 인덱싱!
+print(A[  [[0, 2], [3, 1]],
+          [[0, 2], [1, 0]]  ])
+# 3. A[ tensor(bool) ] => A와 같은 shape을 가지는 tensor형 bool이 어디에 True를 가지고 있냐
+print(A[ torch.tensor([[False,True,True],[False,False,False],[False,False,True],[False,True,False]]) ])
+print(A[A==2]) # 마스킹같은 걸 할 수 있음
+# 4. A[몇 번째 값에 True가 있냐, 몇 번째 값에 True가 있냐]
+print(A[[True,False,False,False],[False,True,True]])
+# 5. A[ tensor ] => 몇 번째 것을 어떻게 쌓을거냐
+print(A[ torch.tensor([1,1,2,2,2]) ])
+
+tensor([[1, 2, 6],
+        [3, 4, 7],
+        [5, 6, 2],
+        [7, 8, 9]])
+torch.Size([4, 3])
+tensor(2)
+tensor([2, 6, 7, 3, 5])
+tensor([[1, 2],
+        [8, 3]])
+tensor([2, 6, 2, 8])
+tensor([2, 2])
+tensor([2, 6])
+tensor([[3, 4, 7],
+        [3, 4, 7],
+        [5, 6, 2],
+        [5, 6, 2],
+        [5, 6, 2]])
+~~~
+
+
+
+
+###### [torch](#torch)
 ###### [Top](#top)
