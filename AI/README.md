@@ -943,9 +943,144 @@ tensor([2.])
 
 # 간단한 인공신경망 만들기
 
+~~~py
+from torch import nn
 
+x=torch.tensor([1.])
+model=nn.Linear(1,1) # 입력 node 한 개, 출력 node 한 개인 layer 만듦
+print(model)
 
+print(model.weight) # 만들면서 initialize 함
+print(model.bias)
 
+y=model(x)
+print(y)
+
+y2 = x @ model.weight + model.bias # 식으로 나타내 본다면..
+print(y2)
+
+make_dot(y)
+
+Linear(in_features=1, out_features=1, bias=True)
+Parameter containing:
+tensor([[-0.4695]], requires_grad=True)
+Parameter containing:
+tensor([-0.6344], requires_grad=True)
+tensor([-1.1038], grad_fn=<ViewBackward0>)
+tensor([-1.1038], grad_fn=<AddBackward0>)
+~~~
+
+<br/>
+
+~~~py
+model = nn.Linear(2,3)
+# nn.Linear는 데이터의 shape의 마지막 차원이 '채'로(1D data) 들어오길 기대하는 녀석이다
+# 따라서, 데이터 여러 개를 통과시키고 싶다면 개x채 의 형태로 줘야 함 ('채x개'나 '개*채' 이런 식으로 말고!)
+x=torch.randn(5,2) # 개x채 => 두 개의 채널 값(키, 몸무게)을 가지는 데이터(사람) 5개
+
+print(x)
+print(model(x))
+
+x=torch.randn(4,5,2) # nn.Linear는 이거를 개x개x채로 들어왔다고 생각함
+print(model(x).shape)
+
+x=torch.randn(2,3,6,4,5,2)
+print(model(x).shape)
+
+make_dot(model(x))
+
+# 그렇다면 왜 웨이트 행렬에 T? weight 도 데이터와 마찬가지로 개x채 형태로 만들기 위함!
+# 예를 들어, nn.Linear(2,3) 이면 두 채널 값을 사용하는 세 '개'의 필터를 통과하는 것이라 3x2 가 된다!
+# 데이터의 개채는 두 채널 값을 가지는 다섯 개의 데이터 (5x2)
+# 웨이트의 개채는 두 채널 값을 이용하는 세 개의 필터 (3x2)
+
+tensor([[ 0.2603,  1.2173],
+        [-1.5334, -2.0263],
+        [ 1.0346,  0.8696],
+        [-2.0687, -1.8992],
+        [ 0.2093, -0.4394]])
+tensor([[-0.2741, -0.9419,  0.2326],
+        [-1.1221,  1.1860, -0.1862],
+        [-0.4308, -1.1708,  0.5043],
+        [-1.0476,  1.3889, -0.3682],
+        [-0.7661, -0.2641,  0.3021]], grad_fn=<AddmmBackward0>)
+torch.Size([4, 5, 3])
+torch.Size([2, 3, 6, 4, 5, 3])
+~~~
+
+<br/>
+
+~~~py
+fc1=nn.Linear(1,3)
+fc2=nn.Linear(3,1)
+
+x=torch.tensor([1.])
+x=fc1(x)
+print(x)
+x=fc2(x)
+print(x)
+
+model = nn.Sequential(fc1,fc2) # layer 풀칠
+x=torch.tensor([1.])
+print(model(x))
+
+make_dot(model(x)) # Sequential은 딱히 표시는 안 함
+
+tensor([ 1.0488, -0.1195,  0.3970], grad_fn=<ViewBackward0>)
+tensor([-0.7355], grad_fn=<ViewBackward0>)
+tensor([-0.7355], grad_fn=<ViewBackward0>)
+~~~
+
+<br/>
+
+  - 가장 기본적인 함수 형태! 꼭 기억해두기
+
+~~~py
+class MyModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.fc1 = nn.Linear(2,5)
+        self.fc2 = nn.Linear(5,10)
+        self.fc3 = nn.Linear(10,3)
+        self.act = nn.Sigmoid()
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.act(x)
+        x = self.fc2(x)
+        x = self.act(x)
+        x = self.fc3(x)
+        x = self.act(x)
+        return x
+
+model = MyModel()
+x = torch.randn(5,2)
+y = model(x) # model.forward(x) (nn.Module의 __call__에서 forward를 통과시킴) (__call__은 인스턴스()로 호출하는 메서드)
+print(y)
+
+make_dot(y)
+
+tensor([[0.4669, 0.3573, 0.6333],
+        [0.4682, 0.3555, 0.6330],
+        [0.4675, 0.3665, 0.6269],
+        [0.4678, 0.3555, 0.6334],
+        [0.4691, 0.3597, 0.6294]], grad_fn=<SigmoidBackward0>)
+~~~
+
+<br/>
+
+~~~py
+
+~~~
+
+<br/>
+
+~~~py
+
+~~~
+
+<br/>
 
 ###### [간단한 인공신경망 만들기](#간단한-인공신경망-만들기)
 ###### [Top](#top)
