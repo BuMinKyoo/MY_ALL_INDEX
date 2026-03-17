@@ -2,6 +2,7 @@
 
 - [AI기초공부](#ai기초공부)
 - [torch](#torch)
+- [간단한 인공신경망 만들기](#간단한-인공신경망-만들기)
 
 <br/>
 <br/>
@@ -881,8 +882,72 @@ tensor([[3, 4, 7],
         [5, 6, 2]])
 ~~~
 
+<br/>
 
+~~~py
+x=torch.tensor([1.])
+print(x)
+print(x.requires_grad)
 
+x.requires_grad=True
+print(x)
+print(x.requires_grad)
+
+tensor([1.])
+False
+tensor([1.], requires_grad=True)
+True
+~~~
+
+<br/>
+
+~~~py
+x=torch.tensor([1.], requires_grad=True)
+y=x**2
+print(y)
+# y.retain_grad() # 이걸 하면 y.grad도 볼 수 있다
+
+z=3*y
+print(z) # MulBackward0 가 붙어있다!
+
+z.backward()
+print(x.grad) # chain rule로 알아냄
+# print(y.grad) # warning! 중간건 안된다
+
+tensor([1.], grad_fn=<PowBackward0>)
+tensor([3.], grad_fn=<MulBackward0>)
+tensor([6.])
+~~~
+
+<br/>
+
+~~~py
+x=torch.tensor([1.],requires_grad=True)
+y=torch.tensor([1.],requires_grad=True)
+z= 2*x**2 + y**2
+print(z)
+z.backward()
+print(x.grad)
+print(y.grad)
+
+tensor([3.], grad_fn=<AddBackward0>)
+tensor([4.])
+tensor([2.])
+~~~
 
 ###### [torch](#torch)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# 간단한 인공신경망 만들기
+
+
+
+
+
+###### [간단한 인공신경망 만들기](#간단한-인공신경망-만들기)
+###### [Top](#top)
+
+
