@@ -3,6 +3,7 @@
 - [AI기초공부](#ai기초공부)
 - [torch](#torch)
 - [간단한 인공신경망 만들기](#간단한-인공신경망-만들기)
+- [선형회기방법](#선형회기방법)
 
 <br/>
 <br/>
@@ -1068,21 +1069,51 @@ tensor([[0.4669, 0.3573, 0.6333],
         [0.4691, 0.3597, 0.6294]], grad_fn=<SigmoidBackward0>)
 ~~~
 
-<br/>
-
-~~~py
-
-~~~
-
-<br/>
-
-~~~py
-
-~~~
-
-<br/>
-
 ###### [간단한 인공신경망 만들기](#간단한-인공신경망-만들기)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# 선형회기방법
+  - 각각 100개씩의 a,b를 하나하나 대입하여 돌려봄
+  - 그 후 각각 5사람의 오차제곱을 다 합하고 평균을 구함 그 평균이 가장 작은 데이터를 찾음(즉, 모든 사람의 오차를 더했을때 a,b가 가장 작은 지점)
+
+~~~py
+import torch
+import matplotlib.pyplot as plt
+
+x = torch.tensor([150, 160, 170, 175, 185.]) # 키
+y = torch.tensor([55, 70, 64, 80, 75.]) # 몸무게
+N = len(x)
+
+# a,b 를 바꿔가면서 Loss 값을 일일히 구해서 가장 작아지게 하는 a,b를 선정
+
+a = 0.5 + torch.linspace(-0.2,0.2,100)
+b = -30 + torch.linspace(-20,20,100)
+
+L=torch.zeros(len(a),len(b))
+for i in range(len(a)):
+    for j in range(len(b)):
+        for n in range(N):
+            L[i,j] = L[i,j] + (y[n] - (a[i]*x[n]+b[j]))**2
+L = L/N # MSE
+
+plt.figure(figsize=[10, 9])
+ax = plt.axes(projection="3d")
+A, B = torch.meshgrid(a,b)
+ax.plot_surface(A,B,L);
+ax.set_xlabel('a'); ax.set_ylabel('b')
+ax.set_zlim([0, 1000])
+
+plt.figure()
+plt.contour(b,a,L,30) # 첫 번째 인자가 가로 축, 두 번째 인자가 세로 축이라서
+plt.xlabel('b'); plt.ylabel('a'); plt.grid()
+~~~
+
+###### [선형회기방법](#선형회기방법)
+###### [Top](#top)
+
+
 
 
