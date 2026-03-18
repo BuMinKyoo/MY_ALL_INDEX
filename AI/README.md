@@ -4,6 +4,7 @@
 - [torch](#torch)
 - [간단한 인공신경망 만들기](#간단한-인공신경망-만들기)
 - [선형회기방법](#선형회기방법)
+- [Gradient descent(경사하강법)](#gradient-descent경사하강법)
 
 <br/>
 <br/>
@@ -1113,6 +1114,79 @@ plt.xlabel('b'); plt.ylabel('a'); plt.grid()
 
 ###### [선형회기방법](#선형회기방법)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# Gradient descent(경사하강법)
+  -  a.grad = torch.tensor([0.]) # gradient , b.grad = torch.tensor([0.]) # gradient 를해주는 이유는 PyTorch의 특징 중 하나는 loss.backward()를 호출할 때마다 계산된 기울기(Gradient) 값을 기존의 a.grad와 b.grad에 더해버리는(Accumulate) 성질이 있기 때문에
+
+~~~py
+import torch
+import matplotlib.pyplot as plt
+
+x = torch.tensor([150, 160, 170, 175, 185.]) # 키
+y = torch.tensor([55, 70, 64, 80, 75.]) # 몸무게
+N = len(x)
+
+# 모델 파라미터 초기화
+a = torch.tensor([0.45], requires_grad=True)
+b = torch.tensor([-35.], requires_grad=True)
+
+# 하이퍼파라미터 설정
+LR = 3e-6
+EPOCH = 20
+
+loss_history = []
+
+for ep in range(EPOCH):
+    # inference
+    y_hat = a * x + b
+    # loss
+    loss = 0
+    for n in range(N):
+        loss += (y[n] - y_hat[n])**2
+    loss = loss/N # MSE
+    # update
+    loss.backward() # backpropagation
+    with torch.no_grad():
+        a -= LR * a.grad # weight update
+        b -= LR * b.grad # weight update
+    a.grad = torch.tensor([0.]) # gradient 초기화
+    b.grad = torch.tensor([0.]) # gradient 초기화
+
+
+    
+    # print loss
+    loss_history += [loss.item()]
+    print(f"Epoch: {ep+1}, train loss: {loss.item():.4f}")
+    # print weight and bias
+    print(f"Weight: {a.item():.4f}, Bias: {b.item():.4f}")
+
+
+    # plot graph
+    x_plot = torch.linspace(145, 190, 100)
+    y_plot = a.detach() * x_plot + b.detach()
+    plt.figure()
+    plt.plot(x, y, 'o')
+    plt.plot(x_plot, y_plot, 'r')
+    plt.title(f"Epoch {ep+1}")
+    plt.show()
+
+    print("-"*20)
+~~~
+
+###### [Gradient descent(경사하강법)](#gradient-descent경사하강법)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
 
 
 
