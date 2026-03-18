@@ -6,6 +6,7 @@
 - [선형회기방법](#선형회기방법)
 - [Gradient descent(경사하강법)](#gradient-descent경사하강법)
 - [Binary Classification(이진분류)](#binary-classification이진분류)
+- [multiclass classification(다중분류)](#multiclass-classification다중분류)
 
 <br/>
 <br/>
@@ -1330,15 +1331,26 @@ plt.ylabel("x2")
 ###### [Binary Classification(이진분류)](#binary-classification이진분류)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
+# multiclass classification(다중분류)
+  - Dataset은 전체 데이터를 보관하는 창고라면, DataLoader는 그 창고에서 데이터를 일정량씩 꺼내주는 컨베이어 벨트
 
+~~~py
+transform = transforms.ToTensor()
 
+# root를 './data'로 변경하여 현재 작업 폴더 하위에 저장
+train_DS = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+test_DS = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 
+BATCH_SIZE = 32
+train_DL = torch.utils.data.DataLoader(train_DS, batch_size=BATCH_SIZE, shuffle=True)
+test_DL = torch.utils.data.DataLoader(test_DS, batch_size=BATCH_SIZE, shuffle=True)
+~~~
 
-
-
-
-
+###### [multiclass classification(다중분류)](#multiclass-classification다중분류)
+###### [Top](#top)
 
 
 
