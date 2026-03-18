@@ -5,6 +5,7 @@
 - [간단한 인공신경망 만들기](#간단한-인공신경망-만들기)
 - [선형회기방법](#선형회기방법)
 - [Gradient descent(경사하강법)](#gradient-descent경사하강법)
+- [Binary Classification(이진분류)](#binary-classification이진분류)
 
 <br/>
 <br/>
@@ -1208,6 +1209,128 @@ for ep in range(EPOCH):
 
 ###### [Gradient descent(경사하강법)](#gradient-descent경사하강법)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# Binary Classification(이진분류)
+
+~~~py
+N=20
+random0=torch.randn(int(N/2),1)
+random5=torch.randn(int(N/2),1)+5
+class1_data=torch.hstack([random0,random5])
+class2_data=torch.hstack([random5,random0])
+class1_label=torch.ones(int(N/2),1)
+class2_label=torch.zeros(int(N/2),1)
+X=torch.vstack([class1_data,class2_data])
+y=torch.vstack([class1_label,class2_label])
+
+from torch import nn
+
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        # case 1, plain
+        self.linear = nn.Sequential(nn.Linear(2, 100), # 10,100,1000,10000 으로 바꿔보면서서 확인
+                                    nn.Sigmoid(),
+                                    nn.Linear(100, 1), # node가 많을수록 좋게 나옴
+                                    nn.Sigmoid())
+
+    def forward(self, x):
+        x = self.linear(x)
+        return x
+
+model = MLP()
+print(model)
+
+model.eval()
+with torch.no_grad():
+    print(model(torch.randn(5,2)).shape) # 2개 값으로 이루어진 좌표값 (x1,x2) 데이터 5개를 입력함
+
+from torch import optim
+# !pip install torchviz # 내 필기용
+# from torchviz import make_dot # 내 필기용
+
+LR = 1e-1 # case 1
+# LR = 1e-2 # case 2, plain 에서 노드 천 개, deep
+# LR = 1e-4 # case 2, very deep relu
+EPOCH = 100 # case 1
+# EPOCH = 500 # case 2, plain 에서 노드 천 개, deep, very deep relu
+
+optimizer = optim.SGD(model.parameters(), lr=LR)
+# optimizer = optim.Adam(model.parameters(), lr=LR) # case 1, deep
+# optimizer = optim.Adam(model.parameters(), lr=LR, eps=0, betas=(0.9, 0.99)) # 내 필기용
+# optimizer = optim.Adam(model.parameters(), lr=LR, eps=1e-12, betas=(0.1, 0.1)) # 내 필기용
+criterion = nn.BCELoss()
+
+loss_history=[]
+grad_history=[] # 내 필기용
+update_size_history=[] # 내 필기용
+
+model.train() # train mode로 전환
+for ep in range(EPOCH):
+    # inference
+    y_hat = model(X)
+    # loss
+    loss = criterion(y_hat, y)
+    # prev weights # 내 필기용
+    # prev=model.linear[0].weight.detach().clone() # 내 필기용
+    # update
+    optimizer.zero_grad() # gradient 누적을 막기 위한 초기화
+    loss.backward() # backpropagation
+    optimizer.step() # weight update
+    # update amount # 내 필기용
+    # grad_history += [ torch.sum(torch.abs( model.linear[0].weight.grad )).item() ] # 내 필기용
+    # update_size_history += [ torch.sum(torch.abs( model.linear[0].weight.detach() - prev)).item() ] # 내 필기용
+    # print loss
+    loss_history += [loss.item()]
+    print(f"Epoch: {ep+1}, train loss: {loss.item():.4f}")
+    print("-"*20)
+~~~
+
+<br/>
+
+  - 모델 테스트 하기
+~~~py
+# from matplotlib.colors import LightSource # 내 필기용
+
+x1_test=torch.linspace(-10,10,30) # case 1
+x2_test=torch.linspace(-10,10,30) # case 1
+# x1_test=torch.linspace(-2,2,30) # case 2
+# x2_test=torch.linspace(-2,2,30) # case 2
+X1_test, X2_test=torch.meshgrid(x1_test,x2_test)
+X_test=torch.cat([X1_test.unsqueeze(dim=2), X2_test.unsqueeze(dim=2)], dim=2)
+
+model.eval() # test mode로 # 1. 해결
+with torch.no_grad(): # 2. 해결
+    y_hat=model(X_test)
+# 1. dropout 혹은 BN 같은거 사용했다면 train mode와 test mode 동작이 다르므로 eval()로 mode를 바꿔줘야
+# 2. grad_fn 계산 <- 메모리가 불필요하게 쓰인다
+Y_hat = y_hat.squeeze()
+
+# print(model.training)
+# model.train()
+# print(model.training)
+
+plt.figure(figsize=[10, 9]) # figsize=[가로, 세로]
+ax = plt.axes(projection="3d")
+ax.view_init(elev=25,azim=-140)
+# ls = LightSource(azdeg=45, altdeg=30) # 내 필기용
+# rgb = ls.shade(Y_hat.numpy(), plt.cm.RdYlBu) # 내 필기용
+# ax.plot_surface(X1_test,X2_test,Y_hat.numpy(), facecolors=rgb, alpha=0.2) # 내 필기용
+ax.plot_surface(X1_test,X2_test,Y_hat.numpy(), cmap="viridis", alpha=0.2)
+plt.plot(class1_data[:,0], class1_data[:,1], class1_label,'bo')
+plt.plot(class2_data[:,0], class2_data[:,1], class2_label,'ro')
+plt.xlabel("x1")
+plt.ylabel("x2")
+~~~
+
+###### [Binary Classification(이진분류)](#binary-classification이진분류)
+###### [Top](#top)
+
+
 
 
 
