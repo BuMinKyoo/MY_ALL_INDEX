@@ -1176,6 +1176,36 @@ for ep in range(EPOCH):
     print("-"*20)
 ~~~
 
+<br/>
+
+~~~py
+from torch import nn, optim
+
+x=x.reshape(-1,1) # 개채 형태로 바꿔줌
+y=y.reshape(-1,1) # x와 같은 형태로 바꿔줌 (MSELoss, BCELoss 는 y의 shape이 x의 shape과 같아야)
+
+model=nn.Linear(1,1)
+model.weight.data = torch.tensor([[0.45]])
+model.bias.data = torch.tensor([-35.])
+
+LR = 3e-6
+EPOCH = 20
+optimizer = optim.SGD(model.parameters(), lr=LR)
+criterion = nn.MSELoss()
+
+loss_history=[]
+
+for ep in range(EPOCH):
+    # inference
+    y_hat = model(x)
+    # loss
+    loss = criterion(y_hat,y)
+    # update
+    optimizer.zero_grad() # gradient 누적을 막기 위한 초기화
+    loss.backward() # backpropagation
+    optimizer.step() # weight update
+~~~
+
 ###### [Gradient descent(경사하강법)](#gradient-descent경사하강법)
 ###### [Top](#top)
 
