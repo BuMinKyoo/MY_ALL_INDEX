@@ -1349,6 +1349,40 @@ train_DL = torch.utils.data.DataLoader(train_DS, batch_size=BATCH_SIZE, shuffle=
 test_DL = torch.utils.data.DataLoader(test_DS, batch_size=BATCH_SIZE, shuffle=True)
 ~~~
 
+<br/>
+
+  - 모델 만들기
+~~~py
+from torch import nn
+
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fcs = nn.Sequential(nn.Linear(28*28, 100),
+                                 nn.ReLU(),
+                                 nn.Linear(100, 10))
+    def forward(self, x):
+        x = torch.flatten(x, start_dim=1)
+        x = self.fcs(x)
+        return x
+
+# flatten 확인
+x_batch, _ = next(iter(train_DL))
+print(x_batch.shape)
+flat_images = torch.flatten(x_batch)
+print(flat_images.shape)
+flat_images2 = torch.flatten(x_batch, start_dim=1)
+print(flat_images2.shape)
+
+
+ㅡㅡㅡㅡ
+torch.Size([32, 1, 28, 28])
+torch.Size([25088])
+torch.Size([32, 784])
+~~~
+
+
+
 ###### [multiclass classification(다중분류)](#multiclass-classification다중분류)
 ###### [Top](#top)
 
