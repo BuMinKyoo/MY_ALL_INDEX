@@ -131,7 +131,10 @@
 - [리버싱](#리버싱)
 - [DB연결](#db연결)
 - [영상데이터](#영상데이터)
+- [프로메테우스(Prometheus),그라파나(Grafana)](#프로메테우스prometheus그라파나grafana)
 
+
+프로메테우스(Prometheus)와 그라파나(Grafana)
 ###### [Basic](#basic)
 ###### [Top](#top)
 
@@ -3147,6 +3150,110 @@ A. MFC (Microsoft Foundation Classes)는 Microsoft가 제공하는 C++ 클래스
 ###### [영상데이터](#영상데이터)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# 프로메테우스(Prometheus),그라파나(Grafana)
+  - 현대 소프트웨어 아키텍처에서 시스템의 건강 상태를 실시간으로 확인하고 모니터링하는 데 있어 사실상 업계 표준(De facto)으로 자리 잡은 오픈소스 조합
+  - 프로메테우스의 가장 큰 특징은 시계열 데이터베이스(TSDB)와 Pull(가져오기) 방식의 아키텍처
+  - 일반적인 로그 수집기들은 각 프로그램이 알아서 중앙 서버로 데이터를 쏘아 보내는 Push 방식을 써. 하지만 프로메테우스는 반대로 자기가 주기적으로(예: 10초마다) 각 프로그램이나 서버를 찾아가서 상태 데이터를 긁어옴
+  - 이 방식의 엄청난 장점은 타겟 서버가 죽어서 응답을 안 하면, 프로메테우스가 바로 "아, 쟤 죽었구나" 하고 즉각적인 헬스 체크(Health Check)를 할 수 있다는 거
+  - 시계열 데이터 (Time-Series Data) "오전 11시 01분에 CPU 45%", "11시 02분에 CPU 48%"처럼 오직 시간과 그 시간에 해당하는 수치(Metric) 값만을 저장하는 데 극도로 최적화되어 있어. 텍스트로 된 긴 에러 로그를 저장하는 용도가 아니라, 숫자로 된 통계 수치를 저장하는 창고
+  - 그라파나(Grafana)는 그걸 가져오는 시각적 툴로 생각하면 됨
+
+<br/>
+
+  - 1.백그라운드 서버 구동: metricServer.Start()가 호출되면, 콘솔의 메인 흐름(엔터키 입력 대기)을 멈추지 않고 내부적으로 아주 가벼운 웹 서버가 1234번 포트를 열고 대기
+  - 2.지표 갱신: Task.Run()으로 돌려놓은 가상의 시뮬레이션 루프가 2초마다 변수(Counter, Gauge)의 숫자를 올리거나 내림
+  - 3.외부 노출: 프로그램이 돌아가는 중에 웹 브라우저로 http://localhost:1234/metrics 에 접속해 보면, 시뮬레이션 루프가 변경해 놓은 최신 숫자 값들이 텍스트로 딱 찍혀 나오는 걸 볼 수 있음. 페이지를 새로고침 할 때마다 누적 프레임 수(cctv_processed_frames_total)가 계속 올라감
+  - 4.이걸 프로메테우스가 퍼가는 방식임
+  - 5.데이터 로그도 작은 서버에 실시간으로 업뎃을 하고, 프로메테우스로 실시간으로 데이터를 가져가기 때문에 로그가 재갱신되는 시간이 빠르면 프로메테우스가 가지가지 못한채 지나가는 데이터가 있을수도 있음, 따라서 실무에서는 절대 지나치면 안되는 log는 다른 방식으로 행해야함, ELK같은 log수집기를 이용함
+
+~~~C#
+using Prometheus;
+using System;
+using System.Diagnostics.Metrics;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        // 1. 수집할 메트릭(지표) 정의
+        // Counter: 계속 증가만 하는 값 (예: 누적 처리 프레임 수)
+        private static readonly Counter ProcessedFramesCounter = Metrics.CreateCounter(
+            "cctv_processed_frames_total",
+            "Total number of processed video frames.");
+
+        // Gauge: 오르락내리락 할 수 있는 값 (예: 현재 연결된 카메라 대수)
+        private static readonly Gauge ConnectedCamerasGauge = Metrics.CreateGauge(
+            "cctv_connected_cameras_current",
+            "Current number of connected CCTV cameras.");
+
+        static void Main(string[] args)
+        {
+            // 2. 메트릭 서버 구동 (포트 1234번)
+            var metricServer = new MetricServer(port: 1234);
+            metricServer.Start();
+
+            Console.WriteLine("메트릭 서버가 시작되었습니다.");
+            Console.WriteLine("웹 브라우저를 열고 http://localhost:1234/metrics 에 접속해보세요.");
+            Console.WriteLine("===============================================================");
+
+            // 초기 카메라 대수 세팅
+            ConnectedCamerasGauge.Set(16);
+
+            // 3. 백그라운드에서 데이터가 변하는 상황 시뮬레이션
+            CancellationTokenSource cts = new CancellationTokenSource();
+            Task simulationTask = Task.Run(() => SimulateCctvOperations(cts.Token));
+
+            // 메인 스레드는 콘솔 입력을 대기하며 프로그램 유지
+            Console.WriteLine("프로그램을 종료하려면 엔터 키를 누르세요...");
+            Console.ReadLine();
+
+            // 4. 프로그램 종료 시 자원 정리
+            cts.Cancel();
+            metricServer.Stop();
+            Console.WriteLine("메트릭 서버가 안전하게 종료되었습니다.");
+        }
+
+        // CCTV 동작을 흉내내는 가상의 루프 함수
+        static void SimulateCctvOperations(CancellationToken token)
+        {
+            Random rand = new Random();
+
+            while (!token.IsCancellationRequested)
+            {
+                // 프레임 처리 누적 카운트 증가 (매번 10~30 프레임씩 처리했다고 가정)
+                int frames = rand.Next(10, 30);
+                ProcessedFramesCounter.Inc(frames);
+
+                // 가끔 랜덤하게 카메라가 끊기거나 복구되는 상황 연출
+                int chance = rand.Next(0, 100);
+                if (chance < 10) // 10% 확률로 카메라 1대 끊김
+                {
+                    ConnectedCamerasGauge.Dec();
+                    Console.WriteLine($"[알림] 카메라 연결 끊김! 현재 연결 대수: {ConnectedCamerasGauge.Value}");
+                }
+                else if (chance > 90 && ConnectedCamerasGauge.Value < 16) // 10% 확률로 카메라 복구
+                {
+                    ConnectedCamerasGauge.Inc();
+                    Console.WriteLine($"[알림] 카메라 연결 복구! 현재 연결 대수: {ConnectedCamerasGauge.Value}");
+                }
+
+                // 2초마다 상태 업데이트
+                Thread.Sleep(2000);
+            }
+        }
+    }
+}
+~~~
+
+###### [프로메테우스(Prometheus),그라파나(Grafana)](#프로메테우스prometheus그라파나grafana)
+###### [Top](#top)
 
 
 
