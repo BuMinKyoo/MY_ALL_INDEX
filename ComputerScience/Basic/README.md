@@ -132,6 +132,7 @@
 - [DB연결](#db연결)
 - [영상데이터](#영상데이터)
 - [프로메테우스(Prometheus),그라파나(Grafana)](#프로메테우스prometheus그라파나grafana)
+- [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
 
 
 프로메테우스(Prometheus)와 그라파나(Grafana)
@@ -3259,6 +3260,27 @@ namespace ConsoleApp1
 
 ###### [프로메테우스(Prometheus),그라파나(Grafana)](#프로메테우스prometheus그라파나grafana)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# RabbitMQ,Apache Kafka,Amazon SQS
+
+| 구분 | RabbitMQ | Apache Kafka | Amazon SQS |
+| :--- | :--- | :--- | :--- |
+| **핵심 용도** | 복잡한 메시지 라우팅 & 실시간 명령 | 대용량 데이터 스트리밍 & 로그 파이프라인 | 클라우드 환경의 심플한 작업 대기열 |
+| **운영 환경** | On-Premise / Cloud (직접 설치) | On-Premise / Cloud (직접 설치) | AWS 전용 (완전 관리형 SaaS) |
+| **데이터 보존** | 소비 후 삭제 (기본값) | 소비 후에도 디스크 보존 (Replay 가능) | 소비 후 삭제 (최대 14일 보관 가능) |
+| **처리량(Throughput)** | 높음 (~수만 msg/sec) | 매우 높음 (~수백만 msg/sec) | 무제한 (AWS가 자동 확장) |
+| **라우팅 기능** | 매우 강력함 (Exchange 활용) | 단순함 (Topic 기반 분리) | 없음 (SNS와 조합 필요) |
+| **C# 라이브러리** | `RabbitMQ.Client` | `Confluent.Kafka` | `AWSSDK.SQS` |
+
+###### [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
+###### [Top](#top)
+
+
 
 
 
