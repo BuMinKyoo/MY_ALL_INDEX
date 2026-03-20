@@ -1347,12 +1347,9 @@ test_DS = datasets.MNIST(root='./data', train=False, download=True, transform=tr
 BATCH_SIZE = 32
 train_DL = torch.utils.data.DataLoader(train_DS, batch_size=BATCH_SIZE, shuffle=True)
 test_DL = torch.utils.data.DataLoader(test_DS, batch_size=BATCH_SIZE, shuffle=True)
-~~~
 
-<br/>
 
-  - 모델 만들기
-~~~py
+# 모델만들기
 from torch import nn
 
 class MLP(nn.Module):
@@ -1381,6 +1378,50 @@ torch.Size([25088])
 torch.Size([32, 784])
 ~~~
 
+<br/>
+
+  - 모델 훈련시키기
+
+~~~py
+from torch import optim
+
+LR = 1e-3
+EPOCH = 5
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=LR)
+
+def Train(model, train_DL, criterion, optimizer, EPOCH):
+
+    loss_history=[]
+    NoT=len(train_DL.dataset) # The number of training data
+
+    model.train() # train mode로 전환
+    for ep in range(EPOCH):
+        rloss = 0 # running loss
+        for x_batch, y_batch in train_DL:
+            x_batch = x_batch.to(DEVICE)
+            y_batch = y_batch.to(DEVICE)
+            # inference
+            y_hat = model(x_batch)
+            # loss
+            loss = criterion(y_hat, y_batch)
+            # update
+            optimizer.zero_grad() # gradient 누적을 막기 위한 초기화
+            loss.backward() # backpropagation
+            optimizer.step() # weight update
+
+
+            # loss accumulation
+            loss_b = loss.item() * x_batch.shape[0] # batch loss # BATCH_SIZE를 곱하면 마지막 18개도 32개를 곱하니까..
+            rloss += loss_b # running loss
+        # print loss
+        loss_e = rloss/NoT # epoch loss
+        loss_history += [loss_e]
+        print(f"Epoch: {ep+1}, train loss: {loss_e:.3f}")
+        print("-"*20)
+
+    return loss_history
+~~~
 
 
 ###### [multiclass classification(다중분류)](#multiclass-classification다중분류)
