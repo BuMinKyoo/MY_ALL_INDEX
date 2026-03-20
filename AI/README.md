@@ -7,6 +7,9 @@
 - [Gradient descent(경사하강법)](#gradient-descent경사하강법)
 - [Binary Classification(이진분류)](#binary-classification이진분류)
 - [multiclass classification(다중분류)](#multiclass-classification다중분류)
+- [transforms.ToTensor()](#transformstotensor)
+
+
 
 <br/>
 <br/>
@@ -735,6 +738,8 @@ for(int i = 0; i < 5; i++)
 <br/>
 <br/>
 
+***
+
 # torch
 
 ~~~py
@@ -945,6 +950,8 @@ tensor([2.])
 <br/>
 <br/>
 
+***
+
 # 간단한 인공신경망 만들기
 
 ~~~py
@@ -1078,6 +1085,8 @@ tensor([[0.4669, 0.3573, 0.6333],
 <br/>
 <br/>
 
+***
+
 # 선형회기방법
   - 각각 100개씩의 a,b를 하나하나 대입하여 돌려봄
   - 그 후 각각 5사람의 오차제곱을 다 합하고 평균을 구함 그 평균이 가장 작은 데이터를 찾음(즉, 모든 사람의 오차를 더했을때 a,b가 가장 작은 지점)
@@ -1119,6 +1128,8 @@ plt.xlabel('b'); plt.ylabel('a'); plt.grid()
 
 <br/>
 <br/>
+
+***
 
 # Gradient descent(경사하강법)
   -  a.grad = torch.tensor([0.]) # gradient , b.grad = torch.tensor([0.]) # gradient 를해주는 이유는 PyTorch의 특징 중 하나는 loss.backward()를 호출할 때마다 계산된 기울기(Gradient) 값을 기존의 a.grad와 b.grad에 더해버리는(Accumulate) 성질이 있기 때문에
@@ -1213,6 +1224,8 @@ for ep in range(EPOCH):
 
 <br/>
 <br/>
+
+***
 
 # Binary Classification(이진분류)
 
@@ -1333,6 +1346,8 @@ plt.ylabel("x2")
 
 <br/>
 <br/>
+
+***
 
 # multiclass classification(다중분류)
   - Dataset은 전체 데이터를 보관하는 창고라면, DataLoader는 그 창고에서 데이터를 일정량씩 꺼내주는 컨베이어 벨트
@@ -1513,6 +1528,25 @@ def Test_plot(model, test_DL):
 ###### [multiclass classification(다중분류)](#multiclass-classification다중분류)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# transforms.ToTensor()
+  - Numpy의 방식: 개·행·열·채 (NHWC)
+    - 코드 출력: (50000, 32, 32, 3)
+  - PyTorch의 방식: 개·채·행·열 (NCHW)
+    - 코드 출력: (50000, 3, 32, 32)
+  - 인공지능의 합성곱(Convolution) 연산은 빨간색 필터는 빨간색 채널끼리, 파란색은 파란색끼리 따로따로 곱셈을 엄청나게 수행합니다. GPU(NVIDIA cuDNN) 입장에서는 같은 채널의 데이터가 메모리상에 연속으로 모여 있어야(Memory Contiguous) 캐시(Cache) 효율이 극대화되어 연산 속도가 미친 듯이 빨라진다
+
+###### [transforms.ToTensor()](#transformstotensor)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
 
 
 
