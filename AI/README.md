@@ -1381,6 +1381,7 @@ torch.Size([32, 784])
 <br/>
 
   - 모델 훈련시키기
+    - 확률로 바꿔주는 Softmax(소프트맥스) 함수는 criterion = nn.CrossEntropyLoss() 안에 포함이 되어 있음, 따라서 따로 적용해 줄 필요가 없음
 
 ~~~py
 from torch import optim
@@ -1421,6 +1422,67 @@ def Train(model, train_DL, criterion, optimizer, EPOCH):
         print("-"*20)
 
     return loss_history
+
+loss_history = Train(model, train_DL, criterion, optimizer, EPOCH)
+
+plt.plot(range(1,EPOCH+1),loss_history)
+plt.xlabel("Epoch")
+plt.ylabel("loss")
+plt.title("Train Loss")
+plt.grid()
+~~~
+
+<br/>
+
+  - cross entropy 구하는 여러가지 방법
+
+~~~py
+# cross entropy 구하는 여러가지 방법
+import torch.nn.functional as F
+
+y_hat = torch.randn(3, 5) # data는 세 개, 5 종류로 분류하는 문제 가정
+print(y_hat) # 가로 축으로 합이 1이 아님, 즉, softmax 통과 전
+y_batch = torch.randint(5, (3,))
+print(y_batch)
+
+# 방법 1
+loss = F.cross_entropy(y_hat, y_batch) # softmax가 내장
+print(loss)
+
+# 방법 2
+criterion = nn.CrossEntropyLoss() # softmax가 내장
+print(criterion(y_hat,y_batch))
+
+# 방법 3
+soft = nn.Softmax(dim=1)
+y_hat_soft = soft(y_hat)
+print(y_hat_soft)
+loss = 0
+for i, val in enumerate(y_hat_soft):
+    print(i,val)
+    loss += -torch.log(val[y_batch[i]])
+print(loss/3) # 평균이 내장되어있음을 알 수 있다
+~~~
+
+<br/>
+
+~~~py
+def Test(model, test_DL):
+    model.eval() # test mode로 전환
+    with torch.no_grad():
+        rcorrect = 0
+        for x_batch, y_batch in test_DL:
+            x_batch = x_batch.to(DEVICE)
+            y_batch = y_batch.to(DEVICE)
+            # inference
+            y_hat = model(x_batch)
+            # corrects accumulation
+            pred = y_hat.argmax(dim=1)
+            corrects_b = torch.sum(pred == y_batch).item() # torch.eq(pred, y_batch).sum().item()
+            rcorrect += corrects_b
+        accuracy_e = rcorrect/len(test_DL.dataset)*100
+    print(f"Test accuracy: {rcorrect}/{len(test_DL.dataset)} ({accuracy_e:.1f} %)")
+    return round(accuracy_e,1)
 ~~~
 
 
