@@ -1466,6 +1466,8 @@ print(loss/3) # 평균이 내장되어있음을 알 수 있다
 
 <br/>
 
+  - 모델 테스트하기
+
 ~~~py
 def Test(model, test_DL):
     model.eval() # test mode로 전환
@@ -1483,6 +1485,28 @@ def Test(model, test_DL):
         accuracy_e = rcorrect/len(test_DL.dataset)*100
     print(f"Test accuracy: {rcorrect}/{len(test_DL.dataset)} ({accuracy_e:.1f} %)")
     return round(accuracy_e,1)
+
+ㅡㅡㅡㅡㅡㅡㅡ
+
+def Test_plot(model, test_DL):
+    model.eval()
+    with torch.no_grad():
+        x_batch, y_batch = next(iter(test_DL))
+        x_batch = x_batch.to(DEVICE)
+        y_hat = model(x_batch)
+        pred = y_hat.argmax(dim=1)
+
+    x_batch = x_batch.to("cpu")
+    # print(x_batch.shape)
+
+    plt.figure(figsize=(8,4))
+    for idx in range(6):
+        plt.subplot(2,3, idx+1, xticks=[], yticks=[])
+        plt.imshow(x_batch[idx].permute(1,2,0), cmap="gray")
+        pred_class = test_DL.dataset.classes[pred[idx]]
+        true_class = test_DL.dataset.classes[y_batch[idx]]
+        plt.title(f"{pred_class} ({true_class})", color = "g" if pred_class==true_class else "r")
+
 ~~~
 
 
