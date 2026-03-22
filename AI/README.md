@@ -9,6 +9,8 @@
   - [Binary Classification(이진분류)](#binary-classification이진분류)
   - [multiclass classification(다중분류)](#multiclass-classification다중분류)
   - [transforms.ToTensor()](#transformstotensor)
+- [CNN](#cnn)
+  - [CNN기초이론](#cnn기초이론)
 
 
 
@@ -1550,6 +1552,27 @@ def Test_plot(model, test_DL):
 
 ***
 
+# CNN
+  - [CNN기초이론](#cnn기초이론)
 
 
 
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+
+# CNN기초이론
+  - MLP에서 CNN이 나온 배경
+    - MLP는 입력 데이터를 무조건 1차원 배열(한 줄로 늘어선 형태)로만 받을 수 있음. 따라서 공간 정보가 완전히 박살난다. 그러한 공간 구조를 전혀 이해하지 못한다는 단점
+    - MLP는 데이터를 1차원 배열로 넣어야 하기 때문에, 예를 들어 1920 x 1080해상도를 1차원으로 펴면 약200만개의 입력 노드가 생김. 따라서 은닉층을 조금이라도 만들면 가중치(W), 바이어스(B)가 엄청 많아짐.
+      - 연산량이 엄청 많아짐
+      - 가중치가 너무 많아서 쓸데없는 노이즈까지 다 외워버림, 즉 과적합(Overfitting) 해버림
+  - CNN?
+    - 
+
+
+###### [CNN](#CNN)
+###### [Top](#top)
