@@ -133,6 +133,8 @@
 - [영상데이터](#영상데이터)
 - [프로메테우스(Prometheus),그라파나(Grafana)](#프로메테우스prometheus그라파나grafana)
 - [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
+- [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
+- [Kubernetes,Kafka,Vertica,databricks](#kuberneteskafkaverticadatabricks)
 
 
 프로메테우스(Prometheus)와 그라파나(Grafana)
@@ -3296,8 +3298,15 @@ namespace ConsoleApp1
 ###### [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# Kubernetes,Kafka,Vertica,databricks
 
 
 
 
-
+###### [Kubernetes,Kafka,Vertica,databricks](#kuberneteskafkaverticadatabricks)
+###### [Top](#top)
