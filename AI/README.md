@@ -1601,8 +1601,30 @@ def Test_plot(model, test_DL):
     - 개체행열
       - 개행열은 정해줘야 함
       - 체는 알아서 정해짐 -> 깊이의 사이즈가 맞아야함
+    - 완전정리
+      - MLP는 행열이 있을때 X와 W의 행렬의 크기가 똑같아서 완전 행열곱셈을 하는것이고, CNN은 X의 행열보다 W의 행열이 작아서, 한칸씩 왼쪽, 한칸씩 오른쪽으로 가서 곱하고 더한것을 한셀로 표현하여 그것을 모은것이 해당 부분이 된다.
+      - w웨이트 = kernel size = Filter Size 다 같은말
 
 <img width="940" height="386" alt="image" src="https://github.com/user-attachments/assets/180d567a-713f-47bb-b0dd-97d6699e446d" />
+
+  - Padding
+    - 주변에 행열을 추가하는것
+      - 필터를 해도 사이즈를 유지한다
+      - 가생이 정보를 잘 살린다
+        - 가생이는 필터인 W와 곱해질때 하나만 매칭될수밖에 없기 때문에, 주변을 늘리면 그것을 더 많이 겹치지게 할 수 있다
+
+<img width="1358" height="872" alt="image" src="https://github.com/user-attachments/assets/5001483b-0c2e-49a5-8e06-60a42a4830d1" />
+
+  - Stride
+    - 위에 까지는 필터(w)가 한칸씩 이동했는데, 여러칸씩이동하는것
+  - Pooling layer
+    - 결과 픽셀값이 주변을 대표할 수 있게 하는 layer(파라미터가 필요 없음)
+    - Max pooling
+      - 필터 크기많큼 지나가면서 가장 큰 값을 추출
+    - Average pooling
+      - 필터 크기많큼 지나가면서 다 더해서 평균값을 추출
+
+<img width="1629" height="400" alt="image" src="https://github.com/user-attachments/assets/444ec20c-db87-4510-b717-efc6ba3ddf0a" />
 
 
 ###### [CNN](#CNN)
