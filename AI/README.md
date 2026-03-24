@@ -12,6 +12,7 @@
 - [CNN](#cnn)
   - [CNN기초이론](#cnn기초이론)
   - [VGGNet](#vggnet)
+  - [Inception Net V1](#inception-net-v1)
 
 
 
@@ -1569,6 +1570,7 @@ def Test_plot(model, test_DL):
 # CNN
   - [CNN기초이론](#cnn기초이론)
   - [VGGNet](#vggnet)
+  - [Inception Net V1](#inception-net-v1)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -1684,6 +1686,93 @@ def Test_plot(model, test_DL):
   - VGGNet의 치명적인 한계점
     - 정답 중 하나를 고르기 위해 1차원으로 쫙 펼치는 FC 층(Fully Connected)이 3개 있는데, 여기서 가중치 파라미터가 1억 개 넘게 폭발해 버린다. 그래서 모델 용량만 수백 메가바이트가 넘어가고 학습 시간도 엄청나게 오래 걸림
 
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+# 각 모델들을 정의하기
+cfgs = { "A": [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+         "B": [64, 64, "M", 128, 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+         "D": [64, 64, "M", 128, 128, "M", 256, 256, 256, "M", 512, 512, 512, "M", 512, 512, 512, "M"],
+         "E": [64, 64, "M", 128, 128, "M", 256, 256, 256, 256, "M", 512, 512, 512, 512, "M", 512, 512, 512, 512, "M"] }
+
+class VGG(nn.Module):
+    def __init__(self, cfg, batch_norm = False, num_classes = 1000, init_weights = True, drop_p = 0.5):
+        super().__init__()
+
+        self.features = self.make_layers(cfg, batch_norm)
+        self.avgpool = nn.AdaptiveAvgPool2d((7, 7)) # 7x7 이 되도록 avg pooling 해주는데 이게 있는 이유는 어떤 레이어의 크기든 넣을 수 있도록 하기 위해서, 작든 크든 무조건 7x7로 맞춰줌
+        self.classifier = nn.Sequential(nn.Linear(512 * 7 * 7, 4096),
+                                        nn.ReLU(),
+                                        nn.Dropout(p=drop_p),
+                                        nn.Linear(4096, 4096),
+                                        nn.ReLU(),
+                                        nn.Dropout(p=drop_p),
+                                        nn.Linear(4096, num_classes))
+
+        if init_weights:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                    # mode="fan_out" → backward gradient 분산 유지를 위해 fan_out 기준으로 std 계산
+                    # nonlinearity="relu" → ReLU가 반 깎으니까 분산도 반으로 줄어서 gain=√2로 분산을 보정
+                    # 즉, 사용한 분산 값은 2/fan_out
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.Linear):
+                    nn.init.normal_(m.weight, mean=0, std=0.01)
+                    nn.init.constant_(m.bias, 0)
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+    def make_layers(self, cfg, batch_norm = False):
+        layers = []
+        in_channels = 3
+        for v in cfg: # cfg = [64, 64, "M", 128, 128, "M", 256, 256, 256, "M", 512, 512, 512, "M", 512, 512, 512, "M"]
+            if type(v) == int:
+                if batch_norm:
+                    layers += [nn.Conv2d(in_channels, v, 3, padding=1, bias=False), # 어차피 BN에 bias 포함
+                               nn.BatchNorm2d(v),
+                               nn.ReLU()]
+                else:
+                    layers += [nn.Conv2d(in_channels, v, 3, padding=1),
+                               nn.ReLU()]
+                in_channels = v
+            else:
+                layers += [nn.MaxPool2d(2)]
+
+        return nn.Sequential(*layers)
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+model = VGG(cfgs["E"], batch_norm=True)
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,224,224), device='cpu')
+
+x = torch.randn(2,3,224,224)
+print(model(x).shape)
+~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Inception Net V1
 
 
 ###### [CNN](#CNN)
