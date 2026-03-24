@@ -1685,6 +1685,9 @@ def Test_plot(model, test_DL):
   - Max Pooling 층: 무조건 2x2 크기에 보폭 2를 사용. 즉, 채널(두께)은 그대로 두고, 가로세로 해상도를 정확히 반토막 내는 역할만 함
   - VGGNet의 치명적인 한계점
     - 정답 중 하나를 고르기 위해 1차원으로 쫙 펼치는 FC 층(Fully Connected)이 3개 있는데, 여기서 가중치 파라미터가 1억 개 넘게 폭발해 버린다. 그래서 모델 용량만 수백 메가바이트가 넘어가고 학습 시간도 엄청나게 오래 걸림
+  - 핵심 개념
+    - 3x3 크기의 작은 합성곱(Convolution) 필터만을 사용하여 신경망을 16층에서 19층까지 아주 깊게 쌓은 모델
+    
 
 <br/>
 
@@ -1773,7 +1776,212 @@ print(model(x).shape)
 <br/>
 
 # Inception Net V1
+  - 여러 커널 사이즈를 가진 conv layer를 다 통과시켜보는것, 그렇게 얻은 feature map들을 depth방향 으로 concat
+    - depth방향으로 쌓으려면 행렬 사이즈가 같아야 한다, 즉 사이즈를 잘 맞춰야 하는 부분이 있다
+    - 논문에서는 stride는 모두1로 고정하고 padding을 적절히 조절한다고 나옴
+      - 1x1 : s=1,p=0
+      - 3x3 : s=1,p=1
+      - 5x5 : s=1,p=2
+      - 3x3 max pooling : s=1,p=1
+  - 핵심 개념
+    - 인셉션 모듈(Inception Module)이라는 독특한 블록 구조. 한 층에서 여러 크기의 필터(1x1, 3x3, 5x5)와 풀링(Pooling) 연산을 병렬로 동시에 적용
 
+<br/>
+
+  - 계산과정
+    - y1 = Conv_1x1(x): 1x1 필터를 4개 사용하겠다고 설정
+      - 입력 채널 2개짜리 데이터를 연산해서, 새로운 특징 4개를 뽑아냅니다.
+    - y1 행렬의 크기: [1, 4, 10, 10]
+      - y2 = Conv_3x3(x): 3x3 필터를 8개 사용하겠다고 설정.
+    - y2 행렬의 크기: [1, 8, 10, 10]
+      - y3 = Conv_5x5(x): 5x5 필터를 6개 사용하겠다고 설정
+    - y3 행렬의 크기: [1, 6, 10, 10]
+    - 각 연산이 뱉어낸 4개, 8개, 6개의 채널들을 메모리 상에서 나란히 이어 붙인다
+      - 합쳐진 총 채널 수 = 4 + 8 + 6 = 18개
+      - 최종 결과물 y 행렬의 크기: [1, 18, 10, 10]
+     
+<br/>
+
+  - Summary
+    - 여러 사이즈의 필터 결과를 concat해서 사용
+    - 1x1 conv로 dimension reduction -> 파라미터 수 줄임
+    - auxiliary classifier로 vanishing gradient를 완화
+    - VGG Net보다 훨씬 작은 파라미터 수
+    - GoogLeNet이라고도 불림
+
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+class BasicConv2d(nn.Module):
+    def __init__(self, in_channels, out_channels, **kwargs):
+        super().__init__()
+        self.conv_block = nn.Sequential(nn.Conv2d(in_channels, out_channels, bias=False, **kwargs),
+                                        nn.BatchNorm2d(out_channels, eps=0.001),
+                                        nn.ReLU())
+    def forward(self, x):
+        x = self.conv_block(x)
+        return x
+
+class Inception(nn.Module):
+    def __init__(self, in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj):
+        super().__init__()
+
+        self.branch1 = BasicConv2d(in_channels, ch1x1, kernel_size=1)
+
+        self.branch2 = nn.Sequential(BasicConv2d(in_channels, ch3x3red, kernel_size=1),
+                                     BasicConv2d(ch3x3red, ch3x3, kernel_size=3, padding=1)) # red는 reduce를 줄인 것
+
+        self.branch3 = nn.Sequential(BasicConv2d(in_channels, ch5x5red, kernel_size=1),
+                                     BasicConv2d(ch5x5red, ch5x5, kernel_size=5, padding=2))
+                                    # Here, kernel_size=3 instead of kernel_size=5 is a known bug. (버그 fix: kernel_size 3=>5, padding 1=>2 로 변경)
+                                    # Please see https://github.com/pytorch/vision/issues/906 for details.
+
+        self.branch4 = nn.Sequential(nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
+                                     BasicConv2d(in_channels, pool_proj, kernel_size=1))
+
+    def forward(self, x):
+        branch1 = self.branch1(x)
+        branch2 = self.branch2(x)
+        branch3 = self.branch3(x)
+        branch4 = self.branch4(x)
+
+        outputs = [branch1, branch2, branch3, branch4]
+        return torch.cat(outputs,1)
+
+class InceptionAux(nn.Module):
+    def __init__(self, in_channels, num_classes, drop_p = 0.7):
+        super().__init__()
+
+        self.avgpool = nn.AvgPool2d(kernel_size=5, stride=3)
+        self.conv = BasicConv2d(in_channels, 128, kernel_size=1)
+        self.fc1 = nn.Linear(2048, 1024)
+        self.act = nn.ReLU()
+        self.dropout = nn.Dropout(p=drop_p)
+        self.fc2 = nn.Linear(1024, num_classes)
+
+    def forward(self, x):
+        # aux1: N x 512 x 14 x 14, aux2: N x 528 x 14 x 14
+        x = self.avgpool(x)
+        # aux1: N x 512 x 4 x 4, aux2: N x 528 x 4 x 4
+        x = self.conv(x)
+        # N x 128 x 4 x 4
+        x = torch.flatten(x, 1)
+        # N x 2048
+        x = self.fc1(x)
+        x = self.act(x)
+        x = self.dropout(x)
+        # N x 1024
+        x = self.fc2(x)
+        # N x 1000 (num_classes)
+        return x
+
+class Inception_V1(nn.Module):
+    def __init__(self, num_classes = 1000, use_aux = True, init_weights = None, drop_p = 0.4, drop_p_aux = 0.7):
+        super().__init__()
+
+        self.conv1 = BasicConv2d(3, 64, kernel_size=7, stride=2, padding=3)
+        self.maxpool1 = nn.MaxPool2d(3, stride=2, padding=1)
+        self.conv2a = BasicConv2d(64, 64, kernel_size=1)
+        self.conv2b = BasicConv2d(64, 192, kernel_size=3, padding=1)
+        self.maxpool2 = nn.MaxPool2d(3, stride=2, padding=1)
+        self.inception3a = Inception(192, 64, 96, 128, 16, 32, 32)
+        self.inception3b = Inception(256, 128, 128, 192, 32, 96, 64)
+        self.maxpool3 = nn.MaxPool2d(3, stride=2, padding=1)
+        self.inception4a = Inception(480, 192, 96, 208, 16, 48, 64)
+        self.inception4b = Inception(512, 160, 112, 224, 24, 64, 64)
+        self.inception4c = Inception(512, 128, 128, 256, 24, 64, 64)
+        self.inception4d = Inception(512, 112, 144, 288, 32, 64, 64)
+        self.inception4e = Inception(528, 256, 160, 320, 32, 128, 128)
+        self.maxpool4 = nn.MaxPool2d(3, stride=2, padding=1)
+        self.inception5a = Inception(832, 256, 160, 320, 32, 128, 128)
+        self.inception5b = Inception(832, 384, 192, 384, 48, 128, 128)
+        if use_aux:
+            self.aux1 = InceptionAux(512, num_classes, drop_p=drop_p_aux)
+            self.aux2 = InceptionAux(528, num_classes, drop_p=drop_p_aux)
+        else:
+            self.aux1 = None
+            self.aux2 = None
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1)) # GAP
+        self.dropout = nn.Dropout(p=drop_p)
+        self.fc = nn.Linear(1024, num_classes)
+
+        if init_weights:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                    torch.nn.init.trunc_normal_(m.weight, mean=0.0, std=0.01, a=-2, b=2)
+
+    def forward(self, x):
+        # N x 3 x 224 x 224
+        x = self.conv1(x)
+        # N x 64 x 112 x 112
+        x = self.maxpool1(x)
+        # N x 64 x 56 x 56
+        x = self.conv2a(x)
+        # N x 64 x 56 x 56
+        x = self.conv2b(x)
+        # N x 192 x 56 x 56
+        x = self.maxpool2(x)
+
+        # N x 192 x 28 x 28
+        x = self.inception3a(x)
+        # N x 256 x 28 x 28
+        x = self.inception3b(x)
+        # N x 480 x 28 x 28
+        x = self.maxpool3(x)
+        # N x 480 x 14 x 14
+        x = self.inception4a(x)
+        # N x 512 x 14 x 14
+        if self.aux1 is not None and self.training:
+            aux1 = self.aux1(x)
+        else:
+            aux1 = None  # 뭐라도 넣어놔야 not defined error 안 뜸
+
+        x = self.inception4b(x)
+        # N x 512 x 14 x 14
+        x = self.inception4c(x)
+        # N x 512 x 14 x 14
+        x = self.inception4d(x)
+        # N x 528 x 14 x 14
+        if self.aux2 is not None and self.training:
+            aux2 = self.aux2(x)
+        else:
+            aux2 = None
+        x = self.inception4e(x)
+        # N x 832 x 14 x 14
+        x = self.maxpool4(x)
+        # N x 832 x 7 x 7
+        x = self.inception5a(x)
+        # N x 832 x 7 x 7
+        x = self.inception5b(x)
+        # N x 1024 x 7 x 7
+
+        x = self.avgpool(x)
+        # N x 1024 x 1 x 1
+        x = torch.flatten(x, 1)
+        # N x 1024
+        x = self.dropout(x)
+        x = self.fc(x)
+        # N x 1000 (num_classes)
+        return x, aux2, aux1
+~~~
+
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+x, aux2, aux1 = model(torch.randn(2,3,224,224))
+print(x.shape)
+print(aux2.shape)
+print(aux1.shape)
+
+x, aux2, aux1 = model(torch.randn(2,3,500,500)) # GAP 덕분에 사이즈가 커도 잘 통과됨
+print(x.shape)
+~~~
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
