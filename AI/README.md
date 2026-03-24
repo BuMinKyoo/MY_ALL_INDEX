@@ -1607,6 +1607,8 @@ def Test_plot(model, test_DL):
 
 <img width="940" height="386" alt="image" src="https://github.com/user-attachments/assets/180d567a-713f-47bb-b0dd-97d6699e446d" />
 
+<br/>
+
   - Padding
     - 주변에 행열을 추가하는것
       - 필터를 해도 사이즈를 유지한다
@@ -1615,16 +1617,29 @@ def Test_plot(model, test_DL):
 
 <img width="1358" height="872" alt="image" src="https://github.com/user-attachments/assets/5001483b-0c2e-49a5-8e06-60a42a4830d1" />
 
+<br/>
+
   - Stride
     - 위에 까지는 필터(w)가 한칸씩 이동했는데, 여러칸씩이동하는것
   - Pooling layer
     - 결과 픽셀값이 주변을 대표할 수 있게 하는 layer(파라미터가 필요 없음)
+    - 각 채널 마다 작용시키기 때문에 채널의 수는 유지됨
     - Max pooling
       - 필터 크기많큼 지나가면서 가장 큰 값을 추출
+      - X의 크기와 필터(W)의 크기가 같으면 Global max pooling
     - Average pooling
       - 필터 크기많큼 지나가면서 다 더해서 평균값을 추출
+      - X의 크기와 필터(W)의 크기가 같으면 Global average pooling(GAP)
 
 <img width="1629" height="400" alt="image" src="https://github.com/user-attachments/assets/444ec20c-db87-4510-b717-efc6ba3ddf0a" />
+
+<br/>
+
+  - Feature Map
+    - Feature Map은 결국 x와 w를 합성곱을 하고 나온 행열 결과값, 그것을 싹다 더해보면 그림짜잔!
+
+<img width="1572" height="780" alt="image" src="https://github.com/user-attachments/assets/cfdae254-fa86-49d3-b1f4-107e50e3b454" />
+
 
 
 ###### [CNN](#CNN)
