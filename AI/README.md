@@ -13,6 +13,7 @@
   - [CNN기초이론](#cnn기초이론)
   - [VGGNet](#vggnet)
   - [Inception Net V1](#inception-net-v1)
+  - [Inception Net V2,V3](#inception-net-v2v3)
 
 
 
@@ -1571,6 +1572,7 @@ def Test_plot(model, test_DL):
   - [CNN기초이론](#cnn기초이론)
   - [VGGNet](#vggnet)
   - [Inception Net V1](#inception-net-v1)
+  - [Inception Net V2,V3](#inception-net-v2v3)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -1786,6 +1788,8 @@ print(model(x).shape)
   - 핵심 개념
     - 인셉션 모듈(Inception Module)이라는 독특한 블록 구조. 한 층에서 여러 크기의 필터(1x1, 3x3, 5x5)와 풀링(Pooling) 연산을 병렬로 동시에 적용
 
+<img width="646" height="333" alt="image" src="https://github.com/user-attachments/assets/6cfa8b84-b503-44d9-9990-0d32c003dbad" />
+
 <br/>
 
   - 계산과정
@@ -1982,6 +1986,50 @@ print(aux1.shape)
 x, aux2, aux1 = model(torch.randn(2,3,500,500)) # GAP 덕분에 사이즈가 커도 잘 통과됨
 print(x.shape)
 ~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Inception Net V2,V3
+  - VGG Net의 아이디어를 수용, 확장해서 반영한 모델
+  - Inception Net V1이 base->1x1->5x5, base->1x1->3x3, base->pool->1x1, base->1x1 했다면 여기서 5x5를 3x3두번으로 변경
+  - 또한 3x3을 1x3 + 3x1으로 쪼개는 것도 반영
+
+<img width="1408" height="624" alt="image" src="https://github.com/user-attachments/assets/3d8326b2-ee62-4ce1-93b3-a3e2681d3432" />
+
+<br/>
+
+<img width="505" height="591" alt="image" src="https://github.com/user-attachments/assets/3c73ed6b-c379-4285-abe6-2fbd6f489f8e" />
+
+<br/>
+
+<img width="788" height="634" alt="image" src="https://github.com/user-attachments/assets/5f056e4a-6205-44d8-8863-74513478cba5" />
+
+<br/>
+
+  - Inception Net V1에서의 문제점
+    - 방법 A (연산량 과부하): 먼저 채널 수를 늘린 뒤(Filter 확장), 나중에 Pooling(Stride=2)으로 크기를 줄인다.
+      - 정보 손실은 적지만, 채널이 늘어난 상태에서 연산하므로 계산량이 폭발합니다.
+    - 방법 B (병목 현상 발생): 먼저 Pooling으로 크기를 줄인 뒤, 나중에 채널을 늘립니다.
+      - 연산량은 적지만, 크기를 줄이는 순간 중요한 정보가 유실되는 Representational Bottleneck이 발생한다.
+    - V2/V3 설계자들은 "그럼 반반씩 섞어서 병렬로 처리한 뒤 합치자!"라는 아이디어를 냄
+      - 1.오른쪽 갈래: Stride=2인 Convolution 레이어를 사용하여 특징을 추출하면서 크기를 절반으로 줄인다
+      - 2.왼쪽 갈래: Stride=2인 Max Pooling 레이어를 사용하여 물리적인 크기를 절반으로 줄인다.
+      - 3.합치기(Concat): 이 두 결과를 옆으로 이어 붙인다.
+  - auxiliary classifier는 V1과 달리 하나만 사용한다
+  - Aux classifier에 BN도 추가됨
+
+<br/>
+
+  - Label Smoothing이론
+    - 레이블 스무딩은 원-핫 인코딩(One-Hot Encoding)의 단점을 보완하기 위한 기법
+      - One-Hot Encoding (원-핫 인코딩) : 어떤 분류를 할때, 값을 다르게 세팅 해야 하는데 개(0), 고양이(1), 자동차(2) 이렇게 하면 숫자가 크고 작고가 생기며, 멀고가깝고가 생겨 버리기 때문에 단 하나의 값만 1(Hot)이고 나머지는 모두 0(Cold)인 벡터로 만드는 것
+    - 정답인 1을 조금 깎아서 나머지 오답들에게 골고루 나눠줍니다. 즉, 정답 레이블을 부드럽게(Smoothing) 만드는 것
+    - 원-핫: [1.0, 0.0, 0.0]
+    - 레이블 스무딩: [0.9, 0.05, 0.05]
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
