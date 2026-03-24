@@ -1815,6 +1815,12 @@ print(model(x).shape)
 
 <br/>
 
+  - 전체 과정
+
+<img width="458" height="1693" alt="image" src="https://github.com/user-attachments/assets/2c81389c-bedc-4bf8-b1b2-e840800996ab" />
+
+<br/>
+
   - 모델 코드 확인하기
 ~~~py
 import torch
@@ -2030,6 +2036,288 @@ print(x.shape)
     - 정답인 1을 조금 깎아서 나머지 오답들에게 골고루 나눠줍니다. 즉, 정답 레이블을 부드럽게(Smoothing) 만드는 것
     - 원-핫: [1.0, 0.0, 0.0]
     - 레이블 스무딩: [0.9, 0.05, 0.05]
+
+<br/>
+
+  - Summary
+    - 같은 receptive field를 얻기 위한 파라미터 수를 최소화 함
+      - 5x5 = 3x3 + 3x3
+      - 7x7 = 1x7 + 7x1
+    - 특징 맵 size를 줄일 때, bottleneck을 피하기 위해 pooling이 아닌 convolution with stride 2사용
+      - 따로 pooling해줬던 v1과는 다르다
+    - Label Smoothing 제안
+    - aux classifier를 두개에서 한개로 줄이고 BN적용
+
+<img width="927" height="371" alt="image" src="https://github.com/user-attachments/assets/836181e5-468a-4f17-848f-0d19150a7e8f" />
+
+  - 각각의 마지막 번째는 resolution을 줄이기 위해 아래 구조 사용
+
+<img width="262" height="293" alt="image" src="https://github.com/user-attachments/assets/365d08b4-67b1-400c-9dec-b2cb8b7c83bf" />
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+class BasicConv2d(nn.Module):
+    def __init__(self, in_channels, out_channels, **kwargs):
+        super().__init__()
+        self.conv_block = nn.Sequential(nn.Conv2d(in_channels, out_channels, bias=False, **kwargs),
+                                        nn.BatchNorm2d(out_channels, eps=0.001),
+                                        nn.ReLU())
+    def forward(self, x):
+        x = self.conv_block(x)
+        return x
+
+class InceptionA(nn.Module): # Figure 5
+    def __init__(self, in_channels, pool_features):
+        super().__init__()
+
+        self.branch1 = nn.Sequential(BasicConv2d(in_channels, 64, kernel_size=1),
+                                     BasicConv2d(64, 96, kernel_size=3, padding=1),
+                                     BasicConv2d(96, 96, kernel_size=3, padding=1))
+
+        self.branch2 = nn.Sequential(BasicConv2d(in_channels, 48, kernel_size=1),
+                                     BasicConv2d(48, 64, kernel_size=3, padding=1))
+
+        self.branch3 = nn.Sequential(nn.AvgPool2d(kernel_size=3, stride=1, padding=1),
+                                     BasicConv2d(in_channels, pool_features, kernel_size=1))
+
+        self.branch4 = BasicConv2d(in_channels, 64, kernel_size=1)
+
+    def forward(self, x):
+        x = [self.branch1(x), self.branch2(x), self.branch3(x), self.branch4(x)]
+        return torch.cat(x,1)
+
+class ReductionA(nn.Module): # Bottleneck 피하면서 grid-size 줄이기
+    def __init__(self, in_channels):
+        super().__init__()
+
+        self.branch1 = nn.Sequential(BasicConv2d(in_channels, 64, kernel_size=1),
+                                     BasicConv2d(64, 96, kernel_size=3, padding=1),
+                                     BasicConv2d(96, 96, kernel_size=3, stride=2))
+
+        self.branch2 = nn.Sequential(BasicConv2d(in_channels, 64, kernel_size=1),
+                                     BasicConv2d(64, 384, kernel_size=3, stride=2))
+
+
+        self.branch3 = nn.MaxPool2d(kernel_size=3, stride=2)
+
+    def forward(self, x):
+        x = [self.branch1(x), self.branch2(x), self.branch3(x)]
+        return torch.cat(x,1)
+
+class InceptionB(nn.Module): # Figure 6
+    def __init__(self, in_channels, channels_7x7):
+        super().__init__()
+
+        c7 = channels_7x7
+        self.branch1 = nn.Sequential(BasicConv2d(in_channels, c7, kernel_size=1),
+                                     BasicConv2d(c7, c7, kernel_size=(1, 7), padding=(0, 3)), # 7x1, 1x7 순으로 되어있던 것을 논문이랑 같게 순서 바꿈
+                                     BasicConv2d(c7, c7, kernel_size=(7, 1), padding=(3, 0)),
+                                     BasicConv2d(c7, c7, kernel_size=(1, 7), padding=(0, 3)),
+                                     BasicConv2d(c7, 192, kernel_size=(7, 1), padding=(3, 0)))
+
+        self.branch2 = nn.Sequential(BasicConv2d(in_channels, c7, kernel_size=1),
+                                     BasicConv2d(c7, c7, kernel_size=(1, 7), padding=(0, 3)),
+                                     BasicConv2d(c7, 192, kernel_size=(7, 1), padding=(3, 0)))
+
+        self.branch3 = nn.Sequential(nn.AvgPool2d(kernel_size=3, stride=1, padding=1),
+                                     BasicConv2d(in_channels, 192, kernel_size=1))
+
+        self.branch4 = BasicConv2d(in_channels, 192, kernel_size=1)
+
+    def forward(self, x):
+        x = [self.branch1(x), self.branch2(x), self.branch3(x), self.branch4(x)]
+        return torch.cat(x,1)
+
+class ReductionB(nn.Module): # Bottleneck 피하면서 grid-size 줄이기
+    def __init__(self, in_channels):
+        super().__init__()
+
+        self.branch1 = nn.Sequential(BasicConv2d(in_channels, 192, kernel_size=1),
+                                     BasicConv2d(192, 192, kernel_size=3, padding=1),
+                                     BasicConv2d(192, 192, kernel_size=3, stride=2))
+
+        self.branch2 = nn.Sequential(BasicConv2d(in_channels, 192, kernel_size=1),
+                                     BasicConv2d(192, 320, kernel_size=3, stride=2))
+
+        self.branch3 = nn.MaxPool2d(kernel_size=3, stride=2)
+
+    def forward(self, x):
+        x = [self.branch1(x), self.branch2(x), self.branch3(x)]
+        return torch.cat(x,1)
+
+class InceptionC(nn.Module): # Figure 7
+    def __init__(self, in_channels):
+        super().__init__()
+
+        self.branch1 = nn.Sequential(BasicConv2d(in_channels, 448, kernel_size=1),
+                                     BasicConv2d(448, 384, kernel_size=3, padding=1))
+        self.branch1a = BasicConv2d(384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch1b = BasicConv2d(384, 384, kernel_size=(3, 1), padding=(1, 0))
+
+        self.branch2 = BasicConv2d(in_channels, 384, kernel_size=1)
+        self.branch2a = BasicConv2d(384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch2b = BasicConv2d(384, 384, kernel_size=(3, 1), padding=(1, 0))
+
+        self.branch3 = nn.Sequential(nn.AvgPool2d(kernel_size=3, stride=1, padding=1),
+                                     BasicConv2d(in_channels, 192, kernel_size=1))
+
+        self.branch4 = BasicConv2d(in_channels, 320, kernel_size=1)
+
+    def forward(self, x):
+        branch1 = self.branch1(x)
+        branch1 = [self.branch1a(branch1),
+                   self.branch1b(branch1)]
+        branch1 = torch.cat(branch1, 1)
+
+        branch2 = self.branch2(x)
+        branch2 = [self.branch2a(branch2),
+                   self.branch2b(branch2)]
+        branch2 = torch.cat(branch2, 1)
+
+        branch3 = self.branch3(x)
+
+        branch4 = self.branch4(x)
+
+        outputs = [branch1, branch2, branch3, branch4]
+        return torch.cat(outputs,1)
+
+class InceptionAux(nn.Module):
+    def __init__(self, in_channels, num_classes):
+        super().__init__()
+
+        self.avgpool1 = nn.AvgPool2d(kernel_size=5, stride=3)
+        self.conv1 = BasicConv2d(in_channels, 128, kernel_size=1)
+        self.fc1 = nn.Linear(128*5*5, 1024)
+        self.fc1.stddev = 0.001
+        self.fc2 = nn.Linear(1024, num_classes)
+        self.fc2.stddev = 0.001
+
+    def forward(self, x):
+        # N x 768 x 17 x 17
+        x = self.avgpool1(x)
+        # N x 768 x 5 x 5
+        x = self.conv1(x)
+        # N x 128 x 5 x 5
+        x = torch.flatten(x, 1)
+        # N x 3200
+        x = self.fc1(x)
+        # N x 1024
+        x = self.fc2(x)
+        # N x 1000
+        return x
+
+class Inception_V3(nn.Module):
+    def __init__(self, num_classes = 1000, use_aux = True, init_weights = None, drop_p = 0.5):
+        super().__init__()
+
+        self.use_aux = use_aux
+
+        self.conv1a = BasicConv2d(3, 32, kernel_size=3, stride=2)
+        self.conv1b = BasicConv2d(32, 32, kernel_size=3)
+        self.conv1c = BasicConv2d(32, 64, kernel_size=3, padding=1)
+        self.maxpool1 = nn.MaxPool2d(kernel_size=3, stride=2)
+
+        self.conv2a = BasicConv2d(64, 80, kernel_size=3)
+        self.conv2b = BasicConv2d(80, 192, kernel_size=3, stride=2)
+        self.conv2c = BasicConv2d(192, 288, kernel_size=3, padding=1)
+
+        self.inception3a = InceptionA(288, pool_features=64)
+        self.inception3b = InceptionA(288, pool_features=64)
+        self.inception3c = ReductionA(288)
+
+        self.inception4a = InceptionB(768, channels_7x7=128)
+        self.inception4b = InceptionB(768, channels_7x7=160)
+        self.inception4c = InceptionB(768, channels_7x7=160)
+        self.inception4d = InceptionB(768, channels_7x7=192)
+        if use_aux:
+            self.aux = InceptionAux(768, num_classes)
+        else:
+            self.aux = None
+        self.inception4e = ReductionB(768)
+
+        self.inception5a = InceptionC(1280)
+        self.inception5b = InceptionC(2048)
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.dropout = nn.Dropout(p=drop_p)
+        self.fc = nn.Linear(2048, num_classes)
+
+        if init_weights:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                    stddev = float(m.stddev) if hasattr(m, "stddev") else 0.1  # type: ignore
+                    torch.nn.init.trunc_normal_(m.weight, mean=0.0, std=stddev, a=-2, b=2)
+
+    def forward(self, x):
+        # N x 3 x 299 x 299
+        x = self.conv1a(x)
+        # N x 32 x 149 x 149
+        x = self.conv1b(x)
+        # N x 32 x 147 x 147
+        x = self.conv1c(x)
+        # N x 64 x 147 x 147
+        x = self.maxpool1(x)
+        # N x 64 x 73 x 73
+        x = self.conv2a(x)
+        # N x 80 x 71 x 71
+        x = self.conv2b(x)
+        # N x 192 x 35 x 35
+        x = self.conv2c(x)
+        # N x 288 x 35 x 35
+        x = self.inception3a(x)
+        # N x 288 x 35 x 35
+        x = self.inception3b(x)
+        # N x 288 x 35 x 35
+        x = self.inception3c(x)
+        # N x 768 x 17 x 17
+        x = self.inception4a(x)
+        # N x 768 x 17 x 17
+        x = self.inception4b(x)
+        # N x 768 x 17 x 17
+        x = self.inception4c(x)
+        # N x 768 x 17 x 17
+        x = self.inception4d(x)
+        # N x 768 x 17 x 17
+
+        if self.aux is not None and self.training:
+            aux = self.aux(x)
+        else:
+            aux = None  # 뭐라도 넣어놔야 not defined error 안 뜸
+
+        x = self.inception4e(x)
+        # N x 1280 x 8 x 8
+        x = self.inception5a(x)
+        # N x 2048 x 8 x 8
+        x = self.inception5b(x)
+        # N x 2048 x 8 x 8
+        x = self.avgpool(x)
+        # N x 2048 x 1 x 1
+        x = self.dropout(x)
+        # N x 2048 x 1 x 1
+        x = torch.flatten(x, 1)
+        # N x 2048
+        x = self.fc(x)
+        # N x 1000 (num_classes)
+        return x, aux
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+model = Inception_V3()
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,299,299), device='cpu')
+
+x, aux = model(torch.randn(2,3,299,299))
+print(x.shape)
+print(aux.shape)
+~~~
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
