@@ -11,6 +11,7 @@
   - [transforms.ToTensor()](#transformstotensor)
 - [CNN](#cnn)
   - [CNN기초이론](#cnn기초이론)
+  - [VGGNet](#vggnet)
 
 
 
@@ -1567,15 +1568,13 @@ def Test_plot(model, test_DL):
 
 # CNN
   - [CNN기초이론](#cnn기초이론)
-
-
+  - [VGGNet](#vggnet)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
 
 <br/>
 <br/>
-
 
 # CNN기초이론
   - MLP에서 CNN이 나온 배경
@@ -1640,7 +1639,21 @@ def Test_plot(model, test_DL):
 
 <img width="1572" height="780" alt="image" src="https://github.com/user-attachments/assets/cfdae254-fa86-49d3-b1f4-107e50e3b454" />
 
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# VGGNet
+  - VGG16 -> 가중치가 있는 층(Conv, FC)이 총 16개
+  - Conv 층 (conv3-xxx): 무조건 필터 크기 3x3, 패딩 1, 보폭(Stride) 1을 사용. 즉, 행과 열의 크기(해상도)는 절대 건드리지 않고, 오직 채널(두께)만 표에 적힌 숫자(xxx)로 늘려주는 역할만 한다
+  - Max Pooling 층: 무조건 2x2 크기에 보폭 2를 사용. 즉, 채널(두께)은 그대로 두고, 가로세로 해상도를 정확히 반토막 내는 역할만 함
+  - VGGNet의 치명적인 한계점
+    - 정답 중 하나를 고르기 위해 1차원으로 쫙 펼치는 FC 층(Fully Connected)이 3개 있는데, 여기서 가중치 파라미터가 1억 개 넘게 폭발해 버린다. 그래서 모델 용량만 수백 메가바이트가 넘어가고 학습 시간도 엄청나게 오래 걸림
+
 
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
+
