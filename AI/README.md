@@ -1603,6 +1603,13 @@ def Test_plot(model, test_DL):
     - 완전정리
       - MLP는 행열이 있을때 X와 W의 행렬의 크기가 똑같아서 완전 행열곱셈을 하는것이고, CNN은 X의 행열보다 W의 행열이 작아서, 한칸씩 왼쪽, 한칸씩 오른쪽으로 가서 곱하고 더한것을 한셀로 표현하여 그것을 모은것이 해당 부분이 된다.
       - w웨이트 = kernel size = Filter Size 다 같은말
+    - 왜 convolution을 하는가?
+      - 아주 적은 수의 weight 로 위치별 특징 추출, 사진 입력에는 반드시 특정 패턴(or 특징)이 있고, convolution은 위치별 패턴(or 특징)을 찾는 연산, CNN 통과하면서 그 패턴들이 곱하고(뭐가 더 중요한 특징?) 합해진다(조합된다)
+    - 여러 번 conv layer를 통과하는 이유
+      - 3x3은 너무 좁은 영역만 본다, 여러 번 통과하면 receptive field가 넓어진다
+      - 3x3 두 번 vs 5x5 한 번 을 비교해보면
+        - 3x3 두 번 이 더 파라미터가 작음 18개, 5x5는 25개
+        - 두번통과하는 3x3이 좀더 비선형적인 함수
 
 <img width="940" height="386" alt="image" src="https://github.com/user-attachments/assets/180d567a-713f-47bb-b0dd-97d6699e446d" />
 
@@ -1638,6 +1645,15 @@ def Test_plot(model, test_DL):
     - Feature Map은 결국 x와 w를 합성곱을 하고 나온 행열 결과값, 그것을 싹다 더해보면 그림짜잔!
 
 <img width="1572" height="780" alt="image" src="https://github.com/user-attachments/assets/cfdae254-fa86-49d3-b1f4-107e50e3b454" />
+
+<br/>
+
+  - 중요한 포인트
+    - CNN이 MLP보다 파라미터 수, 즉 W,B의 수가 작지만, 연산 수로 생각하면 CNN이 훨씬 많음
+    - 대신 MLP가 파라미터가 작기 때문에 파라미터(W, b)가 차지하는 메모리 용량은 CNN이 훨씬 작음. 하지만 CNN은 가중치 하나에 여러번 셈을 하기때문에 셈의 수는 훨씬더 많음, 단순 무식한 사칙연산을 수천 개의 코어로 동시에 때려 박을 수 있는 그래픽 카드(GPU)가 CNN 시대에 와서 절대적으로 필요한 필수품이됨
+
+<br/>
+
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
