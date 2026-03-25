@@ -1803,6 +1803,16 @@ print(model(x).shape)
     - 각 연산이 뱉어낸 4개, 8개, 6개의 채널들을 메모리 상에서 나란히 이어 붙인다
       - 합쳐진 총 채널 수 = 4 + 8 + 6 = 18개
       - 최종 결과물 y 행렬의 크기: [1, 18, 10, 10]
+
+<br/>
+
+  - Auxiliary Classifier(보조 분류기)
+    - 기울기 소실 (Vanishing Gradient) 현상 방지의목적
+      - 인공신경망 파라미터조절을 위해 역전파를 하면서, 연쇄 법칙(Chain Rule)이라는 미분 공식을 사용해서 기울기(미분값)들을 계속 곱해 나가는데, 인공망이 깊었을때(깊다고 다 그런건 아님, 활성화 함수도 중요) 활성화 함수(주로 Sigmoid나 Tanh)를 거친 미분값들은 보통 1보다 작음. 1보다 작은 숫자들을 계속 곱하면 0.1 같은 작은 소수점을 루프 돌면서 계속 곱하다 보면 언더플로우(Underflow)가 나서 결국 0.0으로 수렴해 버리는 현상, 맨 끝(출력층)에서 계산된 오차 미분값이 맨 앞(입력층)까지 도달하는 동안 0에 한없이 가까워져 버림
+    - 기나긴 메인 네트워크 중간중간에 샛길(Side Branch)을 파서, 미니 분류기를 달아놓은 것
+    - 중간에 있는 레이어들은 저 멀리 맨 끝에서 다 죽어가는 희미한 기울기가 오기를 기다릴 필요가 없음. 자기 바로 옆에 붙어있는 보조 분류기에서 다이렉트로 계산한 아주 신선하고 강력한 기울기(미분값)를 주입받는다
+    - 즉, 맨끝에서 오는 역전파만에 의해 업데이트가 되는것이 아니라, 보조분류기는 따로 loss를계산한다, 그리고 최초나온 역전파와 합쳐져서 계산된다
+
      
 <br/>
 
@@ -2026,7 +2036,9 @@ print(x.shape)
       - 2.왼쪽 갈래: Stride=2인 Max Pooling 레이어를 사용하여 물리적인 크기를 절반으로 줄인다.
       - 3.합치기(Concat): 이 두 결과를 옆으로 이어 붙인다.
   - auxiliary classifier는 V1과 달리 하나만 사용한다
-  - Aux classifier에 BN도 추가됨
+  - Aux classifier에 BN(Batch Normalization_배치 정규화)도 추가됨
+
+<img width="528" height="567" alt="image" src="https://github.com/user-attachments/assets/50d94fe9-8e0c-4265-8e98-7a5475442f23" />
 
 <br/>
 
@@ -2039,11 +2051,29 @@ print(x.shape)
 
 <br/>
 
+  - Inception Net V2, V3 둘의차이
+    - 아래표의 4번째줄에 있는 Inception-v2가 진짜 Inception Net V2이지만, 연구진이 이 V2 뼈대에다가 성능을 영끌하기 위해 여러 가지 최신 훈련 기법(잔기술)들을 하나씩 누적해서 적용해 보기 시작한것. 표의 아래로 내려갈수록 이전 기술이 전부 포함된 상태
+      - RMSProp: 학습 속도를 조절하는 더 똑똑한 옵티마이저 적용
+      - Label Smoothing: 정답을 너무 맹신하지 않게 해서 과적합을 막는 기법 적용
+      - Factorized 7x7: 7x7 필터를 1x7, 7x1로 한 번 더 쪼개서 연산량 줄이기
+      - BN-auxiliary: 보조 분류기에 배치 정규화(BN) 달아주기
+    - Inception V3는 결국 Inception Net V2에 RMSProp, Label Smoothing, Factorized 7x7, BN-auxiliary을 다합친것을말함(표의 맨 밑에 있는것)
+
+  - Inception Net V 시리즈의 발전과정
+<img width="861" height="685" alt="image" src="https://github.com/user-attachments/assets/f9ed6d0f-7775-4cfc-b245-6242c8f6c2c3" />
+
+<br/>
+
+  - 전체구조
+<img width="599" height="531" alt="image" src="https://github.com/user-attachments/assets/a797e2a4-2b70-44a7-a93f-e3d09f806fe1" />
+
+<br/>
+
   - Summary
     - 같은 receptive field를 얻기 위한 파라미터 수를 최소화 함
       - 5x5 = 3x3 + 3x3
       - 7x7 = 1x7 + 7x1
-    - 특징 맵 size를 줄일 때, bottleneck을 피하기 위해 pooling이 아닌 convolution with stride 2사용
+    - 특징 맵 size를 줄일 때, bottleneck을 피하기 위해 pooling이 아닌 convolution with stride 2사용(Conv 연산과 Max Pooling을 양갈래(병렬)로 동시에 돌려서 합치는 기가 막힌 꼼수)
       - 따로 pooling해줬던 v1과는 다르다
     - Label Smoothing 제안
     - aux classifier를 두개에서 한개로 줄이고 BN적용
