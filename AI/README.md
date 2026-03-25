@@ -2038,6 +2038,8 @@ print(x.shape)
   - auxiliary classifier는 V1과 달리 하나만 사용한다
   - Aux classifier에 BN(Batch Normalization_배치 정규화)도 추가됨
 
+<br/>
+
 <img width="528" height="567" alt="image" src="https://github.com/user-attachments/assets/50d94fe9-8e0c-4265-8e98-7a5475442f23" />
 
 <br/>
@@ -2063,6 +2065,7 @@ print(x.shape)
 <img width="861" height="685" alt="image" src="https://github.com/user-attachments/assets/f9ed6d0f-7775-4cfc-b245-6242c8f6c2c3" />
 
 <br/>
+<br/>
 
   - 전체구조
 <img width="599" height="531" alt="image" src="https://github.com/user-attachments/assets/a797e2a4-2b70-44a7-a93f-e3d09f806fe1" />
@@ -2078,11 +2081,17 @@ print(x.shape)
     - Label Smoothing 제안
     - aux classifier를 두개에서 한개로 줄이고 BN적용
 
+<br/>
+
 <img width="927" height="371" alt="image" src="https://github.com/user-attachments/assets/836181e5-468a-4f17-848f-0d19150a7e8f" />
+
+<br/>
 
   - 각각의 마지막 번째는 resolution을 줄이기 위해 아래 구조 사용
 
 <img width="262" height="293" alt="image" src="https://github.com/user-attachments/assets/365d08b4-67b1-400c-9dec-b2cb8b7c83bf" />
+
+<br/>
 
   - 모델 코드 확인하기
 ~~~py
