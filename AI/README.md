@@ -11,9 +11,11 @@
   - [transforms.ToTensor()](#transformstotensor)
 - [CNN](#cnn)
   - [CNN기초이론](#cnn기초이론)
-  - [VGGNet](#vggnet)
-  - [Inception Net V1](#inception-net-v1)
-  - [Inception Net V2,V3](#inception-net-v2v3)
+  - [VGGNet](#vggnet)_(2014.09)
+  - [Inception Net V1](#inception-net-v1)_(2014.09)
+  - [Inception Net V2,V3](#inception-net-v2v3)_(2015.12)
+  - [Loss Landscape](#loss-landscape)
+  - [ResNet](#ResNet)_(2015.12)
 
 
 
@@ -1570,9 +1572,11 @@ def Test_plot(model, test_DL):
 
 # CNN
   - [CNN기초이론](#cnn기초이론)
-  - [VGGNet](#vggnet)
-  - [Inception Net V1](#inception-net-v1)
-  - [Inception Net V2,V3](#inception-net-v2v3)
+  - [VGGNet](#vggnet)_(2014.09)
+  - [Inception Net V1](#inception-net-v1)_(2014.09)
+  - [Inception Net V2,V3](#inception-net-v2v3)_(2015.12)
+  - [Loss Landscape](#loss-landscape)
+  - [ResNet](#ResNet)_(2015.12)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -2357,6 +2361,100 @@ x, aux = model(torch.randn(2,3,299,299))
 print(x.shape)
 print(aux.shape)
 ~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# Loss Landscape
+  - BN+ReLU 콤비로 분명 vanishing gradient 해결 했는데, 그래도 너무 깊으면 training, test error가 같이 커진다
+  - No Skip-Connection일 때 깊을수록 loss 모양이 꼬불꼬불해짐
+  - ResNet의 skip-connection 이 대표적인 해결 방안 중 하나
+    - 출력값에 입력값 x를 다이렉트로 더해주는 방식
+
+<br/>
+
+  - No Skip-Connection (일반적인 방식)
+    - 치명적인 문제점: 만약 학습이 덜 됐거나 가중치 문제로 Layer2가 데이터의 특징을 잃어버리고 0에 가까운 값을 반환해버리면, x2 = 0이 되고, Layer3은 0을 받아서 연산하니까 최종 output도 완전히 망가짐
+
+~~~py
+x1 = Layer1(input)
+x2 = Layer2(x1)
+output = Layer3(x2)
+~~~
+
+<br/>
+
+  - Skip-Connection (잔차 연결 방식)
+    - 원본 데이터(input)를 옆으로 빼서 보관해뒀다가 마지막에 더해주는 구조
+    - 만약 학습이 덜 됐거나 가중치 문제로 Layer2가 데이터의 특징을 잃어버리고 0에 가까운 값을 반환해버려도, 최종 결과물에는 최소한 원본 데이터(input)라도 온전히 살아남게됨
+
+~~~py
+x1 = Layer1(input)
+x2 = Layer2(x1)
+output = x2 + input  // 핵심: 원본을 그대로 더함!
+~~~
+
+<br/>
+
+  - Skip-Connection이 loss의 꼬불꼬불함을 해결해 준다
+    - No Skip-Connection일 때 지형이 꼬이는 이유
+      - 일반적으로는 output = Layer3(Layer2(Layer1(input))) 처럼 x가 여러 층을 거치면서 계속 파고들며 가공됨, 각 Layer 안에는 가중치(Weight)를 곱하고, ReLU 같은 비선형 함수를 씌우는 작업이 있어, 가중치를 조금만 변경해도 그 미세한 변화가 곱하기와 비선형 함수를 타고 이리저리 증폭되거나 왜곡됨
+    - Skip-Connection이 지형을 다림질하는 원리
+      - output = Layer2(x1) + input 처럼, input은 아무런 조작이 가해지지 않은, 가장 안정적이고 예측 가능한 선형적인 값, 반면에 Layer2(x1)은 가중치와 함수들이 얽혀서 꼬불꼬불하고 복잡하게 변형된 값, 이둘을 더하는 것이기 때문에, 가중치 변화에 따라 미친 듯이 요동치려는 Layer2(x1)의 결과값에, 아주 안정적이고 매끄러운 직선 형태의 input이 강제로 섞임 그래서 조금 더 펴지게 되는것
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ResNet
+  - 저자 Kaiming He의 생각: Vanishing gradient 해결(BN+ReLU)했는데도, 모델이 깊을수록 training error가 커지는 건 좀 이상하다고 생각
+  - 또한, 깊은 층이 깊지 않은 층을 흉내내고 싶다면 나머지 층은 identity mapping(들어온 대로 나가게 하는것)을 하면 된다고 생각했지만, 이상하게 깊을수록 training error가 더 커짐
+  - 그래서, shortcut connection (이하 skip-connection)을 제안, identity mapping을 잘 만들 수 있게 해서 이 문제를 해결함
+    - 1.training error가 깊을수록 커지지는 않게 함
+    - 2.심지어 training, test error가 깊을수록 작아짐
+
+<br/>
+
+  - skip-connection
+    - x 가 들어와서 f(x)가 나가는 게 기존이지만, x+f(x) 가 나가게끔 연결해 주는 게 skip-connection
+    - 신경망이 깊을때는 입력으로부터 차근차근 조금씩 값을 바꿔 나가는 게 이상적일 것, skip-connection이 있을 때는 input된 데이터를 그대로 더해주기 때문에 비슷한 출력을 잘 만들어냄, 따라서 조금씩만 데이터가 바껴감
+      - ResNet은 깊을수록 각 conv layer 의 출력 편차가 작다! => 편차가 크지 않은 게 좋은 모델이다
+      - 차이만을 학습한다고 해서 잔차(residual)학습!! -> 변화량만 학습하면 되니까 학습이 쉽다(약간씩 보태주는 개념)
+      - 한 층만 skip 해봤을 때는 별 성능 개선이 없었음 -> 논문에서는 두 개 내지 세 개 점프를 사용
+      - BN 쓸 땐 : x -> conv -> BN -> ReLU -> conv -> BN -> +x -> ReLU
+        - ReLU전에 +x하는 이유 -> ReLU는 양수만 살리는 것이기 때문에 ReLU를 먼저 하면 양수만 남아버리는 상황이라 좋지 않음
+
+
+<img width="476" height="279" alt="image" src="https://github.com/user-attachments/assets/51dcbca5-9638-4ff3-8783-3f44da305cae" />
+
+<br/>
+
+  - 전체 구조
+<img width="1363" height="512" alt="image" src="https://github.com/user-attachments/assets/0866283d-542e-458b-bdd8-6b0a9fd0a77f" />
+
+<br/>
+
+  - 18레이어부터~152레이어 층 까지 가능
+  - 첫 pooling 이후 계속 skip-connection 함 
+
+<img width="918" height="401" alt="image" src="https://github.com/user-attachments/assets/1ff2d728-d4e0-4950-b6b3-dd0f499afce1" />
+
+<br/>
+
+  - Bottleneck
+    - 50층 이상 깊은 ResNet 에선 Bottleneck 구조 사용
+    - 기존 block 처럼 3x3만 사용하고 깊게 만들면 파라미터 수가 너무 많아짐
+    - 1x1 로 채널 수를 줄인 다음 3x3을 통과시키고 다시 1x1로 채널 수를 키움
+
+<img width="715" height="281" alt="image" src="https://github.com/user-attachments/assets/30fc092f-4a80-4d80-99a2-0c278494acdf" />
+
+<br/>
+
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
