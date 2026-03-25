@@ -2440,7 +2440,9 @@ output = x2 + input  // 핵심: 원본을 그대로 더함!
 <br/>
 
   - 18레이어부터~152레이어 층 까지 가능
-  - 첫 pooling 이후 계속 skip-connection 함 
+  - 첫 pooling 이후 계속 skip-connection 함
+  - conv3_1, 4_1, 5_1 의 첫 번째 layer에서 stride=2 로 사이즈를 줄임
+  - 블록(Block) 구조: 대괄호 [ ] 안에 있는 것이 하나의 잔차 블록(Residual Block). F(x) + x 연산이 일어나는 기본 단위
 
 <img width="918" height="401" alt="image" src="https://github.com/user-attachments/assets/1ff2d728-d4e0-4950-b6b3-dd0f499afce1" />
 
@@ -2455,6 +2457,155 @@ output = x2 + input  // 핵심: 원본을 그대로 더함!
 
 <br/>
 
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+class BasicBlock(nn.Module):
+    expansion = 1 # 클래스 속성
+    def __init__(self, in_channels, inner_channels, stride = 1, projection = None):
+        super().__init__()
+
+        self.residual = nn.Sequential(nn.Conv2d(in_channels, inner_channels, 3, stride=stride, padding=1, bias=False),
+                                      nn.BatchNorm2d(inner_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(inner_channels, inner_channels * self.expansion, 3, padding=1, bias=False),
+                                      nn.BatchNorm2d(inner_channels))
+        self.projection = projection
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        residual = self.residual(x)
+
+        if self.projection is not None:
+            shortcut = self.projection(x) # 점선 연결
+        else:
+            shortcut = x # 실선 연결
+
+        out = self.relu(residual + shortcut) # 여기서 skip-connection
+        return out
+
+class Bottleneck(nn.Module):
+    expansion = 4 # 클래스 속성
+    def __init__(self, in_channels, inner_channels, stride = 1, projection = None):
+        super().__init__()
+
+        self.residual = nn.Sequential(nn.Conv2d(in_channels, inner_channels, 1, bias=False),
+                                      nn.BatchNorm2d(inner_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(inner_channels, inner_channels, 3, stride=stride, padding=1, bias=False),
+                                      nn.BatchNorm2d(inner_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(inner_channels, inner_channels * self.expansion, 1, bias=False),
+                                      nn.BatchNorm2d(inner_channels * self.expansion))
+
+        self.projection = projection
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        residual = self.residual(x)
+
+        if self.projection is not None:
+            shortcut = self.projection(x)
+        else:
+            shortcut = x
+
+        out = self.relu(residual + shortcut) # 여기서 skip-connection
+        return out
+
+class ResNet(nn.Module):
+    def __init__(self, block, num_block_list, num_classes = 1000, zero_init_residual = True):
+        super().__init__()
+
+        self.in_channels = 64
+
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU(inplace=True) # inplace=True: 좀 더 메모리 효율적
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.stage1 = self.make_stage(block, 64, num_block_list[0], stride=1)
+        self.stage2 = self.make_stage(block, 128, num_block_list[1], stride=2)
+        self.stage3 = self.make_stage(block, 256, num_block_list[2], stride=2)
+        self.stage4 = self.make_stage(block, 512, num_block_list[3], stride=2)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+
+        # Zero-initialize the last BN in each residual branch,
+        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
+        # This improves the model by 0.2~0.3%p according to https://arxiv.org/abs/1706.02677
+        # 아무것도 보태지 않은 상태로 학습을 시작해서 뭘 보태면 좋을지를 알아내라! (더욱 조금만 보태게 학습이 될 것)
+        if zero_init_residual:
+            for m in self.modules():
+                if isinstance(m, block):
+                    nn.init.constant_(m.residual[-1].weight, 0)
+
+    def make_stage(self, block, inner_channels, num_blocks, stride = 1):
+
+        if stride != 1 or self.in_channels != inner_channels * block.expansion:
+            # stride = 2 면 여기로 무조건 들어옴 즉, stage 2,3,4 는 무조건 여기로 들어옴. (Basic block, BottleNeck 상관없이)
+            # stride = 1 이여도 채널 수가 다르면 여기로 들어옴 (resoltion은 그대로, 채널 수만 늘어나는 때)
+            # 즉, Basic block 쓰는 18, 34-layer의 stage 1에서만 else로 가고 BottleNeck 쓰는 50, 101, 152-layer는 모든 stage에서 항상 여기로 들어옴
+            projection = nn.Sequential(
+                nn.Conv2d(self.in_channels, inner_channels * block.expansion, 1, stride=stride, bias=False),
+                nn.BatchNorm2d(inner_channels * block.expansion)) # 점선 connection 임
+        else:
+            projection = None # 실선 connection
+
+        layers = []
+        layers += [block(self.in_channels, inner_channels, stride, projection)] # stride=2, 점선 연결은 첫 block에서만
+        self.in_channels = inner_channels * block.expansion
+        for _ in range(1, num_blocks): # 나머지 block은 실선 연결로 반복
+            layers += [block(self.in_channels, inner_channels)]
+
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)0
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = self.stage4(x)
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+def resnet18(**kwargs):
+    return ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
+
+def resnet34(**kwargs):
+    return ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
+
+def resnet50(**kwargs):
+    return ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+
+def resnet101(**kwargs):
+    return ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
+
+def resnet152(**kwargs):
+    return ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
+
+model = resnet152()
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,224,224), device='cpu')
+~~~
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
