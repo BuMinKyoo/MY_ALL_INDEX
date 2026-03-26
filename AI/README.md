@@ -15,8 +15,10 @@
   - [Inception Net V1](#inception-net-v1)_(2014.09)
   - [Inception Net V2,V3](#inception-net-v2v3)_(2015.12)
   - [Loss Landscape](#loss-landscape)
-  - [ResNet](#ResNet)_(2015.12)
+  - [ResNet](#resnet)_(2015.12)
   - [Inception Net V4,Inception-ResNet](#inception-net-v4inceptionresnet)_(2016.02)
+  - [WideResNet](#wideresnet)_(2016.05)
+  - [ResNeXt](#eesnext)_(2016.11)
 
 
 
@@ -1577,8 +1579,10 @@ def Test_plot(model, test_DL):
   - [Inception Net V1](#inception-net-v1)_(2014.09)
   - [Inception Net V2,V3](#inception-net-v2v3)_(2015.12)
   - [Loss Landscape](#loss-landscape)
-  - [ResNet](#ResNet)_(2015.12)
+  - [ResNet](#resnet)_(2015.12)
   - [Inception Net V4,Inception-ResNet](#inception-net-v4inceptionresnet)_(2016.02)
+  - [WideResNet](#wideresnet)_(2016.05)_(2016.02)
+  - [ResNeXt](#eesnext)_(2016.11)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -3092,8 +3096,156 @@ print(model(x).shape)
 ###### [CNN](#CNN)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+# WideResNet
+  - 깊게 하지 말고 넓게 해보자라는것
+    - a,b는 ResNet
+    - c,b는 논문에서 제안하는것(1x1 없이 3x3 두 번으로만 + dropout 사이에 추가)
+
+<img width="1614" height="574" alt="image" src="https://github.com/user-attachments/assets/7e510574-aba9-41c3-885c-ee43ed7af8dc" />
+
+<br/>
+
+  - 전체구조
+    - WRN-40-8’ => N=6, k=8 이라는 뜻
+
+<img width="970" height="513" alt="image" src="https://github.com/user-attachments/assets/6da0501a-c0ca-40b2-8e60-5aa5c1a81653" />
+
+<br/>
+
+  - ResNet-1001 과의 비교
+    - 28-10 은 파라미터 수가 3.6배니까 더 잘나오는것이 어쩌면 정상
+    - 16-8은 파라미터가 비슷한데 성능이 더 좋은것을 알 수 있음
+      - 그러나 이것도, dataset (32x32 짜리)이기 때문에 더 깊을 필요가 없음을 시사 하며, ResNet-1001의 1001층짜리가 너무 오버스팩으로 단순한 자료셋에 잘 맞지 않을 수도 있지 않나 생각해볼 수 있음
+      - 층을 1001층까지 깊게 쌓는 것을 멈추고 채널을 넓히는 방식으로 얕고 넓게(Shallow & Wide) 가자는 것이 WRN의 주장이지만, 그 실험 결과가 CIFAR-10이라는 아주 작은 해상도의 데이터셋에서 측정되었기 때문에 나온 착시효과일 수도 있다는 맹점
+        - 16 층 짜리가 가지는 receptive field를 써도 충분히 커버 가능한 dataset (32x32 짜리) 였다는것
+          - receptive field는, 3x3 사이즈의 필터(컨볼루션)를 기준으로, 스트라이드(Stride)는 1이라고 가정하면
+          - 1층 통과: 처음 3x3 필터를 거치면 출력된 특성 맵의 픽셀 1개는 원본 이미지의 3x3 픽셀 영역 정보 담고 있음
+          - 2층 통과: 그 다음 층에서 다시 3x3 필터를 적용. 방금 만들어진 1층의 픽셀 3x3개를 묶어서 봄, 그런데 1층의 픽셀 하나당 이미 원본의 3칸짜리 시야를 가지고 있으니까, 이걸 엮으면 양옆으로 1칸씩 더 넓어져서 총 5x5 영역의 정보를 담게됨
+
+<img width="1293" height="576" alt="image" src="https://github.com/user-attachments/assets/81c7ec6c-722e-4516-98bc-a631ae3a3b11" />
+
+<br/>
+
+  - 모델 코드 확인하기(Inception-ResNet V2)
+~~~py
+import torch
+from torch import nn
+
+class WiderBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, stride=1, projection=None, drop_p=0.3):
+        # drop_p = 0.3 for CIFAR, 0.4 for SVHN
+        super().__init__()
+
+        self.residual = nn.Sequential(nn.BatchNorm2d(in_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(in_channels, out_channels, 3, stride=stride, padding=1, bias = False),
+                                      nn.BatchNorm2d(out_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Dropout(drop_p),
+                                      nn.Conv2d(out_channels, out_channels, 3, padding=1, bias = False))
+
+        self.projection = projection
+    def forward(self, x):
+
+        residual = self.residual(x)
+
+        if self.projection is not None:
+            shortcut = self.projection(x)
+        else:
+            shortcut = x
+
+        out = residual + shortcut # 엉! ReLU 였는데 ReLU 없음!
+        return out
+
+class WRN(nn.Module):
+    def __init__(self, depth, k, num_classes=1000, init_weights=True):
+        super().__init__()
+        N = int((depth-4)/3/2)
+
+        self.in_channels = 16
+
+        self.conv1 = nn.Conv2d(3, 16, 3, padding=1, bias = False)
+        # pre-act 구조에선 block 들어가기 전에 pool 있으면 conv-BN-relu-pool -> Bottleneck 이렇게
+        # pooling이 없을 땐? conv -> Block 으로 바로 들어감 why?
+        # conv-bn-relu -> Block 으로 넣으면 Block 에서 bn-relu를 만나서 bn-relu-bn-relu 이렇게 돼버린다!
+        # (만약 맨처음에 bn-relu부터 통과시키면? 데이터 전처리에서 할 일을 하게 되는 셈)
+        self.stage1 = self.make_stage(16*k, N, stride = 1)
+        self.stage2 = self.make_stage(32*k, N, stride = 2)
+        self.stage3 = self.make_stage(64*k, N, stride = 2)
+        self.bn = nn.BatchNorm2d(64*k)
+        self.relu = nn.ReLU(inplace=True)
+        self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
+        self.fc = nn.Linear(64*k, num_classes)
+
+        # weight initialization
+        if init_weights:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.Linear):
+                    nn.init.normal_(m.weight, 0, 0.01)
+                    nn.init.constant_(m.bias, 0)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = self.bn(x)
+        x = self.relu(x)
+        x = self.avg_pool(x)
+        x = torch.flatten(x, start_dim=1)
+        x = self.fc(x)
+        return x
+
+    def make_stage(self, out_channels, num_blocks, stride):
+
+        if stride != 1 or self.in_channels != out_channels:
+            projection = nn.Conv2d(self.in_channels, out_channels, 1, stride=stride, bias = False)
+                # nn.BatchNorm2d(inner_channels * block.expansion)) # pre-act 라서 여기선 생략
+        else:
+            projection = None
+
+        layers = []
+        layers += [WiderBlock(self.in_channels, out_channels, stride, projection)] # stride=2, 점선 연결은 첫 block에서만
+        self.in_channels = out_channels
+        for _ in range(1, num_blocks):
+            layers += [WiderBlock(self.in_channels, out_channels)]
+
+        return nn.Sequential(*layers)
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기(Inception-ResNet V2)
+~~~py
+model = WRN(depth=28, k=10, num_classes=10)
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, (2,3, 224, 224), device="cpu")
+
+x = torch.randn(2,3,32,32)
+print(model(x).shape)
+~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# ResNeXt
 
 
+
+###### [CNN](#CNN)
+###### [Top](#top)
 
 
 
