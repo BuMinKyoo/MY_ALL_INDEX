@@ -19,6 +19,7 @@
   - [Inception Net V4,Inception-ResNet](#inception-net-v4inceptionresnet)_(2016.02)
   - [WideResNet](#wideresnet)_(2016.05)
   - [ResNeXt](#eesnext)_(2016.11)
+  - [DenseNet](#densenet)_(2016.08)
 
 
 
@@ -1583,6 +1584,7 @@ def Test_plot(model, test_DL):
   - [Inception Net V4,Inception-ResNet](#inception-net-v4inceptionresnet)_(2016.02)
   - [WideResNet](#wideresnet)_(2016.05)_(2016.02)
   - [ResNeXt](#eesnext)_(2016.11)
+  - [DenseNet](#densenet)_(2016.08)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -3241,11 +3243,170 @@ print(model(x).shape)
 <br/>
 
 # ResNeXt
+  - ResNet의 BottleNeck 에서 3x3 conv 에 그냥 conv 말고 Grouped conv 를 사용
+    - 들어오는 채널을 그룹으로 쪼개서 각 그룹 별로 따로 conv 하는 것(단, 각 그룹은 서로 동일한 개수의 특징 맵을 얻음)
+    - 입력 채널 = 128 / nn.Conv2d(128, 512, 3, groups=1) 의 weight shape = 512x128x3x3
+    - 입력 채널 = 128 / nn.Conv2d(128, 512, 3, groups=2) 의 weight shape = 2*256x128/2x3x3
+      - 128에서 512채널로 바꿔나가고 싶으니까 필터 갯수는 512개여야 겠지 그래서 weight shape 갯수는 512개 그리고, 128개로 채널이 들어오니까 그거에 대응할 수 있어야 하니 128두께어야 하고 그래서 weight shape = 512x128x3x3 이여야 하는데 groups=2이기 때문에, 펄터의 두께 128개를 절반나누고, 그리고 필터도 절반 나눠서 각각 따로 보기 때문에 256x64x3x3이 된다는 거지? 그리고 필터1개당 1개씩 특징이 나오니까 256개 +256개 하면 512되것
+      - 즉, 그룹 수만큼 파라미터가 줄어든다 / 512x128x3x3 = 589,824 / 256x64x3x3 + 256x64x3x3 = 294,912
+    - Grouped conv 덕에 파라미터를 절약했고 다른 곳에 투자할 수 있게 됨 -> 채널수에 투자를더함! -> Bottleneck 이 줄어듬
+      - inner채널쪽에 채널수가 2배가됨
+      - Bottleneck
+        - 일반적인 방식 (BasicBlock)그냥 무식하게 3x3 필터로 처음부터 끝까지 때려버리면 파라미터가 엄청남. 256 \times 256 \times 3 \times 3 = 589,824개
+        - 보틀넥 방식 (Bottleneck)1단계 (1x1 축소): 256 \times 64 \times 1 \times 1 = 16,384개 / 2단계 (3x3 연산): 64 \times 64 \times 3 \times 3 = 36,864개 / 3단계 (1x1 확장): 64 \times 256 \times 1 \times 1 = 16,384개 / 세 단계를 다 합치면 총 69,632개
 
+<img width="1919" height="801" alt="image" src="https://github.com/user-attachments/assets/a934b286-1485-46ee-a3e0-599e24bde3f3" />
+
+<br/>
+
+  - 이전까지 딥러닝 성능을 올리는 방법은 층을 깊게(Depth) 쌓거나, 채널을 넓게(Width) 늘리는 것 두 가지뿐, ResNeXt는 여기에 카디널리티라는 세 번째 차원을 도입한다, 카디널리티는 수학 용어로 집합의 크기라는 뜻인데, 딥러닝에서는 변환 그룹의 수, 즉 한 블록 안에서 데이터를 몇 갈래로 쪼갤 것인가를 의미. 논문에서는 층을 깊게 하거나 넓히는 것보다, 이 갈래(카디널리티)를 늘리는 것이 성능 향상에 훨씬 더 강력하다고 증명함
+
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+class Bottleneck(nn.Module):
+    expansion = 2 # 클래스 속성
+    def __init__(self, in_channels, inner_channels, cardinality, stride = 1, projection = None):
+        super().__init__()
+
+        self.residual = nn.Sequential(nn.Conv2d(in_channels, inner_channels, 1, bias=False),
+                                      nn.BatchNorm2d(inner_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(inner_channels, inner_channels, 3, stride=stride, padding=1, groups = cardinality, bias=False),
+                                      nn.BatchNorm2d(inner_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(inner_channels, inner_channels * self.expansion, 1, bias=False),
+                                      nn.BatchNorm2d(inner_channels * self.expansion))
+
+        self.projection = projection
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        residual = self.residual(x)
+
+        if self.projection is not None:
+            shortcut = self.projection(x)
+        else:
+            shortcut = x
+
+        out = self.relu(residual + shortcut)
+        return out
+
+class ResNeXt(nn.Module):
+    def __init__(self, block, num_block_list, cardinality, num_classes = 1000, zero_init_residual = True):
+        super().__init__()
+
+        self.in_channels = 64
+        self.cardinality = cardinality
+
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU(inplace=True) # 좀더 메모리 효율적
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.stage1 = self.make_stage(block, 128, num_block_list[0], stride=1)
+        self.stage2 = self.make_stage(block, 256, num_block_list[1], stride=2)
+        self.stage3 = self.make_stage(block, 512, num_block_list[2], stride=2)
+        self.stage4 = self.make_stage(block, 1024, num_block_list[3], stride=2)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(1024 * block.expansion, num_classes)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+
+        # Zero-initialize the last BN in each residual branch,
+        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
+        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
+        if zero_init_residual:
+            for m in self.modules():
+                if isinstance(m, block):
+                    nn.init.constant_(m.residual[-1].weight, 0)
+
+    def make_stage(self, block, inner_channels, num_blocks, stride = 1):
+
+        if stride != 1 or self.in_channels != inner_channels * block.expansion:
+            projection = nn.Sequential(
+                nn.Conv2d(self.in_channels, inner_channels * block.expansion, 1, stride=stride, bias=False),
+                nn.BatchNorm2d(inner_channels * block.expansion))
+        else:
+            projection = None
+
+        layers = []
+        layers += [block(self.in_channels, inner_channels, self.cardinality, stride, projection)] # projection은 첫 block에서만
+        self.in_channels = inner_channels * block.expansion
+        for _ in range(1, num_blocks):
+            layers += [block(self.in_channels, inner_channels, self.cardinality)]
+
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = self.stage4(x)
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+def resnext50(**kwargs):
+    return ResNeXt(Bottleneck, [3, 4, 6, 3], cardinality=32, **kwargs)
+
+def resnext101(**kwargs):
+    return ResNeXt(Bottleneck, [3, 4, 23, 3], cardinality=32, **kwargs)
+
+model = resnext50()
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,224,224), device='cpu')
+
+x = torch.randn(2,3,224,224)
+print(model(x).shape)
+~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# DenseNet
+
+
+
+
+  - 모델 코드 확인하기
+~~~py
+
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+
+~~~
 
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
+
 
 
 
