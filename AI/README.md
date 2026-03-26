@@ -16,6 +16,7 @@
   - [Inception Net V2,V3](#inception-net-v2v3)_(2015.12)
   - [Loss Landscape](#loss-landscape)
   - [ResNet](#ResNet)_(2015.12)
+  - [Inception Net V4,Inception-ResNet](#inception-net-v4inceptionresnet)_(2016.02)
 
 
 
@@ -1577,6 +1578,7 @@ def Test_plot(model, test_DL):
   - [Inception Net V2,V3](#inception-net-v2v3)_(2015.12)
   - [Loss Landscape](#loss-landscape)
   - [ResNet](#ResNet)_(2015.12)
+  - [Inception Net V4,Inception-ResNet](#inception-net-v4inceptionresnet)_(2016.02)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -2607,6 +2609,299 @@ from torchinfo import summary
 summary(model, input_size=(2,3,224,224), device='cpu')
 ~~~
 
+<br/>
+
+  - ResNet은 앙상블 모델이다라고 주장하는 사람이 있고, 아닌 사람이 있고
+  - 54개 block으로 이루어진 110층 ResNet 에서 각 block을 삭제해 가면서 Test error 관찰했으나, ResNet은 값을 조금씩만 바꿔나가기 때문에 한 블록 정도는 없어도 괜찮게 동작한다
+    - VGG에도 비슷한 실험을 했더니 이번엔 난리나는것을 확인
+  - 여러 실험을 통해서, 짧은 path (skip 많이한 path)가 유효한 녀석들이고 긴 녀석들은 별 기여가 없다고 해석 가능함
+
+<br/>
+
+  - ResNet 발전_full pre-activation_(2016.03)
+    - 기존 것은 ReLU가 길목을 딱 막고 있으니까 gradient가 사라질 위험이 존재 => 길을 터주자
+    - act를 Residual 쪽으로 빼서 해결! (post-activation에서 pre-activation으로!)
+
+<img width="1345" height="740" alt="image" src="https://github.com/user-attachments/assets/1daae793-8cf1-4cf5-8a71-00ff5c1c7362" />
+  
+<br/>
+
+  - 이런저런시도 끝에 (BN도 앞으로 빼는) full pre-activation이 최고
+
+<img width="1735" height="842" alt="image" src="https://github.com/user-attachments/assets/78bf9659-14ee-4a87-9dc3-0217ecc27859" />
+
+<br/>
+
+  - full-pre 로 바꿨을 때 달라지는 두 가지
+    - 기존에는 점선 연결 = conv-BN 이었으나, (b)에서 BN을 길목으로 뺀 다음 residual로 보냈기 때문에 점선 연결 = conv 만 한다
+  - 마지막 블록 이후의 처리는, 마지막 BottleNeck -> BN-ReLU-GAP-FC 로 처리
+    - 기존은 마지막 BottleNeck -> GAP-FC
+~~~py
+def make_stage함수에서
+
+projection = nn.Sequential(
+                nn.Conv2d(self.in_channels, inner_channels * block.expansion, 1, stride=stride, bias=False),
+                nn.BatchNorm2d(inner_channels * block.expansion)) # 점선 connection 임
+
+이부분에서 nn.BatchNorm2d(inner_channels * block.expansion)) 이게 빠지게됨
+~~~
+
 ###### [CNN](#CNN)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# Inception Net V4,Inception-ResNet
+  - V4, Inception-ResNet V1, V2 이렇게 세 가지가 한 논문에 소개됨
+  - Inception Net V4
+    - 이전 버전보다 파라미터가 훨씬 많음
+    - 이전 버전인 V3에서 모델 구조가 너무 파편화되고 지저분했던 것을, 아주 깔끔하고 규칙적인 격자(Grid) 형태로 싹 리팩토링함
+    - 스킵 커넥션(skip-connection을) 없음
+    - 보조 분류기 (Aux-classifier) 사용함
+  - Inception-ResNet
+    - ResNet 의 skip-connection을 활용 해서 성능을 키움
+    - aux-classifier 얘기는 쏙 들어감
+      - "초기 기울기 소실 방지" 역할을 전혀 수행하지 못한다는 것이 드러남
+      - skip-connection의 등장으로 기울기 소실 문제 자체가 구조적으로 완벽하게 해결
+    - Residual 에 0.1 ~ 0.3 을 곱해서 더했더니 좀더 낫다는 부분 있지만, Residual 에 0.1 을 곱하는 것은 여기서만 그렇고 다른 논문에선 안 쓰는 방식
+    - Inception과 ResNet이라는 당시 최고의 두 모델을 합쳤는데, 기대만큼 엄청난 시너지가 나지 않고 순수 Inception V4와 성능 차이가 크지않았을까 하는생각이 있었음
+      - 심한 병목 (Bottleneck)발생이 원인이 있었음
+
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+class BasicConv2d(nn.Module):
+    def __init__(self, in_channels, out_channels, **kwargs):
+        super().__init__()
+        self.conv_block = nn.Sequential(nn.Conv2d(in_channels, out_channels, bias=False, **kwargs),
+                                        nn.BatchNorm2d(out_channels, eps=0.001),
+                                        nn.ReLU())
+    def forward(self, x):
+        x = self.conv_block(x)
+        return x
+
+class Inception_Stem(nn.Module):
+    # Figure 3.
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Sequential(BasicConv2d(3, 32, kernel_size=3, stride=2),
+                                   BasicConv2d(32, 32, kernel_size=3),
+                                   BasicConv2d(32, 64, kernel_size=3, padding=1))
+        self.branch3x3_pool = nn.MaxPool2d(3, stride=2)
+        self.branch3x3_conv = BasicConv2d(64, 96, kernel_size=3, stride=2)
+
+        self.branch7x7a = nn.Sequential(BasicConv2d(160, 64, kernel_size=1),
+                                        BasicConv2d(64, 96, kernel_size=3))
+        self.branch7x7b = nn.Sequential(BasicConv2d(160, 64, kernel_size=1),
+                                        BasicConv2d(64, 64, kernel_size=(7, 1), padding=(3, 0)),
+                                        BasicConv2d(64, 64, kernel_size=(1, 7), padding=(0, 3)),
+                                        BasicConv2d(64, 96, kernel_size=3))
+
+        self.branchpoola = BasicConv2d(192, 192, kernel_size=3, stride=2)
+        self.branchpoolb = nn.MaxPool2d(3, stride=2)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = [self.branch3x3_pool(x),
+             self.branch3x3_conv(x)]
+        x = torch.cat(x, 1)
+
+        x = [self.branch7x7a(x),
+             self.branch7x7b(x)]
+        x = torch.cat(x, 1)
+
+        x = [self.branchpoola(x),
+             self.branchpoolb(x)]
+        x = torch.cat(x, 1)
+        return x
+
+class InceptionA(nn.Module):
+    # Figure 4.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branchpool = nn.Sequential(nn.AvgPool2d(kernel_size=3, stride=1, padding=1),
+                                        BasicConv2d(input_channels, 96, kernel_size=1))
+
+        self.branch1x1 = BasicConv2d(input_channels, 96, kernel_size=1)
+
+        self.branch3x3 = nn.Sequential(BasicConv2d(input_channels, 64, kernel_size=1),
+                                       BasicConv2d(64, 96, kernel_size=3, padding=1))
+
+        self.branch3x3dbl = nn.Sequential(BasicConv2d(input_channels, 64, kernel_size=1),
+                                          BasicConv2d(64, 96, kernel_size=3, padding=1),
+                                          BasicConv2d(96, 96, kernel_size=3, padding=1))
+
+    def forward(self, x):
+        x = [self.branchpool(x), self.branch1x1(x), self.branch3x3(x), self.branch3x3dbl(x)]
+        return torch.cat(x, 1)
+
+class ReductionA(nn.Module):
+    # Figure 7.
+    # The k, l, m, n numbers represent filter bank sizes which can be looked up in Table 1.
+    def __init__(self, input_channels, k, l, m, n):
+        super().__init__()
+
+        self.branchpool = nn.MaxPool2d(kernel_size=3, stride=2)
+        self.branch3x3 = BasicConv2d(input_channels, n, kernel_size=3, stride=2)
+        self.branch3x3dbl = nn.Sequential(BasicConv2d(input_channels, k, kernel_size=1),
+                                          BasicConv2d(k, l, kernel_size=3, padding=1),
+                                          BasicConv2d(l, m, kernel_size=3, stride=2))
+
+    def forward(self, x):
+        x = [self.branchpool(x), self.branch3x3(x), self.branch3x3dbl(x)]
+        return torch.cat(x, 1)
+
+class InceptionB(nn.Module):
+
+    # Figure 5.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branchpool = nn.Sequential(
+            nn.AvgPool2d(3, stride=1, padding=1),
+            BasicConv2d(input_channels, 128, kernel_size=1))
+
+        self.branch1x1 = BasicConv2d(input_channels, 384, kernel_size=1)
+
+        self.branch7x7 = nn.Sequential(
+            BasicConv2d(input_channels, 192, kernel_size=1),
+            BasicConv2d(192, 224, kernel_size=(1, 7), padding=(0, 3)),
+            BasicConv2d(224, 256, kernel_size=(7, 1), padding=(3, 0))) # 논문은 여기도 1x7로 되어있음. 하지만 오류일 것으로 추정
+
+        self.branch7x7dbl = nn.Sequential(
+            BasicConv2d(input_channels, 192, kernel_size=1),
+            BasicConv2d(192, 192, kernel_size=(1, 7), padding=(0, 3)),
+            BasicConv2d(192, 224, kernel_size=(7, 1), padding=(3, 0)),
+            BasicConv2d(224, 224, kernel_size=(1, 7), padding=(0, 3)),
+            BasicConv2d(224, 256, kernel_size=(7, 1), padding=(3, 0)))
+
+    def forward(self, x):
+        x = [self.branchpool(x), self.branch1x1(x), self.branch7x7(x), self.branch7x7dbl(x)]
+        return torch.cat(x, 1)
+
+class ReductionB(nn.Module):
+    # Figure 8.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branchpool = nn.MaxPool2d(kernel_size=3, stride=2)
+
+        self.branch3x3 = nn.Sequential(
+            BasicConv2d(input_channels, 192, kernel_size=1),
+            BasicConv2d(192, 192, kernel_size=3, stride=2))
+
+        self.branch7x7 = nn.Sequential(
+            BasicConv2d(input_channels, 256, kernel_size=1),
+            BasicConv2d(256, 256, kernel_size=(1, 7), padding=(0, 3)),
+            BasicConv2d(256, 320, kernel_size=(7, 1), padding=(3, 0)),
+            BasicConv2d(320, 320, kernel_size=3, stride=2))
+
+    def forward(self, x):
+        x = [self.branchpool(x), self.branch3x3(x), self.branch7x7(x)]
+        return torch.cat(x, 1)
+
+class InceptionC(nn.Module):
+    # Figure 6.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branchpool = nn.Sequential(
+            nn.AvgPool2d(kernel_size=3, stride=1, padding=1),
+            BasicConv2d(input_channels, 256, kernel_size=1))
+
+        self.branch1x1 = BasicConv2d(input_channels, 256, kernel_size=1)
+
+        self.branch3x3 = BasicConv2d(input_channels, 384, kernel_size=1)
+        self.branch3x3a = BasicConv2d(384, 256, kernel_size=(1, 3), padding=(0, 1))
+        self.branch3x3b = BasicConv2d(384, 256, kernel_size=(3, 1), padding=(1, 0))
+
+        self.branch3x3dbl = nn.Sequential(
+            BasicConv2d(input_channels, 384, kernel_size=1),
+            BasicConv2d(384, 448, kernel_size=(1, 3), padding=(0, 1)),
+            BasicConv2d(448, 512, kernel_size=(3, 1), padding=(1, 0)))
+        self.branch3x3dbla = BasicConv2d(512, 256, kernel_size=(3, 1), padding=(1, 0))
+        self.branch3x3dblb = BasicConv2d(512, 256, kernel_size=(1, 3), padding=(0, 1))
+
+    def forward(self, x):
+        branchpool = self.branchpool(x)
+
+        branch1x1 = self.branch1x1(x)
+
+        branch3x3 = self.branch3x3(x)
+        branch3x3 = [self.branch3x3a(branch3x3),
+                     self.branch3x3b(branch3x3)]
+        branch3x3 = torch.cat(branch3x3, 1)
+
+        branch3x3dbl = self.branch3x3dbl(x)
+        branch3x3dbl = [self.branch3x3dbla(branch3x3dbl),
+                        self.branch3x3dblb(branch3x3dbl)]
+        branch3x3dbl = torch.cat(branch3x3dbl, 1)
+
+        outputs = [branch1x1, branch3x3, branch3x3dbl, branchpool]
+
+        return torch.cat(outputs, 1)
+
+class InceptionV4(nn.Module):
+    # Figure 9.
+    def __init__(self, A, B, C, k=192, l=224, m=256, n=384, class_nums=1000):
+        super().__init__()
+        self.stem = Inception_Stem()
+        self.inception_a = nn.Sequential(*[InceptionA(384) for _ in range(A)])
+        self.reduction_a = ReductionA(384, k, l, m, n)
+        self.inception_b = nn.Sequential(*[InceptionB(1024) for _ in range(B)])
+        self.reduction_b = ReductionB(1024)
+        self.inception_c = nn.Sequential(*[InceptionC(1536) for _ in range(C)])
+        self.avgpool = nn.AdaptiveAvgPool2d((1,1))
+        self.dropout = nn.Dropout2d(0.2)
+        self.linear = nn.Linear(1536, class_nums)
+
+    def forward(self, x):
+        x = self.stem(x)
+        x = self.inception_a(x)
+        x = self.reduction_a(x)
+        x = self.inception_b(x)
+        x = self.reduction_b(x)
+        x = self.inception_c(x)
+        x = self.avgpool(x)
+        x = self.dropout(x)
+        x = torch.flatten(x,1)
+        x = self.linear(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+model = InceptionV4(4, 7, 3)
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,299,299), device='cpu')
+
+x = model(torch.randn(2,3,299,299))
+print(x.shape)
+~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
