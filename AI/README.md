@@ -2670,7 +2670,27 @@ projection = nn.Sequential(
 
 <br/>
 
-  - 모델 코드 확인하기
+  - Inception Net V4 전체구조
+
+<img width="1271" height="1064" alt="image" src="https://github.com/user-attachments/assets/823bb4bf-718d-4154-ba29-dcf1445dc035" />
+
+<br/>
+
+<img width="2075" height="1177" alt="image" src="https://github.com/user-attachments/assets/a4e1ef10-e585-4ed2-8ffd-31860e4ca8b0" />
+
+<br/>
+
+  - Inception-ResNet V2 전체구조
+
+<img width="1617" height="1182" alt="image" src="https://github.com/user-attachments/assets/ddff150d-2ea7-46b6-86bf-70b40a76eaad" />
+
+<br/>
+
+<img width="2078" height="1190" alt="image" src="https://github.com/user-attachments/assets/b4f767d6-f382-46cf-9ee6-d08915a9f2b3" />
+
+<br/>
+
+  - 모델 코드 확인하기(Inception Net V4)
 ~~~py
 import torch
 from torch import nn
@@ -2877,7 +2897,7 @@ class InceptionV4(nn.Module):
 
 <br/>
 
-  - 모델 인스턴스화 및 실행하기
+  - 모델 인스턴스화 및 실행하기(Inception Net V4)
 ~~~py
 model = InceptionV4(4, 7, 3)
 # print(model)
@@ -2887,6 +2907,186 @@ summary(model, input_size=(2,3,299,299), device='cpu')
 
 x = model(torch.randn(2,3,299,299))
 print(x.shape)
+~~~
+
+<br/>
+
+  - 모델 코드 확인하기(Inception-ResNet V2)
+~~~py
+import torch
+from torch import nn
+
+class InceptionResNetA(nn.Module):
+    # Figure 16.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branch1x1 = BasicConv2d(input_channels, 32, kernel_size=1)
+        self.branch3x3 = nn.Sequential(
+            BasicConv2d(input_channels, 32, kernel_size=1),
+            BasicConv2d(32, 32, kernel_size=3, padding=1))
+        self.branch3x3dbl = nn.Sequential(
+            BasicConv2d(input_channels, 32, kernel_size=1),
+            BasicConv2d(32, 48, kernel_size=3, padding=1),
+            BasicConv2d(48, 64, kernel_size=3, padding=1))
+        self.reduction1x1 = nn.Conv2d(128, 384, kernel_size=1)
+        self.bn = nn.BatchNorm2d(384)
+
+        self.shortcut = nn.Sequential(nn.Conv2d(input_channels, 384, kernel_size=1),
+                                      nn.BatchNorm2d(384))
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        residual = [self.branch1x1(x),
+                    self.branch3x3(x),
+                    self.branch3x3dbl(x)]
+        residual = torch.cat(residual, 1)
+        residual = self.reduction1x1(residual) * 0.1 # Figure 20. 에 맞게 이 모듈에만 0.1이 없길래 추가함
+        residual = self.bn(residual)
+
+        shortcut = self.shortcut(x)
+
+        output = self.relu(residual + shortcut)
+        return output
+
+class InceptionResNetReductionA(nn.Module):
+    # Figure 7.
+    # The k, l, m, n numbers represent filter bank sizes which can be looked up in Table 1.
+    def __init__(self, input_channels, k, l, m, n):
+        super().__init__()
+
+        self.branchpool = nn.MaxPool2d(kernel_size=3, stride=2)
+        self.branch3x3 = BasicConv2d(input_channels, n, kernel_size=3, stride=2)
+        self.branch3x3dbl = nn.Sequential(BasicConv2d(input_channels, k, kernel_size=1),
+                                          BasicConv2d(k, l, kernel_size=3, padding=1),
+                                          BasicConv2d(l, m, kernel_size=3, stride=2))
+
+    def forward(self, x):
+        x = [self.branchpool(x), self.branch3x3(x), self.branch3x3dbl(x)]
+        return torch.cat(x, 1)
+
+class InceptionResNetB(nn.Module):
+    # Figure 17.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branch1x1 = BasicConv2d(input_channels, 192, kernel_size=1)
+        self.branch7x7 = nn.Sequential(
+            BasicConv2d(input_channels, 128, kernel_size=1),
+            BasicConv2d(128, 160, kernel_size=(1, 7), padding=(0, 3)),
+            BasicConv2d(160, 192, kernel_size=(7, 1), padding=(3, 0)))
+        self.reduction1x1 = nn.Conv2d(384, 1154, kernel_size=1)
+        self.bn = nn.BatchNorm2d(1154)
+
+        self.shortcut = nn.Sequential(nn.Conv2d(input_channels, 1154, kernel_size=1),
+                                      nn.BatchNorm2d(1154))
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        residual = [self.branch1x1(x),
+                    self.branch7x7(x)]
+        residual = torch.cat(residual, 1)
+        residual = self.reduction1x1(residual) * 0.1 # Figure 20.
+        residual = self.bn(residual)
+
+        shortcut = self.shortcut(x)
+
+        output = self.relu(residual + shortcut)
+        return output
+
+class InceptionResNetReductionB(nn.Module):
+    # Figure 18.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branchpool = nn.MaxPool2d(3, stride=2)
+
+        self.branch3x3a = nn.Sequential(
+            BasicConv2d(input_channels, 256, kernel_size=1),
+            BasicConv2d(256, 384, kernel_size=3, stride=2))
+
+        self.branch3x3b = nn.Sequential(
+            BasicConv2d(input_channels, 256, kernel_size=1),
+            BasicConv2d(256, 288, kernel_size=3, stride=2))
+
+        self.branch3x3dbl = nn.Sequential(
+            BasicConv2d(input_channels, 256, kernel_size=1),
+            BasicConv2d(256, 288, kernel_size=3, padding=1),
+            BasicConv2d(288, 320, kernel_size=3, stride=2))
+
+    def forward(self, x):
+        x = [self.branch3x3a(x), self.branch3x3b(x), self.branch3x3dbl(x), self.branchpool(x)]
+        return torch.cat(x, 1)
+
+class InceptionResNetC(nn.Module):
+    # Figure 19.
+    def __init__(self, input_channels):
+        super().__init__()
+
+        self.branch1x1 = BasicConv2d(input_channels, 192, kernel_size=1)
+        self.branch3x3 = nn.Sequential(
+            BasicConv2d(input_channels, 192, kernel_size=1),
+            BasicConv2d(192, 224, kernel_size=(1, 3), padding=(0, 1)),
+            BasicConv2d(224, 256, kernel_size=(3, 1), padding=(1, 0)))
+        self.reduction1x1 = nn.Conv2d(448, 2048, kernel_size=1)
+        self.bn = nn.BatchNorm2d(2048)
+
+        self.shortcut = nn.Sequential(nn.Conv2d(input_channels, 2048, kernel_size=1),
+                                      nn.BatchNorm2d(2048))
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        residual = [self.branch1x1(x),
+                    self.branch3x3(x)]
+        residual = torch.cat(residual, 1)
+        residual = self.reduction1x1(residual) * 0.1 # Figure 20.
+        residual = self.bn(residual)
+
+        shortcut = self.shortcut(x)
+
+        output = self.relu(residual + shortcut)
+        return output
+
+class InceptionResNetV2(nn.Module):
+    # Figure 15.
+    def __init__(self, A, B, C, k=256, l=256, m=384, n=384, class_nums=1000):
+        super().__init__()
+        self.stem = Inception_Stem()
+        self.inception_resnet_a = nn.Sequential(*[InceptionResNetA(384) for _ in range(A)])
+        self.reduction_a = InceptionResNetReductionA(384, k, l, m, n)
+        self.inception_resnet_b = nn.Sequential(InceptionResNetB(1152),
+                                                *[InceptionResNetB(1154) for _ in range(B-1)])
+        self.reduction_b = InceptionResNetReductionB(1154)
+        self.inception_resnet_c = nn.Sequential(InceptionResNetC(2146),
+                                                *[InceptionResNetC(2048) for _ in range(C-1)])
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.dropout = nn.Dropout2d(0.2)
+        self.linear = nn.Linear(2048, class_nums)
+
+    def forward(self, x):
+        x = self.stem(x)
+        x = self.inception_resnet_a(x)
+        x = self.reduction_a(x)
+        x = self.inception_resnet_b(x)
+        x = self.reduction_b(x)
+        x = self.inception_resnet_c(x)
+        x = self.avgpool(x)
+        x = self.dropout(x)
+        x = torch.flatten(x,1)
+        x = self.linear(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기(Inception-ResNet V2)
+~~~py
+model = InceptionResNetV2(5, 10, 5)
+# print(model)
+summary(model, input_size=(2,3,299,299), device='cpu')
+
+x = torch.randn(2,3,299,299)
+print(model(x).shape)
 ~~~
 
 ###### [CNN](#CNN)
