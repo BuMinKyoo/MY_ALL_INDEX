@@ -3387,7 +3387,21 @@ print(model(x).shape)
 <br/>
 
 # DenseNet
+  - ResNet의 skip-connection은 더하니까 정보가 뭉개지게 된다
+  - 그러면 더하지 말고 concat! 이전의 feature map들을 모두 사용하자
+  - 이전 연구를 반영, full pre-activation 사용
+  - concat을 계속 하다보면 파라미터가 너무 많아지는 문제발생
+    - 해결1 : 새로운 정보의 양을 엄격하게 통제: Growth Rate (k), 그러면 거기서 뽑힌 특징들은 알짜배기만 뽑히게 된다
+    - 해결2 : 중간중간 메모리 대청소: Transition Layer, 아무리 $k$를 작게 유지해도, 블록 안에서 덧붙이기를 수십 번 반복하면 결국 데이터 덩어리는 뚱뚱해질 수밖에 없다
+      - 1x1 Conv로 채널 압축: 그동안 누적되어 뚱뚱해진 채널의 개수를 절반(0.5배)으로 확 깎아버린다. 보틀넥(Bottleneck) 기법활용 -> 점진적으로 채널을 줄이는 방식을 사용한다
+      - Pooling으로 해상도 압축: Average Pooling 연산을 거쳐서 이미지의 가로세로 크기를 절반으로 줄여준다.
 
+<br/>
+
+  - 전체과정
+    - k = 32, 첫 conv에서 필터 2k 개 사용, “conv” = BN-ReLU-conv 가 함축된 것
+    - 따라서, feature map 개수 추이는 (121 기준),  3 -> 64 -> 256 -> 128 -> 512 -> 256 -> 1024 -> 512 -> 1024
+<img width="1824" height="978" alt="image" src="https://github.com/user-attachments/assets/dadd40c4-2c91-435e-bca9-0ef6dd2e09f9" />
 
 
 
