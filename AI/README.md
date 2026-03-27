@@ -21,6 +21,7 @@
   - [ResNeXt](#eesnext)_(2016.11)
   - [DenseNet](#densenet)_(2016.08)
   - [SE Net](#se-net)_(2017.09)
+  - [MobileNet V1](#mobilenet-v1)_(2017.04)
 
 
 
@@ -1587,6 +1588,7 @@ def Test_plot(model, test_DL):
   - [ResNeXt](#eesnext)_(2016.11)
   - [DenseNet](#densenet)_(2016.08)
   - [SE Net](#se-net)_(2017.09)
+  - [MobileNet V1](#mobilenet-v1)_(2017.04)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -3534,13 +3536,227 @@ print(model(x).shape)
 <br/>
 
 # SE Net
+  - 기존 네트웍(ResNet 등)에 끼워쓸 수 있는 SE block 제안
+  - Squeeze-Excitation 의 약자
+    - GAP 하고 (Squeeze) FC 두 층 통과시킨 것 (Excitation) 을 각 특징 맵에다 곱해줌
+  - SE 블록의 3단계 동작 원리
+    - SE 블록은 크게 세 가지 과정을 거쳐 채널의 가중치를 재조정합니다.
+    - 1.Squeeze (압축)
+      - 특징 맵의 공간적 정보(H x W)를 1 x 1 크기로 압축합니다. 주로 Global Average Pooling(GAP) 연산을 사용하여, 각 채널이 가진 공간상의 전체적인 통계값을 하나의 숫자로 요약합니다. 이를 통해 전역적인 수용 영역(Global Receptive Field)에 대한 정보를 확보합니다.
+    - 2.Excitation (여기/활성화)
+      - 압축된 정보를 바탕으로 각 채널 간의 의존성을 파악하고 중요도를 계산합니다. 이 단계에서는 주로 두 개의 Fully Connected(FC) Layer가 사용됩니다. 파라미터 수와 연산량을 줄이기 위해 첫 번째 FC 레이어에서 채널 차원을 일정 비율로 축소(Bottleneck)했다가, 두 번째 FC 레이어에서 원래 채널 수로 복구합니다. 마지막에 Sigmoid 활성화 함수를 통과시켜 0과 1 사이의 가중치 값을 얻어냅니다.
+    - 3.Scale / Reweight (재보정)
+      - 계산된 가중치(0~1 사이의 값)를 원래의 특징 맵의 각 채널에 각각 곱해줍니다. 이 과정을 거치면 중요한 정보를 담은 채널의 피처 값은 유지되거나 증폭되고, 정보력이 떨어지거나 불필요한 노이즈 채널의 값은 0에 가깝게 억제됩니다.
+    - 파라미터가 너무 많이 늘어나는 것을 막기 위해 reduction ratio r = 16 으로 제안
+
+<br/>
+
+<img width="990" height="309" alt="image" src="https://github.com/user-attachments/assets/d991bd4f-0305-483a-9bac-01ad239628f5" />
+
+<br/>
+
+  - 1x1 conv 랑 다른 점
+    - 1x1 conv는 Feature map(특징 맵) 간의 weighted sum(가중합) 이지만, SE Net에서 하는 작업은 feature map weighing
+    - 1x1 Conv는 채널을 압축하고, Squeeze(GAP)는 공간을 압축
+
+<br/>
+
+  - ResNet 에 적용한다면?
+    - Residual 뒤 쪽으로 추가하면 끝
+
+<br/>
+
+<img width="493" height="482" alt="image" src="https://github.com/user-attachments/assets/38d17049-307f-44aa-bb3e-d98646ece373" />
+
+<br/>
+
+  - 전체 구조
+    - SE Net은 전체 구조랄게 없긴 하다
+    - 아래 사진은 이전에 있었던 SE-ResNet, SE-ResNeXt모델에 SE Net을 적용하는 것을 보여준다, 마지막에 블럭 처럼 끼워 넣는것 fc[~~] 모양이 그것
+
+<br/>
+
+<img width="928" height="417" alt="image" src="https://github.com/user-attachments/assets/1ae09e4b-3d62-49dc-ba95-35ca95d2da74" />
+
+<br/>
+
+  - ResNeXt-50을 기준으로 보면 연산량은 4.24 -> 4.25 로 아주 조금만 늘었는데  4.24 -> 7.99 으로 확 늘린 ResNeXt-101 보다도 성능이 좋다,효율적으로 파라미터 수를 늘렸다는 증거
+    - CFLOPs : 연산량
+    - 오른쪽에 SENet표아래가 SE Net을 적용한 것이라는것
+
+<br/>
+
+<img width="1065" height="363" alt="image" src="https://github.com/user-attachments/assets/4373330f-1130-49eb-8109-2f7918e48d7e" />
+
+<br/>
+
+  - SE를 넣는 순서에대한 고찰
+    - 이리 저리 위치 바꿔보며 비교! 기존 방식이 나쁘지 않다. 앞으로 하면 아주 조금 더 좋다
+
+<br/>
+
+<img width="1027" height="253" alt="image" src="https://github.com/user-attachments/assets/964519c0-41ac-4a07-a1c2-14d1d2fc50a1" />
+
+<br/>
+
+  - 즉, GAP를 채널1장에서 전체 행열에 적용해서 가장 중요한 정보를 남기고, 그 정보를 다시 원래 있는 행렬에 각각 곱합으로써 그 안에서의 중요도를 재 판단하게 해준다
+
+
+<br/>
+
+  - 모델 코드 확인하기
+    - SE_Bottleneck 부분 마지막에 SEBlock 한줄
+    - SE_ResNet 부분은 사용시에 SE_ResNet(SE_Bottleneck, ) 이렇게 인자로 넘김
+~~~py
+import torch
+from torch import nn
+
+class SEBlock(nn.Module):
+    def __init__(self, in_channels, r = 16):
+        super().__init__()
+        self.squeeze = nn.AdaptiveAvgPool2d((1,1))
+        self.excitation = nn.Sequential(nn.Linear(in_channels, in_channels // r),
+                                        nn.ReLU(inplace=True),
+                                        nn.Linear(in_channels // r, in_channels),
+                                        nn.Sigmoid())
+
+    def forward(self, x):
+        SE = self.squeeze(x)
+        SE = SE.reshape(x.shape[0],x.shape[1]) # 개x채로 바꿔주기 위함
+        SE = self.excitation(SE)
+        SE = SE.unsqueeze(dim=2).unsqueeze(dim=3) # 개채11로 만들어주기 위함
+        x = x * SE
+        return x
+
+class SE_Bottleneck(nn.Module):
+    expansion = 4 # 클래스 속성
+    def __init__(self, in_channels, inner_channels, stride = 1, projection = None):
+        super().__init__()
+
+        self.residual = nn.Sequential(nn.Conv2d(in_channels, inner_channels, 1, bias=False),
+                                      nn.BatchNorm2d(inner_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(inner_channels, inner_channels, 3, stride=stride, padding=1, bias=False),
+                                      nn.BatchNorm2d(inner_channels),
+                                      nn.ReLU(inplace=True),
+                                      nn.Conv2d(inner_channels, inner_channels * self.expansion, 1, bias=False),
+                                      nn.BatchNorm2d(inner_channels * self.expansion))
+        self.seblock = SEBlock(inner_channels * self.expansion)
+
+        self.projection = projection
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+
+        residual = self.residual(x)
+        residual = self.seblock(residual)
+
+        if self.projection is not None:
+            shortcut = self.projection(x)
+        else:
+            shortcut = x
+
+        out = self.relu(residual + shortcut)
+        return out
+
+class SE_ResNet(nn.Module):
+    def __init__(self, block, num_block_list, num_classes = 1000, zero_init_residual = True):
+        super().__init__()
+
+        self.in_channels = 64
+
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU(inplace=True) # 좀더 메모리 효율적
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.stage1 = self.make_stage(block, 64, num_block_list[0], stride=1)
+        self.stage2 = self.make_stage(block, 128, num_block_list[1], stride=2)
+        self.stage3 = self.make_stage(block, 256, num_block_list[2], stride=2)
+        self.stage4 = self.make_stage(block, 512, num_block_list[3], stride=2)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+
+        # Zero-initialize the last BN in each residual branch,
+        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
+        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
+        if zero_init_residual:
+            for m in self.modules():
+                if isinstance(m, block):
+                    nn.init.constant_(m.residual[-1].weight, 0)
+
+    def make_stage(self, block, inner_channels, num_blocks, stride = 1):
+
+        if stride != 1 or self.in_channels != inner_channels * block.expansion:
+            projection = nn.Sequential(
+                nn.Conv2d(self.in_channels, inner_channels * block.expansion, 1, stride=stride, bias=False),
+                nn.BatchNorm2d(inner_channels * block.expansion))
+        else:
+            projection = None
+
+        layers = []
+        layers += [block(self.in_channels, inner_channels, stride, projection)] # projection은 첫 block에서만
+        self.in_channels = inner_channels * block.expansion
+        for _ in range(1, num_blocks):
+            layers += [block(self.in_channels, inner_channels)]
+
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = self.stage4(x)
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+def se_resnet50(**kwargs):
+    return SE_ResNet(SE_Bottleneck, [3, 4, 6, 3], **kwargs)
+
+def se_resnet101(**kwargs):
+    return SE_ResNet(SE_Bottleneck, [3, 4, 23, 3], **kwargs)
+
+def se_resnet152(**kwargs):
+    return SE_ResNet(SE_Bottleneck, [3, 8, 36, 3], **kwargs)
+
+model = se_resnet152()
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,224,224), device='cpu')
+
+x = torch.randn(2,3,224,224)
+print(model(x).shape)
+~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MobileNet V1
 
 
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
-
-
 
 
 
