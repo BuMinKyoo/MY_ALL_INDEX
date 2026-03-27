@@ -20,6 +20,7 @@
   - [WideResNet](#wideresnet)_(2016.05)
   - [ResNeXt](#eesnext)_(2016.11)
   - [DenseNet](#densenet)_(2016.08)
+  - [SE Net](#se-net)_(2017.09)
 
 
 
@@ -1585,6 +1586,7 @@ def Test_plot(model, test_DL):
   - [WideResNet](#wideresnet)_(2016.05)_(2016.02)
   - [ResNeXt](#eesnext)_(2016.11)
   - [DenseNet](#densenet)_(2016.08)
+  - [SE Net](#se-net)_(2017.09)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -3528,7 +3530,15 @@ print(model(x).shape)
 ###### [CNN](#CNN)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
+# SE Net
+
+
+
+###### [CNN](#CNN)
+###### [Top](#top)
 
 
 
