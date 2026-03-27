@@ -22,6 +22,7 @@
   - [DenseNet](#densenet)_(2016.08)
   - [SE Net](#se-net)_(2017.09)
   - [MobileNet V1](#mobilenet-v1)_(2017.04)
+  - [MobileNet V2](#mobilenet-v2)_(2018.01)
 
 
 
@@ -1589,6 +1590,7 @@ def Test_plot(model, test_DL):
   - [DenseNet](#densenet)_(2016.08)
   - [SE Net](#se-net)_(2017.09)
   - [MobileNet V1](#mobilenet-v1)_(2017.04)
+  - [MobileNet V2](#mobilenet-v2)_(2018.01)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -3752,11 +3754,139 @@ print(model(x).shape)
 <br/>
 
 # MobileNet V1
+  - Depthwise separable conv 사용, 획기적으로 파라미터 수를 줄임
+  - nn.Conv2d(3,16,3)
+    - 이건 공간 축, 채널 축 둘 다에 대해서 정보를 엮은 것 인데, 이것을 따로 따로 하면 더 잘하지 않을까란 생각에서 출발
+    - 공간 정보를 먼저 엮고 그다음에 채널 정보를 엮자는 생각
+    - 파라미터 수 비교: 16 개 out 채널 만들 때 (ex nn.Conv2d(3,16,3))
+    - 16x3x3x3 vs 3x3/3x3x3 + 16x3x1x1 -> 거의 6배 차이
+    - 구현은?
+      - nn.Sequential( nn.Conv2d(3,3,3, groups=3), nn.Conv2d(3,16,1)) 
 
+<br/>
+
+  - 전체 구조
+    -  처음 빼고는 전부 DepSepConv
+    -  Stride=2(물론 3x3에서)로 down sampling
+
+  - DepSepConv 구조
+
+<img width="226" height="270" alt="image" src="https://github.com/user-attachments/assets/fc82d8d4-d28d-4b46-876c-4c03ada7c9b9" />
+
+<br/>
+<br/>
+
+<img width="485" height="554" alt="image" src="https://github.com/user-attachments/assets/1642bbad-a7fe-40b0-bbf6-a72c2fac726d" />
+
+<br/>
+
+  - Depthwise Separable 과 그냥 conv 비교
+    - Accuracy는 크게 안 떨어지는 데 파라미터 수 7배차이
+
+<img width="791" height="247" alt="image" src="https://github.com/user-attachments/assets/681d1f10-202b-4548-8b89-8a44d27bc970" />
+
+<br/>
+
+  - 무거운 Net과의 비교
+
+<br/>
+
+<img width="618" height="215" alt="image" src="https://github.com/user-attachments/assets/6ab4af1f-ff1c-4756-9d17-163cc047eb74" />
+
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+class DepSepConv(nn.Module):
+    def __init__(self, in_channels, out_channels, stride=1):
+        super().__init__()
+
+        self.depthwise = nn.Sequential(nn.Conv2d(in_channels, in_channels,3, stride = stride, padding = 1, groups = in_channels, bias=False),
+                                       nn.BatchNorm2d(in_channels),
+                                       nn.ReLU(inplace=True))
+
+        self.pointwise = nn.Sequential(nn.Conv2d(in_channels, out_channels,1, bias=False),
+                                       nn.BatchNorm2d(out_channels),
+                                       nn.ReLU(inplace=True))
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.pointwise(x)
+        return x
+
+class MobileNet(nn.Module):
+    def __init__(self, alpha, num_classes=1000):
+        super().__init__()
+
+        self.conv1 = nn.Conv2d(3, int(32*alpha), 3, stride=2, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(int(32*alpha))
+        self.relu = nn.ReLU(inplace=True)
+
+        self.conv2 = DepSepConv(int(32*alpha), int(64*alpha), stride=1)
+        self.conv3 = nn.Sequential(DepSepConv(int(64*alpha), int(128*alpha), stride=2), # down sample
+                                   DepSepConv(int(128*alpha), int(128*alpha)))
+        self.conv4 = nn.Sequential(DepSepConv(int(128*alpha), int(256*alpha), stride=2), # down sample
+                                   DepSepConv(int(256*alpha), int(256*alpha)))
+        self.conv5 = nn.Sequential(DepSepConv(int(256*alpha), int(512*alpha), stride=2), # down sample
+                                   *[DepSepConv(int(512*alpha), int(512*alpha)) for i in range(5)])
+        self.conv6 = nn.Sequential(DepSepConv(int(512*alpha), int(1024*alpha), stride=2), # down sample
+                                   DepSepConv(int(1024*alpha), int(1024*alpha)))
+
+        self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
+        self.fc = nn.Linear(int(1024*alpha), num_classes)
+
+        # weights initialization
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        x = self.conv4(x)
+        x = self.conv5(x)
+        x = self.conv6(x)
+        x = self.avg_pool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+model = MobileNet(alpha=1)
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,224,224), device='cpu')
+
+x = torch.randn(2,3,224,224)
+print(model(x).shape)
+~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# MobileNet V2
 
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
+
+
+
+
+
 
 
 
