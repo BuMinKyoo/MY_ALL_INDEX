@@ -3878,10 +3878,56 @@ print(model(x).shape)
 <br/>
 
 # MobileNet V2
+  - nn.Sequential(nn.Linear(2, dim), nn.ReLU(), nn.Linear(dim, 2)) 실험을 했을때, nn.Sequential(nn.Linear(2, dim)한다음, nn.Linear(dim, 2)을 하면 그대로 나와야 하는데, 그대로 나오지 않으니 ReLU 가 정보 손실을 야기한다
+    - 하지만 ReLU를 쓰더라도 dim이 크면 또 나쁘지 않다
+      - 이미 정보가 많다면(dim이 크다면) 정보손실이 어느정도 되도 나쁘지 않다는것
+
+<br/>
+
+<img width="586" height="298" alt="image" src="https://github.com/user-attachments/assets/dc7409fe-bcc2-4d50-b0bd-f1fa7d163353" />
+
+<br/>
+
+  - Residual Block vs Inverted Residual Block
+    - 원래는 항상 먼저 conv를 하면서 줄이고 그 이후에 늘리는 것을 했음
+      - 이렇게 해왔던 이유는 파라미터 수 때문에
+    - 하지만 이번에는 먼저 늘리고, 줄이는 방식을 택함
+      - Depthwise conv를 사용함 -> Group conv인데, 그룹의 개수(G)를 입력 채널의 개수(C)와 동일하게 설정한것
+      - 하지만, 1) 계속 늘리기만 하면 파라미터 수가 너무 많아지고, 2) 들어온 채널 수로 다시 돌아가야 (실선) skip-connection 연결 가능 하기때문에 다시 채널 수를 줄여줘야함, 하지만 여기에 ReLU까지 쓰면 정보가 너무 많이 손실될것이니 때문에 쓰지 않음 -> 그냥 통과 (linear activation) 시키자는것
+
+<br/>
+
+<img width="925" height="245" alt="image" src="https://github.com/user-attachments/assets/35ef2ec8-3846-4b7a-9d6d-fd151a1d0457" />
+
+<br/>
+
+  - Relu6
+    - 일반 Relu는 마이너스인것은 0으로 보내고 플러스 인것은 그냥 두기 때문에 플러스는 무한대이다, 그런데 Relu6은 양수도 6에서 끊어 버린다 최고치가 6이라는것
+
+<br/>
+
+<img width="829" height="487" alt="image" src="https://github.com/user-attachments/assets/8c298ff5-5cca-494a-8e36-405230879ca5" />
+
+<br/>
+
+  - stride=2 는 첫 block의 Dwise 에서 이루어짐
+  - stride=1 이고 in_c=out_c 때만 skip-connection
+
+<br/>
+
+<img width="322" height="338" alt="image" src="https://github.com/user-attachments/assets/8782d9fd-c1be-45d1-9b98-a7f87c41b05e" />
+
+
+
 
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
+
+
+
+
+
 
 
 
