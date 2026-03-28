@@ -23,6 +23,7 @@
   - [SE Net](#se-net)_(2017.09)
   - [MobileNet V1](#mobilenet-v1)_(2017.04)
   - [MobileNet V2](#mobilenet-v2)_(2018.01)
+  - [MobileNet V3](#mobilenet-v3)_(2019.05)
 
 
 
@@ -1591,6 +1592,7 @@ def Test_plot(model, test_DL):
   - [SE Net](#se-net)_(2017.09)
   - [MobileNet V1](#mobilenet-v1)_(2017.04)
   - [MobileNet V2](#mobilenet-v2)_(2018.01)
+  - [MobileNet V3](#mobilenet-v3)_(2019.05)
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
@@ -4035,9 +4037,232 @@ print(model(x).shape)
 ###### [CNN](#CNN)
 ###### [Top](#top)
 
+<br/>
 
+# MobileNet V3
+  - SE-block 적용 + 새로운 activation 제안 + 입, 출력 쪽 구조 변경
+    - SE-block : reduction ratio r = 4 사용
+    - 새로운 activation 제안 : sigmoid -> Hard Sigmoid(ReLU6(x + 3)/6) 사용 및 Hard Swish(x(ReLU6(x + 3)/6)) 제안
+      - 실제로, 성능 손해 거의 없이 precision loss 도 없고 메모리 접근 수도 줄여준다
 
+<br/>
 
+<img width="600" height="495" alt="image" src="https://github.com/user-attachments/assets/3cf6587f-e117-47db-b22f-c09ea9f1dacb" />
+
+<br/>
+
+<img width="1031" height="284" alt="image" src="https://github.com/user-attachments/assets/8b14405f-07aa-42bb-a798-04151d74ff92" />
+
+<br/>
+
+  - 전체구조
+    - 첫 conv에 H-Swish 사용 : 필터 수를 32->16 으로 줄일 수 있었음
+    - Large와 Small 두 가지 제안
+    - ReLU6는 안쓰고 도로 ReLU 사용
+    - HS(Hard Swish)는 전체가 아닌 모델의 반 정도만 사용
+    - 모든 채널을 8의 배수로 맞춤 (for 연산 효율, 메모리 절약)
+
+<br/>
+
+<img width="469" height="385" alt="image" src="https://github.com/user-attachments/assets/32ec77fd-259d-4064-b5f6-2756c1ad9ac3" />
+
+<br/>
+
+<img width="496" height="553" alt="image" src="https://github.com/user-attachments/assets/11d16710-1c89-4e06-bea8-76544d30d3b4" />
+
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+def _make_divisible(v, divisor, min_value=None):
+    """
+    This function is taken from the original tf repo.
+    It ensures that all layers have a channel number that is divisible by 8
+    It can be seen here:
+    https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet.py
+    :param v:
+    :param divisor:
+    :param min_value:
+    :return:
+    """
+    # 쉽게 말해, 이 함수는 가까운 8의 배수를 찾아줌
+
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor) # divisor / 2 는 반올림을 위해 (너무 작아지지 않게)
+    # case 1) v=10, divisor = 8 이면 10+4 // 8 * 8 = 8 근데 10 => 8 은 10% 이상 빠지는 거니까 8+8 = 16 으로 조정됨
+    # case 2) v=39, divisor = 8 이면 39+4 // 8 * 8 = 40 => 10%보다 빠지지 않았기 때문에 40이 출력됨!
+
+    if new_v < 0.9 * v: # 10% 보다 더 빠지지 않게 조정
+        new_v += divisor
+
+    return new_v
+
+class SEBlock(nn.Module):
+    def __init__(self, in_channels, r = 4): # mobilenet V3 에서는 reduction ratio r=4로!
+        super().__init__()
+        self.squeeze = nn.AdaptiveAvgPool2d((1,1))
+        self.excitation = nn.Sequential(nn.Linear(in_channels, _make_divisible(in_channels // r, 8)),
+                                        nn.ReLU(inplace=True),
+                                        nn.Linear(_make_divisible(in_channels // r, 8), in_channels),
+                                        nn.Hardsigmoid(inplace=True)) # Hard sigmoid!
+
+    def forward(self, x):
+        SE = self.squeeze(x)
+        SE = SE.reshape(x.shape[0],x.shape[1])
+        SE = self.excitation(SE)
+        SE = SE.unsqueeze(dim=2).unsqueeze(dim=3)
+        x = x * SE
+        return x
+
+class DepSESep(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, use_se, use_hs, stride):
+        super().__init__()
+
+        self.depthwise = nn.Sequential(nn.Conv2d(in_channels, in_channels, kernel_size, stride = stride, padding = (kernel_size - 1) // 2, groups = in_channels, bias=False),
+                                       nn.BatchNorm2d(in_channels, momentum=0.99), # momentum = 0.99 는 논문에서 제시
+                                       nn.Hardswish(inplace=True) if use_hs else nn.ReLU(inplace=True)) # hs 아니면 걍 ReLU (ReLU6 아님)
+
+        self.seblock = SEBlock(in_channels) if use_se else None
+
+        self.pointwise = nn.Sequential(nn.Conv2d(in_channels, out_channels,1, bias=False),
+                                       nn.BatchNorm2d(out_channels, momentum=0.99))
+                                       # no activation!!
+    def forward(self, x):
+        x = self.depthwise(x)
+        if self.seblock is not None:
+            x = self.seblock(x)
+        x = self.pointwise(x)
+        return x
+
+class InvertedBlock(nn.Module):
+    def __init__(self, in_channels, exp_channels, out_channels, kernel_size, stride, use_se, use_hs):
+        super().__init__()
+
+        self.use_skip_connect = (stride==1 and in_channels==out_channels)
+
+        layers = []
+        if in_channels != exp_channels: # 채널 안늘어날 때는 1x1 생략. 즉, 1x1은 채널을 키워야할 때만 존재한다.
+            layers += [nn.Sequential(nn.Conv2d(in_channels, exp_channels, 1, bias=False),
+                                     nn.BatchNorm2d(exp_channels, momentum=0.99),
+                                     nn.Hardswish(inplace=True) if use_hs else nn.ReLU(inplace=True))]
+        layers += [DepSESep(exp_channels, out_channels, kernel_size, use_se, use_hs, stride=stride)]
+
+        self.residual = nn.Sequential(*layers)
+
+    def forward(self, x):
+        if self.use_skip_connect:
+            return x + self.residual(x) # 더하고 ReLU 하지 않는다! 그래야 linear block이 되는 거니까
+        else:
+            return self.residual(x)
+
+class MobileNetV3(nn.Module):
+    def __init__(self, cfgs, last_channels, num_classes=1000, width_mult=1.):
+        super().__init__()
+
+        in_channels = _make_divisible(16 * width_mult, 8)
+
+        # building first layer
+        self.stem_conv = nn.Sequential(nn.Conv2d(3, in_channels, 3, padding=1, stride=2, bias=False),
+                                       nn.BatchNorm2d(in_channels, momentum=0.99),
+                                       nn.Hardswish(inplace=True)) # 처음건 무조건 HS, HS를 써서 16으로 줄일 수 있었다 함
+
+        # building inverted residual blocks
+        layers=[]
+        for k, t, c, use_se, use_hs, s in cfgs:
+            exp_channels = _make_divisible(in_channels * t, 8)
+            out_channels = _make_divisible(c * width_mult, 8)
+            layers += [InvertedBlock(in_channels, exp_channels, out_channels, k, s, use_se, use_hs)]
+            in_channels = out_channels
+        self.layers = nn.Sequential(*layers)
+
+        # building last several layers
+        self.last_conv = nn.Sequential(nn.Conv2d(in_channels, exp_channels, 1, bias=False),
+                                       nn.BatchNorm2d(exp_channels, momentum=0.99),
+                                       nn.Hardswish(inplace=True))
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        last_channels = _make_divisible(last_channels * width_mult, 8)
+        self.classifier = nn.Sequential(nn.Linear(exp_channels, last_channels),
+                                        nn.Hardswish(inplace=True),
+                                        nn.Dropout(p=0.2, inplace=True),
+                                        nn.Linear(last_channels, num_classes)) # MLP 부활
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        x = self.stem_conv(x)
+        x = self.layers(x)
+        x = self.last_conv(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+def mobilenetv3_large(**kwargs):
+    cfgs = [#k,   t,   c,   SE,   HS,   s
+            # 이전 output에 t를 곱해서 exp size가 되는 것임!
+            [3,   1,  16, False, False, 1],
+            [3,   4,  24, False, False, 2],
+            [3,   3,  24, False, False, 1],
+            [5,   3,  40, True,  False, 2],
+            [5,   3,  40, True,  False, 1],
+            [5,   3,  40, True,  False, 1],
+            [3,   6,  80, False, True,  2],
+            [3, 2.5,  80, False, True,  1],
+            [3, 2.3,  80, False, True,  1],
+            [3, 2.3,  80, False, True,  1],
+            [3,   6, 112, True,  True,  1],
+            [3,   6, 112, True,  True,  1],
+            [5,   6, 160, True,  True,  2],
+            [5,   6, 160, True,  True,  1],
+            [5,   6, 160, True,  True,  1]]
+
+    return MobileNetV3(cfgs, last_channels=1280, **kwargs)
+
+def mobilenetv3_small(**kwargs):
+    cfgs = [#k,    t,   c,  SE,    HS,   s
+            [3,    1,  16, True,  False, 2],
+            [3,  4.5,  24, False, False, 2],
+            [3, 3.67,  24, False, False, 1],
+            [5,    4,  40, True,  True,  2],
+            [5,    6,  40, True,  True,  1],
+            [5,    6,  40, True,  True,  1],
+            [5,    3,  48, True,  True,  1],
+            [5,    3,  48, True,  True,  1],
+            [5,    6,  96, True,  True,  2],
+            [5,    6,  96, True,  True,  1],
+            [5,    6,  96, True,  True,  1]]
+
+    return MobileNetV3(cfgs, last_channels=1024, **kwargs)
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+model = mobilenetv3_large()
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,224,224), device='cpu')
+
+x = torch.randn(2,3,224,224)
+print(model(x).shape)
+~~~
+
+###### [CNN](#CNN)
+###### [Top](#top)
 
 
 
