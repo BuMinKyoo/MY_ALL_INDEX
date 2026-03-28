@@ -24,6 +24,7 @@
   - [MobileNet V1](#mobilenet-v1)_(2017.04)
   - [MobileNet V2](#mobilenet-v2)_(2018.01)
   - [MobileNet V3](#mobilenet-v3)_(2019.05)
+  - [EfficientNet](#efficientnet)_(2019.05)
 
 
 
@@ -4264,9 +4265,15 @@ print(model(x).shape)
 ###### [CNN](#CNN)
 ###### [Top](#top)
 
+<br/>
+
+# EfficientNet
 
 
 
+
+###### [CNN](#CNN)
+###### [Top](#top)
 
 
 
