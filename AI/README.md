@@ -3912,14 +3912,125 @@ print(model(x).shape)
 
   - stride=2 는 첫 block의 Dwise 에서 이루어짐
   - stride=1 이고 in_c=out_c 때만 skip-connection
+  - 논문에 따르면, 적은 비트 사용에 적합하기 때문에 ReLU6 사용
 
 <br/>
 
 <img width="322" height="338" alt="image" src="https://github.com/user-attachments/assets/8782d9fd-c1be-45d1-9b98-a7f87c41b05e" />
 
+<br/>
 
+  - t : 채널을 몇 배수로 키울지
+  - c : output채널수
+  - n : 반복횟수
+  - s : stride
 
+<img width="701" height="514" alt="image" src="https://github.com/user-attachments/assets/8126cb27-308b-4587-8ede-2035549b57c5" />
 
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+
+class DepSepConv(nn.Module):
+    def __init__(self, in_channels, out_channels, stride):
+        super().__init__()
+
+        self.depthwise = nn.Sequential(nn.Conv2d(in_channels, in_channels,3, stride = stride, padding = 1, groups = in_channels, bias=False),
+                                       nn.BatchNorm2d(in_channels),
+                                       nn.ReLU6(inplace=True))
+
+        self.pointwise = nn.Sequential(nn.Conv2d(in_channels, out_channels,1, bias=False),
+                                       nn.BatchNorm2d(out_channels))
+                                       # no activation!!
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.pointwise(x)
+        return x
+
+class InvertedBlock(nn.Module):
+    def __init__(self, in_channels, exp_channels, out_channels, stride):
+        super().__init__()
+
+        self.use_skip_connect = (stride==1 and in_channels==out_channels)
+
+        layers = []
+        if in_channels != exp_channels: # 채널 안 늘어날 때는 1x1 생략. 즉, 1x1은 채널을 키워야할 때만 존재한다.
+            layers += [nn.Sequential(nn.Conv2d(in_channels, exp_channels, 1, bias=False),
+                                     nn.BatchNorm2d(exp_channels),
+                                     nn.ReLU6(inplace=True))]
+        layers += [DepSepConv(exp_channels, out_channels, stride=stride)]
+
+        self.residual = nn.Sequential(*layers)
+
+    def forward(self, x):
+        if self.use_skip_connect:
+            return x + self.residual(x) # 더하고 ReLU 하지 않는다! 그래야 linear block이 되는 거니까 (근데 그냥 pre-act 구조로 쓴다면 어땠을까?는 약간의 아쉬움)
+        else:
+            return self.residual(x)
+
+class MobileNetV2(nn.Module):
+    def __init__(self, num_classes=1000):
+        super().__init__()
+
+        self.configs=[# t, c, n, s
+                      [1, 16, 1, 1],
+                      [6, 24, 2, 2],
+                      [6, 32, 3, 2],
+                      [6, 64, 4, 2],
+                      [6, 96, 3, 1],
+                      [6, 160, 3, 2],
+                      [6, 320, 1, 1]]
+
+        self.stem_conv = nn.Sequential(nn.Conv2d(3, 32, 3, padding=1, stride=2, bias=False),
+                                       nn.BatchNorm2d(32),
+                                       nn.ReLU6(inplace=True))
+
+        in_channels = 32
+        layers = []
+        for t, c, n, s in self.configs:
+            for i in range(n):
+                stride = s if i == 0 else 1
+                exp_channels = in_channels * t
+                layers += [InvertedBlock(in_channels=in_channels, exp_channels=exp_channels, out_channels=c, stride=stride)]
+                in_channels = c
+
+        self.layers = nn.Sequential(*layers)
+
+        self.last_conv = nn.Sequential(nn.Conv2d(in_channels, 1280, 1, bias=False),
+                                       nn.BatchNorm2d(1280),
+                                       nn.ReLU6(inplace=True))
+
+        self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
+
+        self.classifier = nn.Sequential(nn.Dropout(0.2), # 논문에는 상세히 나와있진 않지만 토치 문서에 있어서 포함 -> 채널 축으로 특징들이 놓여있고 그것들을 일부 가려보며 학습하는 의미
+                                        nn.Linear(1280, num_classes))
+
+    def forward(self, x):
+        x = self.stem_conv(x)
+        x = self.layers(x)
+        x = self.last_conv(x)
+        x = self.avg_pool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+model = MobileNetV2()
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,224,224), device='cpu')
+
+x = torch.randn(2,3,224,224)
+print(model(x).shape)
+~~~
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
