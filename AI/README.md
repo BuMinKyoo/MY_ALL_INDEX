@@ -4268,9 +4268,324 @@ print(model(x).shape)
 <br/>
 
 # EfficientNet
+  - ResNet : 깊이를 늘리기
+  - WideResNet : width를 키우기
+  - MobileNet V1 : 입력 들어가는 사진의 해상도를 줄이기
+  - EfficientNet : 이 세 가지를 같이 키우되 효율적으로 키우자는 것
+    - 큰 이미지를 넣으면
+      - 1.깊게 해서 receptive field를 키워야함
+      - 2.필터가 많아야 더 세밀한 특징도 잡아낸다
 
+<br/>
 
+  - 전체구조
+    - (w = d = r = 1.0)
+    - MBConv6 : Mobile Inverted Bottleneck, t=6 이라는 뜻 (+SE도 추가)
+    - resolution을 보면 stride=2를 어디서 했는지 알 수 있기 때문에 따로 적혀 있지 않음(Dwise 한것)
+    - activation은 전부 SiLU (Sigmoid Linear Unit) (=Swish)
+    - Stochastic Depth 기법 (랜덤하게 skip 하는 기법)
+    - channels(c) : output / Layers(L) : 반복회수
 
+<br/>
+
+<img width="622" height="389" alt="image" src="https://github.com/user-attachments/assets/8ba82afe-c2e7-4ba9-a9f2-2f480e60eac8" />
+
+<br/>
+
+  - FLOPS(billions) : 연산량
+  - d : 레이어 깊이
+  - r : 행열크기
+  - w : 채널수
+  - 같은 연산량(=돈)이여도 d,r,w가 다를 수 있다. 효율적인 모델을 찾는것이 가장 좋은것
+
+<br/>
+
+<img width="502" height="383" alt="image" src="https://github.com/user-attachments/assets/dc4274da-495a-4f58-b242-5fa4d2166727" />
+
+<br/>
+
+  - 셋을 d, w, r 배만큼 키워주면 연산량은 dw^2r^2 배가 된다
+    - d = α ϕ, w = β ϕ, r = γ ϕ로 놓은 다음, αβ^2r^2 ≈ 2 가 되도록 잡아 주면 연산량은 2ϕ 배
+    - ϕ = 0 이면 EfficientNet-B0
+    - ϕ = 1 로 하면 연산량을 2배 키운 모델을 얻는다
+    - αβ^2r^2 ≈ 2 을 만족하는 3가지 조건을 무작위로 테스트해서 가장 좋은 모델을 얻은 결과 B0~B7을 제안
+
+<br/>
+
+<img width="846" height="502" alt="image" src="https://github.com/user-attachments/assets/10cdb8f0-87ba-4dfb-8f71-c4aed3eafdf7" />
+
+<br/>
+
+  - EfficientNet은, Compound Scaling을 통해 아주 효율성을 얻은 모델
+    - Compound Scaling(복합 확장)
+      - 깊이(Depth), 넓이(Width), 해상도(Resolution) 이 세 가지 요소를 일정한 비율로 동시에 키우는 방법론
+
+<br/>
+
+  - stochastic depth
+~~~py
+import torch
+from torch import nn
+from torchvision import transforms, datasets
+from torchvision.ops import StochasticDepth
+import math
+
+# stochastic depth 에 대해
+class test_model(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.residual = nn.Conv2d(1,1,1, bias=False)
+        self.stochastic_depth = StochasticDepth(0.3, "row") # 0.3이 죽일 확률 # "row"는 data 마다 다른 depth를 가지게 함!
+
+    def forward(self,x):
+        residual = self.residual(x)
+        residual = self.stochastic_depth(residual)
+        return x + residual
+
+model=test_model()
+x=torch.ones(2,1,2,2)
+model.train()
+print(model(x)) # 훈련 때는 1/(1-p) 을 residual에 곱한다
+w=model.residual.weight.item()
+print(round(1 + 1 * w/(1-0.3), 4))
+
+model.eval()
+print(model(x))
+print(round(1 + 1 * w, 4)) # 테스트는 무시하지 않고 통과시킨다.
+# stochastic depth는 드랍아웃을 node가 아닌 residual block에 적용했다고 생각할 수 있다.
+# residual=0 이면 그냥 통과인거니까 identity mapping임. 따라서 depth 가 stochastic하다!
+# stochastic depth 논문에서는 훈련 때는 랜덤하게 skip하고 테스트 때는 다 통과하되 1-p를 곱하는 것으로 설명 되어있다.
+# 하지만 토치 구현에서는 반대로 train 땐 1/(1-p) 를 곱하고 테스트 때는 그냥 통과하는 것으로 구현!
+# 드랍아웃도 이처럼 논문과 달리 train 땐 1/(1-p) 로 키워놓고 테스트 때는 그대로 나오게끔 구현되어있음
+~~~
+
+<br/>
+
+  - 모델 코드 확인하기
+~~~py
+import torch
+from torch import nn
+from torchvision import transforms, datasets
+from torchvision.ops import StochasticDepth
+import math
+
+def _make_divisible(v, divisor, min_value=None):
+    """
+    This function is taken from the original tf repo.
+    It ensures that all layers have a channel number that is divisible by 8
+    It can be seen here:
+    https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet.py
+    :param v:
+    :param divisor:
+    :param min_value:
+    :return:
+    """
+    # 쉽게 말해, 이 함수는 가까운 8의 배수를 찾아줌
+
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor) # divisor / 2 는 반올림을 위해 (너무 작아지지 않게)
+    # case 1) v=10, divisor = 8 이면  10+4 // 8 * 8 = 8 근데 10 => 8 은 10% 이상 빠지는 거니까 8+8 = 16 으로 조정됨
+    # case 2) v=39, divisor = 8 이면 39+4 // 8 * 8 = 40 => 10%보다 빠지지 않았기 때문에 40이 출력됨!
+
+    if new_v < 0.9 * v: # 10% 보다 더 빠지지 않게 조정
+        new_v += divisor
+
+    return new_v
+
+class SEBlock(nn.Module):
+    def __init__(self, in_channels, squeeze_channels): # efficientNet 에서도 reduction ratio r=4. (논문에는 딱히 명시되어 있진 않음)
+        super().__init__()
+        self.squeeze = nn.AdaptiveAvgPool2d((1,1))
+        self.excitation = nn.Sequential(nn.Linear(in_channels, squeeze_channels),
+                                        nn.SiLU(inplace=True), # EfficientNet은 여기도 SiLU 사용
+                                        nn.Linear(squeeze_channels, in_channels),
+                                        nn.Sigmoid())
+
+    def forward(self, x):
+        SE = self.squeeze(x)
+        SE = SE.reshape(x.shape[0],x.shape[1])
+        SE = self.excitation(SE)
+        SE = SE.unsqueeze(dim=2).unsqueeze(dim=3)
+        x = x * SE
+        return x
+
+class DepSESep(nn.Module):
+    def __init__(self, in_channels, squeeze_channels, out_channels, kernel_size, stride):
+        super().__init__()
+
+        self.depthwise = nn.Sequential(nn.Conv2d(in_channels, in_channels, kernel_size, stride = stride, padding = (kernel_size - 1) // 2, groups = in_channels, bias=False),
+                                       nn.BatchNorm2d(in_channels, momentum=0.99, eps=1e-3),
+                                       nn.SiLU(inplace=True))
+
+        self.seblock = SEBlock(in_channels, squeeze_channels)
+
+        self.pointwise = nn.Sequential(nn.Conv2d(in_channels, out_channels, 1, bias=False),
+                                       nn.BatchNorm2d(out_channels, momentum=0.99, eps=1e-3))
+                                       # no activation!!
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.seblock(x)
+        x = self.pointwise(x)
+        return x
+
+class MBConv(nn.Module):
+    def __init__(self, in_channels, exp_channels, out_channels, kernel_size, stride, sd_prob):
+        super().__init__()
+
+        self.use_skip_connect = (stride==1 and in_channels==out_channels)
+        self.stochastic_depth = StochasticDepth(sd_prob, "row") # sd_prob가 죽일 확률 # "row"는 data 마다 다른 depth를 가지게 함!
+
+        layers = []
+        if in_channels != exp_channels:
+            layers += [nn.Sequential(nn.Conv2d(in_channels, exp_channels, 1, bias=False),
+                                     nn.BatchNorm2d(exp_channels, momentum=0.99, eps=1e-3),
+                                     nn.SiLU(inplace=True))]
+        squeeze_channels = in_channels // 4
+        # torchvision.models를 보면 mobilenet v3 에선 squeeze_channels = expanded_channels // 4 로 https://github.com/pytorch/vision/blob/main/torchvision/models/mobilenetv3.py#L96
+        # efficientNet 에선 squeeze_channels = in_channels // 4 로 해놨다.. https://github.com/pytorch/vision/blob/main/torchvision/models/efficientnet.py#L149
+        # 그리고, squeeze_channels에 대해서 make_divisible을 mobilenet v3 에서는 하고 efficientNet에는 안해놓음
+        layers += [DepSESep(exp_channels, squeeze_channels, out_channels, kernel_size, stride=stride)]
+
+        self.residual = nn.Sequential(*layers)
+
+    def forward(self, x):
+        if self.use_skip_connect:
+            residual = self.residual(x)
+            residual = self.stochastic_depth(residual) # skip-conn 있을 때만 적용 why?
+            return x + residual
+        else:
+            return self.residual(x)
+
+class EfficientNet(nn.Module):
+    def __init__(self, num_classes, depth_mult, width_mult, resize_size, crop_size, drop_p, stochastic_depth_p = 0.2):
+        super().__init__()
+
+        cfgs = [#k,  t,   c,  n,  s
+                [3,  1,  16,  1,  1],
+                [3,  6,  24,  2,  2],
+                [5,  6,  40,  2,  2],
+                [3,  6,  80,  3,  2],
+                [5,  6,  112, 3,  1],
+                [5,  6,  192, 4,  2],
+                [3,  6,  320, 1,  1]]
+
+        in_channels = _make_divisible(32 * width_mult, 8) # width 조절!
+
+        self.transforms = transforms.Compose([transforms.Resize(resize_size, interpolation=transforms.InterpolationMode.BICUBIC),
+                                              transforms.CenterCrop(crop_size),
+                                              transforms.ToTensor(),
+                                              transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])]) # resolution 조절!
+
+        # building first layer
+        self.stem_conv = nn.Sequential(nn.Conv2d(3, in_channels, 3, padding=1, stride=2, bias=False),
+                                       nn.BatchNorm2d(in_channels, momentum=0.99, eps=1e-3),
+                                       nn.SiLU(inplace=True))
+
+        # building inverted residual blocks
+        layers = []
+        num_block = 0
+        N = sum([math.ceil(cfg[-2] * depth_mult) for cfg in cfgs]) # 총 깊이
+        for k, t, c, n, s in cfgs:
+            n = math.ceil(n * depth_mult) # depth 조절!
+            for i in range(n):
+                stride = s if i == 0 else 1
+                exp_channels = _make_divisible(in_channels * t, 8)
+                out_channels = _make_divisible(c * width_mult, 8) # width 조절!
+                sd_prob = stochastic_depth_p * num_block / (N-1) # 앞에는 안뛰고 뒤로 갈수록 건너 뛸 확률을 크게
+                layers += [MBConv(in_channels, exp_channels, out_channels, k, stride, sd_prob)]
+                in_channels = out_channels
+                num_block += 1
+
+        self.layers = nn.Sequential(*layers)
+
+        # building last several layers
+        last_channels = _make_divisible(1280 * width_mult, 8) # width 조절!
+        self.last_conv = nn.Sequential(nn.Conv2d(in_channels, last_channels, 1, bias=False),
+                                       nn.BatchNorm2d(last_channels, momentum=0.99, eps=1e-3),
+                                       nn.SiLU(inplace=True))
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+
+        self.classifier = nn.Sequential(nn.Dropout(drop_p), # 논문에는 상세히 나와있진 않지만 토치 문서에 있어서 포함 -> 채널 축으로 특징들이 놓여있고 그것들을 이리저리 바꿔 골라가며 학습하는 의미
+                                        nn.Linear(last_channels, num_classes))
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+            elif isinstance(m, nn.Linear):
+                init_range = 1.0 / torch.sqrt(torch.tensor(m.out_features))
+                nn.init.uniform_(m.weight, -init_range, init_range)
+                nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        x = self.stem_conv(x)
+        x = self.layers(x)
+        x = self.last_conv(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+~~~
+
+<br/>
+
+  - 모델 인스턴스화 및 실행하기
+~~~py
+# https://github.com/pytorch/vision/blob/main/torchvision/models/efficientnet.py#L439 참고
+
+def efficientnet_b0(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=1.0, width_mult=1.0, resize_size=256, crop_size=224, drop_p=0.2, **kwargs)
+
+def efficientnet_b1(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=1.1, width_mult=1.0, resize_size=256, crop_size=240, drop_p=0.2, **kwargs)
+
+def efficientnet_b2(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=1.2, width_mult=1.1, resize_size=288, crop_size=288, drop_p=0.3, **kwargs)
+# torchvision에는 288로 되어있는데, 260으로 알려져는 있다. 뭐가 맞는지는 모르겠다.
+# https://github.com/pytorch/vision/blob/98c58158d1bc09e6fab31d3bf1af36e8d1752a89/torchvision/models/efficientnet.py#L516
+
+def efficientnet_b3(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=1.4, width_mult=1.2, resize_size=320, crop_size=300, drop_p=0.3, **kwargs)
+
+def efficientnet_b4(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=1.8, width_mult=1.4, resize_size=384, crop_size=380, drop_p=0.4, **kwargs)
+
+def efficientnet_b5(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=2.2, width_mult=1.6, resize_size=456, crop_size=456, drop_p=0.4, **kwargs)
+
+def efficientnet_b6(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=2.6, width_mult=1.8, resize_size=528, crop_size=528, drop_p=0.5, **kwargs)
+
+def efficientnet_b7(num_classes=1000, **kwargs):
+    return EfficientNet(num_classes=num_classes, depth_mult=3.1, width_mult=2.0, resize_size=600, crop_size=600, drop_p=0.5, **kwargs)
+
+model = efficientnet_b7()
+# print(model)
+!pip install torchinfo
+from torchinfo import summary
+summary(model, input_size=(2,3,456,456), device='cpu')
+
+test_DS = datasets.CIFAR10(root = '/content/drive/MyDrive/Colab Notebooks/data', train=False, download=True, transform=model.transforms) # model.transforms 가 여기서 쓰인다!
+test_DL = torch.utils.data.DataLoader(test_DS, batch_size = 2)
+
+x_batch, _ = next(iter(test_DL))
+
+print(x_batch.shape)
+
+print(model(x_batch).shape)
+model.train()
+print(model(x_batch))
+print(model(x_batch)) # stochastic depth, dropout 때문에 계속 바뀜
+model.eval()
+print(model(x_batch))
+print(model(x_batch)) # 고정!
+~~~
+
+<br/>
 
 ###### [CNN](#CNN)
 ###### [Top](#top)
