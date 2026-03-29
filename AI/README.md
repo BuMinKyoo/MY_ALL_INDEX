@@ -25,7 +25,8 @@
   - [MobileNet V2](#mobilenet-v2)_(2018.01)
   - [MobileNet V3](#mobilenet-v3)_(2019.05)
   - [EfficientNet](#efficientnet)_(2019.05)
-
+- [RNN](#rnn)
+  - [RNN기초이론](#rnn기초이론)
 
 
 <br/>
@@ -1696,7 +1697,7 @@ def Test_plot(model, test_DL):
 <br/>
 
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -1792,7 +1793,7 @@ x = torch.randn(2,3,224,224)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -2024,7 +2025,7 @@ x, aux2, aux1 = model(torch.randn(2,3,500,500)) # GAP 덕분에 사이즈가 커
 print(x.shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -2379,7 +2380,7 @@ print(x.shape)
 print(aux.shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -2422,7 +2423,7 @@ output = x2 + input  // 핵심: 원본을 그대로 더함!
     - Skip-Connection이 지형을 다림질하는 원리
       - output = Layer2(x1) + input 처럼, input은 아무런 조작이 가해지지 않은, 가장 안정적이고 예측 가능한 선형적인 값, 반면에 Layer2(x1)은 가중치와 함수들이 얽혀서 꼬불꼬불하고 복잡하게 변형된 값, 이둘을 더하는 것이기 때문에, 가중치 변화에 따라 미친 듯이 요동치려는 Layer2(x1)의 결과값에, 아주 안정적이고 매끄러운 직선 형태의 input이 강제로 섞임 그래서 조금 더 펴지게 되는것
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -2661,7 +2662,7 @@ projection = nn.Sequential(
 이부분에서 nn.BatchNorm2d(inner_channels * block.expansion)) 이게 빠지게됨
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -3104,7 +3105,7 @@ x = torch.randn(2,3,299,299)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -3245,7 +3246,7 @@ x = torch.randn(2,3,32,32)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -3389,7 +3390,7 @@ x = torch.randn(2,3,224,224)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -3534,7 +3535,7 @@ x = torch.randn(2,3,224,224)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -3750,7 +3751,7 @@ x = torch.randn(2,3,224,224)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -3874,7 +3875,7 @@ x = torch.randn(2,3,224,224)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -4035,7 +4036,7 @@ x = torch.randn(2,3,224,224)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -4262,7 +4263,7 @@ x = torch.randn(2,3,224,224)
 print(model(x).shape)
 ~~~
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
 <br/>
@@ -4587,15 +4588,44 @@ print(model(x_batch)) # 고정!
 
 <br/>
 
-###### [CNN](#CNN)
+###### [CNN](#cnn)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# RNN
+  - [RNN기초이론](#rnn기초이론)
+
+###### [RNN](#rnn)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+# RNN기초이론
+  - 연속적인 데이터(과거의 정보를 현재로 전달하는 것)
+    - 문장 -> 단어 -> 숫자
+    - 저는[1,0,0], 강사[0,1,0], 입니다[0,0,1] -> X1, X2, X3
+    - MLP에 하나씩 순차적으로 넣어보자 -> RNND의 접근법
+   
+<br/>
+
+  - sigmoid대신 tanh 액티베이션 함수를 많이 사용한다 -> Vanishing Gradient 때문
+  - x1, x2, x3인풋은 한번에 들어갈 수 없고, 하나씩 차근 차근 들어가야 함 -> 이전 데이터를 같이 더해주어야 하기 때문
+  - 과정
+    - x1(1x3), w1(3x2), b1(1x2) => h1나옴 -> 해당 과정 이후도 다 끝나면 x2 인풋됨 -> 사실 여기서도 f(x1w1+h0wh + b) 인데 h0은 전에 있던 은닉층 이기 때문에 전부 0으로 채워짐 따라서 의미 없이 사라지는것
+    - x2(1x3), w2(3x2), b2(1x2), h1(1x2), wh(2x2) -> f(x2w2+h1wh+b2) 이렇게 되는것
+    - 또한 wh는 모두 같은 행열 그리고 값을 가지고 있음
+
+<img width="980" height="384" alt="image" src="https://github.com/user-attachments/assets/5977f69e-5766-43f3-8e29-8cbfa9e590e1" />
 
 
 
 
-
-
-
+###### [RNN](#rnn)
+###### [Top](#top)
 
 
