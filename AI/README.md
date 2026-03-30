@@ -27,6 +27,7 @@
   - [EfficientNet](#efficientnet)_(2019.05)
 - [RNN](#rnn)
   - [RNN기초이론](#rnn기초이론)
+  - [Transformer-Attention is all you need](#transformerattention-is-all-you-need)_(2017.06)
 
 
 <br/>
@@ -4598,6 +4599,7 @@ print(model(x_batch)) # 고정!
 
 # RNN
   - [RNN기초이론](#rnn기초이론)
+  - [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 
 ###### [RNN](#rnn)
 ###### [Top](#top)
@@ -4695,14 +4697,34 @@ print(model(x_batch)) # 고정!
     - 인코더가 단어를 읽을 때마다 생기는 모든 타임스텝의 은닉 상태 벡터들(h_1, h_2, h_3, h_4)을 전부 다 보관해 뒀다가 디코더에게 통째로 넘겨준다(h_4는 나머지 것들이 다 포함되어 있지만, h_4를 제일 집중해서 보고 있음)
     - 만약 디코더가 두 번째 단어를 예측할 때, 인코더의 h_1과 90% 연관이 있고 h_2와 10% 연관이 있다고 확인하면, c_t = 0.9 \times h_1 + 0.1 \times h_2 + 0.0 \times h_3 \dots.. 이런것과 같은 벡터를 만들어냄
     - 기존의, Seq2Seq은 x_2 w_2 + h_1 w_h + b_2 라고 했다면, Attention은,  x_2 w_2 + h_1 w_h + b_2 + c_t w_c가 된다
-    - 하지만, 여기서도 문제점은, 멀수록 잊혀진다는것이 존재한다는것!!
+    - 하지만, 여기서도 문제점은, 멀수록 잊혀진다(decoder) + 의미를 제대로 못 담은 h 에 attention 한다는것
       - 인코더 쪽은 좀 나아졌지만, 디코더 쪽은 어차피 처음부터 학습해 나가면서 곱하고 더하는 것이니 잊혀지는 것은 같다(좀 더 나아졌을 뿐)
+      - 또한, 디코더가 attention을 하려고 하는 그 값은 원래 인코더가 처음부터 학습하면서 온 데이터 들인데, 마지막 나온 데이터에 attention을 한다고 하면, 사실 그 데이터에는 맨 처음 들어간 데이터의 의미도 있어야지만 작동이 잘 될수가 있다, 하지만 구조상 그럴수가 없다는것
+    - 그래서!! 트랜스포머는 self-attention을 통해 RNN을 완전히 버렸다
 
 ###### [RNN](#rnn)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+# Transformer-Attention is all you need
+  - 자연어 처리 (Natural Language Processing) 분야를 지배한 모델
+  - self-attention을 이용
+    - 기존 RNN이 단어를 순서대로(x1 -> x2 -> x3...) 처리하는 Linked List 같은 구조였다면, self-attention은 모든 단어가 서로 직접 연결된 N x N 행렬 구조, 단어 사이의 거리가 아무리 멀어도 참조 거리는 항상 O(1)이된다. 문장 안의 각 단어가 "나 자신을 제대로 이해하기 위해, 이 문장 안의 다른 어떤 단어 정보들을 끌어와야 할까?" 를 스스로 계산
+    - Dictionary 자료구조와 매우 유사한 Q, K, V (Query, Key, Value) 개념으로 동작
+      - Query (질의): 현재 처리 중인 단어가 던지는 질문. (예: "나는 '쓰다'라는 동사인데, 내 목적어가 될 명사는 어딨지?")
+      - Key (키): 문장 내 다른 모든 단어들이 가진 꼬리표. (예: "나는 '글을'이라는 목적어 형태의 명사야.")
+      - Value (값): 그 단어가 가진 실제 의미 정보.
+  - 입력 문장도, 출력 문장도 self-attention을 사용해서 단어를 숫자로 잘 바꿔 놓는다
+  - Encoder-Decoder Attention을 통해 번역할 때 어떤 단어를 주목해야 할지를 학습 시켰다
+  - CNN은 conv를 사용해서 이미지에서 어떤 특징을 추출할지를 학습시켰다면, 트랜스포머는 내적과 가중합을 사용해서 다음 단어를 예측할 때 어떤 단어를 주목할지를 학습
 
 
+
+
+###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
+###### [Top](#top)
 
 
 
