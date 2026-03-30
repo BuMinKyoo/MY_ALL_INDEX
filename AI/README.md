@@ -4655,9 +4655,16 @@ print(model(x_batch)) # 고정!
 <br/>
 
   - seq2seq
+    - Encoder, Decoder 두 파트로 구성! 이 둘은 서로 다른 RNN
+    - Encoder의 마지막 h를 decoder의 첫 h로 사용. 즉, 여기선 를 context vector로 사용한 것
+    - Encoder가 단어 3개(저는, 강사, 입니다)를 순서대로 다 읽고 난 후의 최종 은닉 상태(Hidden State, h_3)에는 이 문장 전체의 의미가 압축되어 있음. 이걸 바로 디코더의 초기 상태로 세팅해 주는 것임
+    - decoder는 다음 단어 예측기(Next-word Predictor 또는 Auto-Regressive Language Model)야. 앞서 나온 단어들을 보고 다음에 올 가장 자연스러운 단어를 유추해 내는 역할을 함
+    - Encoder의 역할은 Context Vector(문맥 벡터)를 잘 만드는 것
+    - LSTM과 GRU가 내부 게이트를 써서 기울기 소실(멀수록 잊혀지는 문제)을 꽤 많이 해결하긴했지만, seq2seq 구조 자체가 가지는 아주 치명적인 병목 현상이 있음, 아무리 긴 문장(예: 100단어짜리 스 기사)이 들어와도, 인코더는 무조건 고정된 크기의 벡터 하나(Context Vector)에 그 모든 정보를 구겨 넣어야 함, 따라서, 문장이 길어지면 길어질수록, 초반에 입력했던 정보는 압축 과정에서 공간이 부족해 손실되거나 뭉개질 수밖에 없다
+    - sos, eos도 토큰으로 넣어서 시작과 끝을 알려주는 용도로 사용한다
 
+<img width="1279" height="566" alt="image" src="https://github.com/user-attachments/assets/1d787a48-5dda-4a04-addb-6078236a4419" />
 
-<img width="1177" height="495" alt="image" src="https://github.com/user-attachments/assets/48c3a957-2c67-43e1-8e1e-cc6c147b2584" />
 
 
 
