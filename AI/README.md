@@ -4644,8 +4644,28 @@ print(model(x_batch)) # 고정!
     - 멀수록 잊혀진다 (역전파, Backpropagation 관점)
       - 학습을 할 때는 정답과의 오차를 줄이기 위해 출력단에서부터 거꾸로 계산하며 가중치를 수정해 나가는데, 타임스텝이 길어질수록 맨 앞의 입력데이터의 가중치를 수정하기 위한 신호가 계산 과정을 거치며 점점 작아져서 결국 0에 수렴, 나중에는 맨처음데이터가 결과에 어떤 영향을 미쳤는지 모델이 잊어버려서 앞부분 학습이 안된다
 
+<br/>
+
+  - RNN의 여러가지 유형
+    - One to Many
+    - Many to One
+    - Many to Many
+    - seq2seq -> 번역기에 특화된 모델
+
+<br/>
+
+  - seq2seq
+
+
+<img width="1177" height="495" alt="image" src="https://github.com/user-attachments/assets/48c3a957-2c67-43e1-8e1e-cc6c147b2584" />
+
+
 
 ###### [RNN](#rnn)
 ###### [Top](#top)
+
+
+
+
 
 
