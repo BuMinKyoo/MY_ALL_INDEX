@@ -4882,6 +4882,31 @@ print(model(x_batch)) # 고정!
 
 <img width="1208" height="520" alt="image" src="https://github.com/user-attachments/assets/43cf9258-8d7d-470b-b640-2a27c6bb310d" />
 
+<br/>
+
+<img width="1365" height="262" alt="image" src="https://github.com/user-attachments/assets/b6c43207-fba0-432e-8227-6a7462d0cf22" />
+
+<br/>
+
+  - Encoder-Decoder Attention
+    - 인코더, 디코더 둘다 layer는 6개씩
+    - 인코더의 맨 마지막 6번재 layer에서 나온 output을 다른 디코더의 6개에 전달
+      - Masked MHA가 아닌 그냥 MHA에만 전달하는 것이고, 거기에 있는 K용 가중치 행렬과, V용 가중치 행렬과 곱해져서 행렬이 2개 만들어짐
+    - Q 데이터는 해당 Decoder layer 에서 들어온, 정답값 백터
+      - 학습(Training) 단계에서는 모델이 예측을 잘하고 있는지 채점하고 Loss를 계산해야 하기 때문에, 디코더의 입력으로 실제 정답 문장을 넣어줌, 실제 서비스(Inference) 단계에서는 정답 텍스트가 없으니까, 방금 자기가 뱉어낸 단어를 다시 INPUT으로 집어넣으면서 while 문처럼 한 단어씩 루프(Loop)를 도는 형태로 동작
+      - 학습시에, Q는 MHA를 통과한 놈이기 때문에, 출력 문장의 각 단어에 대한 의미를 잘 담은 Q이다
+      - Masked MHA에서 내적되고 곱해진 값에 Add & Norm을 거치고 그것이 MHA에서 기다리고 있는 Q용 가중치 행렬과 곱해져서 Q가 만들어짐
+      - 즉, K용 가중치 행렬과, V용 가중치 행렬과 곱해진 것은 인코더에서 온 값이고, Q용 가중치 행렬과 곱해진 것은 정답데이터로 들어온 Masked MHA를 거친 놈이다
+
+<br/>
+
+<img width="502" height="656" alt="image" src="https://github.com/user-attachments/assets/8b375d90-3ed5-44f7-a010-99c89f3a14aa" />
+
+<br/>
+
+<img width="545" height="803" alt="image" src="https://github.com/user-attachments/assets/fdac37e8-e911-4c38-8376-50515c53554c" />
+
+<br/>
 
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
