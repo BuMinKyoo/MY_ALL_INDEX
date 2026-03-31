@@ -4628,6 +4628,7 @@ print(model(x_batch)) # 고정!
 <img width="980" height="384" alt="image" src="https://github.com/user-attachments/assets/5977f69e-5766-43f3-8e29-8cbfa9e590e1" />
 
 <br/>
+<br/>
 
   - next token prediction
     - Next Token Prediction(다음 토큰 예측)은 지금까지 입력된 텍스트의 문맥을 파악해서, 바로 다음에 올 가장 알맞은 단어 조각(Token)을 확률적으로 맞추는것
@@ -4674,6 +4675,7 @@ print(model(x_batch)) # 고정!
 
 <img width="1279" height="566" alt="image" src="https://github.com/user-attachments/assets/1d787a48-5dda-4a04-addb-6078236a4419" />
 
+<br/>
 <br/>
 
   - 위에가 정보가 좀 섞여 있는것 같아서 다시 정리
@@ -4758,6 +4760,7 @@ print(model(x_batch)) # 고정!
 <img width="929" height="651" alt="image" src="https://github.com/user-attachments/assets/b8e22c8e-f350-42fb-a9b0-f5003e1468ab" />
 
 <br/>
+<br/>
 
   - Positional Embedding(위치 임베딩)
     - word Embedding만 하게 되면, RNN 과 달리 단어의 순서에 대한 정보를 줄 수 없다
@@ -4772,6 +4775,7 @@ print(model(x_batch)) # 고정!
 
 <img width="792" height="334" alt="image" src="https://github.com/user-attachments/assets/f0c3d2c6-151f-49ea-9602-b1112574d471" />
 
+<br/>
 <br/>
 
   - 하지만 이미 word Embedding vector가 행으로 나눠져 있으면서 순서정보를 가지고 있는데 Positional Embedding vector가 왜또 필요한가?
@@ -4789,6 +4793,11 @@ print(model(x_batch)) # 고정!
       - \sqrt{512} 를 워드 임베딩 쪽에 곱해줌 -> 워드 임베딩은 보통 평균이 0이고 분산이 1인 아주 작은 값들로 이루어져 있음. 여기에 위치 임베딩 벡터의 숫자들을 그냥 더해버리면, 자칫 위치 정보의 숫자가 단어 고유의 의미를 나타내는 숫자들을 압도해 버리거나 희석시킬 위험이 있음
     - 4.인코더 진입: 이 덧셈이 끝난 최종 배열이 비로소 인코더(Encoder) 블록의 첫 번째 Input 파라미터로 들어감
 
+<br/>
+
+<img width="499" height="717" alt="image" src="https://github.com/user-attachments/assets/f794d323-61d4-4421-bdd3-c948804af0a3" />
+
+<br/>
 <br/>
 
   - 여기 아래 부터는 Encoder 진입 후 과정
@@ -4843,6 +4852,11 @@ print(model(x_batch)) # 고정!
 
 <br/>
 
+<img width="499" height="717" alt="image" src="https://github.com/user-attachments/assets/18c10252-b8ee-4028-8551-42bb70c8ae12" />
+
+<br/>
+<br/>
+
   - Multi-Head Attention 이후
     - ResNet 의 skip-connection 사용
       - 인코더에 처음 들어왔던 input 행렬인 원본 배열을 더해준다
@@ -4857,6 +4871,11 @@ print(model(x_batch)) # 고정!
 
 <br/>
 
+<img width="499" height="717" alt="image" src="https://github.com/user-attachments/assets/165d8c92-e5eb-4c72-8d5e-57c63f6eee8e" />
+
+<br/>
+<br/>
+
   - Encoder 구조 분석
     - 어텐션은 가로세로 둘 다, MLP는 가로로만 연산 들어감
       - MLP를 쓴 이유?
@@ -4868,6 +4887,7 @@ print(model(x_batch)) # 고정!
 
 <img width="720" height="1078" alt="image" src="https://github.com/user-attachments/assets/b1953756-2a9b-4268-8c03-44baac572852" />
 
+<br/>
 <br/>
 
   - Masked MHA
@@ -4888,6 +4908,11 @@ print(model(x_batch)) # 고정!
 
 <br/>
 
+<img width="499" height="717" alt="image" src="https://github.com/user-attachments/assets/76fd0b05-dab0-455b-9496-a8ec96894250" />
+
+<br/>
+<br/>
+
   - Encoder-Decoder Attention
     - 인코더, 디코더 둘다 layer는 6개씩
     - 인코더의 맨 마지막 6번재 layer에서 나온 output을 다른 디코더의 6개에 전달
@@ -4904,8 +4929,52 @@ print(model(x_batch)) # 고정!
 
 <br/>
 
-<img width="545" height="803" alt="image" src="https://github.com/user-attachments/assets/fdac37e8-e911-4c38-8376-50515c53554c" />
+<img width="499" height="717" alt="image" src="https://github.com/user-attachments/assets/399f8f8d-14fc-47be-a1b1-1a75a01eb329" />
 
+<br/>
+<br/>
+
+  - Decoder의 마지막 부분
+    - Decoder의 마지막 Layer의 출력을 사용
+    - 그냥 nn.Linear(512, 5000) 통과시키면 끝
+      - 5000는 언어 번역기라고 하면, 처음에 단어에 대한 원핫벡터의 차원의 수 이다
+      - 번역 모델 (예: 영어 -> 한국어): 인코더에는 영어 텍스트가 들어가고, 디코더에서는 한국어 텍스트를 만들어내야 하는 경우, 만약 우리가 만든 영어 단어 사전이 5000개고 한국어 단어 사전이 5972개라면, 인코더에 들어가는 원핫 벡터는 5000차원이고 디코더의 마지막 출력은 5972차원이 된다. 즉, 언어가 다르면 차원도 다를 수 있음!
+    - softmax 통과 시키고 Cross-Entropy 로 Loss 정의
+
+<br/>
+
+<img width="499" height="717" alt="image" src="https://github.com/user-attachments/assets/c56c5a3f-6b94-4722-a3bf-c1d025326e97" />
+
+<br/>
+<br/>
+
+  - 실제 추론 과정
+    - 학습할때는 디코더의 input에 정답 문장을 넣어주지만, test할때와 추론할때는 디코더에서 나온 output을 다시 넣어주어야 한다
+      - 1.<sos> 하나 넣고 I 뽑고
+      - 2.<sos> I 두 단어 넣고 am 뽑고
+      - 3.<sos> I am 세 단어 넣고 an 뽑고
+      - 4.<sos> I am an 네 단어 넣고 instructor 뽑고
+      - 5.<sos> I am an instructor 넣고 <eos> 나왔다면 종료
+    - 추론 시에도 똑같이 masking을적용한다!
+      - <sos> I am an 이렇게 4개의 단어가 한 번에 디코더의 입력 배열로 들어갔을때, 마스킹을 하지 않으면, <sos> 단어가 자기 자신의 벡터 값을 업데이트할 때, 같이 들어온 I, am, an의 정보를 쓱 훔쳐보고 섞어버리게 된다. I 단어도 뒤에 있는 am, an의 정보를 봐버리게 된다. 하지만 모델이 학습할 때는 <sos>는 절대 뒤의 단어를 보지 못하는 환경에서 학습했음, 추론할 때도 학습할 때와 똑같은 환경(과거 단어는 자기 자신과 그 이전 단어만 볼 수 있음)을 보장해 줘야 과거에 계산했던 값들이 엉키지 않고 일관성을 유지한다
+        - <sos>는 <sos>만 본다.
+        - I는 <sos>, I만 본다.
+        - am은 <sos>, I, am만 본다.
+        - an은 <sos>, I, am, an을 다 본다
+
+<br/>
+
+  - Dropout도 함
+    - 총 7군데, Pdrop = 0.1 으로 했다고 함
+    - 논문이 arXiv 에 v1~v5 까지 수정을 거침
+      - v4까지는 Attention 안에도 dropout이 있었음
+      - 수많은 구현 코드에선 Feed Forward 에도 사용
+
+<br/>
+
+<img width="630" height="796" alt="image" src="https://github.com/user-attachments/assets/efaf4950-8b7a-4da8-abf9-6edc5e55042e" />
+
+<br/>
 <br/>
 
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
