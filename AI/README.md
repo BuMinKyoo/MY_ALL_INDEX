@@ -26,8 +26,7 @@
   - [MobileNet V3](#mobilenet-v3)_(2019.05)
   - [EfficientNet](#efficientnet)_(2019.05)
 - [RNN](#rnn)
-  - [RNN기초이론](#rnn기초이론)
-  - [Transformer-Attention is all you need](#transformer-attention-is-all-you-need)_(2017.06)
+- [Transformer-Attention is all you need](#transformer-attention-is-all-you-need)_(2017.06)
 
 
 <br/>
@@ -4598,16 +4597,6 @@ print(model(x_batch)) # 고정!
 ***
 
 # RNN
-  - [RNN기초이론](#rnn기초이론)
-  - [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
-
-###### [RNN](#rnn)
-###### [Top](#top)
-
-<br/>
-<br/>
-
-# RNN기초이론
   - 연속적인 데이터(과거의 정보를 현재로 전달하는 것)
     - 문장 -> 단어 -> 숫자
     - 저는[1,0,0], 강사[0,1,0], 입니다[0,0,1] -> X1, X2, X3
@@ -4709,6 +4698,8 @@ print(model(x_batch)) # 고정!
 
 <br/>
 <br/>
+
+***
 
 # Transformer-Attention is all you need
   - 자연어 처리 (Natural Language Processing) 분야를 지배한 모델
