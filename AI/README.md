@@ -4977,6 +4977,13 @@ print(model(x_batch)) # 고정!
 <br/>
 <br/>
 
+  - Context Window의 실체
+    - 워드 임베딩 테이블은 행이 무한대라고 볼 수 있음, 만약 영어단어 사전에 있는 단어들을 가지고 있는 룩업 데이블이 있을때, 특정 문장이 들어오면 그 룩업 테이블을 보고 해당되는 원핫백터를 행으로 계속 추가해주면 되는것이기 때문에 이것은 Context Window와는 관계 없음
+    - 1.위치 임베딩 테이블의 하드코딩된 최대 행 크기가 Context Window의 실체가 된다. 위치의 행 크기보다 더 큰 단어수를 가진 데이터가 들어오면 하나의 행열 안에 넣을수 없기 때문에 계산 되어 질 수 없음
+      - 위치 임베딩의 행(Row) = 문장의 최대 길이
+    - 2.Multi-Head Attention의 내적 행렬 크기
+      - 단어의 개수(행의 길이)가 N개라면, Q 행렬(N \times 512)과 K의 전치행렬(512 \times N)을 곱하게되는데, 그 결과로 나오는 단어 간의 유사도 점수 행렬의 크기는 정확히 N \times N이 된다, 단어가 1,000개면 $1000 \times 1000$ = 100만 개의 float 데이터를 담을 2차원 배열이 필요하다, 단어 개수(N)가 늘어날수록 GPU VRAM에 동적으로 할당해야 하는 메모리가 제곱으로 폭발한다
+
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
 
