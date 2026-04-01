@@ -4975,6 +4975,25 @@ print(model(x_batch)) # 고정!
     - 2.Multi-Head Attention의 내적 행렬 크기
       - 단어의 개수(행의 길이)가 N개라면, Q 행렬(N \times 512)과 K의 전치행렬(512 \times N)을 곱하게되는데, 그 결과로 나오는 단어 간의 유사도 점수 행렬의 크기는 정확히 N \times N이 된다, 단어가 1,000개면 $1000 \times 1000$ = 100만 개의 float 데이터를 담을 2차원 배열이 필요하다, 단어 개수(N)가 늘어날수록 GPU VRAM에 동적으로 할당해야 하는 메모리가 제곱으로 폭발한다
 
+<br/>
+
+  - Evaluation
+    - 이미지 분류에서 처럼 번역에서도 accuracy로 평가한다면,
+      - “우리는 식당에서 맛있는 음식을 먹었다.” 가 정답 문장일 때, AI가 “식당에서 맛있는 음식을 먹었다.” 라고 번역했다면 -> 정확도 0 %
+      - 따라서, 번역 문제에 있어서는 다른 evaluation metric (평가 지표)들을 사용해야한다
+
+<br/>
+
+  - Evaluation - Perplexity(PPL)(헷갈려하는 정도)
+    - 정답 후보(단어 사전)가 100개인데 AI가 아무것도 학습하지 못한 바보 상태라면, 무작위로 찍어야 하니 맞출 확률은 1/100임, 이것에 대한 PPL은 100이 나옴
+    - 즉, PPL이 100이라는 건 AI가 매 순간 "아... 100개 중에 뭐 고르지?" 하고 헷갈려 하면서 평균적으로 100개의 선택지 사이에서 고민하고 있다는 뜻, 당연히 이 수치는 작을수록 똑똑하고 확신에 찬 모델이라는 의미
+
+<br/>
+
+  - Evaluation - BLEU (Bilingual Evaluation Understudy) score
+    - 번역에 있어서는 PPL 보단 BLEU가 좀 더 신뢰성이 있다.
+    - PPL은 AI가 속으로 얼마나 헷갈려하는지(확률)를 채점하는 거라면, BLEU 스코어는 AI가 최종적으로 내뱉은 텍스트(예측)와 사람이 써놓은 정답지를 쫙 펼쳐놓고 교집합을 찾는 아주 직관적인 문자열 비교 알고리즘이다
+
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
 
