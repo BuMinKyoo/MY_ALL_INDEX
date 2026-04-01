@@ -135,6 +135,7 @@
 - [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
 - [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
 - [Kubernetes,Kafka,Vertica,databricks](#kuberneteskafkaverticadatabricks)
+- [Elasticsearch, OpenSearch](#elasticsearch-opensearch)
 
 
 프로메테우스(Prometheus)와 그라파나(Grafana)
@@ -3327,3 +3328,21 @@ namespace ConsoleApp1
 
 ###### [Kubernetes,Kafka,Vertica,databricks](#kuberneteskafkaverticadatabricks)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Elasticsearch, OpenSearch
+  - 일반 DB(관계형 DB나 일반 NoSQL)는 데이터를 '안전하고 정확하게 저장하고 수정'하는 게 주 임무.
+  - 반면에 Elasticsearch나 OpenSearch는 수방대한 데이터 속에서 원하는 텍스트를 '미친 듯이 빨리 찾아내고 통계를 내는 것'이 주 임무
+  - MongoDB - MongoDB Compass
+  - MS SQL Server - SSMS
+  - Oracle DB - SQL Developer
+  - Elasticsearch - Kibana
+  - OpenSearch - OpenSearch Dashboards
+
+###### [Elasticsearch, OpenSearch](#elasticsearch-opensearch)
+###### [Top](#top)
+
