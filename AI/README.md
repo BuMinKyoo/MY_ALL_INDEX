@@ -5046,7 +5046,11 @@ print(model(x_batch)) # 고정!
       - 9.ResNet 의 skip-connection
       - 10.Layer Normalization
     - 인코딩 -> 디코딩
-      - 
+      - 11.인코딩 마지막 레이어에서 나온 행렬이 디코딩의 각각의 Multi-Head Attention영역의 K용 가중치 행렬과, V용 가중치 행렬과 곱해짐
+    - 디코딩
+      - 디코딩 진입전까지의 과정
+        - 12.학습시 : 정답 문장을 넣어서 1,2,3,4를 똑같이 진행해서 이걸 디코딩에 넣어줌
+        - 12.테스트시 : 예측해서 나온 결과값을 다시 1,2,3,4해서 디코딩에 넣어줌
 
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
