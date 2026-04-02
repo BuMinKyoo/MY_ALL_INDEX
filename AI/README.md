@@ -5088,7 +5088,7 @@ print(model(x_batch)) # 고정!
       - 10 x 512 행렬을 파이토치 텐서 차원으로 보면 [1, 10, 512] -> (1=배치(개), 10=단어 수(단), 512=차원(차)) -> 헤드가 8개라면, 512를 8토막 냄 -> [1, 10, 8, 64] -> (1(배치), 10(단어), 8(헤드), 64(쪼갠차원)) -> 그런데 GPU나 프레임워크의 행렬 곱셈(Matrix Multiplication) 함수들은 무조건 배열의 맨 마지막 두 자리 차원끼리만 곱셈을 수행하도록 하드코딩되어있음 -> 그래서 배열의 차원 순서를 강제로 바꿔줘야 함 -> 개 단 헤 차 ➜ 개 헤 단 차 ([1, 8, 10, 64]) -> [10, 64] 크기의 2차원 배열 8개에 대해서만 동시에 Q * K^T 행렬 곱셈을 병렬로 쫙 처리해 줌 -> 각 헤드에서 어텐션 연산이 끝나면 [1, 8, 10, 64] 모양의 결과물(V가 곱해진 값)이 나옴 -> 다시 원래 상태인 [1, 10, 512] 로 합쳐줘야함 -> 개 헤 단 차 ➜ 개 단 (헤 차)[1, 8, 10, 64] ➜ [1, 10, 512]
       - 결국 10 x 512 행렬이 들어가서 가중치 행렬Q, K, V(10x512)행렬과 각각 곱을 하고 나온 Q와 K는 내적하고 그 후 V가 곱해지는것
 
-  - rearrange코드 확인
+  - rearrange코드 확인(확인용)
 ~~~py
 Q = torch.randn(1, 4, 6) # 개단차
 print(Q)
@@ -5277,7 +5277,7 @@ class Encoder(nn.Module):
 
 <br/>
 
-  - expand_as
+  - expand_as(확인용)
 ~~~py
 src = torch.randint(0,65000,(3,5)) # 개단
 pos = torch.arange(5).expand_as(src).to(DEVICE)
@@ -5298,7 +5298,7 @@ tensor([[0, 1, 2, 3, 4],
 
 <br/>
 
-  - nn.Embedding
+  - nn.Embedding(확인용)
 ~~~py
 # nn.Embedding 실험
 emb=nn.Embedding(10,5) # one-hot encoding 된 벡터가 통과된다는 것이 약속된 상태의 FC layer 인 것
@@ -5406,6 +5406,411 @@ class Decoder(nn.Module):
         return x, atten_decs, atten_enc_decs
 ~~~
 
+<br/>
+
+  - Transformer class
+~~~py
+class Transformer(nn.Module):
+    def __init__(self, vocab_size, max_len, n_layers, d_model, d_ff, n_heads, drop_p):
+        super().__init__()
+
+        self.input_embedding = nn.Embedding(vocab_size, d_model)
+        self.encoder = Encoder(self.input_embedding, max_len, n_layers, d_model, d_ff, n_heads, drop_p)
+        self.decoder = Decoder(self.input_embedding, max_len, n_layers, d_model, d_ff, n_heads, drop_p)
+
+        self.n_heads = n_heads
+
+        for m in self.modules():
+            if hasattr(m,'weight') and m.weight.dim() > 1: # layer norm에 대해선 initial 안하겠다는 뜻
+                nn.init.xavier_uniform_(m.weight) # Kaiming의 분산은 2/Nin, Xavier의 분산은 2/(Nin+Nout)
+                # 즉, 분산이 더 작다. => 그래서 sigmoid/tanh에 적합한 것! (vanishing gradient 막기 위해)
+
+    def make_enc_mask(self, src): # src.shape = 개단
+
+        enc_mask = (src == pad_idx).unsqueeze(1).unsqueeze(2) # 개11단
+        enc_mask = enc_mask.expand(src.shape[0], self.n_heads, src.shape[1], src.shape[1]) # 개헤단단
+        """ src pad mask (문장 마다 다르게 생김. 이건 한 문장에 대한 pad 행렬)
+        F F T T
+        F F T T
+        F F T T
+        F F T T
+        """
+        return enc_mask
+
+    def make_dec_mask(self, trg): # trg.shape = 개단
+
+        # trg_pad_mask = (trg == pad_idx).unsqueeze(1).unsqueeze(2) # 개11단
+        # trg_pad_mask = trg_pad_mask.expand(trg.shape[0], self.n_heads, trg.shape[1], trg.shape[1]) # 개헤단단
+        # """ trg pad mask
+        # F F F T T
+        # F F F T T
+        # F F F T T
+        # F F F T T
+        # F F F T T
+        # """
+        trg_future_mask = torch.tril(torch.ones(trg.shape[0], self.n_heads, trg.shape[1], trg.shape[1]))==0 # 개헤단단
+        # trg_future_mask = trg_future_mask.to(DEVICE) # pad_mask | future_mask 할 때 같은 DEVICE 여야
+        """ trg future mask
+        F T T T T
+        F F T T T
+        F F F T T
+        F F F F T
+        F F F F F
+        """
+        # dec_mask = trg_pad_mask | trg_future_mask # dec_mask.shape = 개헤단단
+        dec_mask = trg_future_mask # dec_mask.shape = 개헤단단 # 문장 중간에 pad가 껴있지 않는 이상 pad mask는 안해도 됨!
+        # """ decoder mask
+        # F T T T T
+        # F F T T T
+        # F F F T T
+        # F F F T T
+        # F F F T T
+        # """
+        return dec_mask
+
+    def make_enc_dec_mask(self, src, trg):
+
+        enc_dec_mask = (src == pad_idx).unsqueeze(1).unsqueeze(2) # 개11단
+        enc_dec_mask = enc_dec_mask.expand(trg.shape[0], self.n_heads, trg.shape[1], src.shape[1]) # 개헤단단
+        """ src pad mask
+        F F T T
+        F F T T
+        F F T T
+        F F T T
+        F F T T
+        """
+        return enc_dec_mask
+
+    def forward(self, src, trg):
+
+        enc_mask = self.make_enc_mask(src)
+        dec_mask = self.make_dec_mask(trg)
+        enc_dec_mask = self.make_enc_dec_mask(src, trg)
+
+        enc_out, atten_encs = self.encoder(src, enc_mask)
+        out, atten_decs, atten_enc_decs = self.decoder(trg, enc_out, dec_mask, enc_dec_mask)
+
+        return out, atten_encs, atten_decs, atten_enc_decs
+~~~
+
+<br/>
+
+  - Kaiming vs Xavier(확인용)
+~~~py
+# Kaiming vs Xavier
+layer = nn.Linear(2,10)
+print(layer.weight)
+nn.init.kaiming_uniform_(layer.weight)
+print(layer.weight) # in 만 보니까 분산 크다
+nn.init.xavier_uniform_(layer.weight)
+print(layer.weight) # in out 둘다 보니까 분산 작다
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+Parameter containing:
+tensor([[-0.3944,  0.6439],
+        [ 0.5155, -0.2986],
+        [ 0.3603, -0.1287],
+        [ 0.1776,  0.1751],
+        [-0.4228,  0.0257],
+        [-0.3353, -0.6263],
+        [-0.0948,  0.0423],
+        [ 0.4657,  0.4260],
+        [ 0.5745,  0.1126],
+        [-0.4502, -0.3011]], requires_grad=True)
+Parameter containing:
+tensor([[ 1.3684, -0.6090],
+        [-0.6438, -1.2935],
+        [ 1.2556,  0.4329],
+        [-1.4143, -1.3268],
+        [ 0.8475, -0.7028],
+        [ 0.3444, -0.5987],
+        [-0.5752, -1.3120],
+        [ 0.9593, -0.2170],
+        [ 0.7855, -0.1299],
+        [-0.5891,  0.4474]], requires_grad=True)
+Parameter containing:
+tensor([[ 0.2238, -0.6880],
+        [-0.2719,  0.3142],
+        [-0.3369, -0.6052],
+        [ 0.0813,  0.5083],
+        [ 0.2164,  0.2459],
+        [ 0.6930, -0.2376],
+        [ 0.6302, -0.2040],
+        [ 0.5373,  0.4957],
+        [-0.6869,  0.1311],
+        [ 0.0326, -0.4407]], requires_grad=True)
+~~~
+
+<br/>
+
+  - tril함수(확인용)
+~~~py
+x = torch.ones(2,3,5,5)
+x = torch.tril(x) # tril: lower triangular
+print(x)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡ
+tensor([[[[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]]],
+
+
+        [[[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]]]])
+~~~
+
+<br/>
+
+  - 모델 생성
+~~~py
+model = Transformer(vocab_size, max_len, n_layers, d_model, d_ff, n_heads, drop_p).to(DEVICE)
+
+src = torch.tensor([[4,6,5,1,1,1],[7,7,1,1,1,1]]).to(DEVICE)
+trg = torch.tensor([[0,2,5,4,4,3,1,1,0],[0,2,9,6,7,3,1,1,0]]).to(DEVICE)
+
+model.eval()
+with torch.no_grad():
+    x = model(src, trg[:,:-1])[0] # 마지막 토큰은 제외하고 입력
+print(src.shape)
+print(trg.shape)
+print(x.shape) # 개단으로 들어가서 개단차로 나옴
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+torch.Size([2, 6])
+torch.Size([2, 9])
+torch.Size([2, 8, 65001])
+~~~
+
+<br/>
+
+  - Train, Test, loss_epoch
+~~~py
+def Train(model, train_DL, val_DL, criterion, optimizer, scheduler = None):
+    loss_history = {"train": [], "val": []}
+    best_loss = 9999
+    for ep in range(EPOCH):
+        model.train() # train mode로 전환
+        train_loss = loss_epoch(model, train_DL, criterion, optimizer = optimizer, scheduler = scheduler)
+        loss_history["train"] += [train_loss]
+
+        model.eval() # test mode로 전환
+        with torch.no_grad():
+            val_loss = loss_epoch(model, val_DL, criterion)
+            loss_history["val"] += [val_loss]
+            if val_loss < best_loss:
+                best_loss = val_loss
+                torch.save({"model": model,
+                            "ep": ep,
+                            "optimizer": optimizer,
+                            "scheduler": scheduler,}, save_model_path)
+        # print loss
+        print(f"Epoch {ep+1}: train loss: {train_loss:.5f}   val loss: {val_loss:.5f}   current_LR: {optimizer.param_groups[0]['lr']:.8f}")
+        print("-" * 20)
+
+    torch.save({"loss_history": loss_history,
+                "EPOCH": EPOCH,
+                "BATCH_SIZE": BATCH_SIZE}, save_history_path)
+
+def Test(model, test_DL, criterion):
+    model.eval() # test mode로 전환
+    with torch.no_grad():
+        test_loss = loss_epoch(model, test_DL, criterion)
+    print(f"Test loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}")
+
+def loss_epoch(model, DL, criterion, optimizer = None, scheduler = None):
+    N = len(DL.dataset) # the number of data
+
+    rloss=0
+    for src_texts, trg_texts in tqdm(DL, leave=False):
+        src = tokenizer(src_texts, padding=True, truncation=True, max_length = max_len, return_tensors='pt', add_special_tokens = False).input_ids.to(DEVICE)
+        trg_texts = ['</s> ' + s for s in trg_texts]
+        trg = tokenizer(trg_texts, padding=True, truncation=True, max_length = max_len, return_tensors='pt', add_special_tokens = True ).input_ids.to(DEVICE)
+        # inference
+        y_hat = model(src, trg[:,:-1])[0] # 모델 통과 시킬 땐 trg의 마지막 토큰은 제외!
+        # y_hat.shape = 개단차 즉, 훈련 땐 문장이 한번에 튀어나옴
+        # loss
+        loss = criterion(y_hat.permute(0,2,1), trg[:,1:]) # loss 계산 시엔 <sos> 는 제외!
+        """
+        개단차 -> 개차단으로 바꿔줌 (1D segmentation으로 생각)
+        개채행열(예측), 개행열(정답)으로 주거나 개채1열, 개1열로 주거나 개채열, 개열로 줘야하도록 함수를 만들어놔서
+        우리 상황에서는 개차단, 개단 으로 줘야 한다.
+        이렇게 함수를 만들어놔야 1D, 2D segmentation 등등으로 확장가능하기 때문
+        그냥 y_hat=개차단, trg=개단으로 줘야만 계산 제대로 된다고 생각하시면 됩니다!
+        """
+        # update
+        if optimizer is not None:
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        if scheduler is not None:
+            scheduler.step()
+        # loss accumulation
+        loss_b = loss.item() * src.shape[0]
+        rloss += loss_b
+    loss_e = rloss/N
+    return loss_e
+
+def count_params(model):
+    num = sum([p.numel() for p in model.parameters() if p.requires_grad])
+    return num
+
+class NoamScheduler:
+    def __init__(self, optimizer, d_model, warmup_steps, LR_scale = 1):
+        self.optimizer = optimizer
+        self.current_step = 0
+        self.d_model = d_model
+        self.warmup_steps = warmup_steps
+        self.LR_scale = LR_scale
+
+    def step(self):
+        self.current_step += 1
+        lrate = self.LR_scale * (self.d_model ** -0.5) * min(self.current_step ** -0.5, self.current_step * self.warmup_steps ** -1.5)
+        self.optimizer.param_groups[0]['lr'] = lrate
+~~~
+
+<br/>
+
+  - 모델 학습
+~~~py
+if new_model_train:
+    params = [p for p in model.parameters() if p.requires_grad] # 사전 학습된 layer를 사용할 경우
+    if scheduler_name == 'Noam':
+        optimizer = optim.Adam(params, lr=0,
+                               betas=(0.9, 0.98), eps=1e-9,
+                               weight_decay=LAMBDA) # 논문에서 제시한 beta와 eps 사용, l2-Regularization은 한번 써봄 & 맨 처음 step 의 LR=0으로 출발 (warm-up)
+        scheduler = NoamScheduler(optimizer, d_model=d_model, warmup_steps=warmup_steps, LR_scale=LR_scale)
+
+    elif scheduler_name == 'Cos':
+        optimizer = optim.Adam(params, lr=LR_init,  # cos restart sheduling
+                               betas=(0.9, 0.98), eps=1e-9,
+                               weight_decay=LAMBDA)
+        scheduler = CosineAnnealingWarmRestarts(optimizer, T0, T_mult)
+
+    Train(model, train_DL, val_DL, criterion, optimizer, scheduler)
+~~~
+
+<br/>
+
+  - 로드 모델
+~~~py
+loaded = torch.load(save_model_path, map_location=DEVICE, weights_only=False)
+load_model = loaded["model"]
+ep = loaded["ep"]
+optimizer = loaded["optimizer"]
+
+loaded = torch.load(save_history_path, map_location=DEVICE)
+loss_history = loaded["loss_history"]
+
+print(ep)
+print(optimizer)
+
+Test(load_model, test_DL, criterion)
+count_params(load_model)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+12
+Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.98)
+    capturable: False
+    decoupled_weight_decay: False
+    differentiable: False
+    eps: 1e-09
+    foreach: None
+    fused: None
+    lr: 0.00022260183745731945
+    maximize: False
+    weight_decay: 0
+)
+
+                                               
+Test loss: 1.323 | Test PPL: 3.756
+
+~~~
+
+<br/>
+
+  - 번역함수, 어텐션 map 그리는 함수
+~~~py
+def translation(model, src_text, atten_map_save = False):
+    model.eval()
+    with torch.no_grad(): 
+        src = tokenizer.encode(src_text, return_tensors='pt', add_special_tokens=False).to(DEVICE) # 1x단
+        enc_mask = model.make_enc_mask(src) # 문장 하나만 넣을거라 사실상 안해도 됨
+        enc_out, atten_encs = model.encoder(src, enc_mask, atten_map_save)
+
+        pred = tokenizer.encode('</s>', return_tensors='pt', add_special_tokens=False).to(DEVICE) # 1x1
+        for _ in range(max_len-1): # <sos> 가 한 토큰이기 때문에 최대 99 번까지만 loop을 돌아야 함
+            dec_mask = model.make_dec_mask(pred)
+            enc_dec_mask = model.make_enc_dec_mask(src, pred)
+            out, atten_decs, atten_enc_decs = model.decoder(pred, enc_out, dec_mask, enc_dec_mask, atten_map_save)
+            # out.shape = (개=1,단,차)
+
+            pred_word = out[:,-1,:].argmax(dim=1).unsqueeze(0) # 마지막 단어에 대해 argmax해서 prediction 하고 shape = (1,1)로
+            pred = torch.cat([pred, pred_word], dim=1) # 1x단 (단은 하나씩 늘면서)
+
+            if tokenizer.decode(pred_word.item()) == '</s>':
+                break
+
+        translated_text = tokenizer.decode(pred[0])
+
+    return translated_text, atten_encs, atten_decs, atten_enc_decs
+
+def show_attention(atten, Query, Key, n):
+    atten = atten.cpu()
+
+    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=[atten.shape[3]*1.5,atten.shape[2]])
+    for i in range(3):
+        ax[i].set_yticks(range(atten.shape[2]))
+        ax[i].set_yticklabels(Query, rotation=45)
+        ax[i].set_xticks(range(atten.shape[3]))
+        ax[i].set_xticklabels(Key, rotation=60)
+        ax[i].imshow(atten[n-1][i], cmap='bone') # n 번째 layer, 앞 세 개의 헤드만 plot
+        # ax[i].xaxis.tick_top()  # x축 레이블을 위쪽으로 이동
+~~~
+
+<br/>
+
+  - 번역하기
+~~~py
+# 번역해보기
+src_text, trg_text = test_DS[2]
+print(f"입력: {src_text}")
+print(f"정답: {trg_text}")
+
+translated_text, atten_encs, atten_decs, atten_enc_decs = translation(load_model, src_text, atten_map_save = True)
+print(f"AI의 번역: {translated_text}")
+~~~
 
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
