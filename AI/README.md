@@ -5033,8 +5033,20 @@ print(model(x_batch)) # 고정!
       - 4.덧셈 (Merge): 위에서 구한 두 개의 10 x 512 배열을 같은 자리(인덱스)끼리 더함
         - \sqrt{512} 를 워드 임베딩 쪽에 곱해줌 -> 워드 임베딩은 보통 평균이 0이고 분산이 1인 아주 작은 값들로 이루어져 있음. 여기에 위치 임베딩 벡터의 숫자들을 그냥 더해버리면, 자칫 위치 정보의 숫자가 단어 고유의 의미를 나타내는 숫자들을 압도해 버리거나 희석시킬 위험이 있음
       - 4.인코더 진입: 이 덧셈이 끝난 최종 배열이 비로소 인코더(Encoder) 블록의 첫 번째 Input 파라미터로 들어감
-    - 인코딩 진입
-      - 5.Multi-Head Attention
+    - 인코딩 진입(6회 반복)
+      - 5.Multi-Head Attention(해드가 1개인 경우, 해드가 여러개면 차원만 나눠주면 됨)
+        -  5-1.input된 10 x 512 행렬에 대해서, 3개의 서로 다른 가중치 행렬(W_Q, W_K, W_V)과 각각 곱해서 3가지 역할로 분리
+        -  5-2.Q와 K는 서로 내적 -> (10 x 512) 곱하기 (512 x 10) 이 되므로, 결과물은 10 x 10
+        -  5-3.스케일 조정 곱하기
+        -  5-4.가로방향 Softmax
+        -  5-5.나온 결과값 10 x 10 행렬에 V 행렬(10 x 512)을 곱하기
+      - 6.ResNet 의 skip-connection
+      - 7.Layer Normalization
+      - 8.Feed Forward
+      - 9.ResNet 의 skip-connection
+      - 10.Layer Normalization
+    - 인코딩 -> 디코딩
+      - 
 
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
