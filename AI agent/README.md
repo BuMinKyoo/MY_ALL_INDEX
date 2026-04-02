@@ -9,6 +9,8 @@
 ***
 
 # Claude
+  - 기본
+    - home폴더에 들어가서 바꾸면 전역 설정이 되고, 폴더 하위 단위로도 적용이 된다
   - 톨더
     - commands : 커스텀 슬래시 커맨드 (레거시)
     - skills : 커스텀 스킬 (SKILL.md 포함, commands/의 후속)
