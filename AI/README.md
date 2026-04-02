@@ -5051,6 +5051,21 @@ print(model(x_batch)) # 고정!
       - 디코딩 진입전까지의 과정
         - 12.학습시 : 정답 문장을 넣어서 1,2,3,4를 똑같이 진행해서 이걸 디코딩에 넣어줌
         - 12.테스트시 : 예측해서 나온 결과값을 다시 1,2,3,4해서 디코딩에 넣어줌
+      - 디코딩 진입 후(6회 반복)
+        - Masked Multi-Head Attention
+          - 13.디코딩으로 들어온 백터에 대해 5번, Multi-Head Attention와 같은 방식으로 진행
+          - 14.ResNet 의 skip-connection
+          - 15.Layer Normalization
+        - Multi-Head Attention
+          - 16.디코딩에서 들어온 INPUT을 Q가중치 행렬과 곱합
+          - 17.인코딩에서 온 K,V와 디코딩에서온 Q행렬을 이용해서 내적, 곱을 함
+        - 18.ResNet 의 skip-connection
+        - 19.Layer Normalization
+        - 20.Feed Forward
+        - 21.ResNet 의 skip-connection
+        - 22.Layer Normalization
+    - 23.Linear통과
+    - 24.Softmax통과
 
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
