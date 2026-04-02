@@ -5029,7 +5029,7 @@ print(model(x_batch)) # 고정!
         - 실제로는 [0,0,0 ... 1 ...  0,0,0] 이런 원핫이 들어가는게 아니라 토크나이저로 나온 숫자가 들어가서, 여기서 구한 정수 인덱스(204번, 206번)를 그대로 사용해서, 5000 x 512 크기의 단어용 W 테이블(float 2차원 배열)에서 204번째 줄, 206번째 줄을 배열 인덱싱으로 쏙쏙 뽑아온다(Lookup)
       - 3.위치 연산: 10 x 100 (위치 원핫) 곱하기 100 x 512 (위치용 W 테이블) = 10 x 512 크기의 위치 임베딩(Positional Embedding) 벡터 추출
         - 위치용 W 테이블 -> 학습될 테이블
-        - 실제로는 [0,0,0 ... 1 ...  0,0,0] 이런 원핫이 들어가는게 아니라 토크나이저로 나온 숫자가 들어가서, 여기서 구한 정수 인덱스(204번, 206번)를 그대로 사용해서, 5000 x 512 크기의 위치용 W 테이블(float 2차원 배열)에서 204번째 줄, 206번째 줄을 배열 인덱싱으로 쏙쏙 뽑아온다(Lookup)
+        - 실제로는 [0,0,0 ... 1 ...  0,0,0] 이런 원핫이 들어가는게 아니라 각 단어의 위치를 확인해서, 여기서 구한 정수 인덱스(1번, 2번 등등)를 그대로 사용해서, 5000 x 512 크기의 위치용 W 테이블(float 2차원 배열)에서 1번째 줄, 2번째 줄을 배열 인덱싱으로 쏙쏙 뽑아온다(Lookup)
       - 4.덧셈 (Merge): 위에서 구한 두 개의 10 x 512 배열을 같은 자리(인덱스)끼리 더함
         - \sqrt{512} 를 워드 임베딩 쪽에 곱해줌 -> 워드 임베딩은 보통 평균이 0이고 분산이 1인 아주 작은 값들로 이루어져 있음. 여기에 위치 임베딩 벡터의 숫자들을 그냥 더해버리면, 자칫 위치 정보의 숫자가 단어 고유의 의미를 나타내는 숫자들을 압도해 버리거나 희석시킬 위험이 있음
       - 4.인코더 진입: 이 덧셈이 끝난 최종 배열이 비로소 인코더(Encoder) 블록의 첫 번째 Input 파라미터로 들어감
@@ -5053,19 +5053,24 @@ print(model(x_batch)) # 고정!
         - 12.테스트시 : 예측해서 나온 결과값을 다시 1,2,3,4해서 디코딩에 넣어줌
       - 디코딩 진입 후(6회 반복)
         - Masked Multi-Head Attention
-          - 13.디코딩으로 들어온 백터에 대해 5번, Multi-Head Attention와 같은 방식으로 진행
-          - 14.ResNet 의 skip-connection
-          - 15.Layer Normalization
+          - 13.input된(오직 디코더로 들어온값) 10 x 512 행렬에 대해서, 3개의 서로 다른 가중치 행렬(W_Q, W_K, W_V)과 각각 곱해서 3가지 역할로 분리
+          - 14..Q와 K는 서로 내적 -> (10 x 512) 곱하기 (512 x 10) 이 되므로, 결과물은 10 x 10
+          - 15.스케일 조정 곱하기
+          - 16.미래의 단어 위치(우측 상단 대각선)를 -1억이라는 엄청나게 작은 음수로 덮어씌우는 마스킹(Masking) 배열 조작
+          - 17.가로방향 Softmax
+          - 18.나온 결과값 10 x 10 행렬에 V 행렬(10 x 512)을 곱하기
+          - 19.ResNet 의 skip-connection
+          - 20.Layer Normalization
         - Multi-Head Attention
-          - 16.디코딩에서 들어온 INPUT을 Q가중치 행렬과 곱합
-          - 17.인코딩에서 온 K,V와 디코딩에서온 Q행렬을 이용해서 내적, 곱을 함
-        - 18.ResNet 의 skip-connection
-        - 19.Layer Normalization
-        - 20.Feed Forward
-        - 21.ResNet 의 skip-connection
-        - 22.Layer Normalization
-    - 23.Linear통과
-    - 24.Softmax통과
+          - 21.디코딩에서 Masked Multi-Head Attention를 진행한 행렬을 Q가중치 행렬과 곱합
+          - 22.인코딩에서 온 K,V와 디코딩에서온 Q행렬을 이용해서 내적, 곱을 함
+        - 23.ResNet 의 skip-connection
+        - 24.Layer Normalization
+        - 25.Feed Forward
+        - 26.ResNet 의 skip-connection
+        - 27.Layer Normalization
+    - 28.Linear통과
+    - 29.Softmax통과
 
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
