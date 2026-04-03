@@ -5089,6 +5089,26 @@ print(model(x_batch)) # 고정!
       - 10 x 512 행렬을 파이토치 텐서 차원으로 보면 [1, 10, 512] -> (1=배치(개), 10=단어 수(단), 512=차원(차)) -> 헤드가 8개라면, 512를 8토막 냄 -> [1, 10, 8, 64] -> (1(배치), 10(단어), 8(헤드), 64(쪼갠차원)) -> 그런데 GPU나 프레임워크의 행렬 곱셈(Matrix Multiplication) 함수들은 무조건 배열의 맨 마지막 두 자리 차원끼리만 곱셈을 수행하도록 하드코딩되어있음 -> 그래서 배열의 차원 순서를 강제로 바꿔줘야 함 -> 개 단 헤 차 ➜ 개 헤 단 차 ([1, 8, 10, 64]) -> [10, 64] 크기의 2차원 배열 8개에 대해서만 동시에 Q * K^T 행렬 곱셈을 병렬로 쫙 처리해 줌 -> 각 헤드에서 어텐션 연산이 끝나면 [1, 8, 10, 64] 모양의 결과물(V가 곱해진 값)이 나옴 -> 다시 원래 상태인 [1, 10, 512] 로 합쳐줘야함 -> 개 헤 단 차 ➜ 개 단 (헤 차)[1, 8, 10, 64] ➜ [1, 10, 512]
       - 결국 10 x 512 행렬이 들어가서 가중치 행렬Q, K, V(10x512)행렬과 각각 곱을 하고 나온 Q와 K는 내적하고 그 후 V가 곱해지는것
 
+<br/>
+
+  - tokenizer,pad_idx,get_vocab 코드(확인용)
+~~~py
+tokenizer = MarianTokenizer.from_pretrained('Helsinki-NLP/opus-mt-ko-en')
+model = MarianMTModel.from_pretrained('Helsinki-NLP/opus-mt-ko-en') # MT: Machine Translation
+
+tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True)
+pad_idx = tokenizer.pad_token_id
+print("pad_idx =", pad_idx)
+print(tokenizer.vocab_size)
+print(tokenizer.tokenize("신발이 참 예쁘네요"))
+
+print(tokenizer.get_vocab())
+vocab_size = tokenizer.vocab_size
+print(vocab_size)
+~~~
+
+<br/>
+
   - rearrange코드 확인(확인용)
 ~~~py
 Q = torch.randn(1, 4, 6) # 개단차
@@ -5136,6 +5156,305 @@ tensor([[[ 0.2595, -0.4927, -0.4737, -0.2074, -1.9427, -1.7322],
          [ 0.1413, -1.7858,  0.2259, -0.0683, -0.4737, -1.9399],
          [-1.4287, -0.6150,  0.4548,  0.8434,  1.2168, -0.7239]]])
 torch.Size([1, 4, 6])
+~~~
+
+<br/>
+
+  - expand_as(확인용)
+~~~py
+src = torch.randint(0,65000,(3,5)) # 개단
+pos = torch.arange(5).expand_as(src).to(DEVICE)
+print(src)
+print(pos)
+
+# arange : 0~4 세팅
+# expand_as : src와 같은 shape만들어주기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+tensor([[17852, 30557, 14802,   783,  2753],
+        [13780,  2814, 59476, 54905, 10648],
+        [21454, 17110, 22480,  4393, 46681]])
+tensor([[0, 1, 2, 3, 4],
+        [0, 1, 2, 3, 4],
+        [0, 1, 2, 3, 4]])
+~~~
+
+<br/>
+
+  - nn.Embedding(확인용)
+~~~py
+# nn.Embedding 실험
+emb=nn.Embedding(10,5) # one-hot encoding 된 벡터가 통과된다는 것이 약속된 상태의 FC layer 인 것
+print(emb.weight.shape) # weight 개수는 nn.Linear(10,5) 과 동일! 동작 방식이 다른 것
+print(emb.weight)
+print(emb(torch.tensor(2)))
+# 여기서 나온 tensor([-1.6781, -0.4184,  0.3999,  1.5914,  0.1325], grad_fn=<EmbeddingBackward0>) 값은 세번째 행을 그냥 가져온것
+
+print(emb(torch.tensor([[6,1,2],[2,1,7]]))) # 2 개 문장, 3개 단어
+print(emb(torch.tensor([[6,1,2],[2,1,7]])).shape)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+torch.Size([10, 5])
+Parameter containing:
+tensor([[ 0.3053,  0.7740, -0.1448, -0.5994,  0.4004],
+        [-0.5822, -0.3072, -0.9433, -2.7531, -0.0236],
+        [-1.6781, -0.4184,  0.3999,  1.5914,  0.1325],
+        [ 0.8183, -0.7544, -0.8827, -1.1778, -1.6542],
+        [-1.3207, -0.6793,  0.1129, -1.0439, -0.4201],
+        [ 0.0988,  0.6815,  1.1168, -0.6703, -0.7377],
+        [-0.2685, -0.1505, -0.4780,  1.2038,  3.6673],
+        [-0.0108,  0.2441,  2.3384, -0.9031, -0.9961],
+        [-2.6855, -0.0280, -2.0526,  2.0998,  1.0727],
+        [ 0.5224,  1.2706, -0.2532,  0.6647, -0.9538]], requires_grad=True)
+tensor([-1.6781, -0.4184,  0.3999,  1.5914,  0.1325],
+       grad_fn=<EmbeddingBackward0>)
+tensor([[[-0.2685, -0.1505, -0.4780,  1.2038,  3.6673],
+         [-0.5822, -0.3072, -0.9433, -2.7531, -0.0236],
+         [-1.6781, -0.4184,  0.3999,  1.5914,  0.1325]],
+
+        [[-1.6781, -0.4184,  0.3999,  1.5914,  0.1325],
+         [-0.5822, -0.3072, -0.9433, -2.7531, -0.0236],
+         [-0.0108,  0.2441,  2.3384, -0.9031, -0.9961]]],
+       grad_fn=<EmbeddingBackward0>)
+torch.Size([2, 3, 5])
+~~~
+
+<br/>
+
+  - Kaiming vs Xavier(확인용)
+~~~py
+# Kaiming vs Xavier
+layer = nn.Linear(2,10)
+print(layer.weight)
+nn.init.kaiming_uniform_(layer.weight)
+print(layer.weight) # in 만 보니까 분산 크다
+nn.init.xavier_uniform_(layer.weight)
+print(layer.weight) # in out 둘다 보니까 분산 작다
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+Parameter containing:
+tensor([[-0.3944,  0.6439],
+        [ 0.5155, -0.2986],
+        [ 0.3603, -0.1287],
+        [ 0.1776,  0.1751],
+        [-0.4228,  0.0257],
+        [-0.3353, -0.6263],
+        [-0.0948,  0.0423],
+        [ 0.4657,  0.4260],
+        [ 0.5745,  0.1126],
+        [-0.4502, -0.3011]], requires_grad=True)
+Parameter containing:
+tensor([[ 1.3684, -0.6090],
+        [-0.6438, -1.2935],
+        [ 1.2556,  0.4329],
+        [-1.4143, -1.3268],
+        [ 0.8475, -0.7028],
+        [ 0.3444, -0.5987],
+        [-0.5752, -1.3120],
+        [ 0.9593, -0.2170],
+        [ 0.7855, -0.1299],
+        [-0.5891,  0.4474]], requires_grad=True)
+Parameter containing:
+tensor([[ 0.2238, -0.6880],
+        [-0.2719,  0.3142],
+        [-0.3369, -0.6052],
+        [ 0.0813,  0.5083],
+        [ 0.2164,  0.2459],
+        [ 0.6930, -0.2376],
+        [ 0.6302, -0.2040],
+        [ 0.5373,  0.4957],
+        [-0.6869,  0.1311],
+        [ 0.0326, -0.4407]], requires_grad=True)
+~~~
+
+<br/>
+
+  - tril함수(확인용)
+~~~py
+x = torch.ones(2,3,5,5)
+x = torch.tril(x) # tril: lower triangular
+print(x)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡ
+tensor([[[[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]]],
+
+
+        [[[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]],
+
+         [[1., 0., 0., 0., 0.],
+          [1., 1., 0., 0., 0.],
+          [1., 1., 1., 0., 0.],
+          [1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1.]]]])
+~~~
+
+<br/>
+
+  - 세팅
+~~~py
+%%capture
+# capture는 주렁주렁 출력 보여주지 않게끔
+# 그래프에서 한글이 깨지지 않게 폰트 설치..
+# *맨처음에 셀 한 번 실행하고 세션 다시 시작하고 또 실행해야 반영됨!!
+!sudo apt-get install -y fonts-nanum
+!sudo fc-cache -fv
+!rm ~/.cache/matplotlib -rf
+import matplotlib.pyplot as plt
+plt.rc('font', family='NanumBarunGothic')
+
+from google.colab import drive
+drive.mount('/content/drive')
+import torch
+from torch import nn, optim
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+from transformers import MarianMTModel, MarianTokenizer # MT: Machine Translation
+import pandas as pd
+from tqdm import tqdm
+import math, random
+from einops import rearrange
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+print(DEVICE)
+
+BATCH_SIZE = 64 # 논문에선 2.5만 token이 한 batch에 담기게 했다고 함.
+LAMBDA = 0 # l2-Regularization를 위한 hyperparam. # 저장된 모델
+EPOCH = 15 # 저장된 모델
+# max_len = 512 # model.model.encoder.embed_positions 를 보면 512로 했음을 알 수 있다.
+max_len = 100 # 너무 긴거 같아서 자름 (GPU 부담도 많이 덜어짐)
+criterion = nn.CrossEntropyLoss(ignore_index = pad_idx) # pad token 이 출력 나와야하는 시점의 loss는 무시 (즉, label이 <pad> 일 때는 무시) # 저장된 모델
+# criterion = nn.CrossEntropyLoss(ignore_index = pad_idx, label_smoothing = 0.1) # 막상 해보니 성능 안나옴 <- 데이터가 많아야 할 듯
+
+scheduler_name = 'Noam'
+# scheduler_name = 'Cos'
+#### Noam ####
+# warmup_steps = 4000 # 이건 논문에서 제시한 값 (총 10만 step의 4%)
+warmup_steps = 1000 # 데이터 수 * EPOCH / BS = 총 step 수 인것 고려 # 저장된 모델
+LR_scale = 0.5 # Noam scheduler에 peak LR 값 조절을 위해 곱해질 녀석 # 저장된 모델
+#### Cos ####
+LR_init = 5e-4
+T0 = 1500 # 첫 주기
+T_mult = 2 # 배 만큼 주기가 길어짐 (1보다 큰 정수여야 함)
+#############
+
+new_model_train = False
+hyuk_model_use = True # 여러분만의 모델 만들어서 사용하고 싶다면 False로
+
+if hyuk_model_use:
+    !gdown https://drive.google.com/uc?id=1bjbeWgqlVKJ9gzDcL1hfD9cIItQy9_N2 -O Transformer_small.pt
+    !gdown https://drive.google.com/uc?id=1M0yYP2umxlwaAbk_iq5G_Z5y3qLu9Wet -O Transformer_small_history.pt
+
+    save_model_path = 'Transformer_small.pt'
+    save_history_path = 'Transformer_small_history.pt'
+else:
+    save_model_path = '/content/drive/MyDrive/Colab Notebooks/results/Transformer_small2.pt'
+    save_history_path = '/content/drive/MyDrive/Colab Notebooks/results/Transformer_small2_history.pt'
+~~~
+
+<br/>
+
+  - DS, DL 생성
+~~~py
+# data 다운
+# https://aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=126 에서 받을 수 있어요
+!gdown https://drive.google.com/uc?id=1r4ZnFJOStyBlNRx7snBQ-Iq2GNyJKL6t -O '대화체.xlsx'
+data = pd.read_excel('대화체.xlsx')
+
+class CustomDataset(torch.utils.data.Dataset):
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return self.data.shape[0]
+
+    def __getitem__(self, idx):
+        return self.data.loc[idx, '원문'], self.data.loc[idx, '번역문']
+
+custom_DS = CustomDataset(data)
+
+train_DS, val_DS, test_DS = torch.utils.data.random_split(custom_DS, [97000, 2000, 1000])
+# 논문에서는 450만개 영,독 문장 pair 사용
+
+train_DL = torch.utils.data.DataLoader(train_DS, batch_size=BATCH_SIZE, shuffle=True)
+val_DL = torch.utils.data.DataLoader(val_DS, batch_size=BATCH_SIZE, shuffle=True)
+test_DL = torch.utils.data.DataLoader(test_DS, batch_size=BATCH_SIZE, shuffle=True)
+
+print(len(train_DS))
+print(len(val_DS))
+print(len(test_DS))
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+97000
+2000
+1000
+~~~
+
+<br/>
+
+  - test_DS,train_DL 확인
+~~~py
+# test_DS 확인
+i = 5
+src_text, trg_text = test_DS[i]
+
+print(f"인덱스: {test_DS.indices[i]}")  # 엑셀 파일에서 idx+2번째 문장에 들어있음을 확인할 수 있다 (엑셀은 1번째부터 시작하고 1열엔 "원문", "번역문" 이런 열 정보가 써있음)
+print(f"원문: {src_text}")
+print(f"번역문: {trg_text}")
+
+# train_DL 테스트
+for src_texts, trg_texts in train_DL:
+
+    print(src_texts)
+    print(trg_texts)
+    print(len(src_texts))
+    print(len(trg_texts))
+
+    # 여러 문장에 대해서는 tokenizer.encode() 가 아닌 그냥 tokenizer()
+    src = tokenizer(src_texts, padding=True, truncation=True, max_length = max_len, return_tensors='pt', add_special_tokens = False).input_ids # pt: pytorch tensor로 변환
+    # add_special_tokens = True (default)면 마지막에 <eos> 를 붙임
+    # truncation = True: max_len 보다 길면 끊어버림
+    trg_texts = ['</s> ' + s for s in trg_texts]
+    # <sos>가 토크나이저에 따로 없길래 </s> 를 <sos> 로도 사용
+    trg = tokenizer(trg_texts, padding=True, truncation=True, max_length = max_len, return_tensors='pt', add_special_tokens = True).input_ids
+
+    print(src[:2])
+    print(trg[:2])
+    print(src.shape)
+    print(trg.shape)
+    print(trg[:,-1]) # 가장 마지막 단어를 보니 어떤 문장은 <eos> 로 끝이 났고 나머지는 <pad> 로 끝이 났다는 걸 볼 수 있음
+    print(tokenizer.decode(trg[trg[:,-1]==eos_idx,:][0])) # 가장 긴 문장 중 첫 번째 문장 관찰
+    print(trg[5,:-1]) # 디코더 입력
+    print(trg[5,1:]) # 디코더 출력으로 나와야 할 label
+    # 그런데 [:,:-1] 로 주면 패딩된 문장은 eos도 넣는 셈 아닌가? 맞다! 하지만 괜찮다. 어차피 출력으로 pad token이 기다리고 있으니.. (loss에서 ignore됨)
+
+    break
+
 ~~~
 
 <br/>
@@ -5274,67 +5593,6 @@ class Encoder(nn.Module):
                 atten_encs = torch.cat([atten_encs , atten_enc[0].unsqueeze(0)], dim=0) # 층헤단단 ㅋ
 
         return x, atten_encs
-~~~
-
-<br/>
-
-  - expand_as(확인용)
-~~~py
-src = torch.randint(0,65000,(3,5)) # 개단
-pos = torch.arange(5).expand_as(src).to(DEVICE)
-print(src)
-print(pos)
-
-# arange : 0~4 세팅
-# expand_as : src와 같은 shape만들어주기
-
-ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-tensor([[17852, 30557, 14802,   783,  2753],
-        [13780,  2814, 59476, 54905, 10648],
-        [21454, 17110, 22480,  4393, 46681]])
-tensor([[0, 1, 2, 3, 4],
-        [0, 1, 2, 3, 4],
-        [0, 1, 2, 3, 4]])
-~~~
-
-<br/>
-
-  - nn.Embedding(확인용)
-~~~py
-# nn.Embedding 실험
-emb=nn.Embedding(10,5) # one-hot encoding 된 벡터가 통과된다는 것이 약속된 상태의 FC layer 인 것
-print(emb.weight.shape) # weight 개수는 nn.Linear(10,5) 과 동일! 동작 방식이 다른 것
-print(emb.weight)
-print(emb(torch.tensor(2)))
-# 여기서 나온 tensor([-1.6781, -0.4184,  0.3999,  1.5914,  0.1325], grad_fn=<EmbeddingBackward0>) 값은 세번째 행을 그냥 가져온것
-
-print(emb(torch.tensor([[6,1,2],[2,1,7]]))) # 2 개 문장, 3개 단어
-print(emb(torch.tensor([[6,1,2],[2,1,7]])).shape)
-
-ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-torch.Size([10, 5])
-Parameter containing:
-tensor([[ 0.3053,  0.7740, -0.1448, -0.5994,  0.4004],
-        [-0.5822, -0.3072, -0.9433, -2.7531, -0.0236],
-        [-1.6781, -0.4184,  0.3999,  1.5914,  0.1325],
-        [ 0.8183, -0.7544, -0.8827, -1.1778, -1.6542],
-        [-1.3207, -0.6793,  0.1129, -1.0439, -0.4201],
-        [ 0.0988,  0.6815,  1.1168, -0.6703, -0.7377],
-        [-0.2685, -0.1505, -0.4780,  1.2038,  3.6673],
-        [-0.0108,  0.2441,  2.3384, -0.9031, -0.9961],
-        [-2.6855, -0.0280, -2.0526,  2.0998,  1.0727],
-        [ 0.5224,  1.2706, -0.2532,  0.6647, -0.9538]], requires_grad=True)
-tensor([-1.6781, -0.4184,  0.3999,  1.5914,  0.1325],
-       grad_fn=<EmbeddingBackward0>)
-tensor([[[-0.2685, -0.1505, -0.4780,  1.2038,  3.6673],
-         [-0.5822, -0.3072, -0.9433, -2.7531, -0.0236],
-         [-1.6781, -0.4184,  0.3999,  1.5914,  0.1325]],
-
-        [[-1.6781, -0.4184,  0.3999,  1.5914,  0.1325],
-         [-0.5822, -0.3072, -0.9433, -2.7531, -0.0236],
-         [-0.0108,  0.2441,  2.3384, -0.9031, -0.9961]]],
-       grad_fn=<EmbeddingBackward0>)
-torch.Size([2, 3, 5])
 ~~~
 
 <br/>
@@ -5492,101 +5750,6 @@ class Transformer(nn.Module):
         out, atten_decs, atten_enc_decs = self.decoder(trg, enc_out, dec_mask, enc_dec_mask)
 
         return out, atten_encs, atten_decs, atten_enc_decs
-~~~
-
-<br/>
-
-  - Kaiming vs Xavier(확인용)
-~~~py
-# Kaiming vs Xavier
-layer = nn.Linear(2,10)
-print(layer.weight)
-nn.init.kaiming_uniform_(layer.weight)
-print(layer.weight) # in 만 보니까 분산 크다
-nn.init.xavier_uniform_(layer.weight)
-print(layer.weight) # in out 둘다 보니까 분산 작다
-
-ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-Parameter containing:
-tensor([[-0.3944,  0.6439],
-        [ 0.5155, -0.2986],
-        [ 0.3603, -0.1287],
-        [ 0.1776,  0.1751],
-        [-0.4228,  0.0257],
-        [-0.3353, -0.6263],
-        [-0.0948,  0.0423],
-        [ 0.4657,  0.4260],
-        [ 0.5745,  0.1126],
-        [-0.4502, -0.3011]], requires_grad=True)
-Parameter containing:
-tensor([[ 1.3684, -0.6090],
-        [-0.6438, -1.2935],
-        [ 1.2556,  0.4329],
-        [-1.4143, -1.3268],
-        [ 0.8475, -0.7028],
-        [ 0.3444, -0.5987],
-        [-0.5752, -1.3120],
-        [ 0.9593, -0.2170],
-        [ 0.7855, -0.1299],
-        [-0.5891,  0.4474]], requires_grad=True)
-Parameter containing:
-tensor([[ 0.2238, -0.6880],
-        [-0.2719,  0.3142],
-        [-0.3369, -0.6052],
-        [ 0.0813,  0.5083],
-        [ 0.2164,  0.2459],
-        [ 0.6930, -0.2376],
-        [ 0.6302, -0.2040],
-        [ 0.5373,  0.4957],
-        [-0.6869,  0.1311],
-        [ 0.0326, -0.4407]], requires_grad=True)
-~~~
-
-<br/>
-
-  - tril함수(확인용)
-~~~py
-x = torch.ones(2,3,5,5)
-x = torch.tril(x) # tril: lower triangular
-print(x)
-
-ㅡㅡㅡㅡㅡㅡㅡㅡ
-tensor([[[[1., 0., 0., 0., 0.],
-          [1., 1., 0., 0., 0.],
-          [1., 1., 1., 0., 0.],
-          [1., 1., 1., 1., 0.],
-          [1., 1., 1., 1., 1.]],
-
-         [[1., 0., 0., 0., 0.],
-          [1., 1., 0., 0., 0.],
-          [1., 1., 1., 0., 0.],
-          [1., 1., 1., 1., 0.],
-          [1., 1., 1., 1., 1.]],
-
-         [[1., 0., 0., 0., 0.],
-          [1., 1., 0., 0., 0.],
-          [1., 1., 1., 0., 0.],
-          [1., 1., 1., 1., 0.],
-          [1., 1., 1., 1., 1.]]],
-
-
-        [[[1., 0., 0., 0., 0.],
-          [1., 1., 0., 0., 0.],
-          [1., 1., 1., 0., 0.],
-          [1., 1., 1., 1., 0.],
-          [1., 1., 1., 1., 1.]],
-
-         [[1., 0., 0., 0., 0.],
-          [1., 1., 0., 0., 0.],
-          [1., 1., 1., 0., 0.],
-          [1., 1., 1., 1., 0.],
-          [1., 1., 1., 1., 1.]],
-
-         [[1., 0., 0., 0., 0.],
-          [1., 1., 0., 0., 0.],
-          [1., 1., 1., 0., 0.],
-          [1., 1., 1., 1., 0.],
-          [1., 1., 1., 1., 1.]]]])
 ~~~
 
 <br/>
