@@ -5316,6 +5316,34 @@ tensor([[[[1., 0., 0., 0., 0.],
 
 <br/>
 
+  - Perplxity(확인용)
+    - 모델이 얼마나 헷갈려 하는가 의 지표입니다. 낮을수록 좋습니다.
+    - perplexity = 3.5  → 평균적으로 3.5개의 단어 중에서 고르는 수준으로 헷갈림
+    - perplexity = 1.0  → 완벽하게 예측 (현실에서 불가능)
+    - perplexity = 65001 → 완전 랜덤 (vocab 전체에서 찍는 수준)
+~~~py
+# Perplxity 구하기
+y_hat = torch.tensor([[[0.3659, 0.7025, 0.3104]], [[0.0097, 0.6577, 0.1947]],[[0.5659, 0.0025, 0.0104]], [[0.9097, 0.0577, 0.7947]]])
+target = torch.tensor([[2], [1], [2], [1]])
+
+soft = nn.Softmax(dim=-1)
+y_hat_soft = soft(y_hat)
+print(y_hat_soft.shape)
+v=1
+for i, val in enumerate(y_hat_soft):
+    v*=val[0,target[i]]
+print(v**(-1/target.shape[0]))
+# 3.5257
+
+criterion_test = nn.CrossEntropyLoss()
+print(y_hat.permute(0,2,1).shape)
+print(target.shape)
+print(torch.exp(criterion_test(y_hat.permute(0,2,1), target))) # 결론: loss에 torch.exp 취하셈
+# 3.5257
+~~~
+
+<br/>
+
   - 세팅
 ~~~py
 %%capture
@@ -5925,6 +5953,7 @@ Test loss: 1.323 | Test PPL: 3.756
 <br/>
 
   - 번역함수, 어텐션 map 그리는 함수
+    - 학습할때 테스트할때 는, 정답을 미리 알고 있기 때문에 바로 이렇게 y_hat = model(src, trg[:,:-1])[0] 넣어서 얼마나 잘 맞는지 확인할 수 있음, 하지만 추론할때는 답을 모르기 때문에 한 단어씩 생성하면서 그걸 다시 입력으로 넣어 줘야함
 ~~~py
 def translation(model, src_text, atten_map_save = False):
     model.eval()
