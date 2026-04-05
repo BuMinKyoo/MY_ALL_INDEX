@@ -28,6 +28,8 @@
   - [EfficientNet](#efficientnet)_(2019.05)
 - [RNN](#rnn)
 - [Transformer-Attention is all you need](#transformer-attention-is-all-you-need)_(2017.06)
+- [GTP-1](#gtp-1)
+
 
 
 <br/>
@@ -6008,5 +6010,50 @@ print(f"AI의 번역: {translated_text}")
 ###### [Transformer-Attention is all you need](#transformerattention-is-all-you-need)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# GTP-1
+  - GPT : Generative Pre-trained Transformer
+  - 트랜스포머의 디코더 활용
+    - 앞 단어만을 참조하는 Masked Self-Attention 사용
+    - Encoder-Decoder Attention 은 안하므로 트랜스포머의 디코더를 그대로 썼다고는 할 수 없음
+    - 즉, Next Token Prediction 이다!
+
+<br/>
+
+  - Next Token Prediction
+    - 문장을 입력했을 때 한 칸 밀린 문장이 출력 나오도록 학습
+      - 1.'저는' 넣고 '강사' 뽑고
+      - 2.'저는 강사' 넣고 '입니다' 뽑고
+      - 3.'저는 강사 입니다' 넣고 '<eos>' 나왔다면 종료
+    - future mask를 사용, 현재 토큰 포함 앞 단어들에 대해서만 attention  하도록 강제
+    - 그냥 문장만 가지고 있으면 되고 label이 딱히 필요 없기 때문에 데이터가 거의 무한
+    - 스스로 만들어낸 label을 사용하므로 자기 지도 학습
+    - 트랜스포머 구조를 가지고 다음 단어를 생성하는 방식으로 사전 학습 됐으므로 Generative Pre-trained Transformer 라고 부름
+
+<br/>
+
+  - Pre-training
+    - Next Token Prediction으로 사전 학습
+    - BookCorpus 라는 dataset 활용
+    - ‘Paperswithcode’ 에 따르면 11,038 권, 7,400 만 문장, 10억 words 라고 함
+
+<br/>
+
+  - Fine-tuning
+    - 자기 지도 학습(Next Token Prediction)을 통해 언어에 대한 이해를 한 후,진짜 풀려고 했던 문제(downstream task)를 풀 수 있게끔 fine-tuning방식으로 진행함
+    - L = λL_1  + L_2  을 loss 로함. (λ = 0.5 사용)
+      - L_1 = next token prediction 을 위한 loss
+      - L_2 = downstream task 를 위한 loss
+        - downstream task을 학습할때는 Pre-training(= 자기 지도 학습(Next Token Prediction)) 때보다 작은 LR, BS를 사용함
+        - Downstream task를 위한 Linear 층을 디코더 최종 출력에 새롭게 추가
+        - L_1 도 사용하므로 next token prediction을 위한 Linear 층도 그대로 존재하는 상태
+        - 즉, next token prediction을 위한, Linear 층 & downstream task 를 위한 Linear 층 둘 다 사용
+
+###### [GTP-1](#gtp-1)
+###### [Top](#top)
 
 
