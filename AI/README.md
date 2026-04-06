@@ -6024,34 +6024,62 @@ print(f"AI의 번역: {translated_text}")
 
 <br/>
 
-  - Next Token Prediction
-    - 문장을 입력했을 때 한 칸 밀린 문장이 출력 나오도록 학습
-      - 1.'저는' 넣고 '강사' 뽑고
-      - 2.'저는 강사' 넣고 '입니다' 뽑고
-      - 3.'저는 강사 입니다' 넣고 '<eos>' 나왔다면 종료
-    - future mask를 사용, 현재 토큰 포함 앞 단어들에 대해서만 attention  하도록 강제
-    - 그냥 문장만 가지고 있으면 되고 label이 딱히 필요 없기 때문에 데이터가 거의 무한
-    - 스스로 만들어낸 label을 사용하므로 자기 지도 학습
-    - 트랜스포머 구조를 가지고 다음 단어를 생성하는 방식으로 사전 학습 됐으므로 Generative Pre-trained Transformer 라고 부름
+  - Pre-training
+    - Next Token Prediction으로 사전 학습
+      - 문장을 입력했을 때 한 칸 밀린 문장이 출력 나오도록 학습
+      - 준비된 원본 데이터: ["start", "이", "영화", "노잼", "eos"]
+      - 모델에 넣는 문제지 (Input): ["start", "이", "영화", "노잼"]
+      - 비교할 정답지 (Target): ["이", "영화", "노잼", "eos"] (문제지를 왼쪽으로 한 칸씩 당긴 것)
+      - 그냥 문장만 가지고 있으면 되고 label이 딱히 필요 없기 때문에 데이터가 거의 무한
+      - 스스로 만들어낸 label을 사용하므로 자기 지도 학습
+      - 트랜스포머 구조를 가지고 다음 단어를 생성하는 방식으로 사전 학습 됐으므로 Generative Pre-trained Transformer 라고 부름\
+      - BookCorpus 라는 dataset 활용
+      - ‘Paperswithcode’ 에 따르면 11,038 권, 7,400 만 문장, 10억 words 라고 함
+      - Masked-MSA
+        - future mask를 사용, 현재 토큰 포함 앞 단어들에 대해서만 attention  하도록 강제
+        - input된 단어를 행렬에 한번에 올려두고 동시에 예측함
+        - 각각의 행렬에 각단어를 두고 다음단어에 대해서만 Mask해서 다음 단어만을 볼 수 없게 세팅함
+      - Norm -> Forward -> Norm진행
+      - 마지막에 Text Prediction 을 거쳐서 loss계산
+      - 전체과정
+        - 1.들어온 단어에 대한 단어 가중치 임베딩, 위치 가중치 임베딩
+        - 2.Q,K,V가중치 행렬과 곱하고 -> Q와 K는 내적 -> 차원수의 루트로 나누기 -> Mask하기 -> 소프트 맥스 -> V행렬 곱하기
+        - 3.skip connection -> Norm -> Forward -> skip connection -> Norm
+        - 4.해당과정 1,2,3을 12번 반복후 마지막 Text Prediction에 예측가능한 단어 수많큼의 차원을 늘려서 단어 예측
+          - 이렇게 하면 단어 여러개를 한번에 예측하게 된다. 빵! 하고 한번에 단어가 예측됨
+          - 학습때는 이렇게 모든 단어를 12레이어를 거쳐 Text Prediction를 지나 한번에 예측하지만, 추론할때는 한 단어씩 예측하게 된다
 
 <br/>
 
-  - Pre-training
-    - Next Token Prediction으로 사전 학습
-    - BookCorpus 라는 dataset 활용
-    - ‘Paperswithcode’ 에 따르면 11,038 권, 7,400 만 문장, 10억 words 라고 함
+<img width="354" height="611" alt="image" src="https://github.com/user-attachments/assets/4162e23a-1217-4837-aa70-c9ee74860d08" />
 
+<br/>
 <br/>
 
   - Fine-tuning
     - 자기 지도 학습(Next Token Prediction)을 통해 언어에 대한 이해를 한 후,진짜 풀려고 했던 문제(downstream task)를 풀 수 있게끔 fine-tuning방식으로 진행함
-    - L = λL_1  + L_2  을 loss 로함. (λ = 0.5 사용)
-      - L_1 = next token prediction 을 위한 loss
-      - L_2 = downstream task 를 위한 loss
-        - downstream task을 학습할때는 Pre-training(= 자기 지도 학습(Next Token Prediction)) 때보다 작은 LR, BS를 사용함
-        - Downstream task를 위한 Linear 층을 디코더 최종 출력에 새롭게 추가
-        - L_1 도 사용하므로 next token prediction을 위한 Linear 층도 그대로 존재하는 상태
-        - 즉, next token prediction을 위한, Linear 층 & downstream task 를 위한 Linear 층 둘 다 사용
+    - Downstream Task(실제 풀고자 하는 문제, 예: 긍정/부정 분류)를 풀기 위한 미세 조정
+      - 문장을 입력했을 때, 전체 문맥을 파악하여 특정 라벨을 맞추도록 학습
+      - 준비된 원본 데이터: ["start", "이", "영화", "노잼"] + 정답 라벨 '부정적'
+      - 모델에 넣는 문제지 (Input): ["start", "이", "영화", "노잼", "extract"] (맨 뒤에 extract 토큰을 강제로 추가)
+      - 비교할 정답지 (Target): 정답지가 2개 필요함!
+        - Target 1 (언어 능력 유지용): ["이", "영화", "노잼", "extract"]
+        - Target 2 (분류 업무용): '부정적' (Task Classifier용 라벨)
+      - 지도 학습(Supervised Learning): 사람이 직접 정답 라벨(긍정/부정 등)을 달아준 데이터셋이 필요함
+      - Pre-training 때보다 작은 LR, BS를 사용함
+      - 특징: L = \lambda L_1 + L_2 공식을 사용하여 두 가지 오차(Loss)를 동시에 줄이는 방향으로 학습 (λ = 0.5 사용)
+      - 기존 Pre-training의 구조(12계층 디코더 + Text Prediction Linear)를 그대로 로드하고, 마지막에 Task Classifier Linear 층만 새롭게 new 해서 추가함
+      - Masked-MSA 동작 방식은 프리트레이닝과 동일함 (미래 단어 훔쳐보기 방지)
+      - 전체 과정
+        - 1.들어온 단어들(start부터 extract까지)에 대한 단어 가중치 임베딩, 위치 가중치 임베딩 적용
+        - 2.Q, K, V 가중치 행렬과 곱하고 -> Q와 K는 내적 -> 차원수의 루트로 나누기 -> Mask 하기 -> 소프트맥스 -> V 행렬 곱하기
+        - 3.skip connection -> Norm -> Forward -> skip connection -> Norm
+        - 4.해당 과정 2, 3을 12번 반복
+        - 5.이것을 12층을 통과하고 나온 결과물 행렬을 두 갈래로 나누어 동시에 예측 및 Loss를 계산
+          - 5-1. L_1 계산 (Text Prediction): 'start'부터 '노잼'까지의 위치에서 나온 결과물을 기존 Linear 층에 통과시켜 "다음 단어를 잘 맞췄는지" 오차 계산
+          - 5-2. L_2 계산 (Task Classifier): 오직 맨 마지막 'extract' 위치에서 나온 결과물 단 1개만 새로 만든 Linear 층에 통과시켜 "이 문장이 부정적인지" 분류 오차 계산
+          - 5-3. 구해진 두 개의 Loss를 합산한 뒤, 모델의 전체 가중치를 한 번에 업데이트 (역전파)
+
 
 ###### [GTP-1](#gtp-1)
 ###### [Top](#top)
