@@ -6047,7 +6047,7 @@ print(f"AI의 번역: {translated_text}")
         - 3.skip connection -> Norm -> Forward -> skip connection -> Norm
         - 4.해당과정 2,3을 12번 반복후 마지막 Text Prediction에 예측가능한 단어 수많큼의 차원을 늘려서 단어 예측
           - 이렇게 하면 단어 여러개를 한번에 예측하게 된다. 빵! 하고 한번에 단어가 예측됨
-          - 학습때는 이렇게 모든 단어를 12레이어를 거쳐 Text Prediction를 지나 한번에 예측하지만, 추론할때는 한 단어씩 예측하게 된다
+    - 학습때는 이렇게 모든 단어를 12레이어를 거쳐 Text Prediction를 지나 한번에 예측하지만, 추론할때는 한 단어씩 예측하게 된다
 
 <br/>
 
@@ -6070,6 +6070,7 @@ print(f"AI의 번역: {translated_text}")
       - 특징: L = \lambda L_1 + L_2 공식을 사용하여 두 가지 오차(Loss)를 동시에 줄이는 방향으로 학습 (λ = 0.5 사용)
       - 기존 Pre-training의 구조(12계층 디코더 + Text Prediction Linear)를 그대로 로드하고, 마지막에 Task Classifier Linear 층만 새롭게 new 해서 추가함
       - Masked-MSA 동작 방식은 프리트레이닝과 동일함 (미래 단어 훔쳐보기 방지)
+      - Delim: Delimiter (구획 문자: 구별이 필요할 때 쓰이는 토큰)
       - 전체 과정
         - 1.들어온 단어들(start부터 extract까지)에 대한 단어 가중치 임베딩, 위치 가중치 임베딩 적용
         - 2.Q, K, V 가중치 행렬과 곱하고 -> Q와 K는 내적 -> 차원수의 루트로 나누기 -> Mask 하기 -> 소프트맥스 -> V 행렬 곱하기
@@ -6079,9 +6080,79 @@ print(f"AI의 번역: {translated_text}")
           - 5-1. L_1 계산 (Text Prediction): 'start'부터 '노잼'까지의 위치에서 나온 결과물을 기존 Linear 층에 통과시켜 "다음 단어를 잘 맞췄는지" 오차 계산
           - 5-2. L_2 계산 (Task Classifier): 오직 맨 마지막 'extract' 위치에서 나온 결과물 단 1개만 새로 만든 Linear 층에 통과시켜 "이 문장이 부정적인지" 분류 오차 계산
           - 5-3. 구해진 두 개의 Loss를 합산한 뒤, 모델의 전체 가중치를 한 번에 업데이트 (역전파)
+     - 학습때는 이렇게 모든 단어를 12레이어체 거쳐 한번에 나온 단어들을 'extract' 전까지는 Text Prediction에 넣고, 'extract'는 Task Classifier에 넣어서 추측하지만, 추론때는 한단어씩 확인하게 되므로, 'extract'전까지를 예측할때는 Text Prediction에 들어가고, 'extract'가 나오면 Task Classifier에 들어간다
+
+<br/>
+
+<img width="344" height="616" alt="image" src="https://github.com/user-attachments/assets/b894b39f-d068-44e5-84de-1be4f1e3878e" />
+
+<br/>
+<br/>
+
+  - '입력 포맷'만 바꾼다
+    - 어떤 태스크(분류, 유사도, 객관식 등)를 하든 중앙의 초록색 Transformer 12레이어는 절대 건드리지 않는다
+    - 대신 문제 유형에 맞춰 입력 데이터를 조립하는 방식(Input Transformation)을 사용한다
+    - 한마디로 모델을 바꾸지 않고, 학습할 input데이터를 다르게 하여 학습 한다는것
+    - Multiple Choice (객관식) 처리 방식의 비밀
+      - 만약 모델에게 본문 + 1번 보기 + 2번 보기 + 3번 보기 + 4번 보기를 한 번에 다 던져주고, "몇 번이 정답이야?"라고 묻는다면 해당 데이터의 편향이 발생될 수 있다 <- 가로로 길게 이어 붙여서' 올라가는 상황
+      - 이것을 방지 하기 위해서 세로로 붙여서 올린다
+        - [입력 행렬] (4개의 독립된 문장)
+        - Row 1: [Start, 본문, 보기1, Extract]  --> (채점관) --> 1번 점수
+        - Row 2: [Start, 본문, 보기2, Extract]  --> (채점관) --> 2번 점수
+        - Row 3: [Start, 본문, 보기3, Extract]  --> (채점관) --> 3번 점수
+        - Row 4: [Start, 본문, 보기4, Extract]  --> (채점관) --> 4번 점수
+        - 그 이후에 소프트맥스를 해서 가장 높은것을 답으로 체크한다
+
+<br/>
+
+<img width="1474" height="624" alt="image" src="https://github.com/user-attachments/assets/da0d2dc4-ffc0-4249-a9d1-6b854db2a08f" />
+
+<br/>
+<br/>
+
+  - 모델 하이퍼파라미터
+    - Decoder 12개 층 사용
+    - Word embedding vector 의 차원은 768 차원
+    - 12개 heads 사용 (각 64 차원 <- 트랜스포머 base 모델과 동일)
+    - FF 에서 늘어나는 건 마찬가지로 4배 (3072 차원)
+    - ReLU 말고 GELU 사용
+    - Positional encoding 말고 embedding 사용 
+
+<br/>
+
+  - GELU
+    - GELU : x가 클수록 통과시킬 확률을 높이자 라는것
+      - 입력 데이터 x가 크면 확률 \Phi(x)도 1에 가까워져 값을 그대로 통과시키고, x가 작으면 확률도 작아져 값을 0으로 짓누릅니다. 즉, 데이터의 크기(중요도) 자체를 확률 밸브와 연동시켰기 때문에 훌륭한 비선형 활성화 함수
+    - ReLU는, 0보다 크면 100% 통과, 아니면 0%로 였음
+    - Dropout: 입력값 x가 100이든 0.1이든 상관없이, 개발자가 설정한 확률(예: 50%)로 랜덤하게 값을 날려버립니다. 즉, 데이터의 '내용'을 보고 판단하는 게 아니라 그냥 장님처럼 눈 감고 스위치를 끕니다.
+
+<br/>
+
+<img width="784" height="491" alt="image" src="https://github.com/user-attachments/assets/455084c3-2edf-47e5-8982-29477d043a6b" />
+
+<br/>
+<br/>
+
+  - 정리
+    - Next Token Prediction 을 통해 언어를 이해해 보자는 시도
+    - 자기 지도 학습
+    - 사전 학습 후 원하는 task에 맞게 fine-tuning 해서 사용
+    - 파라미터를 약 1.1억 개까지 늘려봤는데 계속해서 성능이 올라가더라!
+
 
 
 ###### [GTP-1](#gtp-1)
 ###### [Top](#top)
+
+
+
+
+
+
+
+
+
+
+
 
 
