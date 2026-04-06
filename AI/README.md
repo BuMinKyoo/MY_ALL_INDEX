@@ -28,7 +28,8 @@
   - [EfficientNet](#efficientnet)_(2019.05)
 - [RNN](#rnn)
 - [Transformer-Attention is all you need](#transformer-attention-is-all-you-need)_(2017.06)
-- [GTP-1](#gtp-1)
+- [GTP-1](#gtp-1)_(2018.06)
+- [BERT](#bert)_(2018.10)
 
 
 
@@ -6139,16 +6140,59 @@ print(f"AI의 번역: {translated_text}")
     - 사전 학습 후 원하는 task에 맞게 fine-tuning 해서 사용
     - 파라미터를 약 1.1억 개까지 늘려봤는데 계속해서 성능이 올라가더라!
 
-
-
 ###### [GTP-1](#gtp-1)
 ###### [Top](#top)
 
+***
+
+# BERT
+  - GPT-1 은 단방향이고, BERT(Bidirectional Encoder Representations from Transformers) 은 양방향이다
+    - GPT-1은 디코더 구조인 Masked Self-Attention, BERT는 인코더 구조인 Self-Attention
+    - 그냥 문장을 가리고 예측 하는 것인지 아니면, 전체 문장을 가리지 않고 넣어 문장 전체를 이해하려는 것인지
+  - GPT-1과 구조가 아예 똑같은데 future mask를 안 한다
+  - GPT-1와 같이 자기 지도 학습으로 Pre-training 후, 각 downstream task 에 맞게 Fine-tuning
+  - Next Token Prediction 이 아닌 Masked Token Prediction을 푼다
+    - 문장 중간중간의 토큰들을 [MASK] 토큰으로 바꿔놓고 입력 후, [MASK] 가 안 되어 있는 원래 문장이 출력되도록 학습
+    - 다만 Loss 는 [MASK] 토큰 시점의 출력들에 대해서만 고려!
+
+<br/>
+
+<img width="345" height="322" alt="image" src="https://github.com/user-attachments/assets/c5854e7c-6013-46d4-86e9-5db86aa03bc0" />
+
+<br/>
+<br/>
+
+  - Segment Embedding
+    - 두 개 이상의 문장(또는 텍스트 조각)이 한 번에 모델에 입력될 때, 각 단어(토큰)가 어느 문장에 속하는지 모델에게 알려주기 위해 추가하는 식별 데이터
+    - 트랜스포머(Transformer) 아키텍처의 Self-Attention 메커니즘은 입력된 시퀀스 내의 모든 토큰 간의 관계를 한 번에 계산한다. 모델은 단어의 의미(Token)와 순서(Position)는 알 수 있지만, "여기서부터 여기까지가 첫 번째 문장이고, 저기서부터가 두 번째 문장이다"라는 논리적인 묶음 정보는 스스로 파악하지 못한다
+    - 기계 독해(QA, Question Answering)나 자연어 추론(NLI)처럼 두 문장 간의 관계를 파악해야 하는 태스크에서는 두 문장을 하나의 시퀀스로 이어서 입력해야 한다
+    - 동작법
+      - 1.구분자 삽입: 먼저 입력 시퀀스에 특수 토큰인 [SEP]를 넣어 문장을 물리적으로 나눈다
+      - 2.세그먼트 할당: 첫 번째 문장(질문)에 속한 모든 토큰에는 Segment A 값을, 두 번째 문장(답변)에 속한 모든 토큰에는 Segment B 값을 부여한다
+      - 3.최종 벡터 계산: 모델의 첫 번째 레이어에 들어가는 최종 입력 데이터는 세 가지 벡터의 단순 합산(Summation)으로 만들어진다
+        - 인풋 임베딩 = 워드 임베딩 + Segment 임베딩 + 위치 임베딩
+
+<br/>
+
+<img width="1102" height="331" alt="image" src="https://github.com/user-attachments/assets/d48bdcfe-57f9-404b-aada-437a9c2f76f7" />
+
+<br/>
+<br/>
+
+  - BERT의 구조
+    - 무조건 첫 토큰은 [CLS] 토큰 -> <sos> 토큰에서 그냥 이름만 바뀐 것
+      - 문장 전체에 대한 임베딩을 하는 토큰 -> GPT의 Extract 토큰과 똑같다
+      - Extract 토큰은 반드시 맨 뒤여야 했지만 BERT는 양방향이라 어디에 있어도 무관
 
 
 
 
 
+
+
+
+###### [BERT](#bert)
+###### [Top](#top)
 
 
 
