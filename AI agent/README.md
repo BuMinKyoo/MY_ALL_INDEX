@@ -1,6 +1,7 @@
 ###### Top
 
 - [Claude](#claude)
+- [Gemini](#gemini)
 
 
 <br/>
@@ -35,7 +36,14 @@
 
 
 
+<br/>
+<br/>
 
+***
+
+# Gemini
+  - 파일
+    - .gemini.md
 
 
 
