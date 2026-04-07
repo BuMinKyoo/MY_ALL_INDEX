@@ -28,6 +28,7 @@
     - /branch
     - /fork
     - /exit
+    - /agent
     - claude -r (브렌치)
     - claude --resume
 
