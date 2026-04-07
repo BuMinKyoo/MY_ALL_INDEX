@@ -30,6 +30,7 @@
 - [Transformer-Attention is all you need](#transformer-attention-is-all-you-need)_(2017.06)
 - [GTP-1](#gtp-1)_(2018.06)
 - [BERT](#bert)_(2018.10)
+- [GTP-2](#gtp-2)_(2019.02)
 
 
 
@@ -6258,14 +6259,46 @@ print(f"AI의 번역: {translated_text}")
 <br/>
 <br/>
 
-
-
-
-
 ###### [BERT](#bert)
 ###### [Top](#top)
 
+<br/>
+<br/>
 
+***
+
+# GTP-2
+  - GPT-1 은 task 마다 fine-tuning을 각각 따로 해줘야 한다는 번거로움이 있음
+  - Pre-training (next token prediction) 때 질 좋은 대량의 데이터셋을 이용하면 fine-tuning을 아예 안 해도 어느 정도의 성능은 얻을 수 있지 않을까라는 생각에서 발전
+  - 논문에서 WebText 라는 webpages 데이터셋을 새롭게 제안
+
+<br/>
+
+  - GPT-2 구조
+  - pre-activation ResNet 의 방식을 반영, LN을 앞으로 변경
+    - 기존 : 연산(Attention/FFN) $\rightarrow$ 더하기(Skip Connection) $\rightarrow$ 정규화(Layer Norm)
+      - 연산 결과를 원본에 더한 뒤에 전체를 정규화해 버리면, 메인 데이터 흐름 자체에 계속 변형이 가해집니다. 층이 깊어질수록 오차 역전파(Backpropagation) 시 기울기 소실(Gradient Vanishing)이 발생해 학습이 매우 불안정해짐
+    - 변경 : 정규화(Layer Norm) $\rightarrow$ 연산(Attention/FFN) $\rightarrow$ 더하기(Skip Connection)
+      - 본격적인 무거운 연산(Attention 등)을 수행하기 직전에 입력값을 먼저 정규화
+      - 이 변화의 핵심은 Skip Connection(블록 오른쪽 화살표로 뻗어 올라가는 직통 선)에 어떠한 방해물도 두지 않는 것
+  - Pre-LN 구조로 바꾸다 보니 마지막에 나갈때, 정규화가 되지 않은 '날것'의 상태가 되기 때문에 최종적으로 다음 단어를 예측하기 위해 Linear 층을 통과 시키기 직전에 Layer Norm을 딱 한 번 더 추가해준다
+
+<br/>
+
+<img width="651" height="472" alt="image" src="https://github.com/user-attachments/assets/b0cdf4e9-eded-41db-a9c9-8bee743c1b40" />
+
+<br/>
+<br/>
+
+  - 정리
+    - Fine-tuning 없이 학습!
+      - Next Token Prediction 만으로 다양한 문제를 풀어보자는 것
+      - 각 문제마다 다른 fine-tuned 모델을 만들 필요가 없다 (범용적 모델)
+      - 잘 걸러서 만들어진 WebText 데이터셋으로 학습
+    - 파라미터가 많을수록 성능이 올라감
+
+###### [GTP-2](#gtp-2)
+###### [Top](#top)
 
 
 
