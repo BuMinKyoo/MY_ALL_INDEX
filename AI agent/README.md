@@ -23,6 +23,7 @@
     - settings.json : 프로젝트 설정 (hooks, permissions, MCP 등)
     - settings.local.json :로컬 전용 설정 (gitignore)
     - keybindings.json : 키보드 단축키
+    - CLAUDE.md
   - 명령어
     - /effort
     - /branch
