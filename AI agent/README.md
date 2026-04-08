@@ -34,6 +34,19 @@
     - claude -r (브렌치)
     - claude --resume
 
+<br/>
+
+  - CLAUDE.md
+~~~
+# CLAUDE.md
+
+## 작업 규칙
+
+- 코드 관련 질문을 받았을 때, 분석/설명만 하고 바로 수정하지 말 것
+- 반드시 사용자에게 "이 코드를 수정할까요?" 또는 "다른 질문이 있으신가요?" 확인 후 진행할 것
+- 사용자가 명시적으로 수정을 요청한 경우에만 코드를 변경할 것
+~~~
+
 
 
 <br/>
@@ -45,12 +58,36 @@
   - 파일
     - .gemini.md
 
+<br/>
+
+  - .GEMINI.md
+~~~
+## Gemini Added Memories
+- 코드를 출력할 때 절대 줄 번호(Line numbers)를 포함하지 마세요. 순수한 코드만 제공하세요.
+
+~~~
 
 
 
-
-
-
-
+  - settings.json
+~~~
+{                                        
+  "general": {                           
+    "sessionRetention": {                
+      "enabled": true,                   
+      "maxAge": "30d",                   
+      "warningAcknowledged": true        
+    }                                    
+  },                                     
+  "security": {                          
+    "auth": {                            
+      "selectedType": "oauth-personal"   
+    }                                    
+  },                                     
+  "hooksConfig": {                       
+    "enabled": false                     
+  }                                      
+}                                        
+~~~
 
 
