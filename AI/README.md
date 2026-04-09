@@ -6343,6 +6343,7 @@ print(f"AI의 번역: {translated_text}")
 <br/>
 
   - Summary
+    - GPT-2의 zero-shot말고, -> few-shot으로
     - GPT-3의 파라미터 수는 1,750억
     - Dense & locally banded 어텐션 패턴을 layer 마다 번갈아 가면서 사용
     - 3천억 개 토큰에 해당하는 텍스트를 학습 했지만 오버피팅 안일어남
