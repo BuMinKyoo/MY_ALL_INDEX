@@ -6340,6 +6340,15 @@ print(f"AI의 번역: {translated_text}")
     - LR가 작을 수록 안정적임
       - LR이 크면 너무 크게 변해서 불안정함
 
+<br/>
+
+  - Summary
+    - GPT-3의 파라미터 수는 1,750억
+    - Dense & locally banded 어텐션 패턴을 layer 마다 번갈아 가면서 사용
+    - 3천억 개 토큰에 해당하는 텍스트를 학습 했지만 오버피팅 안일어남
+    - 특정 task에 tuning 시키지 않았기 때문에 새로운 단어 배우기, 문법 교정하기 등 색다른 task에도 바로 적용 가능 (ChatGPT 처럼)
+
+
 
 
 
