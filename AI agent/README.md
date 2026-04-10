@@ -10,6 +10,7 @@
 ***
 
 # Claude
+  - [ClaudeCodeSetting](https://github.com/BuMinKyoo/ClaudeCodeSetting)
   - 기본
     - home폴더에 들어가서 바꾸면 전역 설정이 되고, 폴더 하위 단위로도 적용이 된다
   - 톨더
@@ -46,7 +47,6 @@
 - 반드시 사용자에게 "이 코드를 수정할까요?" 또는 "다른 질문이 있으신가요?" 확인 후 진행할 것
 - 사용자가 명시적으로 수정을 요청한 경우에만 코드를 변경할 것
 ~~~
-
 
 
 <br/>
