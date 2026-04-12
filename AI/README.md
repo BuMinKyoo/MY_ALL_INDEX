@@ -34,6 +34,7 @@
 - [GTP-3](#gtp-3)_(2020.05)
 - [요즘은 어떤 데이터셋으로 평가하나?](#요즘은-어떤-데이터셋으로-평가하나?)
 - [ViT(Vision Transformer)](#vitvision-transformer)_(2020.10)
+- [Swin Transformer](#swin-transformer)_(2021.03)
 
 
 
@@ -7904,32 +7905,58 @@ Test(load_model, test_DL, criterion)
 print(count_params(load_model))
 ~~~
 
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-
-
-
-
 ###### [ViT(Vision Transformer)](#vitvision-transformer)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# Swin Transformer
+  - ViT + Patch merging + Shifted windows
+
+<br/>
+
+  - Patch merging 
+    - ViT는 패치 사이즈가 고정되어 있고, 작게 잡을수록 성능은 좋아지지만 연산량이 너무 커짐
+    - 주변 4개의 패치 임베딩 벡터를 concat, 임베딩 벡터가 담당하는 영역을 점차 점차 키워나가는 방법으로 진행
+      - 이렇게 하면 패치 개수가 점차 줄어 후반부로 갈수록 어텐션 연산량을 줄일 수 있음
+      - 패치 사이즈를 엄청 작게 시작해도 연산량을 줄일 수 있다는것
+
+<br/>
+
+<img width="550" height="312" alt="image" src="https://github.com/user-attachments/assets/48610523-02d7-42a4-945e-d7991a788aed" />
+
+<br/>
+<br/>
+
+  - Shifted window based MSA (Multi-head Self Attention)
+    - ViT는 모든 패치에 대해서 Multi-head Self Attention 이 이루어 진다
+    - 하지만, Shifted window based W-MSA는 Window 개념을 도입, 빨간색 네모 안에 있는 패치들끼리만 MSA를 하는것
+
+<br/>
+
+<img width="544" height="304" alt="image" src="https://github.com/user-attachments/assets/3ca63b17-e5f3-4e1c-8eda-a5ad78797e81" />
+
+<br/>
+<br/>
+
+  - Shifted window based MSA (SW-MSA)
+    - Shifted window based W-MSA는 윈도우 내에서만 MSA 하기 때문에 global 정보를 볼 수 없기 때문에 SW-MSA을 제안함
+    - 윈도우 위치를 Shift 하자!!
+    - 윈도우를 위치를 바꾸면서 진행하기 때문에 결국 서로 global 하게 정보 교환이 이뤄지게 된다
+
+<br/>
+
+<img width="759" height="332" alt="image" src="https://github.com/user-attachments/assets/badd6745-8e52-4318-bb28-e48569b7f031" />
+
+<br/>
+<br/>
 
 
 
-
+###### [Swin Transformer](#swin-transformer)
+###### [Top](#top)
 
 
