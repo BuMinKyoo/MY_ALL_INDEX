@@ -5362,6 +5362,12 @@ print(torch.exp(criterion_test(y_hat.permute(0,2,1), target))) # 결론: loss에
 import matplotlib.pyplot as plt
 plt.rc('font', family='NanumBarunGothic')
 
+!pip install gdown
+!pip install transformers
+!pip install sentencepiece # MarianTokenizer 불러올 때 필요
+!pip install sacremoses # MarianMTModel 에서 불러올 때 warning 뜨는 것 방지
+!pip install einops # Einstein operations => rearrange 함수를 위해
+
 from google.colab import drive
 drive.mount('/content/drive')
 import torch
@@ -6298,6 +6304,436 @@ print(f"AI의 번역: {translated_text}")
       - 각 문제마다 다른 fine-tuned 모델을 만들 필요가 없다 (범용적 모델)
       - 잘 걸러서 만들어진 WebText 데이터셋으로 학습
     - 파라미터가 많을수록 성능이 올라감
+
+<br/>
+
+  - GPT-2 코드(세팅)
+~~~py
+%%capture
+# 그래프에서 한글이 깨지지 않게 폰트 설치..
+# *맨처음 실행 후 세션 다시 시작해야 반영됨!!
+!sudo apt-get install -y fonts-nanum
+!sudo fc-cache -fv
+!rm ~/.cache/matplotlib -rf
+import matplotlib.pyplot as plt
+plt.rc('font', family='NanumBarunGothic')
+
+%%capture
+!pip install gdown
+!pip install einops
+!pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf'
+
+import torch
+from torch import nn, optim
+from torch.optim.lr_scheduler import LambdaLR
+from transformers import AutoTokenizer
+import pandas as pd
+from tqdm import tqdm
+import math, random
+from einops import rearrange
+import time
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+print(DEVICE)
+
+tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True)
+pad_idx = tokenizer.pad_token_id
+print("pad_idx =", pad_idx)
+~~~
+
+<br/>
+
+  - 하이퍼파라미터설정
+~~~py
+BATCH_SIZE = 64 # GPT-1 논문의 값, Fine-tune 시에는 32 사용, GPT-2 에선 512 사용
+LAMBDA = 0 # GPT-1 에선 0.01, l2-Regularization를 위한 hyperparam.
+EPOCH = 15 # GPT-1 에선 100 Epoch, Fine-tune 시에는 3 사용
+max_len = 100
+criterion = nn.CrossEntropyLoss(ignore_index = pad_idx) # pad token 이 출력 나와야하는 시점의 loss는 무시 (즉, label이 <pad> 일 때는 무시)
+
+warmup_steps = 2000 # GPT-1 논문의 값, Fine-tune  시에는 total_steps의 0.2% 만 warmup
+LR_peak = 2.5e-4 # GPT-1 논문의 값, Fine-tune 시에는 6.25e-5
+total_steps = EPOCH * math.ceil(97000/BATCH_SIZE) # 97000: 문장 데이터 수
+def lr_lambda(step): # LambdaLR 쓰면 Custom 스케쥴러처럼 일일히 step+=1 할 필요 없음! step 만 입력 받으면 되는 스케쥴러라면 LambdaLR 사용하면 됨
+    return min(step / warmup_steps, (0.5 * (1 + math.cos(math.pi * (step - warmup_steps) / (total_steps - warmup_steps))))) # 이게 LR_peak 에 곱해짐
+
+new_model_train = False
+hyuk_model_use = True # 여러분만의 모델 만들어서 사용하고 싶다면 False로
+if hyuk_model_use:
+    !gdown https://drive.google.com/uc?id=1u4-QhuKcHwDifff5eHLhuZmfJ52c3tkN -O GPT_small.pt
+    !gdown https://drive.google.com/uc?id=1-3uZGsxgaoll8LNzDBNGjhCYRYorRdRq -O GPT_small_history.pt
+    save_model_path = 'GPT_small.pt'
+    save_history_path = 'GPT_small_history.pt'
+else:
+    save_model_path = '/content/drive/MyDrive/Colab Notebooks/results/GPT_small2.pt'
+    save_history_path = '/content/drive/MyDrive/Colab Notebooks/results/GPT_small2_history.pt'
+
+# GPT-3 (1750억개 파라미터)
+# n_layers = 96
+# d_model = 12288
+# d_ff = 49152 # d_model 의 네 배
+# n_heads = 96
+# drop_p = 0.1
+
+# 실험에서 사용할 작은 GPT (drop_p 이외엔 GPT-1 과 일치)
+n_layers = 12
+d_model = 768
+d_ff = d_model * 4
+n_heads = 12
+drop_p = 0.25 # GPT-1 에서는 0.1
+
+~~~
+
+<br/>
+
+  - DS, DL 생성
+~~~py
+# data 다운
+%%capture
+# https://aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=126 에서 받을 수 있어요
+!gdown https://drive.google.com/uc?id=14lAjaR2dRp5p5kEsm5GnwNM9KH-VgoOq -O 대화체.xlsx
+data = pd.read_excel('대화체.xlsx')
+
+class CustomDataset(torch.utils.data.Dataset):
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return self.data.shape[0]
+
+    def __getitem__(self, idx):
+        return self.data.loc[idx, '원문']
+
+custom_DS = CustomDataset(data)
+
+train_DS, val_DS, test_DS = torch.utils.data.random_split(custom_DS, [97000, 2000, 1000])
+
+train_DL = torch.utils.data.DataLoader(train_DS, batch_size=BATCH_SIZE, shuffle=True)
+val_DL = torch.utils.data.DataLoader(val_DS, batch_size=BATCH_SIZE, shuffle=True)
+test_DL = torch.utils.data.DataLoader(test_DS, batch_size=BATCH_SIZE, shuffle=True)
+
+print(len(train_DS))
+print(len(val_DS))
+print(len(test_DS))
+
+# train_DL 테스트
+for texts in train_DL:
+
+    print(texts) # __getitem__ return이 문자열이면 default_collate 함수가 그냥 리스트로 묶어서 줌. (ndarray, int 이런 애들은 텐서로 바꿔서 묶어서 줌)
+    print(len(texts))
+
+    texts = [s + ' [SEP]'for s in texts] # [SEP]을 <eos>로 사용하기 위함 (<eos>가 따로 토크나이저에 없음)
+    x_batch = tokenizer(texts, padding=True, truncation=True, max_length = max_len, return_tensors='pt', add_special_tokens = False).input_ids # pt: pytorch tensor로 변환
+    # add_special_tokens = True (default)면 첫 토큰에 [CLS], 마지막 토큰에 [SEP]이 붙어 나옴
+
+    print(x_batch[:2])
+    print(x_batch.shape)
+    print(x_batch[5,:-1]) # 입력
+    print(x_batch[5,1:]) # label
+
+    break
+~~~
+
+<br/>
+
+  - 모델구현
+~~~py
+class MHA(nn.Module):
+    def __init__(self, d_model, n_heads, drop_p):
+        super().__init__()
+
+        self.n_heads = n_heads
+
+        self.fc_q = nn.Linear(d_model, d_model) # 차 or 개x차 or 개x개x차 로 입력해줘야
+        self.fc_k = nn.Linear(d_model, d_model)
+        self.fc_v = nn.Linear(d_model, d_model)
+        self.fc_o = nn.Linear(d_model, d_model)
+
+        self.dropout = nn.Dropout(drop_p) # GPT-1 논문에서 어텐션 드롭아웃 적용
+        self.scale = torch.sqrt(torch.tensor(d_model / n_heads))
+
+    def forward(self, x, mask=None):
+        Q = self.fc_q(x)  # 개단차
+        K = self.fc_k(x)
+        V = self.fc_v(x)
+
+        Q = rearrange(Q, '개 단 (헤 차) -> 개 헤 단 차', 헤 = self.n_heads) # 개단차 -> 개헤단차
+        K = rearrange(K, '개 단 (헤 차) -> 개 헤 단 차', 헤 = self.n_heads)
+        V = rearrange(V, '개 단 (헤 차) -> 개 헤 단 차', 헤 = self.n_heads)
+
+        attention_score = Q @ K.transpose(-2,-1) / self.scale # 개헤단단
+
+        if mask is not None:
+            attention_score[mask] = -1e10
+        attention_weights = torch.softmax(attention_score, dim=-1) # 개헤단단
+
+        attention_weights = self.dropout(attention_weights) # 개헤단단
+
+        attention = attention_weights @ V # 개헤단차
+
+        x = rearrange(attention, '개 헤 단 차 -> 개 단 (헤 차)') # 개헤단차 -> 개단차
+        x = self.fc_o(x)  # 개단차
+
+        return x, attention_weights
+
+class FeedForward(nn.Module):
+    def __init__(self, d_model, d_ff, drop_p):
+        super().__init__()
+
+        self.linear = nn.Sequential(nn.Linear(d_model, d_ff),
+                                    nn.GELU(),
+                                    nn.Dropout(drop_p), # 논문에는 명시되어 있지 않지만.. overfitting 취약한 부분이라
+                                    nn.Linear(d_ff, d_model))
+
+    def forward(self, x):
+        x = self.linear(x)
+        return x
+
+class DecoderLayer(nn.Module):
+    def __init__(self, d_model, d_ff, n_heads, drop_p):
+        super().__init__()
+
+        self.self_atten_LN = nn.LayerNorm(d_model)
+        self.self_atten = MHA(d_model, n_heads, drop_p)
+
+        self.FF_LN = nn.LayerNorm(d_model)
+        self.FF = FeedForward(d_model, d_ff, drop_p)
+
+        self.dropout = nn.Dropout(drop_p)
+
+    def forward(self, x, dec_mask):
+
+        residual = self.self_atten_LN(x)
+        residual, atten_dec = self.self_atten(residual, dec_mask)
+        residual = self.dropout(residual) # 원랜 attn -> drop -> add -> norm 이었는데 norm -> attn -> drop -> add 순으로 변경 (GPT-2 에서)
+        x = x + residual
+
+        residual = self.FF_LN(x)
+        residual = self.FF(residual)
+        residual = self.dropout(residual)
+        x = x + residual
+
+        return x, atten_dec
+
+class Decoder(nn.Module):
+    def __init__(self, vocab_size, max_len, n_layers, d_model, d_ff, n_heads, drop_p):
+        super().__init__()
+
+        self.input_embedding = nn.Embedding(vocab_size, d_model)
+        self.pos_embedding = nn.Embedding(max_len, d_model)
+
+        self.dropout = nn.Dropout(drop_p)
+
+        self.layers = nn.ModuleList([DecoderLayer(d_model, d_ff, n_heads, drop_p) for _ in range(n_layers)])
+
+        self.LN_out = nn.LayerNorm(d_model)
+        self.fc_out = nn.Linear(d_model, vocab_size)
+
+    def forward(self, x, dec_mask, atten_map_save = False): # x.shape = 개단, enc_out.shape = 개단차, dec_mask.shape = 개헤단단
+
+        pos = torch.arange(x.shape[1]).expand_as(x).to(DEVICE) # 개단
+
+        x = self.input_embedding(x) + self.pos_embedding(pos) # 개단차
+        x = self.dropout(x)
+
+        atten_decs = torch.tensor([]).to(DEVICE) # 그림표현하기위해 사용
+        for layer in self.layers:
+            x, atten_dec = layer(x, dec_mask)
+            if atten_map_save is True: # 그림표현하기위해 사용
+                atten_decs = torch.cat([atten_decs , atten_dec[0].unsqueeze(0)], dim=0) # 그림표현하기위해 사용
+
+        x = self.LN_out(x) # pre-acrivation 이기 때문에 fc_out 전에 (CNN 에서는 GAP-fc => BN-relu-GAP-fc 로 추가했었음)
+        x = self.fc_out(x) # activation 없이 바로 fc_out 통과시키더라 (https://github.com/graykode/gpt-2-Pytorch/blob/master/GPT2/model.py#L205 참고)
+
+        return x, atten_decs
+
+class GPT(nn.Module):
+    def __init__(self, vocab_size, max_len, n_layers, d_model, d_ff, n_heads, drop_p):
+        super().__init__()
+
+        self.decoder = Decoder(vocab_size, max_len, n_layers, d_model, d_ff, n_heads, drop_p)
+
+        self.n_heads = n_heads
+
+        # 초기화 기법은 GPT-2 참고해서 만듦
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, mean=0, std=0.02) # GPT-1 논문에서의 초기화
+                m.weight.data *= 1/torch.sqrt(torch.tensor(n_layers*2)) # 이건 GPT-2 논문에서 변형한 초기화 (residual 에 1/sqrt(N) 곱하기, N:residual block 총 개수)
+                # 더 0 근처로 학습되게 해서 더 "톡!"을 살짝만 하게
+            elif isinstance(m, nn.Embedding):
+                nn.init.normal_(m.weight, mean=0, std=0.02) # 임베딩 레이어는 residual이 아니라서 이것만
+
+        nn.init.normal_(self.decoder.fc_out.weight, mean=0, std=0.02) # 얘는 residual이 아니기 때문에 원래 초기화대로
+
+    def make_dec_mask(self, x): # x.shape = 개단
+
+        future_mask = torch.tril(torch.ones(x.shape[0], self.n_heads, x.shape[1], x.shape[1]))==0 # 개헤단단
+        """ future mask
+        F T T T T
+        F F T T T
+        F F F T T
+        F F F F T
+        F F F F F
+        """
+        dec_mask = future_mask # dec_mask.shape = 개헤단단 # 문장 중간에 pad가 껴있지 않는 이상 pad mask는 안해도 됨!
+        return dec_mask
+
+    def forward(self, x, atten_map_save = False):
+
+        dec_mask = self.make_dec_mask(x)
+        out, atten_decs = self.decoder(x, dec_mask, atten_map_save = atten_map_save)
+
+        return out, atten_decs
+~~~
+
+<br/>
+
+  - 모델 생성
+~~~py
+model = GPT(vocab_size, max_len, n_layers, d_model, d_ff, n_heads, drop_p).to(DEVICE)
+
+x = torch.tensor([[2,5,4,4,3,1,1],[2,9,6,7,3,1,1]]).to(DEVICE)
+print(x.shape)
+
+model.eval()
+with torch.no_grad():
+    x = model(x[:,:-1])[0]
+print(x.shape)
+~~~
+
+<br/>
+
+  - Train, Test, loss_epoch 함수
+~~~py
+def Train(model, train_DL, val_DL, criterion, optimizer, scheduler = None):
+    loss_history = {"train": [], "val": []}
+    best_loss = 9999
+    for ep in range(EPOCH):
+        epoch_start = time.time()
+
+        model.train() # train mode로 전환
+        train_loss = loss_epoch(model, train_DL, criterion, optimizer = optimizer, scheduler = scheduler)
+        loss_history["train"] += [train_loss]
+
+        model.eval() # test mode로 전환
+        with torch.no_grad():
+            val_loss = loss_epoch(model, val_DL, criterion)
+            loss_history["val"] += [val_loss]
+            if val_loss < best_loss:
+                best_loss = val_loss
+                torch.save({"model": model,
+                            "ep": ep,
+                            "optimizer": optimizer,
+                            "scheduler": scheduler,}, save_model_path)
+        # print loss
+        print(f"Epoch {ep+1}: train loss: {train_loss:.5f}   val loss: {val_loss:.5f}   current_LR: {optimizer.param_groups[0]['lr']:.8f}   time: {time.time()-epoch_start:.0f} s")
+        print("-" * 20)
+
+    torch.save({"loss_history": loss_history,
+                "EPOCH": EPOCH,
+                "BATCH_SIZE": BATCH_SIZE}, save_history_path)
+
+def Test(model, test_DL, criterion):
+    model.eval() # test mode로 전환
+    with torch.no_grad():
+        test_loss = loss_epoch(model, test_DL, criterion)
+    print(f"Test loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}")
+
+def loss_epoch(model, DL, criterion, optimizer = None, scheduler = None):
+    N = len(DL.dataset) # the number of data
+
+    rloss=0
+    for texts in tqdm(DL, leave=False):
+        texts = [s + ' [SEP]'for s in texts]
+        x_batch = tokenizer(texts, padding=True, truncation=True, max_length = max_len, return_tensors='pt', add_special_tokens = False).input_ids.to(DEVICE)
+        # inference
+        y_hat = model(x_batch[:,:-1])[0] # 모델 통과 시킬 땐 마지막 토큰은 제외!
+        # y_hat.shape = 개단차 즉, 훈련 땐 문장이 한번에 튀어나옴
+        # loss
+        loss = criterion(y_hat.permute(0,2,1), x_batch[:,1:]) # loss 계산 시엔 첫 토큰은 제외!
+        # update
+        if optimizer is not None:
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        if scheduler is not None:
+            scheduler.step()
+        # loss accumulation
+        loss_b = loss.item() * x_batch.shape[0]
+        rloss += loss_b
+    loss_e = rloss/N
+    return loss_e
+
+def count_params(model):
+    num = sum([p.numel() for p in model.parameters() if p.requires_grad])
+    return num
+~~~
+
+<br/>
+
+   - 모델 학습
+~~~py
+if new_model_train:
+    params = [p for p in model.parameters() if p.requires_grad] # 사전 학습된 layer를 사용할 경우를 대비
+    optimizer = optim.AdamW(params, lr=LR_peak, weight_decay=LAMBDA) # GPT-1 논문에서 AdamW를 사용했음
+    scheduler = LambdaLR(optimizer, lr_lambda=lr_lambda)
+
+    Train(model, train_DL, val_DL, criterion, optimizer, scheduler)
+~~~
+
+<br/>
+
+  - 로드 모델/test
+~~~py
+loaded = torch.load(save_model_path, map_location=DEVICE, weights_only=False)
+load_model = loaded["model"]
+ep = loaded["ep"]
+optimizer = loaded["optimizer"]
+
+loaded = torch.load(save_history_path, map_location=DEVICE)
+loss_history = loaded["loss_history"]
+
+print(ep)
+print(optimizer)
+
+Test(load_model, test_DL, criterion)
+count_params(load_model)
+~~~
+
+<br/>
+
+  - Next Token Prediction 함수
+~~~py
+def generate(model, src_text, atten_map_save = False):
+    model.eval()
+    with torch.no_grad():
+        pred = tokenizer.encode(src_text, return_tensors='pt', add_special_tokens=False).to(DEVICE) # 1x단
+        init_length = pred.shape[1]
+
+        for _ in range(max_len-init_length):
+            out, atten_decs = model(pred, atten_map_save = atten_map_save)
+            # out.shape = (개=1,단,차)
+
+            pred_word = out[:,-1,:].argmax(dim=1).unsqueeze(0) # 마지막 단어에 대해 argmax해서 prediction 하고 shape = (1,1)로
+            pred = torch.cat([pred, pred_word], dim=1) # 1x(단+1) (단이 하나 늘어남)
+
+            if tokenizer.decode(pred_word.item()) == '[SEP]':
+                break
+
+        pred_text = tokenizer.decode(pred[0])
+
+    return pred_text, atten_decs
+
+
+src_text = "정말 기대되네요. 내일 회식에는"
+# src_text = "정말 죄송합니다. 내일 회식에는"
+# src_text = "일도 열심히 했으니 우리 오늘 회"
+print(f"입력: {src_text}")
+
+pred_text, atten_decs = generate(load_model, src_text, atten_map_save = True)
+print(f"생성된 문장: {pred_text}")
+~~~
 
 ###### [GTP-2](#gtp-2)
 ###### [Top](#top)
