@@ -7954,6 +7954,34 @@ print(count_params(load_model))
 <br/>
 <br/>
 
+  - Cyclic shift
+    - Shifted window based MSA를 하게 되면 윈도우 수가 기존 9개에서 16개로 늘어남, 또한 윈도우 사이즈도 서로 다름, Cyclic shift 를 활용하면 기존과 같은 사이즈의(7x7) 9개 윈도우로 계산이 가능하게 된다
+
+<br/>
+
+<img width="1151" height="373" alt="image" src="https://github.com/user-attachments/assets/5d08208a-d689-4976-8c44-d2e8536a3598" />
+
+<br/>
+<br/>
+
+  - Relative Position Bias
+    - 기존의 트랜스포머(ViT 등)가 이미지 전체 패치에 '절대적인 위치 좌표(Absolute Positional Encoding)'를 맨 처음 한 번만 더해주는 방식이었다면, Swin Transformer는 Self-Attention 연산을 할 때마다 패치 간의 '상대적인 거리'를 반영한다
+    - Q,K,V백터가 있다면, Q와K를 내적하고 그걸 차수의 루트로 나눈다음에 바로 소프트맥스를 해야 하지만, 여기서는 Relative Position Bias인 B를 더하고 나서 소프트맥스를 진행한다
+    - Q와K를 내적한 행렬이 49x49일것이기 때문에 b행렬또한 49x49가 된다
+    - 기준 픽셀이 어디든 자기 스스로의 relative position 은 (0,0) 이므로 스스로에 내적한 것에 더해지는 bias는 동일해야 한다
+    - 좌푯값의 범위는 (-6,-6) 부터 (6,6) 까지
+
+<br/>
+
+<img width="566" height="560" alt="image" src="https://github.com/user-attachments/assets/4c3f245e-a0ba-4e41-a4c4-2cd10c491bc7" />
+
+<br/>
+<br/>
+
+<img width="610" height="438" alt="image" src="https://github.com/user-attachments/assets/0ba5c772-d0e7-4c10-8eef-5faa6ea11140" />
+
+<br/>
+<br/>
 
 
 ###### [Swin Transformer](#swin-transformer)
