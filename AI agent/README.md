@@ -59,6 +59,7 @@
 ***
 
 # Gemini
+  - [GeminiSetting](https://github.com/BuMinKyoo/GeminiSetting)
   - 파일
     - .gemini.md
 
