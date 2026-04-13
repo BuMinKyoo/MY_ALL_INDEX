@@ -34,6 +34,10 @@
     - /agent
     - claude -r (브렌치)
     - claude --resume
+    - /clear
+    - /plugin
+  - 프레임웍
+    - Bkit
 
 <br/>
 
