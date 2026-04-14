@@ -8323,6 +8323,34 @@ class SwinTransformer(nn.Module):
   - ConvNeXt
     - ConvNeXt의 목표는 "순수 CNN 구조를 유지하면서 트랜스포머(Swin, ViT)의 성능을 따라잡는" 것
 
+<br/>
+
+  - 전체구조
+    - 1.입력 데이터 전처리 및 임베딩
+      - 1-1. [Swin과 완벽 동일] 하나의 이미지를 일정한 크기의 아주 작은 사각형 패치(Patch) 들로 쪼갬 (예: 4 \times 4 픽셀 크기)
+      - 1-2. 각 패치를 1차원 벡터로 쫙 폄(Flatten)
+      - 1-3. [Swin과 완벽 동일] 평탄화된 패치들을 선형 투영 가중치와 곱해 임베딩 차원($C$)의 벡터로 변환 (기존 ResNet의 복잡한 초기 Conv들을 버리고, nn.Conv2d(3, C, kernel_size=4, stride=4) 단 한 줄로 Swin의 Patch 임베딩을 그대로 모방함)
+      - 1-4. [Swin과 동일] [class] 토큰 없음. 2D 바둑판 형태($\frac{H}{4} \times \frac{W}{4}$) 유지
+      - 1-5. [Swin과 동일] 절대적 위치 임베딩 없음. (CNN은 커널이 이미지를 훑으며 겹치는 부분(Padding)을 통해 상대적 위치 정보를 자연스럽게 학습함)
+    - 2.핵심 연산: Large Kernel Depthwise Conv (Self-Attention의 완벽한 대체제)
+      - 2-1. [Swin의 W-MSA 대체] 2D 배열된 전체 패치에 대해 7 \times 7 크기의 아주 큰 커널(Large Kernel)을 사용하는 깊이별 합성곱(Depthwise Convolution)을 수행함. (Swin이 7 \times 7 윈도우 안에서만 연산하듯, ConvNeXt도 7 \times 7 크기만큼의 정보만 묶어서 봄)
+      - 2-2. [Swin의 채널 독립성 모방] 일반 Conv와 달리, Depthwise Conv는 각 채널(C)별로 완전히 독립적으로 필터를 적용함. (이것은 Self-Attention이 각 채널별 차원의 의미를 섞지 않고 공간적인 유사도만 구하는 특성과 완벽하게 일치함)
+      - 2-3. 위치 편향(Relative Bias) 행렬을 명시적으로 더해주진 않지만, 7 \times 7 필터 자체가 윈도우 내의 공간적 가중치 역할을 완벽히 수행함
+    - 3.ConvNeXt 블록 연산
+      - 3-1. [Swin의 Pre-Norm 모방] 7x7 Depthwise Conv 통과 후 \rightarrow LayerNorm 적용 (CNN의 상징이던 BatchNorm을 버리고 트랜스포머의 상징인 LayerNorm을 채택함)
+      - 3-2. [Swin의 MLP 첫 번째 층 모방] 1 \times 1 Conv를 사용해 채널 차원을 4배(4C)로 뻥튀기함 \rightarrow GELU 활성화 함수 적용 (ReLU를 버리고 트랜스포머가 쓰는 GELU를 사용하며, 블록당 딱 1번만 적용함)
+      - 3-3. [Swin의 MLP 두 번째 층 모방] 다시 1 \times 1 Conv를 사용해 채널 차원을 원래 크기(C)로 압축함
+      - 3-4. Skip connection (입력값을 최종 결과물에 더해줌)
+    - 4.공간적 다운샘플링 및 층(Layer) 반복 (Stage 구성)
+      - 4-1. [Swin의 Patch Merging 대체] Stage가 넘어갈 때마다 별도의 다운샘플링 레이어(nn.Conv2d(in, 2*in, kernel=2, stride=2))를 통과함. 가로세로 해상도는 절반으로 줄고, 채널은 2배로 늘어남. (단, 훈련 안정성을 위해 이 다운샘플링 직전에 LayerNorm을 하나 더 추가함)
+      - 4-2. 위 블록 연산을 4개의 Stage에 걸쳐 반복. 이때 Stage별 블록 반복 횟수의 비율을 Swin-T 모델과 완전히 똑같이 맞춤 (예: ResNet의 $3 \rightarrow 4 \rightarrow 6 \rightarrow 3$ 비율을 Swin의 비율인 $3 \rightarrow 3 \rightarrow 9 \rightarrow 3$ 으로 변경함)
+    - 5.예측 및 Loss 계산
+      - 5-1. [Swin과 동일] 마지막 Stage를 통과하고 나온 최종 결과물에 대해 모든 패치들의 결과값을 평균 내어(Global Average Pooling) 단 1개의 벡터로 압축함
+      - 5-2. 이 1개의 결과물을 분류를 위한 레이어(Linear Layer)에 통과시켜 클래스 확률 예측
+      - 5-3. 정답 클래스와의 오차(Loss) 계산
+      - 5-4. 구해진 Loss를 바탕으로 모델의 전체 가중치 업데이트 (역전파)
+
+<br/>
 
 
 
