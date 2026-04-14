@@ -8029,6 +8029,332 @@ print(count_params(load_model))
       - W-MSA: 윈도우 안에서만 attention 해서 연산량을 크게 줄임
       - SW-MSA: 스멀스멀 global 정보도 볼 수 있게 함
 
+<br/>
+
+  - pad(확인용)
+~~~py
+# F.pad 실험
+input = torch.randn(1, 5, 5, 3) # 개행열채
+pad_r = 2
+pad_b = 1
+output = F.pad(input, (0, 0, 0, pad_r, 0, pad_b))
+# pad size 는 left right (열) top bottom (행) front back (채) 순인데 채행열로 들어온다고 생각하기 때문에 행열채로 되어있는 현재 상황을 잘 생각해줘야..
+# 즉, front back lr tb 순이 된다!
+
+print(output.shape)
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+torch.Size([1, 6, 7, 3])
+~~~
+
+<br/>
+
+  - Swin Transformer 세팅코드
+~~~py
+import torch
+import torch.nn.functional as F # for F.pad
+from torch import nn
+
+from torchvision.ops.misc import Permute
+from torchvision.ops import StochasticDepth
+
+import matplotlib.pyplot as plt
+!pip install einops
+from einops import rearrange
+~~~
+
+<br/>
+
+  - 모델코드
+~~~py
+class FeedForward(nn.Module):
+    def __init__(self, dim, d_ff, drop_p):
+        super().__init__()
+
+        self.linear = nn.Sequential(nn.Linear(dim, d_ff),
+                                    nn.GELU(),
+                                    nn.Dropout(drop_p),
+                                    nn.Linear(d_ff, dim))
+
+    def forward(self, x):
+        x = self.linear(x)
+        return x
+
+class PatchMerging(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+
+        self.dim = dim
+        self.norm = nn.LayerNorm(4*dim, eps=1e-5)
+        self.reduction = nn.Linear(4*dim, 2*dim, bias=False) # merging 할 때 torch.cat으로 channel 축으로 쌓기 때문에 4dim이 된다
+
+    def forward(self, x): # 개행열채
+        H, W, _ = x.shape[1:]
+        x = F.pad(x, (0, 0, 0, W % 2, 0, H % 2)) # 홀수면 한줄 패딩 시킴, 채행열 기준 lr tb front back 순 이므로 행열채에 대해서는 front back lr tb 가 된다
+        x0 = x[..., 0::2, 0::2, :]  # 1행 1열들
+        x1 = x[..., 1::2, 0::2, :]  # 2행 1열들
+        x2 = x[..., 0::2, 1::2, :]  # 1행 2열들
+        x3 = x[..., 1::2, 1::2, :]  # 2행 2열들
+        x = torch.cat([x0, x1, x2, x3], -1)  # 개 행/2 열/2 4채
+
+        x = self.norm(x) # concat 하고 나서 바로 LN 하므로 (즉, 2x2 묶고 + channel 축 으로 normalization 한다) conv 로는 구현이 불가능! 그래서 nn.Linear로
+        x = self.reduction(x)  # 개 행/2 열/2 2채
+        return x
+
+class ShiftedWindowAttention(nn.Module):
+    def __init__(self, dim, window_size, shift_size, num_heads, drop_p = 0.0):
+        super().__init__()
+
+        self.window_size = window_size
+        self.shift_size = shift_size
+        self.num_heads = num_heads
+
+        self.fc_q = nn.Linear(dim, dim)
+        self.fc_k = nn.Linear(dim, dim)
+        self.fc_v = nn.Linear(dim, dim)
+        self.fc_o = nn.Linear(dim, dim)
+
+        self.scale = torch.sqrt(torch.tensor(dim / num_heads))
+
+        self.get_relative_position_bias()
+
+    def get_relative_position_bias(self):
+
+        B_hat = nn.Parameter(torch.zeros(self.num_heads, (2 * self.window_size[0] - 1), (2 * self.window_size[1] - 1)))
+        nn.init.trunc_normal_(B_hat, std=0.02)
+
+        coords_h = torch.arange(self.window_size[0])
+        coords_w = torch.arange(self.window_size[1])
+        H, W = torch.meshgrid(coords_h, coords_w)
+
+        relative_coords_h = H.reshape(1,-1) - H.reshape(-1,1)
+        relative_coords_w = W.reshape(1,-1) - W.reshape(-1,1)
+        relative_position_index_h = relative_coords_h + self.window_size[0] - 1 # 인덱스가 0부터 시작하도록 6을 더해줌 (즉, "기준"의 좌표는 (6,6)임)
+        relative_position_index_w = relative_coords_w + self.window_size[1] - 1
+
+        self.B = B_hat[:, relative_position_index_h, relative_position_index_w]
+        self.B = self.B.unsqueeze(0).unsqueeze(0)
+
+    def forward(self, x):
+
+        M0, M1 = self.window_size
+        B, H, W, C = x.shape # 개행열채
+
+        # window size의 배수가 되도록 padding
+        pad_r = (M1 - W % M1) % M1
+        pad_b = (M0 - H % M0) % M0
+        x = F.pad(x, (0, 0, 0, pad_r, 0, pad_b)) # 채행열 기준 lr tb front back 순 이므로 행열채에 대해서는 front back lr tb 가 된다
+        _, H_pad, W_pad, _ = x.shape
+
+        # down sample 많이 돼서 window size보다 resolution이 더 작으면 shift 할 필요 없음
+        shift_size = self.shift_size.copy()
+        if H_pad <= M0:
+            shift_size[0] = 0
+        if W_pad <= M1:
+            shift_size[1] = 0
+
+        # cyclic shift
+        if sum(shift_size) > 0:
+            x = torch.roll(x, shifts=(-shift_size[0], -shift_size[1]), dims=(1, 2))
+
+        # MSA
+        x = rearrange(x, '개 (윈0 M0) (윈1 M1) 차 -> 개 (윈0 윈1) (M0 M1) 차', M0=M0, M1=M1) # 개행(21)열(21)채 -> 개윈(9)단(49)차
+
+        Q = self.fc_q(x) # 개윈(9)단(49)차
+        K = self.fc_k(x)
+        V = self.fc_v(x)
+
+        Q = rearrange(Q, '개 윈 단 (헤 차) -> 개 윈 헤 단 차', 헤 = self.num_heads) # 개윈단차 -> 개윈헤단차
+        K = rearrange(K, '개 윈 단 (헤 차) -> 개 윈 헤 단 차', 헤 = self.num_heads)
+        V = rearrange(V, '개 윈 단 (헤 차) -> 개 윈 헤 단 차', 헤 = self.num_heads)
+
+        attn = Q @ K.transpose(-2,-1)/self.scale # 개윈헤단단
+
+        # add relative position bias
+        attn = attn + self.B
+
+        # generate attention mask
+        if sum(shift_size) > 0:
+            window_group_num = x.new_zeros(H_pad, W_pad) # x와 같은 데이터 타입과 디바이스에 올려진, H_pad 행 x W_pad 열인 행렬을 만듦
+            h_slices = ((0, -M0), (-M0, -shift_size[0]), (-shift_size[0], None))
+            w_slices = ((0, -M1), (-M1, -shift_size[1]), (-shift_size[1], None))
+            count = 0
+            for h in h_slices:
+                for w in w_slices:
+                    window_group_num[h[0] : h[1], w[0] : w[1]] = count
+                    count += 1
+            window_group_num = rearrange(window_group_num, '(윈0 M0) (윈1 M1) -> (윈0 윈1) (M0 M1)', M0=M0, M1=M1)
+            attn_mask = window_group_num.unsqueeze(2) - window_group_num.unsqueeze(1) # 9 x 49 x 49
+            attn_mask[attn_mask != 0] = -1e10
+            attn = attn + attn_mask.unsqueeze(1).unsqueeze(0) # + 1 9 1 49 49
+
+        attn = F.softmax(attn, dim=-1) # 개윈헤단단
+
+        attn = attn @ V # 개윈헤단차
+
+        x = rearrange(attn, '개 윈 헤 단 차 -> 개 윈 단 (헤 차)') # 개윈헤단차 -> 개윈단차
+        x = self.fc_o(x) # 개윈단차
+
+        x = rearrange(x, '개 (윈0 윈1) (M0 M1) 차 -> 개 (윈0 M0) (윈1 M1) 차', 윈0=H_pad//M0, M0=M0) # 개윈(9)단(49)차 -> 개행(21)열(21)채
+
+        # reverse cyclic shift
+        if sum(shift_size) > 0:
+            x = torch.roll(x, shifts=(shift_size[0], shift_size[1]), dims=(1, 2))
+
+        # unpad features
+        x = x[:, :H, :W, :]
+
+        return x
+
+class SwinTransformerBlock(nn.Module):
+    def __init__(self, dim, num_heads, window_size, shift_size, mlp_ratio = 4.0, drop_p = 0.0, stochastic_depth_prob = 0.0):
+        super().__init__()
+
+        self.SW_MSA_LN = nn.LayerNorm(dim, eps=1e-5)
+        self.SW_MSA = ShiftedWindowAttention(dim, window_size, shift_size, num_heads, drop_p=drop_p)
+
+        self.FF_LN = nn.LayerNorm(dim, eps=1e-5)
+        self.FF = FeedForward(dim, int(dim * mlp_ratio), drop_p=drop_p)
+
+        self.dropout = nn.Dropout(drop_p)
+        self.stochastic_depth = StochasticDepth(stochastic_depth_prob, "row")
+
+        # 초기화는 https://github.com/pytorch/vision/blob/main/torchvision/models/swin_transformer.py#L446 참고
+        for m in self.FF.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+                if m.bias is not None:
+                    nn.init.normal_(m.bias, std=1e-6)
+
+    def forward(self, x):
+
+        residual = self.SW_MSA_LN(x)
+        residual = self.SW_MSA(residual)
+        residual = self.dropout(residual)
+        residual = self.stochastic_depth(residual)
+        x = x + residual
+
+        residual = self.FF_LN(x)
+        residual = self.FF(residual)
+        residual = self.dropout(residual)
+        residual = self.stochastic_depth(residual)
+        x = x + residual
+
+        return x
+
+class SwinTransformer(nn.Module):
+    def __init__(self, patch_size, embed_dim, depths, num_heads, window_size, mlp_ratio = 4, drop_p = 0.0, stochastic_depth_prob = 0.1, num_classes = 1000):
+        super().__init__()
+
+        self.num_classes = num_classes
+
+        layers = []
+        # split image into non-overlapping patches
+        layers += [nn.Sequential(nn.Conv2d(3, embed_dim, kernel_size=(patch_size[0], patch_size[1]), stride=(patch_size[0], patch_size[1])),
+                                 Permute([0, 2, 3, 1]), # 여기서 개행열채로 바뀜. torch.permute() 를 쓰려면 forward 에서 해야하기 때문에 nn.Sequential() 안에 넣으려면 이렇게!
+                                 nn.LayerNorm(embed_dim, eps=1e-5))]
+                                 # 여기에 LN? 좀 이상 https://github.com/pytorch/vision/blob/main/torchvision/models/swin_transformer.py#L561 여기 보면 norm 하고 block에서 또 norm 함
+
+        total_stage_blocks = sum(depths)
+        stage_block_id = 0
+        # build SwinTransformer blocks
+        for i_stage in range(len(depths)):
+            stage = []
+            dim = embed_dim * 2**i_stage
+            for i_layer in range(depths[i_stage]):
+                # adjust stochastic depth probability based on the depth of the stage block
+                sd_prob = stochastic_depth_prob * stage_block_id / (total_stage_blocks - 1)
+                stage += [SwinTransformerBlock(dim,
+                                               num_heads[i_stage],
+                                               window_size=window_size,
+                                               shift_size=[0 if i_layer % 2 == 0 else w // 2 for w in window_size], # 한 번은 W-MSA, 한 번은 SW-MSA
+                                               mlp_ratio=mlp_ratio,
+                                               drop_p = drop_p,
+                                               stochastic_depth_prob=sd_prob)]
+                stage_block_id += 1
+            layers += [nn.Sequential(*stage)]
+            # add patch merging layer
+            # https://github.com/pytorch/vision/blob/main/torchvision/models/swin_transformer.py#L590 참고
+            # Stage 구성이 그림에서 Partition - [[ Linear Embedding - Swin Block ]] 이렇게 묶여있는데 코드에서는
+            # 첫 conv - [[ Swin Block - Path Merging ]] 이렇게 묶이게끔 짜여져 있다)
+            if i_stage < (len(depths) - 1):
+                layers += [PatchMerging(dim)]
+        self.features = nn.Sequential(*layers)
+
+        # https://github.com/pytorch/vision/blob/main/torchvision/models/swin_transformer.py#L595 참고
+        # LN - GAP - fc 로 되어있음.
+        # ViT의 실험 중 CLS 토큰 안 쓰고 최종 인코더 아웃풋에 LN-GAP-fc 하는 방식을 Swin 에서는 기본 구조로 채택함!
+        self.norm = nn.LayerNorm(dim, eps=1e-5)
+        self.avgpool = nn.Sequential(Permute([0, 3, 1, 2]), # 개행열채 -> 개채행열
+                                     nn.AdaptiveAvgPool2d((1,1)))
+        self.fc = nn.Linear(dim, num_classes)
+
+        # 초기화는 https://github.com/pytorch/vision/blob/main/torchvision/models/swin_transformer.py#L601 참고
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.trunc_normal_(m.weight, std=0.02)
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.norm(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, start_dim=1)
+        x = self.fc(x)
+        return x
+~~~
+
+<br/>
+
+  - 
+~~~py
+
+~~~
+
+<br/>
+
+  - 
+~~~py
+
+~~~
+
+<br/>
+
+  - 
+~~~py
+
+~~~
+
+<br/>
+
+  - 
+~~~py
+
+~~~
+
+<br/>
+
+  - 
+~~~py
+
+~~~
+
+<br/>
+
+  - 
+~~~py
+
+~~~
+
+<br/>
+
+  - 
+~~~py
+
+~~~
+
+<br/>
 
 
 
