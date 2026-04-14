@@ -8329,8 +8329,8 @@ class SwinTransformer(nn.Module):
     - 1.입력 데이터 전처리 및 임베딩
       - 1-1. [Swin과 완벽 동일] 하나의 이미지를 일정한 크기의 아주 작은 사각형 패치(Patch) 들로 쪼갬 (예: 4 \times 4 픽셀 크기)
       - 1-2. 각 패치를 1차원 벡터로 쫙 폄(Flatten)
-      - 1-3. [Swin과 완벽 동일] 평탄화된 패치들을 선형 투영 가중치와 곱해 임베딩 차원($C$)의 벡터로 변환 (기존 ResNet의 복잡한 초기 Conv들을 버리고, nn.Conv2d(3, C, kernel_size=4, stride=4) 단 한 줄로 Swin의 Patch 임베딩을 그대로 모방함)
-      - 1-4. [Swin과 동일] [class] 토큰 없음. 2D 바둑판 형태($\frac{H}{4} \times \frac{W}{4}$) 유지
+      - 1-3. [Swin과 완벽 동일] 평탄화된 패치들을 선형 투영 가중치와 곱해 임베딩 차원(C)의 벡터로 변환 (기존 ResNet의 복잡한 초기 Conv들을 버리고, nn.Conv2d(3, C, kernel_size=4, stride=4) 단 한 줄로 Swin의 Patch 임베딩을 그대로 모방함)
+      - 1-4. [Swin과 동일] [class] 토큰 없음. 2D 바둑판 형태(H4×W4) 유지
       - 1-5. [Swin과 동일] 절대적 위치 임베딩 없음. (CNN은 커널이 이미지를 훑으며 겹치는 부분(Padding)을 통해 상대적 위치 정보를 자연스럽게 학습함)
     - 2.핵심 연산: Large Kernel Depthwise Conv (Self-Attention의 완벽한 대체제)
       - 2-1. [Swin의 W-MSA 대체] 2D 배열된 전체 패치에 대해 7 \times 7 크기의 아주 큰 커널(Large Kernel)을 사용하는 깊이별 합성곱(Depthwise Convolution)을 수행함. (Swin이 7 \times 7 윈도우 안에서만 연산하듯, ConvNeXt도 7 \times 7 크기만큼의 정보만 묶어서 봄)
@@ -8341,16 +8341,136 @@ class SwinTransformer(nn.Module):
       - 3-2. [Swin의 MLP 첫 번째 층 모방] 1 \times 1 Conv를 사용해 채널 차원을 4배(4C)로 뻥튀기함 \rightarrow GELU 활성화 함수 적용 (ReLU를 버리고 트랜스포머가 쓰는 GELU를 사용하며, 블록당 딱 1번만 적용함)
       - 3-3. [Swin의 MLP 두 번째 층 모방] 다시 1 \times 1 Conv를 사용해 채널 차원을 원래 크기(C)로 압축함
       - 3-4. Skip connection (입력값을 최종 결과물에 더해줌)
-    - 4.공간적 다운샘플링 및 층(Layer) 반복 (Stage 구성)
-      - 4-1. [Swin의 Patch Merging 대체] Stage가 넘어갈 때마다 별도의 다운샘플링 레이어(nn.Conv2d(in, 2*in, kernel=2, stride=2))를 통과함. 가로세로 해상도는 절반으로 줄고, 채널은 2배로 늘어남. (단, 훈련 안정성을 위해 이 다운샘플링 직전에 LayerNorm을 하나 더 추가함)
-      - 4-2. 위 블록 연산을 4개의 Stage에 걸쳐 반복. 이때 Stage별 블록 반복 횟수의 비율을 Swin-T 모델과 완전히 똑같이 맞춤 (예: ResNet의 $3 \rightarrow 4 \rightarrow 6 \rightarrow 3$ 비율을 Swin의 비율인 $3 \rightarrow 3 \rightarrow 9 \rightarrow 3$ 으로 변경함)
-    - 5.예측 및 Loss 계산
-      - 5-1. [Swin과 동일] 마지막 Stage를 통과하고 나온 최종 결과물에 대해 모든 패치들의 결과값을 평균 내어(Global Average Pooling) 단 1개의 벡터로 압축함
-      - 5-2. 이 1개의 결과물을 분류를 위한 레이어(Linear Layer)에 통과시켜 클래스 확률 예측
-      - 5-3. 정답 클래스와의 오차(Loss) 계산
-      - 5-4. 구해진 Loss를 바탕으로 모델의 전체 가중치 업데이트 (역전파)
+   - 4.공간적 다운샘플링 및 층(Layer) 반복 (Stage 구성)
+     - 4-1. [Swin의 Patch Merging 대체] Stage가 넘어갈 때마다 별도의 다운샘플링 레이어(nn.Conv2d(in, 2*in, kernel=2, stride=2))를 통과함. 가로세로 해상도는 절반으로 줄고, 채널은 2배로 늘어남. (단, 훈련 안정성을 위해 이 다운샘플링 직전에 LayerNorm을 하나 더 추가함)
+     - 4-2. 위 블록 연산을 4개의 Stage에 걸쳐 반복. 이때 Stage별 블록 반복 횟수의 비율을 Swin-T 모델과 완전히 똑같이 맞춤 (예: ResNet의 3→4→6→3 비율을 Swin의 비율인 3→3→9→3 으로 변경함)
+  - 5.예측 및 Loss 계산
+    - 5-1. [Swin과 동일] 마지막 Stage를 통과하고 나온 최종 결과물에 대해 모든 패치들의 결과값을 평균 내어(Global Average Pooling) 단 1개의 벡터로 압축함
+    - 5-2. 이 1개의 결과물을 분류를 위한 레이어(Linear Layer)에 통과시켜 클래스 확률 예측
+    - 5-3. 정답 클래스와의 오차(Loss) 계산
+    - 5-4. 구해진 Loss를 바탕으로 모델의 전체 가중치 업데이트 (역전파)
 
 <br/>
+
+<img width="773" height="564" alt="image" src="https://github.com/user-attachments/assets/8f78a167-2fb0-47d5-8f7f-2350e1251155" />
+
+<br/>
+<br/>
+
+<img width="562" height="609" alt="image" src="https://github.com/user-attachments/assets/9dcb00c4-ea06-4f81-8b5a-e399dbcc922c" />
+
+<br/>
+<br/>
+
+  - ConvNeXt코드
+~~~py
+import torch
+from torch import nn
+from torchvision.ops.misc import Permute
+from torchvision.ops import StochasticDepth
+
+class CNBlock(nn.Module):
+    def __init__(self, in_channels, layer_scale, stochastic_depth_prob):
+        super().__init__()
+
+        self.residual = nn.Sequential(nn.Conv2d(in_channels, in_channels, 7, padding=3, groups=in_channels), # torchvision 구현체 보면 bias=True
+                                      Permute([0, 2, 3, 1]), # 개채행열 -> 개행열채
+                                      nn.LayerNorm(in_channels, eps=1e-6), # pixel-wise로 채널 축의 값들을 이용해서 normalize 하는 것
+                                      # nn.LayerNorm 은 평균, 분산을 "last D dimensions" 에 대해 구한다.
+                                      # 예를 들어, x = torch.randn(개, 채, 행, 열) 라면 layer_norm = nn.LayerNorm([채, 행, 열]) 이렇게 주면
+                                      # 채,행,열 에 대해서 평균, 분산 구하는 데 참여시킨다는 뜻
+                                      # 그러나 [개, 행, 열] 이런 식으로 건너뛸 순 없다! 따라서 채널 축의 값들만 이용하고 싶다면 Permute 해줘야
+                                      Permute([0, 3, 1, 2]), # 개행열채 -> 개채행열
+                                      nn.Conv2d(in_channels, 4 * in_channels, 1),
+                                      nn.GELU(),
+                                      nn.Conv2d(4 * in_channels, in_channels, 1))
+        self.layer_scale = nn.Parameter(torch.ones(1,in_channels, 1, 1) * layer_scale)
+        self.stochastic_depth = StochasticDepth(stochastic_depth_prob, "row")
+
+    def forward(self, x):
+        residual = self.layer_scale * self.residual(x) # 어떤 channel이 중요한지를 학습시키자 (SE Net 아이디어 비슷)
+        residual = self.stochastic_depth(residual)
+        out = residual + x
+        return out
+
+class ConvNeXt(nn.Module):
+    def __init__(self, block_setting, stochastic_depth_prob = 0.0, layer_scale = 1e-6, num_classes = 1000, **kwargs):
+        super().__init__()
+
+        layers = []
+        layers += [nn.Sequential(nn.Conv2d(3, block_setting[0][0], kernel_size=4, stride=4),
+                                 Permute([0, 2, 3, 1]),
+                                 nn.LayerNorm(block_setting[0][0], eps=1e-6),
+                                 Permute([0, 3, 1, 2]))]
+
+        total_stage_blocks = sum([setting[2] for setting in block_setting])
+        stage_block_id = 0
+        for in_channels, out_channels, num_blocks in block_setting:
+            stage = []
+            for _ in range(num_blocks):
+                sd_prob = stochastic_depth_prob * stage_block_id / (total_stage_blocks - 1) # 1 빼야 마지막 블록이 설정한 stochastic_depth_prob을 가지게 된다.
+                stage.append(CNBlock(in_channels, layer_scale, sd_prob))
+                stage_block_id += 1
+            layers += [nn.Sequential(*stage)]
+            if out_channels is not None:
+                downsample = nn.Sequential(Permute([0, 2, 3, 1]),
+                                           nn.LayerNorm(in_channels),
+                                           Permute([0, 3, 1, 2]),
+                                           nn.Conv2d(in_channels, out_channels, kernel_size=2, stride=2))
+                layers += [downsample]
+
+        self.features = nn.Sequential(*layers)
+
+        # https://github.com/pytorch/vision/blob/main/torchvision/models/convnext.py#L160 참고
+        # Swin과 달리 pre-activation이 아니라서 LN-GAP-fc 가 아님. 근데 GAP-fc 만 하기엔 마지막 LN이 멀어서 GAP-fc 사이에 LN을 추가한 듯
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.classifier = nn.Sequential(nn.LayerNorm(block_setting[-1][0]),
+                                        nn.Linear(block_setting[-1][0], num_classes))
+
+        for m in self.modules():
+            if isinstance(m, (nn.Conv2d, nn.Linear)):
+                nn.init.trunc_normal_(m.weight, std=0.02) # 논문엔 0.2 라 나와있는데 torchvision 코드는 0.02로 되어있음. 참고: https://github.com/pytorch/vision/blob/main/torchvision/models/convnext.py#L166
+                # timm 코드도 0.02 로 되어있어서 코드도 0.02로 반영. 참고: https://github.com/huggingface/pytorch-image-models/blob/4d9c3ae2fb7cc4739ec57d4c06254d2ffc7e2c89/timm/models/convnext.py#L380
+                # head init scale 은 fine-tuning 때 하는 것이므로 여기선 생략. 적용 코드 참고: https://github.com/huggingface/pytorch-image-models/blob/4d9c3ae2fb7cc4739ec57d4c06254d2ffc7e2c89/timm/models/convnext.py#L383
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+
+def ConvNeXt_T(**kwargs):
+    block_setting = [[96, 192, 3], # 192는 sep. d.s. conv에서 patch merging 따라하기 위해 똑같이 임베딩 차원 두 배 하는 것
+                     [192, 384, 3],
+                     [384, 768, 9],
+                     [768, None, 3]]
+    return ConvNeXt(block_setting, stochastic_depth_prob = 0.1,  **kwargs)
+
+def ConvNeXt_S(**kwargs):
+    block_setting = [[96, 192, 3],
+                     [192, 384, 3],
+                     [384, 768, 27],
+                     [768, None, 3]]
+    return ConvNeXt(block_setting, stochastic_depth_prob = 0.4, **kwargs)
+
+def ConvNeXt_B(**kwargs):
+    block_setting = [[128, 256, 3],
+                     [256, 512, 3],
+                     [512, 1024, 27],
+                     [1024, None, 3]]
+    return ConvNeXt(block_setting, stochastic_depth_prob = 0.5, **kwargs)
+
+def ConvNeXt_L(**kwargs):
+    block_setting = [[192, 384, 3],
+                     [384, 768, 3],
+                     [768, 1536, 27],
+                     [1536, None, 3]]
+    return ConvNeXt(block_setting, stochastic_depth_prob = 0.5, **kwargs)
+~~~
 
 
 
