@@ -8018,6 +8018,18 @@ print(count_params(load_model))
 <br/>
 <br/>
 
+<img width="1263" height="488" alt="image" src="https://github.com/user-attachments/assets/a78b3ce3-0954-42a7-a2ce-a9a9956515cd" />
+
+<br/>
+<br/>
+
+  - Summary
+    - ViT 에 Patch merging 과 Shifted Windows 개념 도입
+      - Patch merging: 패치 사이즈를 2배씩 키움 (+임베딩 차원도 2배씩)
+      - W-MSA: 윈도우 안에서만 attention 해서 연산량을 크게 줄임
+      - SW-MSA: 스멀스멀 global 정보도 볼 수 있게 함
+
+
 
 
 ###### [Swin Transformer](#swin-transformer)
