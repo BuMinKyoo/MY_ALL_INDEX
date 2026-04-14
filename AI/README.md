@@ -35,6 +35,7 @@
 - [요즘은 어떤 데이터셋으로 평가하나?](#요즘은-어떤-데이터셋으로-평가하나?)
 - [ViT(Vision Transformer)](#vitvision-transformer)_(2020.10)
 - [Swin Transformer](#swin-transformer)_(2021.03)
+- [ConvNeXt](#convnext)_(2022.01)
 
 
 
@@ -8305,60 +8306,36 @@ class SwinTransformer(nn.Module):
         return x
 ~~~
 
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-  - 
-~~~py
-
-~~~
-
-<br/>
-
-
 
 ###### [Swin Transformer](#swin-transformer)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# ConvNeXt
+  - 트랜스포머 -> ViT -> Swin 으로 이미지 분야의 발전
+  - vit,Swin
+    -  image-specific inductive bias (고정 관념)가 적어서 모델 클수록 성능 높음
+    -  이미지 사이즈에 따라 계산량이 너무 크게 증가한다는 단점 => Swin 으로 발전
+  - ConvNeXt
+    - ConvNeXt의 목표는 "순수 CNN 구조를 유지하면서 트랜스포머(Swin, ViT)의 성능을 따라잡는" 것
+
+
+
+
+###### [ConvNeXt](#convnext)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
 
 
