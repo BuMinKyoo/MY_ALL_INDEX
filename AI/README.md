@@ -7915,6 +7915,8 @@ print(count_params(load_model))
 
 # Swin Transformer
   - ViT + Patch merging + Shifted windows
+  - ViT의 문제 (Global Attention): ViT는 이미지 내의 '모든 패치가 다른 모든 패치와' 유사도를 구합니다. 만약 고해상도 이미지가 들어와서 가로세로 크기가 2배 커지면 패치 개수(N)는 4배가 됩니다. 이때 Attention 연산량은 패치 개수의 제곱(N^2)에 비례하므로 연산량은 무려 16배로 폭발해버립니다.
+  - Swin의 해결책 (Window Attention):  W-MSA입니다. 화면을 작은 윈도우(예: 7 \times 7 패치)로 쪼개고 오직 그 안에서만 연산합니다. 이렇게 하면 이미지 해상도가 아무리 커져도 연산량이 O(N)으로 정직하게(선형적으로)만 증가
 
 <br/>
 
@@ -7982,6 +7984,40 @@ print(count_params(load_model))
 
 <br/>
 <br/>
+
+  - 전체 구조
+    - 1.입력 데이터 전처리 및 임베딩
+      - 1-1. 하나의 이미지를 일정한 크기의 아주 작은 사각형 패치(Patch) 들로 쪼갬 (예: 4 \times 4 픽셀 크기)
+      - 1-2. 각 패치를 1차원 벡터로 쫙 폄(Flatten)
+      - 1-3. 평탄화된 패치들을 선형 투영(Linear Projection) 가중치와 곱해 임베딩 차원(C)의 벡터로 변환 (여기까지 nn.Conv2d 한 줄로 1-1~1-3 동시 처리)
+      - 1-4. [ViT와 차이점] 전체 이미지를 대표할 [class] 토큰을 추가하지 않음. 또한, 패치를 1열로 줄 세우지 않고 원래 이미지의 가로세로 2D 바둑판 형태(\frac{H}{4} \times \frac{W}{4})를 그대로 유지함
+      - 1-5. [ViT와 차이점] 맨 처음에 절대적 위치 임베딩(Absolute Position Embedding)을 더해주지 않음. (위치 정보는 2-3 단계에서 더해줌)
+    - 2.Window / Shifted Window Self-Attention
+      - 2-1. [ViT와 차이점] 2D 배열된 전체 패치를 M \times M (예: 7 \times 7) 크기의 윈도우(Window) 구역들로 나눔, 임베딩된 값들을 Q, K, V 행렬과 곱하는데, 전체가 아닌 오직 윈도우 내부의 패치들끼리만 연산함
+      - 2-2. Q와 K 내적 -> 차원수의 루트로 나누기
+      - 2-3. [ViT와 차이점] 루트로 나눈 값에, 윈도우 내 패치들 간의 상대적인 거리를 나타내는 상대적 위치 편향(Relative Position Bias) 가중치 행렬을 더해줌(이때 위치 정보가 들어감)
+      - 2-4. 소프트맥스 -> V 행렬 곱하기 (Shifted Window인 경우, 이동으로 인해 잘못 섞인 경계선 부분을 가리는 Masking 과정이 들어감)
+    - 3.트랜스포머 블록 연산 (항상 짝수로 2개가 1세트)
+      - 3-1. [홀수 층] Norm -> W-MSA (일반 윈도우 Attention) -> Skip connection
+      - 3-2. [홀수 층] Norm -> MLP (Forward 연산)(GELU 사용) -> Skip connection
+      - 3-3. [짝수 층] Norm -> SW-MSA (우측 하단으로 이동시킨 윈도우 Attention) -> Skip connection
+      - 3-4. [짝수 층] Norm -> MLP (Forward 연산)(GELU 사용) -> Skip connection
+    - 4.패치 병합(Patch Merging) 및 층(Layer) 반복 (Stage 구성)
+      - 4-1. [ViT와 차이점] Stage가 넘어갈 때마다 주변 2 \times 2 (총 4개)의 패치를 하나로 묶음(Merging). 선형 투영을 거쳐 가로세로 해상도는 절반으로 줄고, 채널(임베딩 차원)은 2배로 늘어남
+      - 4-2. 위 2~3의 Attention 블록 연산을 4개의 Stage에 걸쳐 모델 크기에 따라 정해진 횟수만큼 반복 (예: Swin-T 모델은 $2 \rightarrow 2 \rightarrow 6 \rightarrow 2$ 번 반복)
+    - 5.예측 및 Loss 계산
+      - 5-1. [ViT와 차이점] 마지막 Stage를 통과하고 나온 최종 결과물($\frac{H}{32} \times \frac{W}{32}$ 크기의 2D 피처 맵)에 [class] 토큰이 없으므로, 모든 패치들의 결과값을 평균 내어(Global Average Pooling) 단 1개의 벡터로 압축함
+      - 5-2. 이 1개의 결과물을 분류를 위한 새로운 레이어(MLP Head)에 통과시켜 "이 이미지가 어떤 클래스인지" 확률을 예측
+      - 5-3. 정답 클래스와의 오차(Loss, 주로 Cross-Entropy Loss)를 계산
+      - 5-4. 구해진 Loss를 바탕으로 모델의 전체 가중치(Patch Projection, Attention 가중치, MLP 등)를 한 번에 업데이트 (역전파)
+
+<br/>
+
+<img width="1265" height="360" alt="image" src="https://github.com/user-attachments/assets/3b258170-7670-471c-a9c9-dabca18c8080" />
+
+<br/>
+<br/>
+
 
 
 ###### [Swin Transformer](#swin-transformer)
