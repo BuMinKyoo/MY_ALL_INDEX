@@ -2,6 +2,7 @@
 
 - [Claude](#claude)
 - [Gemini](#gemini)
+- [Codex](#codex)
 
 
 <br/>
@@ -52,6 +53,8 @@
 - 사용자가 명시적으로 수정을 요청한 경우에만 코드를 변경할 것
 ~~~
 
+###### [Claude](#claude)
+###### [Top](#top)
 
 <br/>
 <br/>
@@ -62,5 +65,21 @@
   - [GeminiSetting](https://github.com/BuMinKyoo/GeminiSetting)
   - 파일
     - .gemini.md
+
+
+###### [Gemini](#gemini)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# Codex
+  - [CodexSetting](https://github.com/BuMinKyoo/CodexSetting)
+
+
+###### [Codex](#codex)
+###### [Top](#top)
 
 
