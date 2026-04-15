@@ -77,7 +77,8 @@
 
 # Codex
   - [CodexSetting](https://github.com/BuMinKyoo/CodexSetting)
-
+  - 파일
+    - AGENTS.md
 
 ###### [Codex](#codex)
 ###### [Top](#top)
