@@ -37,6 +37,7 @@
     - claude --resume
     - /clear
     - /plugin
+    - /rewind
   - 프레임웍
     - Bkit
 
