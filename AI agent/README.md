@@ -38,6 +38,8 @@
     - /clear
     - /plugin
     - /rewind
+      - Restore conversation : 선택한 메시지를 입력하기 직전의 상태로 대화 내역을 완전히 되돌립니다
+      - Summarize from here : 돌아가고자 하는 시점 이후의 대화 내용들을 완전히 지우는 대신 짧은 요약본으로 압축하여 기억하게 만듭니다, add context를 통해 요약에 추가적인 지시를 덧붙일 수도 있습니다
   - 프레임웍
     - Bkit
 
