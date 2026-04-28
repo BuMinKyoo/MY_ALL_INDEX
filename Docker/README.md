@@ -1,6 +1,8 @@
 ###### Top
 
+- [도커file](https://github.com/BuMinKyoo/DockerRepository)
 - [리눅스에 도커설치](#리눅스에-도커설치)
+- [명령어](#명령어)
 
 <br/>
 <br/>
@@ -36,5 +38,14 @@
 <br/>
 <br/>
 
-[도커file](https://github.com/BuMinKyoo/DockerRepository)
+***
 
+# 명령어
+  - docker images : 도커에 있는 이미지 뭐뭐 있나 확인
+  - docker run --rm bmkhomeground : 도커에 있는 이미지를 실행하되, exit해서 빠져 나오면 기본값을 제외하고 다 지움
+  - docker run bmkhomeground : 도커에 있는 이미지를 실행하되, exit해서 빠져 나와도 설치했던 것을 지우지 않음
+  - docker build -t bmkhomeground . : 이미지 굽기
+
+
+###### [명령어](#명령어)
+###### [Top](#top)
