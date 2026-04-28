@@ -37,6 +37,9 @@
 - [Swin Transformer](#swin-transformer)_(2021.03)
 - [ConvNeXt](#convnext)_(2022.01)
 
+<br/>
+
+- [AI Agent from scratch](https://github.com/BuMinKyoo/AI-Agent-from-scratch)
 
 
 <br/>
