@@ -47,7 +47,9 @@
   - docker build -t [이미지이름] . : 이미지 굽기
   - docker build -f Dockerfile2 -t [이미지이름] . : Dockerfile 이라는 이름이 아닌 다른 파일을 이용해서 굽는 방법
   - docker run -it [이미지이름] : -it옵션을 넣으면 도커 안에서 리눅스 터미널을 사용할 수 있음
+  - docker rmi [이미지_이름 또는 이미지_ID] : 이미지 삭제하기
   - docker ps -a : 흔적이 남은 컨테이너까지 포함해서 모두 출력
+    - docker rm [컨테이너_ID] : docker ps -a 명령어를 통해서 나온 컨테이너 삭제하기
   - docker commit [컨테이너_ID] [새_이미지_이름] : 흔적이 남은 컨테이너를 그대로 다시 굽기
 
 
