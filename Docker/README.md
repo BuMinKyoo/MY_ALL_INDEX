@@ -42,9 +42,12 @@
 
 # 명령어
   - docker images : 도커에 있는 이미지 뭐뭐 있나 확인
-  - docker run --rm bmkhomeground : 도커에 있는 이미지를 실행하되, exit해서 빠져 나오면 기본값을 제외하고 다 지움
-  - docker run bmkhomeground : 도커에 있는 이미지를 실행하되, exit해서 빠져 나와도 설치했던 것을 지우지 않음
-  - docker build -t bmkhomeground . : 이미지 굽기
+  - docker run --rm [이미지이름] : 도커에 있는 이미지를 실행하되, exit해서 빠져 나오면 기본값을 제외하고 다 지움
+  - docker run [이미지이름] : 도커에 있는 이미지를 실행하되, exit해서 빠져 나와도 설치했던 것을 지우지 않음
+  - docker build -t [이미지이름] . : 이미지 굽기
+  - docker run -it [이미지이름] : -it옵션을 넣으면 도커 안에서 리눅스 터미널을 사용할 수 있음
+  - docker ps -a : 흔적이 남은 컨테이너까지 포함해서 모두 출력
+  - docker commit [컨테이너_ID] [새_이미지_이름] : 흔적이 남은 컨테이너를 그대로 다시 굽기
 
 
 ###### [명령어](#명령어)
