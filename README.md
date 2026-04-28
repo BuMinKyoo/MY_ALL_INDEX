@@ -56,8 +56,8 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 
 ***
 
-### [AI](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/AI)
-### [AI agent](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/AI%20agent)
+### [AI_LLM](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/AI_LLM/README.md)
+### [AI agent Setting](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/AI%20agent%20Setting/README.md)
 ### [Docker](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/Docker)
 
 <br/>
