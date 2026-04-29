@@ -59,6 +59,7 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ### [AI_LLM](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/AI_LLM/README.md)
 ### [AI agent Setting](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/AI%20agent%20Setting/README.md)
 ### [Docker](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/Docker)
+### [Computer Vision & Edge AI](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Computer%20Vision%20&%20Edge%20AI)
 
 <br/>
 
