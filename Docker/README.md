@@ -56,8 +56,10 @@
 
   - docker-compose.yml파일 사용시
     - docker compose up -d : docker-compose.yml파일로 도커 실행할때사용, 자동으로 이미지가 구워지고 컨테이너가 실행, 최초실행시 사용
+      - docker compose -f [compose.yml파일명] up : 기본 설정 이름인 docker-compose.yml이 아닌 다른 이름의 yml파일을 사용할때
     - docker exec -it [컨테이너 이름] /bin/bash : 컨테이너 안으로 들어가서 코딩
     - docker compose up -d --build : 다시 굽고 다시 실행
+    - docker ps : 현재 실행중인 컨테이너들 목록
 
 
 ###### [명령어](#명령어)
