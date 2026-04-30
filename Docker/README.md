@@ -52,6 +52,13 @@
     - docker rm [컨테이너_ID] : docker ps -a 명령어를 통해서 나온 컨테이너 삭제하기
   - docker commit [컨테이너_ID] [새_이미지_이름] : 흔적이 남은 컨테이너를 그대로 다시 굽기
 
+<br/>
+
+  - docker-compose.yml파일 사용시
+    - docker compose up -d : docker-compose.yml파일로 도커 실행할때사용, 자동으로 이미지가 구워지고 컨테이너가 실행, 최초실행시 사용
+    - docker exec -it [컨테이너 이름] /bin/bash : 컨테이너 안으로 들어가서 코딩
+    - docker compose up -d --build : 다시 굽고 다시 실행
+
 
 ###### [명령어](#명령어)
 ###### [Top](#top)
