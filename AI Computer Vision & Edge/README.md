@@ -3,7 +3,8 @@
 - [그래픽관련tool](#그래픽관련tool)
 - [Ai_Agent_API](https://github.com/BuMinKyoo/Ai_Agent_API/tree/main)
   - WPF 기반 LLM 로그 분석 도우미. 장비/시스템에서 발생한 로그·에러 메시지를 LLM API로 보내, 근본 원인 추정과 점검 항목을 자동으로 받아보는 데스크톱 앱
-- [OllamaWpfClient](https://github.com/BuMinKyoo/OllamaWpfClient/blob/main/README.md)
+- [OllamaWpfClient](https://github.com/BuMinKyoo/OllamaWpfClient/tree/main)
+  - 오프라인 환경에서 로컬 PC에 설치한 Ollama와 REST API로 통신하는 WPF 채팅 클라이언트입니다. 인터넷 연결 없이 127.0.0.1:11434 로컬호스트에서 Llama 3, Qwen 등 LLM 모델을 구동하고 사용하는 것을 목표로 합니다
 
 
 
