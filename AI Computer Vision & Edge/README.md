@@ -16,13 +16,15 @@
     - 파이썬으로 짠 모델을 누군가가 c++로 짰기 때문에(llama.cpp) 복잡한 파이썬 실행환경을 만들 필요가 없음
     - API로 통신할 수 있도록 바로 제공
     - 최적화 제한적
-- [Vision.OnnxTester](https://github.com/BuMinKyoo/Vision.OnnxTester)
+- [Vision.OnnxTester](https://github.com/BuMinKyoo/Vision.OnnxTester/tree/main)
   - WPF (.NET 10) 기반의 ONNX Runtime 학습용 테스트 프로젝트. YOLOv8 모델을 로드해 정적 이미지(CCTV 스냅샷 등)에서 객체를 검출하고, Bounding Box를 시각화한다
   - ONNX
     - ONNX는 특정 모델을 위한 코드가 아니라, "수학적 연산의 실행 순서(Graph)"를 적어놓은 설계도
     - 최적화 자유로움
     - ONNX Runtime은 "이건 Llama야"라고 이해하는 게 아니라, "첫 번째는 행렬 곱셈이고, 두 번째는 Softmax 연산이네? 내가 가진 연산기(Kernels)로 순서대로 실행할게"라고 동작
     - .PT 확장자(파이토치) -> .ONNX 확장자로 포맷 변경
+- [Vision.LiveStream.Inference](https://github.com/BuMinKyoo/Vision.LiveStream.Inference/tree/main)
+  - WPF (.NET 10) + ONNX Runtime 기반 실시간 RTSP 영상 객체 검출 학습 프로젝트. 선행 프로젝트 Vision.OnnxTester (정적 이미지 + YOLOv8) 의 검출 엔진을 베이스로, RTSP 스트림을 받아 실시간으로 추론하고 화면에 박스를 그리는 것이 목표
 
 
 
