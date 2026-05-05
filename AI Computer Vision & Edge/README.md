@@ -1,6 +1,7 @@
 ###### Top
 
 - [그래픽관련tool](#그래픽관련tool)
+- [해석과정](#해석과정)
 - [Ai_Agent_API](https://github.com/BuMinKyoo/Ai_Agent_API/tree/main)
   - WPF 기반 LLM 로그 분석 도우미. 장비/시스템에서 발생한 로그·에러 메시지를 LLM API로 보내, 근본 원인 추정과 점검 항목을 자동으로 받아보는 데스크톱 앱
 - [OllamaWpfClient](https://github.com/BuMinKyoo/OllamaWpfClient/tree/main)
@@ -78,6 +79,42 @@
 ###### [Top](#top)
 
 
+<br/>
+<br/>
+
+***
+
+# 해석과정
+  - Level 5: Application Layer
+    - 역할: 사용자 UI 제공, 이미지나 텍스트 데이터 준비 (전처리)
+    - 실체: 만든 WPF.exe
+  - Level 4: Inference Engine (추론 엔진 / 프레임워크)
+    - 역할: "이 모델(가중치)을 가지고, 이 데이터로 계산해 줘!"라고 주문을 받는 '현장 소장'
+    - 실체: ONNX Runtime, TensorRT, Microsoft ML.NET, PyTorch 등
+    - 엔진들은 내부에 C/C++로 짜인 거대한 로직을 가지고 있고, 밑에 있는 하청업체(cuDNN)를 부려먹는다
+  - Level 3: Deep Learning Library (cuDNN, cuBLAS)
+    - 역할: 행렬 곱셈, 컨볼루션(CNN), 어텐션(Transformer) 같은 복잡한 수학을 가장 빠르게 푸는 '특수 비급(레시피)'
+    - 실체: cudnn64_8.dll, cublas64_11.dll (그냥 흔한 C++ 동적 라이브러리)
+    - 미친 듯이 최적화된 C++ 함수들의 모음집
+    - Level 4의 엔진(TensorRT 등)이 추론을 하다가 "어? 여기서 행렬 곱셈 해야 하네?" 하면, 자기가 직접 C++ for문을 돌리는 게 아니라, "야 cuDNN! 네가 가진 행렬 곱셈 함수(cublasSgemm 같은 거) 실행해!" 하고 호출
+  - Level 2: Parallel Computing API (CUDA Toolkit / Runtime)
+    - 역할: C++ 코드를 수천 개의 GPU 스레드로 쪼개서 던져주는 '작업 반장'
+    - 실체: cudart64_110.dll (CUDA 런타임), 그리고 개발할 때 쓰는 nvcc 컴파일러.
+  - Level 1: OS Driver (NVIDIA Display Driver)
+
+<br/>
+
+  - 그래픽카드 하드웨어(인텔,amd,엔비디아 등)
+    - 그래픽카드에게 명령하는 드라이버(인텔,amd,엔비디아 등)
+      - 그런데 이 드라이버까지는 그래픽카드사에서 제공해준다(여기에 어떤 api를 받을 수 있는지도 제조사에서 제공해야 한다)
+      - 그래픽카드 드라이버가 가지고 있는 api를 호출하는놈 -> CUDA 툴킷,DirectX 12
+        - CUDA 툴킷,DirectX 12 이 친구들을 사용하는 통로 -> cuDNN, DirectML
+        - cuDNN, DirectML을 사용하도록 판단하는 엔진 -> TensorRT, ML.NET, ONNX Runtime
+  - 내 C# 프로그램이 ➔ ONNX Runtime(엔진)에게 추론을 지시하면 ➔ 엔진이 DirectML(또는 cuDNN)의 수학 공식을 가져와 ➔ DirectX 12(또는 CUDA)라는 통로를 통해 ➔ NVIDIA 드라이버를 때려서 ➔ GPU 코어를 사용한다
 
 
 
+
+
+###### [해석과정](#해석과정)
+###### [Top](#top)
