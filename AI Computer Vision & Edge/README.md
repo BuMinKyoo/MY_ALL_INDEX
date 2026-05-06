@@ -26,12 +26,13 @@
     - .PT 확장자(파이토치) -> .ONNX 확장자로 포맷 변경
 - [Vision.LiveStream.Inference](https://github.com/BuMinKyoo/Vision.LiveStream.Inference/tree/main)
   - WPF (.NET 10) + ONNX Runtime 기반 실시간 RTSP 영상 객체 검출 학습 프로젝트. 선행 프로젝트 Vision.OnnxTester (정적 이미지 + YOLOv8) 의 검출 엔진을 베이스로, RTSP 스트림을 받아 실시간으로 추론하고 화면에 박스를 그리는 것이 목표
-  - CUDA Toolkit 11.X
+  - CUDA Toolkit 11.X  <- 환경변수
     - 호환 cuDNN 버전: cuDNN 8.x 시리즈 (주로 8.9.x 최신 버전)
-  - CUDA Toolkit 12.X
+  - CUDA Toolkit 12.X  <- 환경변수
     - 호환 cuDNN 버전: cuDNN 8.x 시리즈 및 cuDNN 9.x 시리즈
-  - CUDA Toolkit 13.X
+  - CUDA Toolkit 13.X  <- 환경변수
     - 호환 cuDNN 버전: cuDNN 9.x 시리즈 (최신 버전)
+    - C:\Program Files\NVIDIA\CUDNN\v9.21\bin\12.9\x64 <- 환경변수
 - [Vision.MultiStream.Inference](https://github.com/BuMinKyoo/Vision.MultiStream.Inference/tree/main)
 
 
