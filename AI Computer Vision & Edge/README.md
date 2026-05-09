@@ -39,6 +39,22 @@
     - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.2\bin\x64 <- 환경변수
     - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.2\bin <- 환경변수
 - [Vision.MultiStream.Inference](https://github.com/BuMinKyoo/Vision.MultiStream.Inference/tree/main)
+  - 비디오 :
+    - 큐: H.264 압축 (~50KB)
+    - ↓ avcodec_send_packet
+    - ↓ avcodec_receive_frame
+    - 디코더 출력: YUV420P (3MB)
+    - ↓ sws_scale (YUV→BGR)
+    - 변환 결과: BGR24 (6MB)
+  - 오디오 :
+    - 큐: AAC 압축 (~700B)
+    - ↓ avcodec_send_packet
+    - ↓ avcodec_receive_frame
+    - 디코더 출력: FLTP (8KB)
+    - ↓ swr_convert (FLTP→S16)
+    - 변환 결과: S16 (4KB)      
+
+
 
 
 
