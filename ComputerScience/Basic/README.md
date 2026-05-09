@@ -3194,7 +3194,20 @@ A. MFC (Microsoft Foundation Classes)는 Microsoft가 제공하는 C++ 클래스
       - s16le: Signed 16-bit, Little-Endian (윈도우 표준)
       - s16be: Signed 16-bit, Big-Endian
       - f32le: Float 32-bit, Little-Endian
-  - 오디오도 녹화가 되는 순간 압축이 되며 압축된 데이터를 받아서 실행할때는 압축을 풀어서 실행한다
+  - 오디오도 녹화가 되는 순간 압축이 되며 압축된 데이터를 받아서 실행할때는 압축을 풀어서 실행한다. 최신 코덱을(AAC, Opus, Vorbis등) 을 디코딩한다면 거의 항상 FLTP로나오게 된다
+  - 상세 과정
+    -  카메라/마이크 측 (송신)
+      -  1.마이크가 공기 압력 → 전기 신호 (아날로그)
+      -  2.ADC가 디지털 샘플로 변환  ← Raw PCM (압축 X, 너무 큼)
+      -  3.AAC 인코더가 압축  ← 6배 작아짐
+      -  4.비디오와 함께 RTP/RTSP로 패킷화 (먹싱)
+      -  5.네트워크로 송출
+    - 우리 프로그램 측 (수신)
+      -  6.RTSP로 받음
+      -  7.디먹싱 (av_read_frame) ← 비디오/오디오 스트림 분리
+      -  8.디코딩 (avcodec_receive_frame) ← FLTP raw로 압축 풀림
+      -  9.S16 stereo interleaved로 변환
+      -  10.WASAPI로 출력 (스피커)
 
 <br/>
 
