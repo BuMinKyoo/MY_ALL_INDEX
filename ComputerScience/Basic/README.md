@@ -130,7 +130,7 @@
 
 - [리버싱](#리버싱)
 - [DB연결](#db연결)
-- [영상데이터](#영상데이터)
+- [영상데이터,오디오데이터](#영상데이터오디오데이터)
 - [프로메테우스(Prometheus),그라파나(Grafana)](#프로메테우스prometheus그라파나grafana)
 - [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
 - [RabbitMQ,Apache Kafka,Amazon SQS](#rabbitmqapache-kafkaamazon-sqs)
@@ -3079,7 +3079,7 @@ A. MFC (Microsoft Foundation Classes)는 Microsoft가 제공하는 C++ 클래스
 
 ***
 
-# 영상데이터
+# 영상데이터,오디오데이터
   - 영상의 전체 흐름
     - 1.캡처(Capture)
       - 카메라 촬영 및 CCTV촬영할때 센서(CMOS)가 빛을 받아들여서 엄청나게 무거운 날것의 픽셀 데이터(Raw, YUV 등)를 만듬
@@ -3180,7 +3180,36 @@ A. MFC (Microsoft Foundation Classes)는 Microsoft가 제공하는 C++ 클래스
       - 트래픽을 크게 아낄 수 있습니다. 무선망을 쓰거나 네트워크 대역폭이 제한적인 환경에서 다수의 카메라를 연결할 때 필수적인 설정
       - 중간에 피프레임 하나가 네트워크에서 유실되면, 최대 2초 동안 다음 아이프레임이 올 때까지 화면 일부가 일그러지거나 이전 프레임의 잔상이 화면에 계속 남게 됩
 
-###### [영상데이터](#영상데이터)
+<br/>
+
+  - 오디오
+    - 해르츠 : 1초에 몇 번 측정? (Hz)
+      - 44.1kHz (44,100Hz)
+      - 48kHz (48,000Hz)
+    - Channel : 한 번 측정 시 몇 채널?
+      - 모노 (Mono, 1채널)
+      - 스테레오 (Stereo, 2채널)
+      - 서라운드 시스템 (다채널)
+    - 한 샘플당 몇 비트?(Bit Depth)
+      - s16le: Signed 16-bit, Little-Endian (윈도우 표준)
+      - s16be: Signed 16-bit, Big-Endian
+      - f32le: Float 32-bit, Little-Endian
+  - 오디오도 녹화가 되는 순간 압축이 되며 압축된 데이터를 받아서 실행할때는 압축을 풀어서 실행한다
+
+<br/>
+
+  -  오디오의 비트수(예시)
+    -  (44,100Hz)44100 x (스테레오2채널)2 x (s16le)2 = 176,400
+
+<br/>
+
+  - 오디오의 프레임
+    - 비디오가 1초에 24프레임 30프레임 60프레임 하는 것처럼 오디오도 프레임이 존재함(그래야지만 지연없이 소리를 들을 수 있게됨)
+    - 코덱별로 1프레임당 샘플 수가 다름
+      - AAC -> 1024
+      - MP3 -> 1152
+
+###### [영상데이터,오디오데이터](#영상데이터오디오데이터)
 ###### [Top](#top)
 
 <br/>
