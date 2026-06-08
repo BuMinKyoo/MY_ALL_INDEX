@@ -49,6 +49,7 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
   - [C](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/C)
   - [C++](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/C%2B%2B)
   - [C#](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/C%23)
+  - [Rust](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/Rust)
   - [JavaScript](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/JavaScript)
   - [HTML,CSS](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Language/HTML%2CCSS)
 
