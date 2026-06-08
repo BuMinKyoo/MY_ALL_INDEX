@@ -6,6 +6,7 @@
   - [Hello world](#hello-world)
   - [main,함수](#main함수)
   - [변수,상수](#변수상수)
+  - [데이터 타입](#데이터-타입)
 
 <br/>
 <br/>
@@ -183,5 +184,128 @@ fn sub_fn(){
 ###### [변수,상수](#변수상수)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# 데이터 타입
+  - 정수
+
+<br/>
+
+<img width="1132" height="523" alt="image" src="https://github.com/user-attachments/assets/a4ba393f-9a33-4231-9850-3a7ef3014b5a" />
+
+<br/>
+<br/>
+
+~~~rust
+fn main(){
+    //1. 가독성을 위해 숫자 사이에 _ 사용 가능
+    let a1 = 100_000;
+    let a2 = 100000;
+    println!("{} {}",a1,a2); //100000 100000
+
+    //2. 16진수
+    let b1 = 0xff;
+    let b2 = 15*16 + 15; 
+    println!("{} {}",b1,b2); //255 255
+
+    //3. 8진수
+    let c1 = 0o77;
+    let c2 = 7*8 + 7;
+    println!("{} {}",c1,c2); //63 63
+
+    //4. 이진수
+    let d1 = 0b1111_0000;
+    let d2 = 128+64+32+16;
+    println!("{} {}",d1,d2); //240 240
+
+    //5. 문자 아스키 값
+    let e1 = b'A'; //e1:u8
+    let e2 = 'A';  //e2:char
+    println!("{} {}", e1, e2); //65 A
+}
+~~~
+
+<br/>
+
+  - 부동소수점
+
+<img width="982" height="240" alt="image" src="https://github.com/user-attachments/assets/96c75cf5-500b-474a-983a-4f143c0f6db9" />
+
+<br/>
+<br/>
+
+~~~rust
+    let x = 2.0; // f64
+    let y: f32 = 3.0; // f32
+    println!("x={}, y={}",x,y);
+
+    let u:u32 = 40000;
+    let sqrt_u = (u as f64).sqrt();
+    println!("sqrt(u) = {}", sqrt_u);
+~~~
+
+<br/>
+
+  - 불 타입
+
+~~~rust
+let t1 = true;
+let t2:bool = false;
+
+if t1 {
+  ...
+}
+~~~
+
+<br/>
+
+  - 문자
+
+~~~rust
+let a = 'a';
+let z = 'z';
+
+println!("{}, {}", a,z);  //a, z
+~~~
+
+<br/>
+
+  - 튜플
+
+~~~rust
+fn main(){
+    let p:(&str, u32) = ("Lee", 20);
+    println!("name:{}, age={}",p.0, p.1);  //name:Lee, age=20
+    println!("{:?}",p);  //("Lee", 20)  // {:?}를 하면 전체 순회
+
+    let info = get_info();
+    println!("age:{}, height={}",info.0, info.1);  //age:20, height=60.5
+}
+
+fn get_info() -> (i32, f64){
+    let age = 20;
+    let height = 60.5;
+
+    return (age,height);
+}
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+###### [데이터 타입](#데이터-타입)
+###### [Top](#top)
 
 
