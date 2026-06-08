@@ -39,7 +39,11 @@
 ***
 
 # Hello world
-
+  - cargo new hello : hello 프로젝트 생성
+  - src폴더 안쪽에 main생성
+  - cargo run : main을 실행한다
+    - main함수 위쪽에 Run을 마우스로 클릭해도 실행됨
+  - 한번 run을 하면 exe가 생성되고, target -> debug폴더 안쪽에 생성됨
 
 
 
