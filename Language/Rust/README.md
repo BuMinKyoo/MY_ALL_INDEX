@@ -9,6 +9,7 @@
   - [데이터 타입](#데이터-타입)
   - [함수,매서드,매크로,클로저](#함수매서드매크로클로저)
   - [제어문(if,match,for,loop,while)](#제어문ifmatchforloopwhile)
+  - [컬렉션(vec,hashmap,hashset)](#컬렉션vechashmaphashset)
 
 <br/>
 <br/>
@@ -339,19 +340,15 @@ fn main(){
 ***
 
 # 함수,매서드,매크로,클로저
+ 
   - 함수선언은 fn으로 한다
-
 ~~~rust
+// 정의
 fn 함수이름(파라미터1 이름: 파라미터1 타입, 파라미터2 이름: 파라미터2 타입) -> 리턴 타입 {
   ...
-} 
-~~~
+}
 
-<br/>
-
-  - 기본형태
-
-~~~rust
+// 기본형태
  fn main() {
     println!("Hello, world!");
 
@@ -361,14 +358,9 @@ fn 함수이름(파라미터1 이름: 파라미터1 타입, 파라미터2 이름
 
 fn add(a:i32, b:i32) -> i32{
     return a+b;
-} 
-~~~
+}
 
-<br/>
-
-  - return을 사용하지 않고 함수의 맨 끝에 세미콜론 ; 없이 값이나 변수명을 적어 놓으면, 그 값이 리턴된다
-
-~~~rust
+// return을 사용하지 않고 함수의 맨 끝에 세미콜론 ; 없이 값이나 변수명을 적어 놓으면, 그 값이 리턴된다
 fn main() {
     println!("Hello, world!");
 
@@ -421,26 +413,27 @@ fn main(){
     - 클로저(closure)는 익명함수이다
 
 ~~~rust
+//정의
 let <변수명> = | <파라미터> | <표현식> ;
 
-   // 1. 클로저 "|x| x+1"를 변수 add_one에 할당해서 함수처럼 사용가능
-    let add_one = |x:i32| x+1;
-    println!("{}",add_one(2)); //3
+ // 1. 클로저 "|x| x+1"를 변수 add_one에 할당해서 함수처럼 사용가능
+  let add_one = |x:i32| x+1;
+  println!("{}",add_one(2)); //3
 
-    // 2. 함수와 달리 파라미터의 타입지정 안해도 됨. 자동 추정
-    let add_one = |x| x+1;
-    println!("{}",add_one(2)); //3
+  // 2. 함수와 달리 파라미터의 타입지정 안해도 됨. 자동 추정
+  let add_one = |x| x+1;
+  println!("{}",add_one(2)); //3
 
-    // 3. 파라미터가 없어도 된다. 
-    let print_hello = || println!("hello");
-    print_hello(); //hello
+  // 3. 파라미터가 없어도 된다. 
+  let print_hello = || println!("hello");
+  print_hello(); //hello
 
-    // 4. 바디는 {}로 감쌀 수 있다. 파라미터를 여러개 사용 가능
-    let divmod = |x:i32, y:i32| { 
-        let q = x / y;   let r = x % y; 
-        return (q,r);
-    };
-    println!("{:?}",divmod(10,3)); //(3,1)
+  // 4. 바디는 {}로 감쌀 수 있다. 파라미터를 여러개 사용 가능
+  let divmod = |x:i32, y:i32| { 
+      let q = x / y;   let r = x % y; 
+      return (q,r);
+  };
+  println!("{:?}",divmod(10,3)); //(3,1)
 
 ~~~
 
@@ -510,21 +503,17 @@ fn get_val(v:&Vec<i32>, idx:usize) -> i32 {
 ***
 
 # 제어문(if,match,for,loop,while)
+
   - if나 else 다음에 있는 중괄호는 무조건 작성해야 한다
-
 ~~~rust
-  if <조건식> {
-      ...
-  }else {
-      ...
-  }
-~~~
+//정의
+if <조건식> {
+    ...
+}else {
+    ...
+}
 
-<br/>
-
-  - 기본형태 if문
-
-~~~rust
+// 기본형태 if문
 fn main(){
     // 1. 전형적인 if~else 표현식
     let n = 5;
@@ -627,6 +616,7 @@ fn main() {
   - for문
 
 ~~~rust
+// 정의
 for <변수> in <시작되는 값>..=<마지막 값> {
   ...
 }
@@ -648,13 +638,7 @@ for i in 1..101{
 }
 println!("sum = {}",sum);
 
-~~~
-
-<br/>
-
-  - for문 안에서의 break
-
-~~~rust
+// for문 안에서의 break
 let a = [2,4,10, 60, 61];
 let mut sum = 0;
 for i in a {
@@ -662,13 +646,8 @@ for i in a {
     sum += i; 
 }
 println!("sum={}",sum);  //16
-~~~
 
-<br/>
-
-  - 이중 for 루프에서의 break
-
-~~~rust
+// 이중 for 루프에서의 break
 #[test]
 fn test6(){
     let mut v:Vec<(i32,i32)> = Vec::new();
@@ -681,13 +660,8 @@ fn test6(){
     }
     println!("{:?}",v); //[(2, 2), (2, 3), (2, 4), (3, 2), (3, 3), (3, 4)]
 }
-~~~
 
-<br/>
-
-  - 레이블 사용하여 for문 벗어나기
-
-~~~rust
+// 레이블 사용하여 for문 벗어나기
 fn test7(){
     let mut v:Vec<(i32,i32)> = Vec::new();
     'label_i: for i in 2..=10{       
@@ -780,6 +754,50 @@ fn main() {
 ###### [제어문(if,match,for,loop,while)](#제어문ifmatchforloopwhile)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# 컬렉션(vec,hashmap,hashset)
+  
+  
+  - 벡터선언
+
+~~~rust
+//벡터의 선언, push
+let mut v:Vec<i32> = Vec::new();
+v.push(1); v.push(2);
+println!("{:?}",v);  //[1,2]
+
+// 매크로를 사용한 벡터의 선언
+//vec! 매크로 이용 벡터 생성
+let v = vec![5,6,7];
+println!("{:?}",v);  //[5,6,7]
+
+let v = vec![1;5];
+println!("{:?}",v);  //[1, 1, 1, 1, 1]
+
+// 이미 만들어져 있는 배열을 벡터로 바꾸기
+//array를 벡터로 전환하기
+let arr = [3,4];
+let v = arr.to_vec();
+println!("{:?}",v);  //[3,4]
+
+//벡터에 어떤 배열값을 추가
+let mut v = vec![1,2,3];
+v.extend([4,5,6,7]);
+println!("{:?}",v); //[1, 2, 3, 4, 5, 6, 7]
+~~~
+
+<br/>
+
+  - 백터 접근
+
+
+
+###### [컬렉션(vec,hashmap,hashset)](#컬렉션vechashmaphashset)
+###### [Top](#top)
 
 
 
