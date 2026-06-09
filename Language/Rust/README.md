@@ -8,6 +8,7 @@
   - [변수,상수](#변수상수)
   - [데이터 타입](#데이터-타입)
   - [함수,매서드,매크로,클로저](#함수매서드매크로클로저)
+  - [제어문](#제어문)
 
 <br/>
 <br/>
@@ -500,11 +501,142 @@ fn get_val(v:&Vec<i32>, idx:usize) -> i32 {
 }
 ~~~
 
-
-
 ###### [함수,매서드,매크로,클로저](#함수매서드매크로클로저)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# 제어문
+  - if나 else 다음에 있는 중괄호는 무조건 작성해야 한다
+
+~~~rust
+  if <조건식> {
+      ...
+  }else {
+      ...
+  }
+~~~
+
+<br/>
+
+  - 기본형태 if문
+
+~~~rust
+fn main(){
+    // 1. 전형적인 if~else 표현식
+    let n = 5;
+    if n > 5 {
+        println!("larger than 5");
+    }else {
+        println!("less than 5");
+    }
+
+    //2. 한줄에 표현
+    if n > 5 { println!("larger than 5");}
+    else { println!("less than 5");}
+
+    //3. 에러
+    //if n { println! ("do something"); }
+
+    //4. if가 조건식(expression)임을 이용
+    let c = if n > 5 { n+1__WD_MARK_CLOSE__ } else { n-1__WD_MARK_CLOSE__ };
+    println!("c={}",c); // 4
+}
+~~~
+
+<br/>
+
+  - match
+    - C나 Java의 switch와 유사하다. 비교하는 값이 여러 개일 때 사용한다
+
+~~~rust
+ //1. 변수 값에 따른 matching
+  let x = 1;
+  match x {
+      1 => println!("one"),
+      2 => println!("two"),
+      3 => println!("three"),
+      _ => println!("anything"),    // 지정된 조건이 아닌 모든 것에 대해서는 이렇게 처리
+  }
+
+  //2. 변수 범위에 따른 matching
+  let age:u32 = 30;
+  let group = match age {
+      0..=10__WD_MARK_CLOSE__ => "baby",     
+      11..=20 => "teen",
+      21..=60 => "adult",
+      _ => "old",
+  };   //let group = ...; 형태의 statement라서 ; 있어야 함  
+
+  //3. 변수의 타입에 따른 matching
+  let c = '5';
+  let num = match c.to_digit(10){  //to_digit는 Option 타입 리턴
+      Some(n) => n,
+      None => 0__WD_MARK_CLOSE__,
+  };
+
+  //4. 튜플에 대한 matching
+  let n = 33;
+  match (n%3, n%5) {
+      (0, 0) => println!("3과 5의 배수"),
+      (0, _) => println!("3의 배수"),
+      (_, 0) => println!("5의 배수"),
+      (_, _) => println!("3의 배수도 5의 배수도 아님"),
+  }
+~~~
+
+<br/>
+
+  - if let 표현식 : match 패턴의 간략 표현식
+
+~~~rust
+fn main() {
+
+    // 간략 표현식이지만, 실패했을 때 그냥 자연스럽게 넘어가는것
+    let c = '6';
+    if let Some(num) = c.to_digit(10) {
+        println!("num={}",num); //num=6
+    }
+
+
+    // 실패했을때 어떻게 할지 정할 수 있다.
+    let d: char = '5';
+    let num = match d.to_digit(20){
+        Some(number) => number,
+        None => 0,
+    };
+    println!("num={}",num); //num=5
+}
+
+//ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+// 간략 패턴을 아래와 같이 if else로 표현할 수도 있따
+
+    let mut sum = 0;
+
+    let c = '6';
+    if let Some(num) = c.to_digit(10) {
+        println!("num={}",num); //num=6
+    }else{
+        println!("errro"); 
+    }
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+###### [제어문](#제어문)
+###### [Top](#top)
 
 
 
