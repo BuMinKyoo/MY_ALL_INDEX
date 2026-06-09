@@ -794,6 +794,70 @@ println!("{:?}",v); //[1, 2, 3, 4, 5, 6, 7]
 
   - 백터 접근
 
+~~~rust
+//벡터 원소 접근하기
+let v = vec![5,6,7];
+println!("v[0]={}", v[0]);
+println!("last element={}", v[v.len()-1]);
+
+
+//get 이용한 접근
+//get을 이용해 접근 하면 v[3]과 v.get(3)은 동일하게 벡터 v에 있는 4 번째 원소에 접근한다.
+//차이는, v[3]으로 했을 때 만약 벡터 v의 크기가 3이라면 프로그램은 panic에 빠진다. 같은 조건에서 v.get(3)을 하면 None을 리턴한다
+let v = vec![1,2,3];
+// println!("{}",v[3]);  //panic 발생
+println!("{:?}", v.get(3));  //None 출력
+
+if let Some(n) = v.get(1) {
+    println!("v.get(1)={}",n);
+    }
+
+
+// 반복자로 접근하기
+//레퍼런스로 접근하기
+for a in &v{ print!("{} ",*a); }  //5 6 7   // for a in v.iter()
+println!("");
+
+for a in &v{ print!("{} ",a); }  //5 6 7  print! 매크로는 레퍼런스 변수에 대해서도 안의 내용을 출력함
+println!("");
+
+//소유권 이동
+for a in v{ print!("{} ",a); }  //5 6 7   // for a in v.into_iter()
+println!("");
+
+//println!("{}",v[0]); //error
+~~~
+
+<br/>
+
+  - 벡터 값 변경
+
+~~~rust
+let mut v = vec![1,2,3];
+for i in 0..v.len() { v[i] *= 2; }
+println!("{:?}",v);  //2,4,6
+
+
+// mutable 반복자 이용: &mut v
+let mut v = vec![1,2,3];
+for a in &mut v { *a *= 2; }
+println!("{:?}",v);  //2,4,6
+// 참조자(레퍼런스)로 나오기 때문에, 해당 원소의 값에 접근하려면 *a라고 해줘야 한다
+
+
+// mutalble 반복자 이용 : v.iter_mut()
+let mut v = vec![1,2,3];
+for a in v.iter_mut() { *a *= 2;}
+println!("{:?}",v);  //2,4,6
+
+
+// Iterator Adapter 이용
+let mut v = vec![1,2,3];
+v.iter_mut().for_each(|a| *a *= 2 );
+println!("{:?}",v);  //2,4,6
+~~~
+
+
 
 
 ###### [컬렉션(vec,hashmap,hashset)](#컬렉션vechashmaphashset)
