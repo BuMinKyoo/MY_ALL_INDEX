@@ -8,7 +8,7 @@
   - [변수,상수](#변수상수)
   - [데이터 타입](#데이터-타입)
   - [함수,매서드,매크로,클로저](#함수매서드매크로클로저)
-  - [제어문](#제어문)
+  - [제어문(if,match,for,loop,while)](#제어문ifmatchforloopwhile)
 
 <br/>
 <br/>
@@ -509,7 +509,7 @@ fn get_val(v:&Vec<i32>, idx:usize) -> i32 {
 
 ***
 
-# 제어문
+# 제어문(if,match,for,loop,while)
   - if나 else 다음에 있는 중괄호는 무조건 작성해야 한다
 
 ~~~rust
@@ -624,20 +624,104 @@ fn main() {
     }
 ~~~
 
+  - for문
+
+~~~rust
+for <변수> in <시작되는 값>..=<마지막 값> {
+  ...
+}
+
+//ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+let mut sum=0;  //값 변경이 필요한 변수는 mut 키워드를 사용해야한다. 
+for i in 1..=100{
+  sum += i;
+}
+println!("sum = {},sum);
+
+//ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+// 위의 코드는 아래의 코드와 동일하다
+
+let mut sum=0;
+for i in 1..101{
+  sum += i;
+}
+println!("sum = {}",sum);
+
+~~~
+
+<br/>
+
+  - for문 안에서의 break
+
+~~~rust
+let a = [2,4,10, 60, 61];
+let mut sum = 0;
+for i in a {
+    if i > 50 {break;}
+    sum += i; 
+}
+println!("sum={}",sum);  //16
+~~~
+
+<br/>
+
+  - 이중 for 루프에서의 break
+
+~~~rust
+#[test]
+fn test6(){
+    let mut v:Vec<(i32,i32)> = Vec::new();
+    for i in 2..=10{
+        if i >= 4 {break; }  // for i 루르플 벗어난다. 
+        for j in 2..=10{
+            if j >= 5 {break;}  // for j 루프를 벗어난다. 
+            v.push((i,j)); 
+        }
+    }
+    println!("{:?}",v); //[(2, 2), (2, 3), (2, 4), (3, 2), (3, 3), (3, 4)]
+}
+~~~
+
+<br/>
+
+  - 레이블 사용하여 for문 벗어나기
+
+~~~rust
+fn test7(){
+    let mut v:Vec<(i32,i32)> = Vec::new();
+    'label_i: for i in 2..=10{       
+        for j in 2..=10{
+            if j >= 5 {break 'label_i;}
+            v.push((i,j)); 
+        }
+    }
+    println!("{:?}",v); //[(2, 2), (2, 3), (2, 4)]
+}
+~~~
+
+<br/>
+
+  - collection 객체 전체 돌리기
+
+~~~rust
+let v = vec![1,2,3,4,5];
+for val in v.iter() {  //v.iter()를 사용했다.
+    print!("{} ", val); // 1 2 3 4 5 
+}
+
+println!("");
+
+for val in &v {   //for 루프에서는 벡터의 iterator가 자동으로 나온다. 
+    print!("{} ", val); // 1 2 3 4 5 
+}
+~~~
 
 
 
 
-
-
-
-
-
-
-
-###### [제어문](#제어문)
+###### [제어문(if,match,for,loop,while)](#제어문ifmatchforloopwhile)
 ###### [Top](#top)
-
 
 
 
