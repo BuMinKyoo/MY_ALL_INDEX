@@ -717,8 +717,65 @@ for val in &v {   //for 루프에서는 벡터의 iterator가 자동으로 나�
 }
 ~~~
 
+<br/>
+
+  - loop사용하기
+    - loop는 조건식이 없는 루프 명령어다. 일단 loop 안의 코드가 실행되고, 루프를 벗어나는 break; 키워드가 없으면 무한으로 돈다. 강제로 멈추게 하려면 'Ctrl-C'를 누르면 된다.
+
+~~~rust
+fn main() {
+    let mut i = 1; 
+    loop {
+        if i > 10 { break; } 
+        println!("{}", i);         
+        i += 1;
+    }
+}
 
 
+///ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+fn main(){
+    let p = max_factor(10);
+    println!("max_factor = {}", p); //max_factor=5
+}
+
+fn max_factor(mut n:u64) -> u64{   
+    let mut p = 2;  // 2부터 나눌 것임   
+    loop{                         
+        let (q, r) = (n/p, n%p);        
+
+        if q==1 { break;}  // n/p==1 이면 루프 벗어남. 즉, p==n
+
+        if r == 0 { n = q;  }  // n%p==0. 즉, p로 나눠떨어지는 경우
+        else      { p += 1; }      
+    }
+    return n;
+}
+~~~
+
+<br/>
+
+  - whhile문
+    - 뒤의 조건식이 참인 경우에만 진행
+
+~~~rust
+while <조건식> {
+  do_something();
+}
+
+//ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+fn main() {
+    let mut sum = 0;
+    let mut i = 1;
+
+    while i <= 100__WD_MARK_CLOSE__ {
+        sum += i;   i += i ;
+    } 
+    println!("sum: {}", sum);
+}
+~~~
 
 ###### [제어문(if,match,for,loop,while)](#제어문ifmatchforloopwhile)
 ###### [Top](#top)
