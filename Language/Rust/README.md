@@ -421,7 +421,85 @@ fn main(){
 
 ~~~rust
 let <변수명> = | <파라미터> | <표현식> ;
+
+   // 1. 클로저 "|x| x+1"를 변수 add_one에 할당해서 함수처럼 사용가능
+    let add_one = |x:i32| x+1;
+    println!("{}",add_one(2)); //3
+
+    // 2. 함수와 달리 파라미터의 타입지정 안해도 됨. 자동 추정
+    let add_one = |x| x+1;
+    println!("{}",add_one(2)); //3
+
+    // 3. 파라미터가 없어도 된다. 
+    let print_hello = || println!("hello");
+    print_hello(); //hello
+
+    // 4. 바디는 {}로 감쌀 수 있다. 파라미터를 여러개 사용 가능
+    let divmod = |x:i32, y:i32| { 
+        let q = x / y;   let r = x % y; 
+        return (q,r);
+    };
+    println!("{:?}",divmod(10,3)); //(3,1)
+
 ~~~
+
+<br/>
+
+  - 클로저는 같은 스코프에 있는 변수를 접근 가능하다
+
+~~~rust
+fn main(){
+    let num = 100;
+    let add_num = |x| x+num;
+    println!("{}", add_num(5)); //105
+}
+~~~
+
+<br/>
+
+  - 예제 : 벡터의 값을 읽는 get 메서드를 이용해서 어떤 벡터와 인덱스를 주면, 해당 인덱스에 있는 벡터의 원소값을 리턴하는 함수를 작성하시오. 만약 해당 인덱스에 값이 없으면 첫 번째 있는 원소를 리턴하고, 첫 번째 원소도 없다면 0을 리턴하시오.
+
+~~~rust
+/// 클로저가 있는 경우
+fn main(){
+    let v = vec![1,2,3];
+    assert_eq!(1, get_val(&v, 3)); 
+    assert_eq!(3, get_val(&v, 2)); 
+
+    let v:Vec<i32> = Vec::new();
+    assert_eq!(0, get_val(&v, 1));    
+}
+
+fn get_val(v:&Vec<i32>, idx:usize) -> i32 {
+    let val = v.get(idx).unwrap_or_else(||{
+        if v.get(0).is_some() {&v[0]}
+        else {&0}
+    });
+    return *val;
+}
+
+/// 클로저가 없는 경우
+fn main(){
+    let v = vec![1,2,3];
+    assert_eq!(1, get_val(&v, 3)); 
+    assert_eq!(3, get_val(&v, 2)); 
+
+    let v:Vec<i32> = Vec::new();
+    assert_eq!(0, get_val(&v, 1));    
+}
+
+fn get_val(v:&Vec<i32>, idx:usize) -> i32 {
+    let val = match v.get(idx) {
+        Some(x) => x,
+        None => {
+            if v.get(0).is_some() {&v[0]}
+            else {&0}
+        },
+    };
+    return *val;
+}
+~~~
+
 
 
 ###### [함수,매서드,매크로,클로저](#함수매서드매크로클로저)
