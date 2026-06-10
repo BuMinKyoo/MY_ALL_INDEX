@@ -10,6 +10,7 @@
   - [함수,매서드,매크로,클로저](#함수매서드매크로클로저)
   - [제어문(if,match,for,loop,while)](#제어문ifmatchforloopwhile)
   - [컬렉션(vec,hashmap,hashset)](#컬렉션vechashmaphashset)
+  - [문자열](#문자열)
 
 <br/>
 <br/>
@@ -857,11 +858,132 @@ v.iter_mut().for_each(|a| *a *= 2 );
 println!("{:?}",v);  //2,4,6
 ~~~
 
+<br/>
+
+  - 벡터를 스택으로 사용하기
+
+~~~rust
+let mut s:Vec<i32> = Vec::new();
+
+s.push(0);  s.push(1); s.push(2);
+while s.len() > 0 {
+    let i = s.pop().unwrap();
+    println!("pop:{}",i);
+}    
+~~~
+
+<br/>
+
+  - 해시맵
+    - Key - Value 형태의 데이터 구조
+
+~~~rust
+use std::collections::HashMap;
+
+fn main(){
+    let mut map:HashMap<&str, i32> = HashMap::new();
+    map.insert("Jeff", 100);
+    map.insert("Tom", 90);
+    println!("{:?}",map);  //{"Tom": 90, "Jeff": 100}
+}
+~~~
+
+<br/>
+
+  - 해시맵 접근하기
+~~~rust
+let map = HashMap::from([
+    ("Jeff", 100), ("Tom", 90), ("Josh", 80),
+]);
+
+// Key를 지정해서 get
+println!("Jeff's score:{}", map.get("Jeff").unwrap());  //Jeff's score:100
+
+// HashMap에 있는 모든 Key-Value
+for (k, val) in &map {
+    println!("{}: {}", k, val);
+}
+
+// Key를 얻어낸 후 Value 액세스
+for k in map.keys(){
+    if k.starts_with("J") {print!("{} ", map.get(k).unwrap()); }
+}
+~~~
+
+<br/>
+
+  - 해시맵 데이터 갱신
+~~~rust
+use std::collections::HashMap;
+fn main(){
+    let mut map = HashMap::from([
+        ("Jeff", 100), ("Tom", 90), ("Josh", 80),
+    ]);
+
+    //덮어쓰기
+    map.insert("Jeff", 50);
+    println!("{:?}",map);  //{"Josh": 80, "Tom": 90, "Jeff": 50}
+}
+~~~
+
+<br/>
+
+  - 해시셋
+    - 중복되지 않는 데이터로 관리 된다
+
+~~~rust
+//생성하기, 넣기
+let mut set = HashSet::new();
+
+set.insert(1); set.insert(2); set.insert(3);
+set.insert(3); set.insert(4); set.insert(5);
+println!("{:?}",set);  //{1, 3, 4, 5, 2}
 
 
+// 배열로 부터 해시셋 만들기
+//배열로부터 생성
+let set = HashSet::from([1,2,3,3,4,5]);
+println!("{:?}",set);  //{1, 3, 2, 4, 5}
+
+~~~
 
 ###### [컬렉션(vec,hashmap,hashset)](#컬렉션vechashmaphashset)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 문자열
+
+
+
+
+
+
+###### [문자열](#문자열)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
