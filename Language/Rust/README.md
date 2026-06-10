@@ -11,6 +11,7 @@
   - [제어문(if,match,for,loop,while)](#제어문ifmatchforloopwhile)
   - [컬렉션(vec,hashmap,hashset)](#컬렉션vechashmaphashset)
   - [문자열](#문자열)
+  - [반복자](#반복자)
 
 <br/>
 <br/>
@@ -1011,15 +1012,243 @@ let num4: &str = &phone_num[8..];   // 문자열 슬라이스(String Slice)
 ###### [문자열](#문자열)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# 반복자
+
+~~~rust
+iter() : 반복자에 의해 접근되는 원소들의 레펀런스가 넘어온다. 소유권이 이동되는 것이 아니다. 따라서, iter()에 의한 반복자로 원소들을 사용하고 난 후에도, 해당 컬렉션에 대한 사용이 가능하다. 컬렉션의 소유권이 이동하지 않았기 때문이다.
+into_iter() : 컬렉션 자체가 넘겨져서, 소유권이 넘어가 버리기에, into_iter()를 수행하고 난 후에는, 해당 컬렉션 변수로의 접근이 안된다.
+iter_mut(): 컬렉션의 값을 수정해야할 때 사용한다. 레퍼런스로 받은 다음에 수정하는 것이다. 소유권이 넘어가지는 않는다.
+
+// iter()
+#[test]
+fn iter_test(){
+    let v = vec![1,2,3,4,5];
+    for val in v.iter() {  //v.iter()를 사용했다.
+        print!("{} ", val); // 1 2 3 4 5 
+    }
+
+    println!("");
+
+    for val in &v {   //for 루프에서는 벡터의 iterator가 자동으로 나온다. 
+        print!("{} ", val); // 1 2 3 4 5 
+    }
+}
+ /// 이 때 벡터에 대한 접근은 reference로 하기 때문에 소유권이 넘어가지 않는다. 즉, 그 아래 편 코드에서 벡터 v에 대해서 다시 접근하더라도 문제 없다
+
+// into_iter()
+#[test]
+fn into_iter_test(){
+    let v = vec![1,2,3,4,5];
+    for val in v.into_iter() {  //into_iter()를 사용했다. 소유권이 넘어간다.
+        print!("{} ", val); // 1 2 3 4 5 
+    }
+
+    println!("");
+
+    for val in &v {   //여기서 에러 발생한다. 위에서 v.into_iter()에 의해 소유권이 넘어갔기 때문.
+        print!("{} ", val); // 1 2 3 4 5 
+    }
+}
+ /// v.into_iter()에 의해 벡터 v에 대한 소유권이 넘어갔기에, 다시 v에 대한 접근을 하는 for in &v에서 에러가 발생
+
+
+// iter_mut()
+#[test]
+fn iter_mut_test(){
+    let mut v = vec![1,2,3,4,5];
+    for x in v.iter_mut(){
+        *x += 1;   //borrow한 것이기에 *를 붙여야 된다.
+    } 
+    println!("{:?}",v);   // [2,3,4,5,6]
+
+    for val in &v {   //동작 가능하다. iter_mut()에 의해 소유권이 넘어가지 않기 때문
+        print!("{} ", val); // 2,3,4,5,6 
+    }
+}
+~~~
+
+  - 반복자의 메서드
+    - for_each: 루프를 돌려서 값들을 변경하고 그냥 종결해도 될 때
+    - map: 루프를 돌려서 값들을 변경하고, 변경된 값을 이용해서 다시 무언가를 해야할 때
+
+<br/>
+
+  - 반복자의 메서드
+
+~~~rust
+//////////
+collect() : iterator의 내용을 collection으로 만든다. 어떤 컬렉션으로 만들지는 지정해줘야한다.
+sum() : iterator의 내용을 합한 결과를 리턴. 결과가 어떤 타입(u32 등)일 지는 지정해줘야 한다.
+max() : 최댓값을 리턴. 타입 지정 필요
+min() : 최솟값을 리턴. 타입 지정 필요
+count() : iterator의 원소 개수 리턴
+product() : iterator의 각 원소를 곱한 결과를 리턴. 타입 지정 필요
+//////////
+~~~
+
+<br/>
+
+  - map
+~~~rust
+// 벡터에 있는 모든 값을 읽어서 1씩 더한 후, 그 결괏값을 다른 벡터로 저장한다고 할때
+fn map_test(){
+    let v = vec![1,2,3,4,5];
+    let v1:Vec<_> = v.iter().map(|&x| x+1).collect();
+
+    println!("v={:?}",v);  //v=[1, 2, 3, 4, 5]
+    println!("v1={:?}",v1);  //v1=[2, 3, 4, 5, 6]
+}
 
 
 
+#[test]
+fn map_test(){
+    // 1. 각 원소에 대해 2을 곱해서 다른 벡터로 만듦
+    let v = vec![1,2,3,4,5];
+    let v1:Vec<_> = v.iter().map(|x| (*x)*2).collect();
+    println!("{:?}",v1);  //[2, 4, 6, 8, 10]
+
+    // map(|x| x*2): 이렇게 해도 됨. 간단.
+    let v2:Vec<_> = v.iter().map(|x| x*2).collect();  
+    println!("{:?}",v2); //[2, 4, 6, 8, 10]
+
+    // into_iter()을 써도 됨
+    let v = vec![1,2,3,4,5];
+    let v1:Vec<_> = v.into_iter().map(|x| x*2).collect();
+    println!("{:?}",v1);  //[2, 4, 6, 8, 10]
+
+    // collect::<Vec<u32>>()와 같이 해도 됨
+    let v = vec![1,2,3,4,5];
+    let v1 = v.iter().map(|x| (*x)*2).collect::<Vec<u32>>();
+    println!("{:?}",v1);  //[2, 4, 6, 8, 10]
+
+    //2. 문자열을 모두 소문자로 변환
+    let words:Vec<&str> = vec!["Hello", "Good Morning", "Hi"];
+    let low_words:Vec<String> = words.iter().map(|w| w.to_lowercase()).collect();
+    println!("{:?}",low_words);  //["hello", "good morning", "hi"]        
+
+    //3. 문자열에서, 각 문자에 대해 문자열에서 해당 문자의 개수를 HashMap으로 저장. (ch: cnt)
+    use std::collections::HashMap;
+    let s = "abc aaa bb c";
+    let map:HashMap<char,usize> = "abc".chars()
+        .map(|c| (c,s.matches(c).count()))
+        .collect::<HashMap<char,usize>>();
+    println!("{:?}",map);  //{'a': 4, 'c': 2, 'b': 3}
+
+    // (참조)어떤 문자열에서 알파벳만을 집합으로 뽑아낼 때
+    use std::collections::HashSet;
+    let s = "abc aaa bb c";
+    let set = s.chars()
+        .filter(|c| c.is_alphabetic())        
+        .collect::<HashSet<_>>();        
+    println!("{:?}",set);  //{'c', 'a', 'b'}
+}
+~~~
+
+<br/>
+
+  - filter
+
+~~~rust
+// 원소 중 짝수인 것만을 추려서 벡터로 만드는 코드
+#[test]
+fn filter_test(){
+    let v = vec![1,2,3,4,5];
+    let v1:Vec<_> = v.iter().filter(|&&x| x%2==0__WD_MARK_CLOSE__).collect();
+
+    println!("v={:?}",v);  //v=[1, 2, 3, 4, 5]
+    println!("v1={:?}",v1);  //v1=[2, 4]
+}
 
 
+#[test]
+fn filter_test(){
+    //1. 모든 원소 중 짝수인 원소만 추려서 벡터로 만듦
+    let v = vec![1,2,3,4,5];
+    let v1:Vec<_> = v.iter().filter(|x| *x%2==0).collect();
+    println!("{:?}",v1); //[2, 4]
+
+    //into_iter()를 써도 됨
+    let v = vec![1,2,3,4,5];
+    let v1:Vec<_> = v.into_iter().filter(|x| x%2==0).collect();
+    println!("{:?}",v1); //[2, 4]
+
+    //2. 10이상이면서 홀수인 원소만 추려서 벡터로 만듦
+    let v = vec![1,2,3,10,11,12,13];
+    let v1:Vec<_> = v.iter().filter(|x| (*x)>=(&10) && (*x)%(&2)==1).collect();
+    println!("{:?}",v1); //[11, 13]
+
+    //"**x>=10 && **x%2==1"와 같이 해도 됨. 더블 * 사용
+    let v = vec![1,2,3,10,11,12,13];
+    let v1:Vec<_> = v.iter().filter(|x| **x>=10 && **x%2==1).collect();
+    println!("{:?}",v1); //[11, 13]
+
+    //into_iter()를 써도 됨
+    let v = vec![1,2,3,10,11,12,13];
+    let v1:Vec<_> = v.into_iter().filter(|x| x>=&10 && x%2==1).collect();
+    println!("{:?}",v1); //[11, 13]
+}
+
+~~~
+
+<br/>
+
+  - filter_map
+
+~~~rust
+let a = ["1", "two", "NaN", "four", "5"];
+
+#[test]
+fn filter_map_test(){
+    let a = ["1", "two", "NaN", "four", "5"];
+    let v:Vec<_> = a.iter().map(|s| s.parse::<i32>()).filter(|s| s.is_ok()).map(|s| s.unwrap()).collect();
+
+    println!("v={:?}",v);   //v=[1, 5]
 
 
+// 첫 번째 map에서 문자열에 대해 parsing 시도를 하고,
+// parsing 시도에서 ok된 것만을 filtering해서,
+// 그것들 만을 대상으로해서 unwrap()했다
 
 
+#[test]
+fn filter_map_test1(){
+    let a = ["1", "two", "NaN", "four", "5"];
+    let v:Vec<_> = a.iter().filter_map(|s| s.parse::<i32>().ok()).collect();
+
+    println!("v={:?}",v); //v=[1, 5]
+} 
+~~~
+
+<br/>
+
+  - for_each
+
+~~~rust
+#[test]
+fn for_each_test(){
+    //1. 각 원소에 대해 +1을 해서 업데이트
+    let mut v = vec![1,2,3,4,5];  
+    v.iter_mut().for_each(|x| *x += 1);     
+    println!("{:?}",v); //[2, 3, 4, 5, 6]
+
+    //2. 홀수 인덱스에는 1, 짝수 인덱스에는 0을 가지는 배열 만들기
+    let mut v = vec![1;10];
+    v.iter_mut()
+        .enumerate()
+        .filter(|(i,_)| *i % 2 == 0)
+        .for_each(|(_,val)| *val=0);
+    println!("{:?}",v); //[0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+}
+~~~
+
+###### [반복자](#반복자)
+###### [Top](#top)
 
 
 
