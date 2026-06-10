@@ -996,8 +996,17 @@ println!("c={}",c); // "foobar"
 
 ~~~
 
+<br/>
 
+  - 문자열
+~~~rust
+let person: &'static str = "Jeff";  //문자열 리터럴(String Literal)
+let phone_num: String = String::from("010-123-4567");  // String
+let num4: &str = &phone_num[8..];   // 문자열 슬라이스(String Slice)
 
+// phone_num는 소유하고 있기때문에 얘가 사라질때 힙헤제를 해야 하는것을 컴파일러가 작동 시켜 준다
+// &'static str 은 이 데이터는 프로그램이 종료되기 전까지 소멸되지 않는 데이터라는 의미
+~~~
 
 ###### [문자열](#문자열)
 ###### [Top](#top)
