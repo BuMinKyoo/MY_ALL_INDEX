@@ -956,8 +956,45 @@ println!("{:?}",set);  //{1, 3, 2, 4, 5}
 ***
 
 # 문자열
+  - &str은 str에 대한 레퍼런스란 의미다. str은 고정된 문자열이고 프로그램 바이너리의 어딘가에 위치하고 있다가 프로그램이 수행될 때 메모리에 로드된다. &str은 이 메모리의 위치를 가지키는 레퍼런스 타입
+  - &str은 고정된 문자열을 다루는 타입인데 반해, String은 가변 크기 문자열을 다룬다
+
+~~~rust
+let s = "Hello, World";  /// s는 &str 타입 변수가 된다.
+
+let hello = String::from("Hello, world!")
+let s1 = "Hello, ".to_owned();
+let s2 = "world!".to_string();
+
+// 문자열 합치기
+let mut s = String::from("foo");
+s.push_str("bar");
+assert_eq!("foobar", s);
+
+// +오퍼레이션 이용
+let a: String = String::from("foo");
+let b: String = String::from("bar");
+let c = a + &b;
+// 변수 a의 소유권이 c로 이동되어 버렸다. 따라서 let c = a + &b;이후에는 더 이상 변수 a로의 접근을 할 수 없다
+// b는 대여를 해서 사용하는 형태이기에 let c = a + &b; 코드 이후에도 변수 b로의 접근은 문제 없다
+
+println!("c={}",c); // "foobar"
 
 
+// 편하게 format! 매크로를 사용하면 된다
+    // &String 이용
+    let c = format!("{}{}",&a,&b);
+    println!("c={}",c);
+
+    // &str 이용
+    let c = format!("{}{}","foo","bar");
+    println!("c={}",c);
+
+    // String 이용
+    let c = format!("{}{}",a,b);
+    println!("c={}",c);  
+
+~~~
 
 
 
