@@ -14,6 +14,7 @@
   - [반복자](#반복자)
   - [Rust특징 소유권](#rust특징-소유권)
   - [구조체](#구조체)
+  - [열거형Option,Result](#열거형optionresult)
 
 <br/>
 <br/>
@@ -1662,9 +1663,133 @@ fn max_distance(p1:&Point, p2:&Point, p3:&Point) -> f64 {
 
 ~~~
 
-
-
 ###### [구조체](#구조체)
+###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 열거형Option,Result
+
+~~~rust
+enum Gender {
+  Male,
+  Female
+}
+
+enum Gender {
+    Male,
+    Female
+}
+
+fn get_customer(id:i32) -> Gender {    
+    if id % 2 == 0 {return Gender::Male;}
+    return Gender::Female; 
+}
+
+fn main() {
+    let gender = get_customer(10);
+    match gender {
+        Gender::Male => println!("Male"),
+        Gender::Female => println!("Female"),
+    }
+}
+
+
+
+// 열거형을 타입체크로 사용하고 싶을떼
+enum Gender {
+    Male {name:String, is_military:bool},
+    Female {name:String}
+}
+
+fn get_customer(id:i32) -> Gender {    
+    if id % 2 == 0 {
+        return Gender::Male{name:"Jeff".to_owned(), is_military:true};
+    }
+    return Gender::Female {name:"Alice".to_owned()};
+}
+~~~
+
+<br/>
+
+  - 열거형(Option)
+
+~~~rust
+// 열거형 Option의 구조
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+
+use std::collections::HashMap;
+fn main(){
+    let map = HashMap::from([
+       ("Jeff", 80), ("Alice", 100), 
+    ]);
+
+
+// get에서 리턴된 Option 타입에서 값을 얻어내는 가장 간단한 방법은 unwrap()을 이용하는 것
+    let name = "Jeff";
+    let point = map.get(name).unwrap();
+    println!("{}'s point = {}", name, point);
+
+    // let name = "Bob";
+    // let point = map.get(name).unwrap();  //panic
+    // println!("{}'s point = {}", name, point);
+
+
+// None이 있을 수 있는 경우는 unwrap()를 사용하면 안되고 None에 대한 처리를 해줘야 한다
+    let name = "Jeff";
+    match map.get(name) {
+        Some(point) => println!("{}'s point = {}", name, point),
+        None => println!("There is no name of {}",name),
+    }
+
+    let name = "Jeff";
+    if let Some(point) = map.get(name) {
+        println!("{}'s point = {}", name, point);
+    }else {
+        println!("There is no name of {}",name);
+    } 
+}
+
+~~~
+
+<br/>
+
+  - 열거형(Result)
+    - Option은 "값이 없는 경우"를 위한 열거형이고, Result는 "에러가 발생한 경우"를 위한 열거형이다.
+
+~~~rust
+// 아래 코드와 같이 만들면 divmod(10,0)을 했을때 err가 난다
+fn main(){
+    let (q, r) = divmod(10,3);
+    println!("(quotient, remainder)={:?}",(q,r));  //(3,1)
+}
+
+// return (n/d, n%d)
+fn divmod(n:i32, d:i32) -> (i32, i32) {
+    (n/d, n%d)
+}
+
+
+// 위의 err를 막기 위해 아래와 같이 바꿀 수 있다
+fn divmod(n:i32, d:i32) -> Result<(i32, i32), String> {
+    if d==0 {
+        Err("can't divide by zero".to_owned())
+    }else {        
+        Ok((n/d, n%d))
+    }    
+}
+
+
+~~~
+
+###### [열거형Option,Result](#열거형optionresult)
 ###### [Top](#top)
 
 
