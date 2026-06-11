@@ -13,6 +13,7 @@
   - [문자열](#문자열)
   - [반복자](#반복자)
   - [Rust특징 소유권](#rust특징-소유권)
+  - [구조체](#구조체)
 
 <br/>
 <br/>
@@ -1482,9 +1483,189 @@ fn main(){
 ###### [Rust특징 소유권](#rust특징-소유권)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+***
+
+# 구조체
+
+~~~rust
+// 구조체 정의
+struct Student {
+    name: String,
+    point: i32,
+}
+
+// 구조체 인스턴스의 생성
+fn main() {
+    let s1 = Student {
+        name : "Jeff".to_owned(),
+        point : 80, 
+    };
+
+    println!("name={}, point={}", s1.name, s1.point);
+}
+
+// 구조체 접근
+struct Student {
+    name: String,
+    point: i32,
+}
+
+fn main() {
+    let s1 = Student {
+        name : "Jeff".to_owned(),
+        point : 80, 
+    };
+
+    println!("name={}, point={}", s1.name, s1.point);
+}
+
+// 쓰기가능 인스턴스 만들기
+let mut s1 = Student {
+        name : "Jeff".to_owned(),
+        point : 80, 
+    };
+
+
+#[derive(Debug)]
+struct Student {
+    name: String,
+    point: i32,
+}
+
+fn main() {
+    let mut s1 = Student {
+        name : "Jeff".to_owned(),
+        point : 80, 
+    };
+    s1.point = 100;
+
+    println!("{:?}", s1);
+    println!("name={}, point={}", s1.name, s1.point);
+}
+
+
+// 필드값을 편하게 지정하는 방법: 필드명과 동일한 변수 사용하기
+struct Student {
+    name: String,
+    point: i32,
+}
+
+fn main() {
+    let s1 = make_student("Jeff".to_owned(), 80);
+    println!("name={}, point={}", s1.name, s1.point);
+}
+
+fn make_student(name:String, point:i32) -> Student {
+    Student {
+        name: name,
+        point: point,
+    }
+}
+
+~~~
+
+<br/>
+
+  - 튜플구조체
+~~~rust
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+struct Color {
+  r:i32,
+  g:i32,
+  b;i32,
+}
+
+/////
+
+struct Point(i32,i32);
+
+fn main(){
+    let p1 = Point (0,0);
+    let p2 = Point(3,4);
+    let dist = cal_distance(&p1, &p2);
+    assert_eq!(5.0, dist);
+}
+
+fn cal_distance(p1:&Point, p2:&Point) -> f64 {    
+    (((p2.0-p1.0).pow(2) + (p2.1-p1.1).pow(2)) as f64).sqrt() 
+}
+
+~~~
+
+<br/>
+
+  - 연관함수, 메서드
+~~~rust
+// &self라는 변수가 없는 new는 연관함수이다 :: 으로 호출한다
+// &self있는 distance는 메서드 이며 . 으로 호출한다
+
+
+struct Point {
+    x: i32,    y: i32
+}
+
+impl Point {
+    fn new(x:i32, y:i32) -> Point{  //연관 함수
+        Point {x:x, y:y}
+    }
+
+    fn distance(&self, p:&Point) -> f64{  //메서드
+        (((p.x-self.x).pow(2) + (p.y-self.y).pow(2)) as f64).sqrt()
+    }
+}
+
+fn main(){
+    let p1 = Point::new(0,0);    let p2 = Point::new(3,4);  //연관함수의 사용
+    assert_eq!(5.0, p1.distance(&p2));  //메서드의 사용
+}
 
 
 
+/// 아래는 예시 코드
+struct Point {
+    x: i32,   y: i32
+}
+
+impl Point {
+    fn new(x:i32, y:i32) -> Point{
+        Point {x:x, y:y}
+    }
+
+    fn distance(&self, p:&Point) -> f64{
+        (((p.x-self.x).pow(2) + (p.y-self.y).pow(2)) as f64).sqrt()
+    }
+}
+
+fn main(){
+    let p1 = Point::new(0,0); 
+    let p2 = Point::new(3,4); 
+    let p3 = Point::new(-3,5);
+
+    let max = max_distance(&p1, &p2, &p3);
+    println!("max distance = {}", max);  //6.08276253029821
+}
+
+fn max_distance(p1:&Point, p2:&Point, p3:&Point) -> f64 {
+    let d1 = p1.distance(p2);
+    let d2 = p1.distance(p3);
+    let d3 = p2.distance(p3);
+
+    let mut max = d1;
+    if d2 > max {max=d2;}  if d3 > max {max=d3;}
+    return max;
+}
+
+~~~
+
+
+
+###### [구조체](#구조체)
+###### [Top](#top)
 
 
 
