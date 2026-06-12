@@ -15,6 +15,7 @@
   - [Rust특징 소유권](#rust특징-소유권)
   - [구조체](#구조체)
   - [열거형Option,Result](#열거형optionresult)
+  - [trait,정적바인딩,동적바인딩](#trait정적바인딩동적바인딩)
 
 <br/>
 <br/>
@@ -1791,6 +1792,208 @@ fn divmod(n:i32, d:i32) -> Result<(i32, i32), String> {
 
 ###### [열거형Option,Result](#열거형optionresult)
 ###### [Top](#top)
+
+
+<br/>
+<br/>
+
+***
+
+# trait,정적바인딩,동적바인딩
+  - trait은 인터페이스와 비슷하다고 생각하면 된다
+
+~~~rust
+trait Car {
+    fn drive(&self);
+}
+
+struct Truck {}
+
+impl Car for Truck{
+    fn drive(&self) { println!("Truck is driving."); }
+}
+
+struct SUV {}
+impl Car for SUV {
+    fn drive(&self) { println!("SUV is driving."); }
+}
+
+struct Sedan {}
+impl Car for Sedan {
+    fn drive(&self) { println!("Sedan is driving."); }
+}
+
+
+fn main() {
+    let car1 = Truck {};
+    car1.drive(); //Truck is driving.
+
+    let car2 = SUV {};
+    car2.drive(); //SUV is driving. 
+
+    let car3 = Sedan {};
+    car3.drive(); //Sedan is driving.
+}
+
+~~~
+
+  - 연산자 오버로딩을 할때도 사용한다
+
+~~~rust
+struct Point {
+    x:i32, y:i32
+}
+
+impl std::ops::Add for Point {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+fn main(){
+    let p1 = Point { x:2, y:3 };  let p2 = Point { x:4, y:5 };
+
+    let p3 = p1 + p2;   
+    println!("addition=({},{})",p3.x, p3.y); //plus=(6,8)  
+}
+~~~
+
+<br/>
+
+  - 정적바인딩
+~~~rust
+struct Human;
+struct Dog;
+
+trait Moving {
+    fn run(&self);
+}
+
+impl Moving for Human{
+    fn run(&self) { println!("A human is running."); }
+}
+
+impl Moving for Dog {
+    fn run(&self) { println!("A dog is running")}
+}
+
+fn run(x: impl Moving) {
+    x.run();
+}
+
+fn main() {
+    let tom = Human;
+    let hodu = Dog;
+
+    run(tom);
+    run(hodu);
+}
+
+
+/// 위의 코드에 덧붙여서
+fn who_moved_there() -> impl Moving {
+    let jeff = Human;
+    return jeff;
+}
+// 위에 것은 컴파일이 되는데
+fn find_runner(is_human: bool) -> impl Moving {
+    if is_human {
+        Human
+    }else {
+        Dog
+    }
+}
+// 이것은 컴파일이 안된다
+// 이유는 rust는 기본적으로 정적 바인딩이고 컴파일러가 저 함수로 부터 어떤 객체가 나와야 하는지 결정이 안되기 때문에
+// 저런것은 동적 바인딩을 사용해야 한다
+~~~
+
+  - 동적 바인딩
+~~~rust
+// 위쪽에서 에러가 났던 코드를
+fn find_runner(is_human: bool) -> impl Moving {
+    if is_human {
+        Human
+    }else {
+        Dog
+    }
+}
+
+// 이렇게 바꿔보자
+fn find_runner(is_human: bool) -> Box<dyn Moving> {
+    if is_human {
+        Box::new(Human)
+    }else {
+        Box::new(Dog)
+    }
+}
+
+
+// 아래는 전체 코드
+struct Human;
+struct Dog;
+
+trait Moving {
+    fn run(&self);
+}
+
+impl Moving for Human{
+    fn run(&self) { println!("A human is running."); }
+}
+
+impl Moving for Dog {
+    fn run(&self) { println!("A dog is running")}
+}
+
+fn run(x: impl Moving) {
+    x.run();
+}
+
+// fn run<T: Moving>(x: T) {
+//     x.run();
+// }
+
+fn who_moved_there() -> impl Moving {
+    let jeff = Human;
+    return jeff;
+}
+
+fn find_runner(is_human: bool) -> Box<dyn Moving> {
+    if is_human {
+        Box::new(Human)
+    }else {
+        Box::new(Dog)
+    }
+}
+
+fn main() {
+    let tom = Human;
+    let hodu = Dog;
+
+    run(tom);
+    run(hodu);
+
+    let w = who_moved_there();
+    run(w);    
+
+    let x = find_runner(true);
+    x.run();    
+}
+
+~~~
+
+
+
+###### [trait,정적바인딩,동적바인딩](#trait정적바인딩동적바인딩)
+###### [Top](#top)
+
+
+
 
 
 
