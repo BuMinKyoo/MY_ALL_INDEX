@@ -52,7 +52,15 @@
     - ↓ avcodec_receive_frame
     - 디코더 출력: FLTP (8KB)
     - ↓ swr_convert (FLTP→S16)
-    - 변환 결과: S16 (4KB)      
+    - 변환 결과: S16 (4KB)
+  - 최적화
+    - 1.어떤 모델을 쓸껀지
+    - 2.어떤 엔진을 쓸껀지
+      - onnx엔진 써서 -> cpu
+      - onnx엔진 써서 -> DirectML -> 엔비디아 그래픽 카드
+      - onnx엔진 써서 -> cuda -> 엔비디아 그래픽 카드
+      - TensorRT엔진 써서 -> cuda -> 엔비디아 그래픽 카드
+    - 3.코드를 어떻게 최적화 할껀지(속도 최적화 메모리 최적화)
 
 
 
