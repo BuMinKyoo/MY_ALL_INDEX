@@ -31,6 +31,7 @@
   - CUDA Toolkit 12.X  <- 환경변수
     - 호환 cuDNN 버전: cuDNN 8.x 시리즈 및 cuDNN 9.x 시리즈
       - cuDNN 8버전은 알집으로 풀어서 Toolkit쪽에 풀기
+      - cuDNN 9버전은 설치후 환경변수 적용
     - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\bin <- 환경변수
     - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\libnvvp <- 환경변수
   - CUDA Toolkit 13.X  <- 환경변수
