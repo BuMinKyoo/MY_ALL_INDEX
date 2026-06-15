@@ -62,6 +62,7 @@
       - onnx엔진 써서 -> cuda -> 엔비디아 그래픽 카드
       - TensorRT엔진 써서 -> cuda -> 엔비디아 그래픽 카드
     - 3.코드를 어떻게 최적화 할껀지(속도 최적화 메모리 최적화)
+  - TensorRT 10.5 GA for Windows 10, 11, Server 2019, Server 2022 and CUDA 12.0 to 12.6 ZIP Package -> 설치함
 
 
 
