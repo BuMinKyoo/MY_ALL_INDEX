@@ -62,6 +62,7 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
   - [AI agent Setting](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/AI%20agent%20Setting/README.md)
   - [AI Computer Vision & Edge](https://github.com/BuMinKyoo/MY_ALL_INDEX/blob/main/AI%20Computer%20Vision%20&%20Edge/README.md)
   - [RAG_Basic](https://github.com/BuMinKyoo/RAG_Basic)
+  - [CudaPrectice](https://github.com/BuMinKyoo/CudaPrectice)
 
 
 
