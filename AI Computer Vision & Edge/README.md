@@ -1,7 +1,16 @@
 ###### Top
 
+- [프로젝트](#프로젝트)
 - [그래픽관련tool](#그래픽관련tool)
 - [해석과정](#해석과정)
+
+
+<br/>
+<br/>
+
+***
+
+# 프로젝트
 - [Ai_Agent_API](https://github.com/BuMinKyoo/Ai_Agent_API/tree/main)
   - WPF 기반 LLM 로그 분석 도우미. 장비/시스템에서 발생한 로그·에러 메시지를 LLM API로 보내, 근본 원인 추정과 점검 항목을 자동으로 받아보는 데스크톱 앱
 - [OllamaWpfClient](https://github.com/BuMinKyoo/OllamaWpfClient/tree/main)
@@ -63,10 +72,6 @@
       - TensorRT엔진 써서 -> cuda -> 엔비디아 그래픽 카드
     - 3.코드를 어떻게 최적화 할껀지(속도 최적화 메모리 최적화)
   - TensorRT 10.5 GA for Windows 10, 11, Server 2019, Server 2022 and CUDA 12.0 to 12.6 ZIP Package -> 설치함
-
-
-
-
 
 
 <br/>
