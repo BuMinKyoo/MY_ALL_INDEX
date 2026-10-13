@@ -2,7 +2,7 @@
 
 ###### Top
 
-- [Computer Graphics](#computergraphics)
+- [Computer Graphics](#computer-graphics)
 
 <br/>
 <br/>
