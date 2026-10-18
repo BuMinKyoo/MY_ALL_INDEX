@@ -2,14 +2,15 @@
 
 ###### Top
 
-- [Computer Graphics](#computer-graphics)
+- [MFC,ImGui](#mfcimgui)
+- [2d이미지 프로세싱](#2d이미지-프로세싱)
 
 <br/>
 <br/>
 
 ***
 
-# Computer Graphics
+# MFC,ImGui
   - MFC와 Dear ImGui 비교
     - ImGui는 실행 중인 프로그램의 상태를 확인하거나 값을 조절하는 개발용 GUI를 빠르게 만들 때 주로 사용
 
@@ -25,11 +26,26 @@ UI 구성     창과 컨트롤 생성 후 이벤트 처리   매 프레임 코�
 ```
 
 
-###### [Computer Graphics](#computergraphics)
+###### [MFC,ImGui](#mfcimgui)
 ###### [Top](#top)
 
 <br/>
 <br/>
 
 ***
+
+# 2d이미지 프로세싱
+  - 이미지는 픽셀의 집합이며, 각 픽셀은 RGB 색상 값을 가진다
+  - 이미지 처리는 이 값을 직접 바꾸거나 주변 픽셀과 섞어 새로운 이미지를 만드는 과정
+    - 밝기 조절 : RGB 값에 일정 값을 더하거나 배율을 곱한다.
+    - 블러 : 주변 픽셀의 색을 섞어 색상 변화와 경계를 부드럽게 만든다
+    - 등등...
+
+<br/>
+
+<img width="648" height="691" alt="image" src="https://github.com/user-attachments/assets/58e74515-8d38-48b0-bdd4-657971640b55" />
+
+
+###### [2d이미지 프로세싱](#2d이미지-프로세싱)
+###### [Top](#top)
 
