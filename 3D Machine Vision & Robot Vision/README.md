@@ -254,11 +254,13 @@ const float diff = glm::max(glm::dot(hit.normal, dirToLight), 0.0f);
 
 <br/>
 
-  - Specular 는 가장 구하기 어려운데,
+  - Specular 는 가장 구하기 어려운데, Specular는 충돌 포인트에서 광원으로 향하는 방향과 표면의 법선을 이용해 → 빛이 표면에 부딪힌 뒤 반사되어 나가는 방향을 구하고 → 그 반사 방향과 충돌 포인트에서 관찰자로 향하는 방향(-ray.dir)을 닷프로덕트해서 얼마나 같은 방향인지 확인한 후 → 음수는 0으로 처리하고 → alpha만큼 거듭제곱해서 반짝임의 값을 구한다
 
 <br/>
 
 ~~~c++
+https://en.wikipedia.org/wiki/Phong_reflection_model -> Phong_reflection설명(Ambient+Diffuse+Specular = Phong Reflection)
+
 const vec3 reflectDir = 2.0f * dot(hit.normal, dirToLight) * hit.normal - dirToLight;
 // 하단의 사진을 봤을때 reflectDir의 값은 "충돌포인트 -> 광원 의 반대점" 의 부분이 되고
 
@@ -268,8 +270,6 @@ const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), 
 
 <img width="627" height="460" alt="image" src="https://github.com/user-attachments/assets/d8d3cef7-8d66-4613-8b32-572306f3e3ce" />
 
-
-https://en.wikipedia.org/wiki/Phong_reflection_model -> Phong_reflection설명(Ambient+Diffuse+Specular = Phong Reflection)
 
 ###### [3d입체원그리기](#3d입체원그리기)
 ###### [Top](#top)
