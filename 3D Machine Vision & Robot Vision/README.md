@@ -6,6 +6,7 @@
 - [2d이미지 프로세싱](#2d이미지-프로세싱)
 - [GLM](#glm)
 - [화면 좌표를 월드 좌표로 변환하기](#화면-좌표를-월드-좌표로-변환하기)
+- [3d입체원그리기](#3d입체원그리기)
 
 <br/>
 <br/>
@@ -196,5 +197,65 @@ float y = 픽셀좌표.y * yScale - 1.0f;
 
 ###### 화면 좌표를 월드 좌표로 변환하기](#화면-좌표를-월드-좌표로-변환하기)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+***
+
+# 3d입체원그리기
+  - [DrawingSphere](https://github.com/BuMinKyoo/DrawingSphere)
+
+<br/>
+
+  - 1단계
+    - 먼저 3d구를 표현하기 위해서는 ray라는 개념이 필요하다
+    - 컴퓨터 화면은 평면이기 때문에 그것을 3d로 보이게 하기 위해서, 컴퓨터의 (0,0)~(width-1, height-1)의 모든 좌표에서 일직선으로 쏘는 직선이 있다고 생각을 하고, 그 각각의 선의 방정식에서, 우리가 보여야 하는 구를 정의해두고 구의 점의 방정식을 대입해서, 서로 교차하는, 즉 충돌하는 부분을 수학적으로 구하게 되면 3d차원에서의 점들을 구할수 있다
+
+<br/>
+
+~~~c++
+// 월드 좌표계로 만든 값과, z값을 합쳐서
+Start = TransformScreenToWorld(x, y, width, height)
+
+// Ray를 만들고
+Ray ray = new Ray
+{
+    Start = TransformScreenToWorld(x, y, width, height),
+    Direction = Vector3.UnitZ
+};
+
+// 그것을 IntersectRayCollision 함수에 넣고 충돌을 확인한다
+// https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection -> 직선과 구의 교차 방정식을 확인한다
+~~~
+
+<br/>
+
+<img width="572" height="350" alt="image" src="https://github.com/user-attachments/assets/23c6c0e2-de66-4466-be63-c16df8f015da" />
+
+<br/>
+
+  - 2단계
+
+
+
+https://en.wikipedia.org/wiki/Phong_reflection_model -> Phong_reflection설명(Ambient+Diffuse+Specular = Phong Reflection)
+
+###### [3d입체원그리기](#3d입체원그리기)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
