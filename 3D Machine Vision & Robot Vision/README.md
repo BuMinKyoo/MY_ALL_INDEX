@@ -208,7 +208,7 @@ float y = 픽셀좌표.y * yScale - 1.0f;
 
 <br/>
 
-  - 1단계
+  - step1
     - 먼저 3d구를 표현하기 위해서는 ray라는 개념이 필요하다
     - 컴퓨터 화면은 평면이기 때문에 그것을 3d로 보이게 하기 위해서, 컴퓨터의 (0,0)~(width-1, height-1)의 모든 좌표에서 일직선으로 쏘는 직선이 있다고 생각을 하고, 그 각각의 선의 방정식에서, 우리가 보여야 하는 구를 정의해두고 구의 점의 방정식을 대입해서, 서로 교차하는, 즉 충돌하는 부분을 수학적으로 구하게 되면 3d차원에서의 점들을 구할수 있다
 
@@ -235,7 +235,7 @@ Ray ray = new Ray
 
 <br/>
 
-  - 2단계
+  - step2
     - Phong 조명을 추가 해서 빛이 들어오는 방향에 대한 3d모델 계산을 추가
     - Phong 조명은 구 표면에 빛이 어떻게 보일지 계산하는 모델이다
 
@@ -270,6 +270,31 @@ const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), 
 
 <img width="627" height="460" alt="image" src="https://github.com/user-attachments/assets/d8d3cef7-8d66-4613-8b32-572306f3e3ce" />
 
+<br/>
+
+<img width="570" height="346" alt="image" src="https://github.com/user-attachments/assets/9cdbd421-f63e-4845-99ff-69db61876f9c" />
+
+<br/>
+
+  - step3
+    - Orthographic projection (정투영) vs perspective projection (원근투영)
+    - step2까지는 정투영으로써, z축이 모두 똑같은 위치에서 출발해서 원근법이 적용되지 않았음, 그러나 step3은 원근투영을 사용함
+    - Ray를 만들때, Direction을 달라지게 만듬
+   
+  <br/>
+
+~~~c++
+if (UsePerspective)
+{
+    // 눈은 고정되어 있지만 픽셀 위치가 달라지므로 방향도 달라집니다.
+    Vector3 eyeToPixel = pixelPosWorld - EyePosition;
+    rayDirection = Vector3.Normalize(eyeToPixel);
+}
+~~~
+
+<br/>
+
+<img width="571" height="350" alt="image" src="https://github.com/user-attachments/assets/2994092e-d3c3-4c1d-8cfe-87f503a24470" />
 
 ###### [3d입체원그리기](#3d입체원그리기)
 ###### [Top](#top)
