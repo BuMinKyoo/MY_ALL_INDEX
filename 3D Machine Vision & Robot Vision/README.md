@@ -236,7 +236,37 @@ Ray ray = new Ray
 <br/>
 
   - 2단계
+    - Phong 조명을 추가 해서 빛이 들어오는 방향에 대한 3d모델 계산을 추가
+    - Phong 조명은 구 표면에 빛이 어떻게 보일지 계산하는 모델이다
 
+<br/>
+
+  - Ambient 주변광 + Diffuse 확산 반사 + Specular 정반사 이렇게 3개를 더해야 구의 둥근 모양과 반짝이는 재질을 표현할 수 있다고 한다.
+    - Ambient는 수학적으로 따로 구할건 없다 왜냐하면, 어두울때도 기본적으로 보이는 색이니까 입혀주기만 하면되고
+  - Diffuse는 광원의 점을 알고 있으면 -> 충돌 포인트와 광원의 점을 빼고 정규화 한후 -> 정규화한 구원점에서 충돌포인트와 정규화한 충돌포인트에서 광원까지의 백터를 닷프로덕트해서 얼마나 비슷한 방향을 가고 있는지 확인하는 것으로 값을 구한다
+
+<br/>
+
+~~~c++
+const vec3 dirToLight = glm::normalize(light.pos - hit.point);
+const float diff = glm::max(glm::dot(hit.normal, dirToLight), 0.0f);
+~~~
+
+<br/>
+
+  - Specular 는 가장 구하기 어려운데,
+
+<br/>
+
+~~~c++
+const vec3 reflectDir = 2.0f * dot(hit.normal, dirToLight) * hit.normal - dirToLight;
+// 하단의 사진을 봤을때 reflectDir의 값은 "충돌포인트 -> 광원 의 반대점" 의 부분이 되고
+
+const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), sphere->alpha);
+// 를 해서 결과값을 구한다
+~~~
+
+<img width="627" height="460" alt="image" src="https://github.com/user-attachments/assets/d8d3cef7-8d66-4613-8b32-572306f3e3ce" />
 
 
 https://en.wikipedia.org/wiki/Phong_reflection_model -> Phong_reflection설명(Ambient+Diffuse+Specular = Phong Reflection)
