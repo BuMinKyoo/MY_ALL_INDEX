@@ -307,6 +307,15 @@ if (UsePerspective)
 
 <img width="572" height="353" alt="image" src="https://github.com/user-attachments/assets/2eefc765-2467-4566-95a4-bd3e1113403b" />
 
+<br/>
+
+  - step5
+    - 그림자 만들기, 그림자를 만드는 것은 충돌한 지점에서 다시한번더 광원으로 ray를 발사시켜서, 그곳에 닿으면 그림자를 안만들고, 그곳에 닿지 못하면(즉 다른 것과 다시 충돌하면)그림자를 만들면 된다
+
+<br/>
+
+<img width="572" height="348" alt="image" src="https://github.com/user-attachments/assets/a44f97de-955f-462e-8891-3a69fc1025b4" />
+
 ###### [3d입체원그리기](#3d입체원그리기)
 ###### [Top](#top)
 
