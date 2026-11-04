@@ -352,6 +352,17 @@ if (UsePerspective)
 
 <img width="425" height="346" alt="image" src="https://github.com/user-attachments/assets/3c61f813-99e4-4f26-97d1-35de76833fe7" />
 
+<br/>
+
+  - step2
+    - 삼각형 여러 개를 중심점 주변에 이어 붙여 원을 근사한다.
+    - 한 바퀴에 해당하는 2π를 삼각형 개수로 나누어 각도 간격을 구한다 → 첫 둘레점은 중심에서 X 방향으로 반지름만큼 이동한 위치에 만든다 → 이후 각도를 누적하면서 중심 + (반지름 × cosθ, 반지름 × sinθ, 0)으로 둘레점을 만든다.
+    - 기본값은 삼각형 6개라 빨간 육각형이 나온다. 삼각형 개수를 늘리면 둘레의 선분이 많아져 원에 가까워진다.
+
+<br/>
+
+<img width="635" height="519" alt="image" src="https://github.com/user-attachments/assets/0967d0bc-48f3-496c-91b5-5055e24d4a96" />
+
 ###### [레스터화](#레스터화)
 ###### [Top](#top)
 
