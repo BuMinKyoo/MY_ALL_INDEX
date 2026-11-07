@@ -363,6 +363,45 @@ if (UsePerspective)
 
 <img width="635" height="519" alt="image" src="https://github.com/user-attachments/assets/0967d0bc-48f3-496c-91b5-5055e24d4a96" />
 
+<br/>
+
+  - step3
+    - 화면에 그린것들을 사이즈를 바꾼다거나, 이동시킨다거나 하는것은 vertexBuffer 를 만들어서, 거기에 해당 점들을 다 넣어두고 이걸 움직여서 표현하게 된다
+
+<br/>
+
+<img width="574" height="347" alt="image" src="https://github.com/user-attachments/assets/45cdb3dd-1895-4404-8fba-6130e0735278" />
+
+<br/>
+
+  - step4
+    - Bary-centric coordinates를 사용해서 삼각형위의 특점 점P의 점을 알수 있기 때문에 그것을 z를 구해서 각각의 컬러를 넣어주면 된다
+    - 예를 들어 원이 2개 있는데 빨간색, 파란색, 만약 빨간색의 z축이 파란색보다 더 작아서 앞에 표시가 되어야 한다고 하면, 각각의 점을 확인하면서 그릴때 빨간색과, 파란색의 점이 있을때 각각을 검사해서 가장 작은 z축인 경우를 세팅하고 컬러 표시를 하면 된다
+   
+<br/>
+
+~~~c++
+// 아래와 같은 것을 각각의 도형에 검사하게 되면, 결국에는 depthBuffer 버퍼에 지금까지 검사한 도형의 가장
+// z축이 낮은것이 저장되어 있을것이다
+
+const float depth = (alpha0 * this->vertexBuffer[i0].z +
+                     alpha1 * this->vertexBuffer[i1].z +
+                     alpha2 * this->vertexBuffer[i2].z) /
+                    area;
+
+//TODO: 조건 추가
+if (depth < depthBuffer[i + width * j]) {
+    //TODO: 깊이 버퍼 업데이트
+    depthBuffer[i + width * j] = depth;
+    pixels[i + width * j] = vec4(color, 1.0f);
+}
+~~~
+
+<br/>
+
+<img width="423" height="352" alt="image" src="https://github.com/user-attachments/assets/4975485f-d356-4540-b057-cda48e97139b" />
+
+
 ###### [레스터화](#레스터화)
 ###### [Top](#top)
 
