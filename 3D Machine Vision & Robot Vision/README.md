@@ -401,6 +401,31 @@ if (depth < depthBuffer[i + width * j]) {
 
 <img width="423" height="352" alt="image" src="https://github.com/user-attachments/assets/4975485f-d356-4540-b057-cda48e97139b" />
 
+<br/>
+
+  - step5
+    - 래스터화의 원근 투영과 원근 보정 보간
+    - 레이트레이싱에서는 눈의 위치를 고려해 픽셀마다 광선을 만든다 → 광선과 3D 표면의 교점을 구한다 → 그 교점에서 표면의 위치와 UV를 결정할 수 있다.
+    - 래스터화에서는 3D 꼭짓점을 원근 투영해서 화면 좌표로 옮긴다 → 삼각형 내부의 픽셀마다 화면상의 가중치 w0, w1, w2를 구한다 → 이 가중치로 꼭짓점의 UV를 섞어 해당 픽셀의 UV를 계산한다.
+    - 그런데 원근 투영에서는 깊이에 따라 축소되는 비율이 다르다 → 화면에서의 위치 비율과 실제 3D 표면에서의 위치 비율이 달라진다 → 화면 가중치를 그대로 UV에 사용하면 무늬의 간격이 잘못되거나, 삼각형 경계에서 격자선이 꺾여 보일 수 있다.
+    - 이를 해결하기 위해 각 가중치를 해당 정점의 눈 기준 Z깊이로 나눈다 → 나눈 값들의 합으로 다시 나누어 전체 합을 1로 맞춘다 → 보정된 가중치로 UV를 섞어서 표면에 맞는 무늬를 구한다.
+
+<br/>
+
+  - 원근투영
+
+<img width="317" height="160" alt="image" src="https://github.com/user-attachments/assets/830faabe-7fda-4fc6-a837-8b81484401be" />
+
+<br/>
+
+  - 왜곡을 없애기 위해서 내부 픽셀의 uv를 섞은 값
+
+<img width="484" height="553" alt="image" src="https://github.com/user-attachments/assets/aeb12ea6-c673-4441-ba9b-96c3612e5e07" />
+
+<br/>
+
+<img width="590" height="348" alt="image" src="https://github.com/user-attachments/assets/d229492e-e856-45c9-9b01-c9952da08563" />
+
 
 ###### [레스터화](#레스터화)
 ###### [Top](#top)
