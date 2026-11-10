@@ -2076,6 +2076,49 @@ w = 0이면 이동 항이 사라져 이 차이를 표현할 수 있다.
    역변환은 각 배율의 역수를 곱한다. 단, 배율은 모두 0이 아니어야 한다.
 ~~~
 
+<br/>
+
+  - 회전행렬
+    - 유도 과정은 있지만 굳이 여기에 기록하지 않음
+
+<br/>
+
+<img width="569" height="163" alt="image" src="https://github.com/user-attachments/assets/8fce4f42-748e-41a8-839d-08d094f14206" />
+
+<br/>
+
+  - Affine Transformation
+    - 아핀 변환(Affine Transformation)은 “선형 변환을 한 다음, 일정한 거리만큼 이동시키는 변환”이다.
+
+<br/>
+
+<img width="380" height="167" alt="image" src="https://github.com/user-attachments/assets/2d33efe6-a23e-4767-9630-9f61ed7d747b" />
+
+  - 벡터는 (x,y,z,0) 이기 때문에 이동이 되지 않고, 포인트는 (x,y,z,1) 이기 때문에 이동이 가능하다
+
+<br/>
+
+~~~text
+3차원에서는 4×4 행렬을 사용한다
+
+3차원에서는 원래 좌표가 (x, y, z)이므로,
+w를 붙이면 성분이 4개가 된다.
+
+그래서 4×4 행렬을 사용한다.
+
+                       [ A11  A12  A13  0 ]
+    [x', y', z', w]    [ A21  A22  A23  0 ]
+      = [x, y, z, w]  [ A31  A32  A33  0 ]
+                       [ bx   by   bz   1 ]
+~~~
+
+<br/>
+
+  - 아래 사진과 같이, 스케일링과 회전행렬도 각각 1행,1열씩 추가로 생기게 된다
+
+<br/>
+
+<img width="529" height="336" alt="image" src="https://github.com/user-attachments/assets/453443da-f9da-46fa-91ca-d1db11513bf9" />
 
 ###### [행렬 변환](#행렬-변환)
 ###### [Top](#top)
