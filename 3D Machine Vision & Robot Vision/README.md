@@ -18,6 +18,7 @@
 - [행렬](#행렬)
 - [행렬 변환](#행렬-변환)
 - [행렬계산(GML)](#행렬계산gml)
+- [물체 변환과 법선벡터의 변환](#물체-변환과-법선벡터의-변환)
 
 
 
@@ -2680,6 +2681,27 @@ w' = w
 ###### [행렬계산(GML)](#행렬계산gml)
 ###### [Top](#top)
 
+
+<br/>
+<br/>
+
+# 물체 변환과 법선벡터의 변환
+  - 물체를 회전할 때 법선도 회전해야 하는 이유
+    - 법선벡터(normal)는 표면에 수직이며, 표면이 향하는 방향을 나타낸다
+    - 물체를 회전하면 표면의 방향도 달라진다. 따라서 법선도 함께 회전시켜야 한다
+    - 또한 Transforming을 해도 법선벡터의 수직이 부분이 깨지기 때문에 같이 조정해 줘야 한다
+
+<br/>
+
+<img width="289" height="168" alt="image" src="https://github.com/user-attachments/assets/ee77469d-e1b3-479a-806a-e334e43f5fee" />
+
+<br/>
+
+<img width="973" height="237" alt="image" src="https://github.com/user-attachments/assets/d7e240ce-97e3-4cc2-809e-df9a863e934d" />
+
+
+###### [물체 변환과 법선벡터의 변환](#물체-변환과-법선벡터의-변환)
+###### [Top](#top)
 
 
 
