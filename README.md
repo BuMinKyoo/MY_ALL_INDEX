@@ -71,7 +71,7 @@ GitHub에 있는 모든 내용을 목차로 정리합니다.
 ### 3D Machine Vision & Robot Vision
 
   - [Cuda](https://github.com/BuMinKyoo/CUDA)
-  - [3D Machine Vision & Robot Vision](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/3D%20Machine%20Vision%20%26%20Robot%20Vision)
+  - [Graphics](https://github.com/BuMinKyoo/MY_ALL_INDEX/tree/main/Graphics)
 
 <br/>
 
