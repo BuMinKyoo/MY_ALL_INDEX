@@ -2750,6 +2750,15 @@ GPU
 ~~~
 
   - 제조사가 달라도 같은 API를 사용할 수 있게 해 준다는 점이 핵심. Microsoft가 공통 API와 실행 환경을 제공하고, GPU 제조사는 그 규격에 맞춰 자기 하드웨어를 제어하는 드라이버를 만드는 구조
+    - OpenGL, OpenGL ES, WebGL, Vulkan, Metal, DirectX 11/12
+
+<be/>
+
+  - DirectX 11/12
+    - Direct3D
+    - DirectDraw
+    - DirectMusic
+    - DirectSound
 
 ###### [렌더링 파이프 라인](#렌더링-파이프-라인)
 ###### [Top](#top)
