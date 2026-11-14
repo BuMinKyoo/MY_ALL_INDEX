@@ -2763,6 +2763,101 @@ GPU
     - DirectDraw
     - DirectMusic
     - DirectSound
+   
+<br/>
+
+~~~text
+그래픽스 파이프라인 전체 흐름
+
+[처음에 준비하는 과정]
+
+1. Device와 Context를 만든다.
+   화면 표시를 위한 SwapChain 등도 준비한다.
+
+   Device: 버퍼와 셰이더 객체를 만드는 역할
+   Context: 데이터 갱신, 리소스 연결, 그리기 명령을 내리는 역할
+
+2. Vertex Shader와 Pixel Shader를 준비한다.
+
+   셰이더 코드를 컴파일하고,
+   Device로 GPU에서 사용할 셰이더 객체를 만든다.
+
+3. Vertex 데이터를 GPU 버퍼에 넣는다.
+
+   CPU에서 Vertex별 위치·색·UV 등의 데이터를 준비한다.
+   Device로 Vertex Buffer를 만들고 그 데이터를 넣는다.
+
+   인덱스를 사용하는 경우 Index Buffer도 만든다.
+
+4. 셰이더에 전달할 공통 설정값을 준비한다.
+
+   CPU에는 설정값을 보관할 데이터를 만든다.
+   GPU에는 그 값을 전달할 Constant Buffer를 만든다.
+
+   예시:
+   Constant Buffer A → 변환 행렬
+   Constant Buffer B → 색·조명 설정
+
+   A와 B는 같은 종류의 버퍼를 독립적으로 두 개 만든 것이다.
+
+
+[화면을 그릴 때 반복하는 과정]
+
+5. 변경된 값을 CPU에서 계산한다.
+
+   예: 물체를 회전시키려면 CPU에서 변환 행렬을 갱신한다.
+
+6. 변경된 데이터를 GPU 버퍼에 반영한다.
+
+   Context를 이용해 CPU의 설정값을 GPU Constant Buffer에 복사한다.
+
+7. Context로 사용할 리소스를 연결한다.
+
+   사용할 Vertex Shader와 Pixel Shader를 지정한다.
+   Vertex Buffer와 필요한 Index Buffer를 연결한다.
+
+   예시:
+   Constant Buffer A를 Vertex Shader에서 읽도록 연결
+   Constant Buffer B를 Pixel Shader에서 읽도록 연결
+
+   결과를 기록할 Render Target과 그릴 영역인 Viewport도 지정한다.
+
+8. Context로 Draw 또는 DrawIndexed 명령을 내린다.
+
+   지금 연결된 셰이더와 버퍼를 사용해서 그리도록 GPU에 지시한다.
+
+9. GPU가 파이프라인을 따라 처리한다.
+
+   Vertex Buffer에서 Vertex 데이터 읽기
+       ↓
+   Vertex Shader
+   : Vertex 데이터와 필요한 Constant Buffer를 읽어 위치 등을 계산
+       ↓
+   Rasterizer
+   : 삼각형이 덮는 화면 부분을 찾고, Vertex Shader의 출력값을 보간
+       ↓
+   Pixel Shader
+   : 보간된 입력과 필요한 Constant Buffer를 읽어 색을 계산
+       ↓
+   깊이 검사·블렌딩 등의 처리를 거쳐 Render Target에 기록
+
+10. Present로 화면 표시를 요청한다.
+
+
+[Constant Buffer에서 기억할 점]
+
+Constant Buffer의 이름이 사용 단계를 결정하지 않는다.
+어느 셰이더에서 읽을지는 Context로 연결할 때 지정한다.
+
+셰이더마다 Constant Buffer를 반드시 하나씩 만들 필요는 없다.
+데이터 배치가 맞으면 하나의 버퍼를 여러 셰이더에 연결할 수도 있다.
+
+Vertex Shader의 출력은 래스터화·보간을 거쳐 Pixel Shader에 전달된다.
+Constant Buffer는 각 셰이더가 공통 설정값을 읽는 별도의 입력이다.
+
+처음 만든 셰이더와 버퍼는 재사용하고,
+버퍼의 내용은 필요한 값이 바뀔 때 갱신한다.
+~~~
 
 ###### [렌더링 파이프 라인](#렌더링-파이프-라인)
 ###### [Top](#top)
