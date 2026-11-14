@@ -2721,6 +2721,10 @@ w' = w
 <br/>
 
 # 시작
+  - [GraphicsPrectice](https://github.com/BuMinKyoo/GraphicsPrectice][https://github.com/BuMinKyoo/GraphicsPrectice)
+
+<br/>
+
   - com
     - Component Object Model의 약자로, Microsoft가 만든 ‘소프트웨어 객체를 정해진 인터페이스로 사용하는 규약’
     - 따라서 new로 만드는것도 아니고 정해진 대로 만들어야한다
