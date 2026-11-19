@@ -309,10 +309,6 @@ power = -0.5 * np.einsum('ij,jk,ik->i', translated, Sigma_inv, translated)
 gaussian_value = np.exp(power).reshape(x.shape)
 ```
 
-
-
-
-
 ###### [가우시안 함수](#가우시안-함수)
 ###### [Top](#top)
 
