@@ -4,6 +4,7 @@
 
 - [Computer Graphics 기초이론](#computer-graphics-기초이론)
 - [Computer Vision 기초이론](#computer-vision-기초이론)
+- [가우시안 함수](#가우시안-함수)
 
  
 
@@ -263,3 +264,63 @@ x'² + y'²
 
 ###### [Computer Vision 기초이론](#computer-vision-기초이론)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# 가우시안 함수
+  - 가우시안 함수란
+    - 가우시안 함수는 중심에서 값이 가장 크고, 중심에서 멀어질수록 0에 가까워지는 함수다. 1차원에서는 종 모양이고, 2차원에서는 같은 값을 갖는 점들을 이으면 원이나 타원이 된다.
+  - Gaussian Splatting에서 왜 사용하는가?
+    - 가우시안을 쓰면 하나의 스플랫이 주변 픽셀에 얼마나 기여하는지 부드러운 가중치로 표현할 수 있다. 중심 주변에는 색과 불투명도가 강하게 반영되고, 가장자리로 갈수록 기여도가 작아진다.
+
+<br/>
+
+  - 최종계산식
+
+~~~text
+// 최종 계산식
+
+화면의 픽셀 위치를 x, 스플랫의 중심을 mu라고 하면 해당 픽셀의 가중치는 다음과 같다.
+
+d = x - mu
+G(x) = exp(-0.5 * d^T * Sigma^(-1) * d)
+
+d         중심에서 픽셀까지의 좌표 차이
+d^T       d의 전치
+Sigma^(-1)  공분산 행렬 Sigma의 역행렬
+G(x)      픽셀 x에서 스플랫의 가중치
+~~~
+
+<br/>
+
+  - 코드 계산
+
+```python
+# 픽셀 좌표에서 가우시안의 중심을 뺀다.
+translated = np.stack([x_flat - mu_x, y_flat - mu_y], axis=1)
+
+# 스케일 행렬 S와 회전 행렬 R로 공분산을 만든다.
+Sigma = R @ S @ S.T @ R.T
+Sigma_inv = np.linalg.inv(Sigma)
+
+# 모든 픽셀의 지수를 계산하고 가중치로 변환한다.
+power = -0.5 * np.einsum('ij,jk,ik->i', translated, Sigma_inv, translated)
+gaussian_value = np.exp(power).reshape(x.shape)
+```
+
+
+
+
+
+###### [가우시안 함수](#가우시안-함수)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
