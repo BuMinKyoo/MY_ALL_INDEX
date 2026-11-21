@@ -6,6 +6,7 @@
 - [Computer Vision 기초이론](#computer-vision-기초이론)
 - [가우시안 함수](#가우시안-함수)
 - [미분 가능한 렌더링](#미분-가능한-렌더링)
+- [렌더링 가속(바운딩 박스)](#렌더링-가속바운딩-박스)
 
  
 
@@ -1063,17 +1064,133 @@ print(f"Final loss: {history_tri[-1]:.6f}")
 print(f"Trained {num_gaussians} Gaussians to approximate triangle")
 ~~~
 
-
-
-
 ###### [미분 가능한 렌더링](#미분-가능한-렌더링)
 ###### [Top](#top)
 
+<br/>
+<br/>
+
+# 렌더링 가속(바운딩 박스)
+  - 컴퓨터 그래픽스에서는 속도를 빠르게 하니 위해서 렌더링을 할때 렌더링이 필요한 부분만 진행 함으로써 속도를 높인다
+  - 공분산을 통해서 바운딩 박스의 크기를 어떻게 할지 결정할 수 있다
+    - 공분산은 두 값이 평균을 기준으로 어느 방향으로 함께 변하는지 나타내는 값, 대각선 값은 가로·세로로 얼마나 퍼지는지, 대각선 밖의 값은 두 축이 어떻게 함께 변하는지를 담는다. 그래서 바운딩 박스를 구할 때는 대각선 값에 제곱근을 씌워 화면 x, y 방향의 표준편차를 얻고, 각각 3을 곱해 3σ 박스의 반폭으로 사용한다
+
+<br/>
+
+~~~python
+def render_gaussians_2d(H, W, mus, sigmas, thetas, opacities, rgbs, n_sigma=3.0):
+    P = make_pixel_grid(H, W, device=mus.device)
+    img = torch.zeros((H, W, 3), device=mus.device, dtype=mus.dtype)
+
+    for i in range(len(mus)):
+        mu = mus[i]
+        sigma = torch.clamp(sigmas[i], min=1e-3)
+        theta = thetas[i]
+        opacity = opacities[i]
+        rgb = rgbs[i]
+
+        # Axis-aligned 3σ (default) box for the rotated ellipse to cull distant pixels
+        cos_t, sin_t = torch.cos(theta), torch.sin(theta)
+        bbox_half = n_sigma * sigma.max()
+        lower, upper = mu - bbox_half, mu + bbox_half
+        mask_bbox = ((P >= lower) & (P <= upper)).all(dim=-1)
+        if not mask_bbox.any():
+            continue
+
+        # Gaussian evaluation only inside the bounding box
+        R = torch.stack([torch.stack([cos_t, -sin_t]), torch.stack([sin_t, cos_t])])
+        sigma_inv = R @ torch.diag(1.0 / (sigma ** 2)) @ R.T
+
+        diff = P[mask_bbox] - mu
+        exponent = torch.einsum("bi,ij,bj->b", diff, sigma_inv, diff)
+        f_x = torch.exp(-0.5 * exponent)
+        img[mask_bbox] = img[mask_bbox] + (opacity * rgb).view(1, 3) * f_x.unsqueeze(-1)
+
+    return torch.clamp(img, 0.0, 1.0)
+~~~
+
+<br/>
+
+  - 학습
+
+~~~python
+# Optimize multiple Gaussians to fit the triangle - now with rotation!
+mus_param = init_mus.clone().detach().requires_grad_(True)
+sigmas_param = init_sigmas.clone().detach().requires_grad_(True)
+thetas_param = init_thetas.clone().detach().requires_grad_(True)
+opacities_param = init_opacities.clone().detach().requires_grad_(True)
+rgbs_param = init_rgbs.clone().detach().requires_grad_(True)
+
+optimizer_tri = torch.optim.Adam([mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param], lr=0.01)
+
+history_tri = []
+snapshots_tri = []
+snapshot_schedule_tri = {0, 1, 2, 5, 10, 20, 40, 80, 120, 160, 200, 250, 300, 350}
+
+# Video frames
+video_frames_tri = []
+video_sample_rate = 3
+
+# Snapshot initial state
+snapshots_tri.append((0, mus_param.detach().clone(), sigmas_param.detach().clone(),
+                     thetas_param.detach().clone(), opacities_param.detach().clone(), rgbs_param.detach().clone()))
+video_frames_tri.append(img_init_tri.detach().cpu().numpy())
+
+max_iters_tri = 100
+print(f"Optimizing {num_gaussians} Gaussians (with rotation) to fit triangle...")
+for it in range(max_iters_tri):
+    optimizer_tri.zero_grad()
+    
+    # Clamp parameters to valid ranges
+    with torch.no_grad():
+        mus_param.clamp_(-1.5, 1.5)
+        sigmas_param.clamp_(0.01, 1.0)
+        opacities_param.clamp_(0.0, 1.0)
+        rgbs_param.clamp_(0.0, 1.0)
+        # No clamping for thetas - let them rotate freely
+    
+    # Render all Gaussians and compute loss
+    img = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param)
+    loss = torch.mean((img - img_target_tri) ** 2)
+    
+    # Backward pass
+    loss.backward()
+    optimizer_tri.step()
+    
+    # Record history
+    history_tri.append(loss.item())
+    
+    # Take snapshots
+    if (it + 1) in snapshot_schedule_tri:
+        snapshots_tri.append((it + 1, mus_param.detach().clone(), sigmas_param.detach().clone(),
+                             thetas_param.detach().clone(), opacities_param.detach().clone(), rgbs_param.detach().clone()))
+    
+    # Capture video frames
+    if (it + 1) % video_sample_rate == 0:
+        frame = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param).detach().cpu().numpy()
+        video_frames_tri.append(frame)
+    
+    if (it + 1) % 50 == 0:
+        print(f"Iteration {it+1}/{max_iters_tri}, Loss: {loss.item():.6f}")
+
+# Add final frame
+final_frame = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param).detach().cpu().numpy()
+video_frames_tri.append(final_frame)
 
 
+print(f"Final loss: {history_tri[-1]:.6f}")
+print(f"Trained {num_gaussians} Gaussians to approximate triangle")
+~~~
 
+  - 스플랫마다 바운딩 박스를 하나씩 만들게 된다, 스필랫이 20개면 20개 전부 바운딩 박스를 만드는 거고, 그것은 결국 스플랫의 맨 끝 부분인 바운딩 박스를 넘어가는 부분은 짤리게 된다는것
 
+~~~python
+// 이 부분에서, 전체 이미지 img를 만들 때 스플랫마다 계산한 색을 같은 이미지에 더한다
+img[mask_bbox] = img[mask_bbox] + (opacity * rgb).view(1, 3) * f_x.unsqueeze(-1)
+~~~
 
+###### [렌더링 가속(바운딩 박스)](#렌더링-가속바운딩-박스)
+###### [Top](#top)
 
 
 
