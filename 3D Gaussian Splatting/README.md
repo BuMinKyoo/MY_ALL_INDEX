@@ -5,6 +5,7 @@
 - [Computer Graphics 기초이론](#computer-graphics-기초이론)
 - [Computer Vision 기초이론](#computer-vision-기초이론)
 - [가우시안 함수](#가우시안-함수)
+- [미분 가능한 렌더링](#미분-가능한-렌더링)
 
  
 
@@ -311,6 +312,782 @@ gaussian_value = np.exp(power).reshape(x.shape)
 
 ###### [가우시안 함수](#가우시안-함수)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# 미분 가능한 렌더링
+  - 현실 장면을 컴퓨터 그래픽으로 재현하려면, 사진을 보고 어떤 위치에 어떤 모양과 색이 있어야 그 이미지가 나오는지 추정해야 한다
+  - PyTorch로 장면의 파라미터를 직접 조정하면서 목표 이미지에 가까워지도록 학습한다
+  - 여러가지 도형 모두(원, 타원, 삼각형 등) 장면을 표현하는 데 쓸 수 있다. 어떤 요소를 쓰느냐에 따라 표현할 수 있는 모양, 학습에 쓸 수 있는 기울기, 렌더링 비용이 달라진다
+
+<br/>
+
+  - 순방향 렌더링
+    - 위치와 색 같은 장면 설정을 받아 이미지를 그리는 과정
+  - 역방향 렌더링
+    - 목표 이미지가 주어졌을 때, 비슷한 이미지를 만드는 장면 설정을 찾는 과정
+      - 1. 현재 설정으로 이미지를 그린다.
+      - 2. 그린 이미지와 목표 이미지의 차이를 구한다.
+      - 3. 차이가 줄어드는 방향으로 설정을 업데이트한다.
+
+<br/>
+
+  - 삼각형으로 삼각형 맞추기
+    - 위치가 조금 틀린 흰 삼각형에서 시작.
+    - 목표는 검은 배경 위에 그려진 RGB 삼각형.
+    - 학습하는 값은 **꼭짓점 3개의 위치와 각 꼭짓점의 색**.
+    - 목표 삼각형과, 학습하고 있는 삼각형을 mse로 해서 LOSS를 비교한다
+
+<br/>
+
+  - 타겟 삼각형 그리기
+
+~~~python
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+from matplotlib.animation import FuncAnimation, FFMpegWriter
+from IPython.display import Video
+
+# Figure defaults (keeps visuals readable and consistent)
+plt.rcParams["figure.dpi"] = 120
+plt.rcParams["savefig.dpi"] = 120
+
+def make_pixel_grid(H, W, device='cpu'):
+    # Pixel centers in normalized device coords [-1, 1] with y pointing up
+    xs = (torch.arange(W, device=device) + 0.5) / W * 2 - 1
+    ys = (torch.arange(H, device=device) + 0.5) / H * 2 - 1
+    Y, X = torch.meshgrid(ys, xs, indexing='ij')
+    Y = torch.flip(Y, dims=[0])  # flip so first row is +1 (top) for nicer plotting consistency
+    P = torch.stack([X, Y], dim=-1)  # (H, W, 2)
+    return P
+
+def edge_function(a, b, p):
+    # Signed area (2D cross) of (b-a) x (p-a)
+    return (b[..., 0] - a[..., 0]) * (p[..., 1] - a[..., 1]) - (b[..., 1] - a[..., 1]) * (p[..., 0] - a[..., 0])
+
+def barycentric_weights(v0, v1, v2, p):
+    # Works for any p; weights sum to 1 for points in the triangle plane
+    area = edge_function(v0, v1, v2)
+    # Avoid divide-by-zero (degenerate triangles)
+    area = torch.where(torch.abs(area) < 1e-12, torch.tensor(1e-12, device=area.device), area)
+    w0 = edge_function(v1, v2, p) / area
+    w1 = edge_function(v2, v0, p) / area
+    w2 = edge_function(v0, v1, p) / area
+    return w0, w1, w2
+
+def render_triangle_hard(H, W, verts, colors, background=(0.0, 0.0, 0.0)):
+    """Hard-edge triangle rasterizer (non-smooth).
+    verts: (3,2) in [-1,1] NDC; colors: (3,3) in [0,1].
+    """
+    device = verts.device
+    P = make_pixel_grid(H, W, device=device)
+    v0, v1, v2 = verts[0], verts[1], verts[2]
+    # Ensure consistent orientation by using area sign for inside test
+    area = edge_function(v0, v1, v2)
+    s = 1.0 if area >= 0 else -1.0
+    e0 = s * edge_function(v0, v1, P)
+    e1 = s * edge_function(v1, v2, P)
+    e2 = s * edge_function(v2, v0, P)
+    inside = (e0 >= 0) & (e1 >= 0) & (e2 >= 0)
+    w0, w1, w2 = barycentric_weights(v0, v1, v2, P)
+    rgb = (w0[..., None] * colors[0] + w1[..., None] * colors[1] + w2[..., None] * colors[2])
+    rgb = torch.clamp(rgb, 0.0, 1.0)
+    img = torch.zeros((H, W, 3), device=device, dtype=verts.dtype)
+    img[...] = torch.tensor(background, device=device, dtype=verts.dtype)
+    img[inside] = rgb[inside]
+    return img
+
+def show_images(images, titles, figsize=None, vmin=0.0, vmax=1.0):
+    n = len(images)
+    if figsize is None:
+        # Default: compact but readable; scales with number of panels
+        figsize = (3.6 * n, 3.6)
+    fig, axes = plt.subplots(1, n, figsize=figsize)
+    if n == 1:
+        axes = [axes]
+    for ax, im, title in zip(axes, images, titles):
+        # Convert to numpy for display if tensor
+        if torch.is_tensor(im):
+            im = im.detach().cpu().numpy()
+        ax.imshow(im, vmin=vmin, vmax=vmax, interpolation="nearest")
+        ax.set_title(title)
+        ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+def show_image_grid(images, titles, cols=4, cell_size=3.2, vmin=0.0, vmax=1.0):
+    n = len(images)
+    cols = int(max(1, cols))
+    rows = int(np.ceil(n / cols))
+    fig, axes = plt.subplots(rows, cols, figsize=(cell_size * cols, cell_size * rows))
+    axes = np.array(axes).reshape(rows, cols)
+    for i in range(rows * cols):
+        r, c = divmod(i, cols)
+        ax = axes[r, c]
+        if i < n:
+            im = images[i]
+            # Convert to numpy for display if tensor
+            if torch.is_tensor(im):
+                im = im.detach().cpu().numpy()
+            ax.imshow(im, vmin=vmin, vmax=vmax, interpolation="nearest")
+            ax.set_title(titles[i])
+        ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+def diff_image(a, b):
+    # pixel-wise absolute difference (RGB) and a grayscale magnitude view
+    d = torch.abs(a - b)
+    mag = torch.clamp(torch.norm(d, dim=-1, keepdim=True) / np.sqrt(3.0), 0.0, 1.0)
+    return d, mag.repeat(1, 1, 3)
+
+def save_training_video(frames, filename, fps=30, title="Training Progress"):
+    """Save list of image frames as MP4 video."""
+    if len(frames) == 0:
+        print(f"No frames to save for {filename}")
+        return
+    
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.set_title(title)
+    ax.axis('off')
+    
+    # Initialize with first frame
+    im_display = ax.imshow(frames[0], vmin=0.0, vmax=1.0, interpolation="nearest")
+    text = ax.text(0.5, -0.05, f"Iteration: 0", transform=ax.transAxes, 
+                   ha='center', fontsize=12)
+    
+    def update(frame_idx):
+        im_display.set_array(frames[frame_idx])
+        text.set_text(f"Iteration: {frame_idx}")
+        return [im_display, text]
+    
+    anim = FuncAnimation(fig, update, frames=len(frames), interval=1000/fps, blit=True)
+    
+    # Save as MP4
+    writer = FFMpegWriter(fps=fps, bitrate=1800)
+    anim.save(filename, writer=writer)
+    plt.close(fig)
+    print(f"Video saved to {filename}")
+~~~
+
+<br/>
+
+  - 삼각형 학습(아마 잘 안됨)
+
+~~~python
+# Optimization with PyTorch (hard-edge version)
+# Create trainable parameters
+verts_hard = verts_init.clone().detach().requires_grad_(True) # True/False 바꿔보세요
+colors_hard = colors_init.clone().detach().requires_grad_(True)
+
+
+# Use Adam optimizer for simpler, more stable training
+optimizer_hard = torch.optim.Adam([verts_hard, colors_hard], lr=0.01)
+
+history_hard = []
+snapshots_hard = []  # list of (iter, verts, colors)
+snapshot_schedule_hard = {0, 1, 2, 5, 10, 20, 40, 80, 100, 140, 160, 200}
+
+# Video frames - capture every N iterations to keep video size reasonable
+video_frames_hard = []
+video_sample_rate = 1  # capture every 1 iterations
+
+# Snapshot initial state
+snapshots_hard.append((0, verts_hard.detach().clone(), colors_hard.detach().clone()))
+# Add initial frame for video
+initial_img = render_triangle_hard(H, W, verts_hard, colors_hard).detach().cpu().numpy()
+video_frames_hard.append(initial_img)
+
+max_iters_hard = 200
+for it in range(max_iters_hard):
+    optimizer_hard.zero_grad()
+    
+    # Clamp values to valid ranges (vertices and colors)
+    with torch.no_grad():
+        verts_hard.clamp_(-1.2, 1.2)
+        colors_hard.clamp_(0.0, 1.0)
+    
+    # Render and compute loss
+    img = render_triangle_hard(H, W, verts_hard, colors_hard)
+    loss = torch.mean((img - img_target) ** 2)
+    
+    # Backward pass (NOTE: hard edges have zero/undefined gradients at discontinuities)
+    loss.backward()
+    optimizer_hard.step()
+    
+    # Record history
+    history_hard.append(loss.item())
+    
+    # Take snapshots
+    if (it + 1) in snapshot_schedule_hard:
+        snapshots_hard.append((it + 1, verts_hard.detach().clone(), colors_hard.detach().clone()))
+    
+    # Capture video frames
+    if (it + 1) % video_sample_rate == 0:
+        frame = render_triangle_hard(H, W, verts_hard, colors_hard).detach().cpu().numpy()
+        video_frames_hard.append(frame)
+
+# Add final frame
+final_frame = render_triangle_hard(H, W, verts_hard, colors_hard).detach().cpu().numpy()
+video_frames_hard.append(final_frame)
+
+# Save video
+print(f"Creating video with {len(video_frames_hard)} frames...")
+save_training_video(video_frames_hard, "hard_edge_training.mp4", fps=30, 
+                   title="Hard-Edge Triangle Optimization")
+
+# Display video
+Video("hard_edge_training.mp4", embed=True, width=600)
+
+# Final render
+img_trained_hard = render_triangle_hard(H, W, verts_hard, colors_hard)
+
+# Required: pixel-wise difference between target and trained
+d_rgb_t, d_mag_t = diff_image(img_target, img_trained_hard)
+show_images(
+    [img_target, img_init_hard, img_trained_hard, d_mag_t],
+    ["Target", "Initial", "Trained (hard)", "|Target - Trained|"],
+    figsize=(16, 4)
+ )
+
+# Intermediate results during training (hard edges often jump / stall)
+seen = set()
+snapshots_hard_unique = []
+for it, v, c in snapshots_hard:
+    if it not in seen:
+        snapshots_hard_unique.append((it, v, c))
+        seen.add(it)
+snapshots_hard_unique.sort(key=lambda t: t[0])
+
+snap_imgs = []
+snap_titles = []
+for it, v, c in snapshots_hard_unique:
+    snap_imgs.append(render_triangle_hard(H, W, v, c))
+    snap_titles.append(f"iter {it}")
+show_image_grid(snap_imgs, snap_titles, cols=4, cell_size=3.0)
+
+plt.figure(figsize=(6, 3))
+plt.plot(history_hard)
+plt.title("Hard-edge optimization loss (often jagged / stuck)")
+plt.xlabel("Iteration")
+plt.ylabel("MSE")
+plt.grid(True)
+plt.show()
+
+print("Hard-edge final loss:", history_hard[-1])
+print("Hard-edge verts:\n", verts_hard.detach().numpy())
+print("Hard-edge colors:\n", colors_hard.detach().numpy())
+~~~
+
+<br/>
+
+  - 가우시안 스플랫으로 맞추기
+    - 스플랫 하나는 중심에서 영향이 가장 크고, 멀어질수록 영향이 부드럽게 줄어드는 타원형 요소
+    - 스플랫마다 다음 값을 학습
+      - 중심 위치 `mu`
+      - 두 방향의 크기 `sigma_x`, `sigma_y`
+      - 회전 각도
+      - 불투명도
+      - RGB 색
+
+<br/>
+
+  - 가우시안 스플랫 그리기
+
+~~~python
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+from matplotlib.animation import FuncAnimation, FFMpegWriter
+from IPython.display import Video
+
+# Figure defaults
+plt.rcParams["figure.dpi"] = 120
+plt.rcParams["savefig.dpi"] = 120
+
+def make_pixel_grid(H, W, device='cpu'):
+    """Create pixel centers in normalized device coords [-1, 1] with y pointing up"""
+    xs = (torch.arange(W, device=device) + 0.5) / W * 2 - 1
+    ys = (torch.arange(H, device=device) + 0.5) / H * 2 - 1
+    Y, X = torch.meshgrid(ys, xs, indexing='ij')
+    Y = torch.flip(Y, dims=[0])
+    P = torch.stack([X, Y], dim=-1)  # (H, W, 2)
+    return P
+
+def render_gaussians_2d(H, W, mus, sigmas, thetas, opacities, rgbs):
+    """Render multiple 2D Gaussian splats using full covariance matrices.
+    
+    Args:
+        H, W: image dimensions
+        mus: (N, 2) center positions μ
+        sigmas: (N, 2) scale parameters σ
+        thetas: (N,) rotation angles θ in radians
+        opacities: (N,) opacity scalars α in [0, 1]
+        rgbs: (N, 3) RGB color vectors
+    
+    Returns:
+        img: (H, W, 3) rendered image
+    
+    Full covariance formulation: I(p) = Σ(i=1 to N) α_i * rgb_i * f_i(p; μ_i, Σ_i)
+    where f_i uses 2×2 covariance matrix with rotation.
+    """
+    device = mus.device
+    P = make_pixel_grid(H, W, device=device)  # (H, W, 2)
+    
+    img = torch.zeros((H, W, 3), device=device, dtype=mus.dtype)
+        
+    # Additive blending: sum all Gaussian contributions
+    for i in range(len(mus)):
+        mu = mus[i]
+        sigma = sigmas[i]
+        theta = thetas[i]
+        opacity = opacities[i]
+        rgb = rgbs[i]
+        
+        # Build inverse covariance matrix inline (formerly build_sigma_inv)
+        cos_theta = torch.cos(theta)
+        sin_theta = torch.sin(theta)
+        rotation = torch.stack((
+            torch.stack((cos_theta, -sin_theta)),
+            torch.stack((sin_theta, cos_theta)),
+        ))
+        inv_scale_sq = sigma.reciprocal().square()
+        sigma_inv = rotation @ torch.diag(inv_scale_sq) @ rotation.T
+        
+        # Compute Gaussian function f_i(p) with full covariance
+        offsets = P - mu
+        power = -0.5 * torch.einsum(
+            "...i,ij,...j->...", offsets, sigma_inv, offsets
+        )
+        gaussian = torch.exp(power)
+
+        # Accumulate: I(p) += α_i * rgb_i * f_i(p)
+        img = img + opacity * gaussian[..., None] * rgb
+    
+    img = torch.clamp(img, 0.0, 1.0)
+    return img
+
+def show_images(images, titles, figsize=None, vmin=0.0, vmax=1.0):
+    n = len(images)
+    if figsize is None:
+        figsize = (3.6 * n, 3.6)
+    fig, axes = plt.subplots(1, n, figsize=figsize)
+    if n == 1:
+        axes = [axes]
+    for ax, im, title in zip(axes, images, titles):
+        if torch.is_tensor(im):
+            im = im.detach().cpu().numpy()
+        ax.imshow(im, vmin=vmin, vmax=vmax, interpolation="nearest")
+        ax.set_title(title)
+        ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+def show_image_grid(images, titles, cols=4, cell_size=3.2, vmin=0.0, vmax=1.0):
+    n = len(images)
+    cols = int(max(1, cols))
+    rows = int(np.ceil(n / cols))
+    fig, axes = plt.subplots(rows, cols, figsize=(cell_size * cols, cell_size * rows))
+    axes = np.array(axes).reshape(rows, cols)
+    for i in range(rows * cols):
+        r, c = divmod(i, cols)
+        ax = axes[r, c]
+        if i < n:
+            im = images[i]
+            if torch.is_tensor(im):
+                im = im.detach().cpu().numpy()
+            ax.imshow(im, vmin=vmin, vmax=vmax, interpolation="nearest")
+            ax.set_title(titles[i])
+        ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+def diff_image(a, b):
+    """Compute pixel-wise absolute difference"""
+    d = torch.abs(a - b)
+    mag = torch.clamp(torch.norm(d, dim=-1, keepdim=True) / np.sqrt(3.0), 0.0, 1.0)
+    return d, mag.repeat(1, 1, 3)
+
+def save_training_video(frames, filename, fps=30, title="Training Progress"):
+    """Save list of image frames as MP4 video."""
+    if len(frames) == 0:
+        print(f"No frames to save for {filename}")
+        return
+    
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.set_title(title)
+    ax.axis('off')
+    
+    im_display = ax.imshow(frames[0], vmin=0.0, vmax=1.0, interpolation="nearest")
+    text = ax.text(0.5, -0.05, f"Iteration: 0", transform=ax.transAxes, 
+                   ha='center', fontsize=12)
+    
+    def update(frame_idx):
+        im_display.set_array(frames[frame_idx])
+        text.set_text(f"Iteration: {frame_idx}")
+        return [im_display, text]
+    
+    anim = FuncAnimation(fig, update, frames=len(frames), interval=1000/fps, blit=True)
+    writer = FFMpegWriter(fps=fps, bitrate=1800)
+    anim.save(filename, writer=writer)
+
+    plt.close(fig)    
+    print(f"Video saved to {filename}")
+
+def draw_gaussian_ellipses(ax, mus, sigmas, thetas, color='yellow', label='Gaussians', 
+                          sigma_scale=3.0, show_centers=True, alpha=0.7, linewidth=2):
+    """Draw nσ ellipse boundaries for Gaussian parameters.
+    
+    Args:
+        ax: matplotlib axis to draw on
+        mus: (N, 2) center positions μ (or (2,) for single Gaussian)
+        sigmas: (N, 2) scale parameters σ (or (2,) for single Gaussian)
+        thetas: (N,) rotation angles θ in radians (or scalar for single Gaussian)
+        color: edge color for ellipses and center markers
+        label: legend label (only applied to first element)
+        sigma_scale: multiplier for ellipse size (default 3.0 for 3σ boundary)
+        show_centers: whether to draw center markers
+        alpha: transparency of ellipses
+        linewidth: line width of ellipse boundaries
+    
+    The 3σ boundary represents where ~99% of the Gaussian's mass is contained,
+    effectively showing the Gaussian's "support" in the image.
+    """
+    from matplotlib.patches import Ellipse
+    
+    # Convert to numpy if needed
+    if torch.is_tensor(mus):
+        mus = mus.detach().cpu().numpy()
+    if torch.is_tensor(sigmas):
+        sigmas = sigmas.detach().cpu().numpy()
+    if torch.is_tensor(thetas):
+        thetas = thetas.detach().cpu().numpy()
+    
+    # Handle single Gaussian (1, 2) or (2,) shape
+    if mus.ndim == 2 and mus.shape[0] == 1:
+        mus = mus[0]
+        sigmas = sigmas[0]
+        thetas = thetas[0:1]
+    
+    # Ensure arrays are 2D for iteration
+    if mus.ndim == 1:
+        mus = mus.reshape(1, -1)
+        sigmas = sigmas.reshape(1, -1)
+        thetas = np.atleast_1d(thetas)
+    
+    # Draw centers if requested
+    if show_centers:
+        ax.scatter(mus[:, 0], mus[:, 1], c=color, s=80, marker='x', 
+                  linewidths=2, label=label if label else None, zorder=100)
+    
+    # Draw ellipses
+    for i in range(len(mus)):
+        ellipse = Ellipse(
+            (mus[i, 0], mus[i, 1]),
+            width=sigmas[i, 0] * sigma_scale,
+            height=sigmas[i, 1] * sigma_scale,
+            angle=np.degrees(thetas[i]),
+            edgecolor=color,
+            facecolor='none',
+            linewidth=linewidth,
+            alpha=alpha,
+            label=label if (i == 0 and not show_centers) else None,
+            zorder=99
+        )
+        ax.add_patch(ellipse)
+~~~
+
+<br/>
+
+~~~python
+# Scene setup
+H, W = 96, 96
+
+# Target: a single rotated Gaussian with purple color
+# Use batched format (1, k) for consistency with render_gaussians_2d
+target_mu = torch.tensor([[0.2, 0.1]], dtype=torch.float32)  # (1, 2)
+target_sigma = torch.tensor([[0.35, 0.25]], dtype=torch.float32)  # (1, 2)
+target_theta = torch.tensor([0.6], dtype=torch.float32)  # (1,) ~34 degrees rotation
+target_opacity = torch.tensor([0.95], dtype=torch.float32)  # (1,) opacity
+target_rgb = torch.tensor([[0.8, 0.3, 0.9]], dtype=torch.float32)  # (1, 3) Purple RGB
+
+img_target_g = render_gaussians_2d(H, W, target_mu, target_sigma, target_theta, target_opacity, target_rgb)
+
+# Visualize with and without ellipse boundary
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
+# Left: plain target image
+ax1.imshow(img_target_g.detach().cpu().numpy(), interpolation="nearest")
+ax1.set_title("Target Gaussian (rotated)")
+ax1.axis('off')
+
+# Right: target with ellipse boundary
+ax2.imshow(img_target_g.detach().cpu().numpy(), extent=[-1, 1, -1, 1], origin='upper', interpolation="nearest")
+draw_gaussian_ellipses(ax2, target_mu, target_sigma, target_theta, 
+                       color='yellow', label='Center', alpha=0.9)
+ax2.set_xlim(-1, 1)
+ax2.set_ylim(-1, 1)
+ax2.set_aspect('equal')
+ax2.set_title('Target with Ellipse Boundary (1.5σ)')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+~~~
+
+  - 학습하기
+    - 가우시안 스플릿 하나에서 하나로 맞추기
+
+~~~python
+# Optimization with PyTorch - now with separate opacity and RGB!
+mu_param = init_mu.clone().detach().requires_grad_(True)
+sigma_param = init_sigma.clone().detach().requires_grad_(True)
+theta_param = init_theta.clone().detach().requires_grad_(True)
+opacity_param = init_opacity.clone().detach().requires_grad_(True)
+rgb_param = init_rgb.clone().detach().requires_grad_(True)
+
+optimizer_g = torch.optim.Adam([mu_param, sigma_param, theta_param, opacity_param, rgb_param], lr=0.01)
+
+history_g = []
+snapshots_g = []
+snapshot_schedule_g = {0, 1, 2, 5, 10, 20, 40, 60, 100, 150, 200, 250}
+
+# Video frames
+video_frames_g = []
+video_sample_rate = 2
+
+# Snapshot initial state
+snapshots_g.append((0, mu_param.detach().clone(), sigma_param.detach().clone(),
+                    theta_param.detach().clone(), opacity_param.detach().clone(), rgb_param.detach().clone()))
+video_frames_g.append(img_init_g.detach().cpu().numpy())
+
+max_iters_g = 250
+for it in range(max_iters_g):
+    optimizer_g.zero_grad()
+    
+    # Clamp parameters to valid ranges
+    with torch.no_grad():
+        mu_param.clamp_(-1.0, 1.0)
+        sigma_param.clamp_(0.01, 2.0)
+        opacity_param.clamp_(0.0, 1.0)
+        rgb_param.clamp_(0.0, 1.0)
+        # No clamping for theta - let it rotate freely
+    
+    # Render and compute loss
+    img = render_gaussians_2d(H, W, mu_param, sigma_param, theta_param, opacity_param, rgb_param)
+    loss = torch.mean((img - img_target_g) ** 2)
+    
+    # Backward pass
+    loss.backward()
+    optimizer_g.step()
+    
+    # Record history
+    history_g.append(loss.item())
+    
+    # Take snapshots
+    if (it + 1) in snapshot_schedule_g:
+        snapshots_g.append((it + 1, mu_param.detach().clone(), sigma_param.detach().clone(),
+                           theta_param.detach().clone(), opacity_param.detach().clone(), rgb_param.detach().clone()))
+    
+    # Capture video frames
+    if (it + 1) % video_sample_rate == 0:
+        frame = render_gaussians_2d(H, W, mu_param, sigma_param, theta_param, opacity_param, rgb_param).detach().cpu().numpy()
+        video_frames_g.append(frame)
+
+# Add final frame
+final_frame = render_gaussians_2d(H, W, mu_param, sigma_param, theta_param, opacity_param, rgb_param).detach().cpu().numpy()
+video_frames_g.append(final_frame)
+
+print(f"Final loss: {history_g[-1]:.6f}")
+print(f"Final mu: {mu_param.detach().numpy()}")
+print(f"Final sigma: {sigma_param.detach().numpy()}")
+print(f"Final theta: {theta_param.detach().numpy()[0]:.4f} rad ({np.degrees(theta_param.detach().numpy()[0]):.1f}°)")
+print(f"Final opacity: {opacity_param.detach().numpy()}")
+print(f"Final RGB: {rgb_param.detach().numpy()}")
+~~~
+
+<br/>
+
+  - 삼각형을 스플릿으로 맞추는 학습하기
+
+~~~python
+// 삼각형 그리기
+# Helper function for triangle rendering (from 0202)
+def edge_function(a, b, p):
+    return (b[..., 0] - a[..., 0]) * (p[..., 1] - a[..., 1]) - (b[..., 1] - a[..., 1]) * (p[..., 0] - a[..., 0])
+
+def barycentric_weights(v0, v1, v2, p):
+    area = edge_function(v0, v1, v2)
+    area = torch.where(torch.abs(area) < 1e-12, torch.tensor(1e-12, device=area.device), area)
+    w0 = edge_function(v1, v2, p) / area
+    w1 = edge_function(v2, v0, p) / area
+    w2 = edge_function(v0, v1, p) / area
+    return w0, w1, w2
+
+def render_triangle_hard(H, W, verts, colors, background=(0.0, 0.0, 0.0)):
+    """Hard-edge triangle rasterizer."""
+    device = verts.device
+    P = make_pixel_grid(H, W, device=device)
+    v0, v1, v2 = verts[0], verts[1], verts[2]
+    area = edge_function(v0, v1, v2)
+    s = 1.0 if area >= 0 else -1.0
+    e0 = s * edge_function(v0, v1, P)
+    e1 = s * edge_function(v1, v2, P)
+    e2 = s * edge_function(v2, v0, P)
+    inside = (e0 >= 0) & (e1 >= 0) & (e2 >= 0)
+    w0, w1, w2 = barycentric_weights(v0, v1, v2, P)
+    rgb = (w0[..., None] * colors[0] + w1[..., None] * colors[1] + w2[..., None] * colors[2])
+    rgb = torch.clamp(rgb, 0.0, 1.0)
+    img = torch.zeros((H, W, 3), device=device, dtype=verts.dtype)
+    img[...] = torch.tensor(background, device=device, dtype=verts.dtype)
+    img[inside] = rgb[inside]
+    return img
+
+
+
+
+// 삼각형 표출
+# Create target triangle
+verts_target = torch.tensor([
+    [-0.65, -0.55],
+    [ 0.90, -0.20],
+    [-0.05,  0.75],
+], dtype=torch.float32)
+
+colors_target = torch.tensor([
+    [1.0, 0.0, 0.0],  # Red
+    [0.0, 1.0, 0.0],  # Green
+    [0.0, 0.0, 1.0],  # Blue
+], dtype=torch.float32)
+
+img_target_tri = render_triangle_hard(H, W, verts_target, colors_target)
+show_images([img_target_tri], ["Target Triangle (RGB)"])
+
+
+
+
+
+// 가우시안 24개
+# Initialize multiple random Gaussians to fit the triangle
+num_gaussians = 24  # Use multiple Gaussians to approximate the triangle
+
+# Random initialization
+torch.manual_seed(42)
+init_mus = torch.randn(num_gaussians, 2) * 0.5
+init_sigmas = torch.rand(num_gaussians, 2) * 0.2 + 0.1  # Random sizes
+init_thetas = torch.rand(num_gaussians) * 2 * np.pi  # Random rotations [0, 2π]
+init_opacities = torch.rand(num_gaussians) * 0.5 + 0.3  # Random opacities [0.3, 0.8]
+init_rgbs = torch.rand(num_gaussians, 3) * 0.6 + 0.2  # Random RGB colors
+
+img_init_tri = render_gaussians_2d(H, W, init_mus, init_sigmas, init_thetas, init_opacities, init_rgbs)
+d_rgb_tri, d_mag_tri = diff_image(img_init_tri, img_target_tri)
+show_images(
+    [img_target_tri, img_init_tri, d_mag_tri],
+    ["Target Triangle", f"Initial ({num_gaussians} Gaussians)", "|Target - Initial|"],
+    figsize=(12, 4)
+)
+
+
+
+
+
+// 학습하기
+# Optimize multiple Gaussians to fit the triangle - now with rotation!
+mus_param = init_mus.clone().detach().requires_grad_(True)
+sigmas_param = init_sigmas.clone().detach().requires_grad_(True)
+thetas_param = init_thetas.clone().detach().requires_grad_(True)
+opacities_param = init_opacities.clone().detach().requires_grad_(True)
+rgbs_param = init_rgbs.clone().detach().requires_grad_(True)
+
+optimizer_tri = torch.optim.Adam([mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param], lr=0.01)
+
+history_tri = []
+snapshots_tri = []
+snapshot_schedule_tri = {0, 1, 2, 5, 10, 20, 40, 80, 120, 160, 200, 250, 300, 350}
+
+# Video frames
+video_frames_tri = []
+video_sample_rate = 3
+
+# Snapshot initial state
+snapshots_tri.append((0, mus_param.detach().clone(), sigmas_param.detach().clone(),
+                     thetas_param.detach().clone(), opacities_param.detach().clone(), rgbs_param.detach().clone()))
+video_frames_tri.append(img_init_tri.detach().cpu().numpy())
+
+max_iters_tri = 350
+print(f"Optimizing {num_gaussians} Gaussians (with rotation) to fit triangle...")
+for it in range(max_iters_tri):
+    optimizer_tri.zero_grad()
+    
+    # Clamp parameters to valid ranges
+    with torch.no_grad():
+        mus_param.clamp_(-1.5, 1.5)
+        sigmas_param.clamp_(0.01, 1.0)
+        opacities_param.clamp_(0.0, 1.0)
+        rgbs_param.clamp_(0.0, 1.0)
+        # No clamping for thetas - let them rotate freely
+    
+    # Render all Gaussians and compute loss
+    img = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param)
+    loss = torch.mean((img - img_target_tri) ** 2)
+    
+    # Backward pass
+    loss.backward()
+    optimizer_tri.step()
+    
+    # Record history
+    history_tri.append(loss.item())
+    
+    # Take snapshots
+    if (it + 1) in snapshot_schedule_tri:
+        snapshots_tri.append((it + 1, mus_param.detach().clone(), sigmas_param.detach().clone(),
+                             thetas_param.detach().clone(), opacities_param.detach().clone(), rgbs_param.detach().clone()))
+    
+    # Capture video frames
+    if (it + 1) % video_sample_rate == 0:
+        frame = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param).detach().cpu().numpy()
+        video_frames_tri.append(frame)
+    
+    if (it + 1) % 50 == 0:
+        print(f"Iteration {it+1}/{max_iters_tri}, Loss: {loss.item():.6f}")
+
+# Add final frame
+final_frame = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param).detach().cpu().numpy()
+video_frames_tri.append(final_frame)
+
+
+print(f"Final loss: {history_tri[-1]:.6f}")
+print(f"Trained {num_gaussians} Gaussians to approximate triangle")
+~~~
+
+
+
+
+###### [미분 가능한 렌더링](#미분-가능한-렌더링)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
