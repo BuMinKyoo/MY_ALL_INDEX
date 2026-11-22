@@ -7,6 +7,7 @@
 - [가우시안 함수](#가우시안-함수)
 - [미분 가능한 렌더링](#미분-가능한-렌더링)
 - [렌더링 가속(바운딩 박스)](#렌더링-가속바운딩-박스)
+- [가우시안 밀도 조절 (분할,복제,제거)](#가우시안-밀도-조절-분할복제제거)
 
  
 
@@ -1193,15 +1194,471 @@ img[mask_bbox] = img[mask_bbox] + (opacity * rgb).view(1, 3) * f_x.unsqueeze(-1)
 ###### [Top](#top)
 
 
+<br/>
+<br/>
+
+# 가우시안 밀도 조절 (분할,복제,제거)
+  - 1. Splitting: 크기가 너무 커졌을 때 쪼개기
+  - 2. Cloning: 기울기(gradient)가 너무 클때 추가
+  - 3. Pruning: 투명해졌을 때 삭제
+
+<br/>
+
+  - 가우시안 스플랫 생성
+
+~~~python
+import numpy as np
+import torch
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, FFMpegWriter
+from IPython.display import Video
+from matplotlib.patches import Ellipse, Rectangle
+
+# Keep figures sharp
+plt.rcParams["figure.dpi"] = 120
+plt.rcParams["savefig.dpi"] = 120
+
+# Image size (normalized coordinate frame [-1, 1])
+H, W = 96, 96
+
+def make_pixel_grid(H, W, device="cpu"):
+    xs = (torch.arange(W, device=device) + 0.5) / W * 2 - 1
+    ys = (torch.arange(H, device=device) + 0.5) / H * 2 - 1
+    Y, X = torch.meshgrid(ys, xs, indexing="ij")
+    Y = torch.flip(Y, dims=[0])
+    return torch.stack([X, Y], dim=-1)
+
+def render_gaussians_2d(H, W, mus, sigmas, thetas, opacities, rgbs, n_sigma=3.0):
+    P = make_pixel_grid(H, W, device=mus.device)
+    img = torch.zeros((H, W, 3), device=mus.device, dtype=mus.dtype)
+
+    for i in range(len(mus)):
+        mu = mus[i]
+        sigma = torch.clamp(sigmas[i], min=1e-3)
+        theta = thetas[i]
+        opacity = opacities[i]
+        rgb = rgbs[i]
+
+        # Axis-aligned 3σ (default) box for the rotated ellipse to cull distant pixels
+        cos_t, sin_t = torch.cos(theta), torch.sin(theta)
+        half_w = n_sigma * (torch.abs(cos_t) * sigma[0] + torch.abs(sin_t) * sigma[1])
+        half_h = n_sigma * (torch.abs(sin_t) * sigma[0] + torch.abs(cos_t) * sigma[1])
+        x0, x1 = mu[0] - half_w, mu[0] + half_w
+        y0, y1 = mu[1] - half_h, mu[1] + half_h
+        mask_bbox = (P[..., 0] >= x0) & (P[..., 0] <= x1) & (P[..., 1] >= y0) & (P[..., 1] <= y1)
+        if not mask_bbox.any():
+            continue
+
+        # Gaussian evaluation only inside the bounding box
+        R = torch.stack([torch.stack([cos_t, -sin_t]), torch.stack([sin_t, cos_t])])
+        sigma_inv = R @ torch.diag(1.0 / (sigma ** 2)) @ R.T
+
+        diff = P[mask_bbox] - mu
+        exponent = torch.einsum("bi,ij,bj->b", diff, sigma_inv, diff)
+        f_x = torch.exp(-0.5 * exponent)
+        img[mask_bbox] = img[mask_bbox] + (opacity * rgb).view(1, 3) * f_x.unsqueeze(-1)
+
+    return torch.clamp(img, 0.0, 1.0)
+
+def draw_gaussian_ellipses(ax, mus, sigmas, thetas, color="yellow", label=None, alpha=0.7, n_sigma=3.0):
+    """Draw n-sigma ellipses for 2D Gaussians in normalized coords [-1, 1]."""
+    mus = mus.detach().cpu()
+    sigmas = sigmas.detach().cpu()
+    thetas = thetas.detach().cpu()
+    first = True
+    for i in range(len(mus)):
+        width = sigmas[i, 0].item() * n_sigma * 2.0
+        height = sigmas[i, 1].item() * n_sigma * 2.0
+        angle = float(thetas[i].item() * 180.0 / np.pi)
+        e = Ellipse(
+            (mus[i, 0].item(), mus[i, 1].item()),
+            width=width,
+            height=height,
+            angle=angle,
+            edgecolor=color,
+            facecolor="none",
+            linewidth=2.0,
+            alpha=alpha,
+            label=label if first and label is not None else None,
+        )
+        ax.add_patch(e)
+        first = False
+
+    ax.scatter(mus[:, 0], mus[:, 1], c=color, s=30, marker="x", linewidths=2, alpha=alpha)
+
+def show_images(images, titles, figsize=None, vmin=0.0, vmax=1.0):
+    n = len(images)
+    figsize = figsize or (3.6 * n, 3.6)
+    fig, axes = plt.subplots(1, n, figsize=figsize)
+    axes = [axes] if n == 1 else axes
+    for ax, im, title in zip(axes, images, titles):
+        if torch.is_tensor(im):
+            im = im.detach().cpu().numpy()
+        ax.imshow(im, vmin=vmin, vmax=vmax, interpolation="nearest")
+        ax.set_title(title)
+        ax.axis("off")
+    plt.tight_layout()
+    plt.show()
+
+def show_image_grid(images, titles, cols=4, cell_size=3.2, vmin=0.0, vmax=1.0):
+    n = len(images)
+    cols = int(max(1, cols))
+    rows = int(np.ceil(n / cols))
+    fig, axes = plt.subplots(rows, cols, figsize=(cell_size * cols, cell_size * rows))
+    axes = np.array(axes).reshape(rows, cols)
+    for i in range(rows * cols):
+        r, c = divmod(i, cols)
+        ax = axes[r, c]
+        if i < n:
+            im = images[i]
+            if torch.is_tensor(im):
+                im = im.detach().cpu().numpy()
+            ax.imshow(im, vmin=vmin, vmax=vmax, interpolation="nearest")
+            ax.set_title(titles[i])
+        ax.axis("off")
+    plt.tight_layout()
+    plt.show()
+
+def diff_image(a, b):
+    d = torch.abs(a - b)
+    mag = torch.clamp(torch.norm(d, dim=-1, keepdim=True) / np.sqrt(3.0), 0.0, 1.0)
+    return d, mag.repeat(1, 1, 3)
+
+def save_training_video(frames, filename, fps=30, title="Training Progress"):
+    if len(frames) == 0:
+        print(f"No frames to save for {filename}")
+        return
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.set_title(title)
+    ax.axis("off")
+
+    im_display = ax.imshow(frames[0], vmin=0.0, vmax=1.0, interpolation="nearest")
+    text = ax.text(0.5, -0.05, "Iteration: 0", transform=ax.transAxes, ha="center", fontsize=12)
+
+    def update(frame_idx):
+        im_display.set_array(frames[frame_idx])
+        text.set_text(f"Iteration: {frame_idx}")
+        return [im_display, text]
+
+    anim = FuncAnimation(fig, update, frames=len(frames), interval=1000 / fps, blit=True)
+    writer = FFMpegWriter(fps=fps, bitrate=1800)
+    anim.save(filename, writer=writer)
+    plt.close(fig)
+    print(f"Video saved to {filename}")
+~~~
+
+<br/>
+
+  - Splitting: 크기가 너무 커졌을 때 쪼개기
+    - max_sigma 로 얼마나 커졌을때 쪼갤지 하이퍼파라미터
+    - split_gaussians_if_large 함수 안에서 어떻게 쪼갤지 정하기
+
+~~~python
+def split_gaussians_if_large(mus, sigmas, thetas, opacities, rgbs, max_sigma=0.35):
+    """Split Gaussians whose largest sigma exceeds max_sigma along their major axis."""
+    largest = sigmas.max(dim=1).values
+    large_mask = largest > max_sigma
+    if not torch.any(large_mask):
+        return mus, sigmas, thetas, opacities, rgbs
+    
+    # Clone originals to serve as the "updated parents" (Child 1)
+    # This preserves index alignment: index i corresponds to optimizer param i
+    new_mus = mus.clone()
+    new_sigmas = sigmas.clone()
+    new_thetas = thetas.clone()
+    new_opacities = opacities.clone()
+    new_rgbs = rgbs.clone()
+    
+    # Collect new children (Child 2) to append at the end
+    added_mus, added_sigmas, added_thetas, added_opacities, added_rgbs = [], [], [], [], []
+    
+    split_indices = torch.nonzero(large_mask).flatten()
+    num_splits = len(split_indices)
+    if num_splits > 0:
+        print(f"Splitting: {num_splits} Gaussians → {num_splits} new points added")
+    
+    for i in split_indices:
+        cos_t, sin_t = torch.cos(thetas[i]), torch.sin(thetas[i])
+        R = torch.stack([torch.stack([cos_t, -sin_t]), torch.stack([sin_t, cos_t])])
+        major_first = sigmas[i, 0] >= sigmas[i, 1]
+        major_dir = R[:, 0] if major_first else R[:, 1]
+        
+        offset = major_dir * (largest[i] * 0.35)
+        child_sigma = torch.clamp(sigmas[i] * 0.7, min=1e-3)
+        child_opacity = opacities[i] * 0.5
+        
+        # Update original slot (Child 1)
+        new_mus[i] = mus[i] + offset
+        new_sigmas[i] = child_sigma
+        new_opacities[i] = child_opacity
+        
+        # Create new particle (Child 2)
+        added_mus.append(mus[i] - offset)
+        added_sigmas.append(child_sigma)
+        added_thetas.append(thetas[i])
+        added_opacities.append(child_opacity)
+        added_rgbs.append(rgbs[i])
+        
+    # Concatenate: [Updated Originals] + [New Children]
+    return (
+        torch.cat([new_mus, torch.stack(added_mus)], dim=0),
+        torch.cat([new_sigmas, torch.stack(added_sigmas)], dim=0),
+        torch.cat([new_thetas, torch.stack(added_thetas)], dim=0),
+        torch.cat([new_opacities, torch.stack(added_opacities)], dim=0),
+        torch.cat([new_rgbs, torch.stack(added_rgbs)], dim=0)
+    )
+
+# Demo: one oversized Gaussian gets split into two children
+mus_demo = torch.tensor([[0.0, 0.0]], dtype=torch.float32)
+sigmas_demo = torch.tensor([[0.7, 0.4]], dtype=torch.float32)
+thetas_demo = torch.tensor([0.2], dtype=torch.float32)
+opacities_demo = torch.tensor([0.9], dtype=torch.float32)
+rgbs_demo = torch.tensor([[1.0, 0.8, 0.2]], dtype=torch.float32)
+
+img_before = render_gaussians_2d(H, W, mus_demo, sigmas_demo, thetas_demo, opacities_demo, rgbs_demo)
+split_out = split_gaussians_if_large(mus_demo, sigmas_demo, thetas_demo, opacities_demo, rgbs_demo, max_sigma=0.35)
+mus_split, sigmas_split, thetas_split, opacities_split, rgbs_split = split_out
+img_after = render_gaussians_2d(H, W, mus_split, sigmas_split, thetas_split, opacities_split, rgbs_split)
+
+print(f"Gaussians before: {len(mus_demo)}, after split: {len(mus_split)}")
+
+# Draw Gaussian boundaries (n-sigma ellipses) on top of the images
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+pairs = [
+    (axes[0], img_before, "Before split", mus_demo, sigmas_demo, thetas_demo),
+    (axes[1], img_after, "After split", mus_split, sigmas_split, thetas_split),
+]
+for ax, img, title, mus_v, sigmas_v, thetas_v in pairs:
+    ax.imshow(img.detach().cpu().numpy(), extent=[-1, 1, -1, 1], origin="upper", vmin=0.0, vmax=1.0)
+    draw_gaussian_ellipses(ax, mus_v, sigmas_v, thetas_v, color="cyan", alpha=0.8, n_sigma=1.5)
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_title(title)
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
+~~~
+
+<br/>
+
+  - Cloning: 기울기(gradient)가 너무 클때 추가
+    - 기울기가 grad_threshold 이상이면 복사함
+    - 가우시안의 중심을 조금 움직였을 때, 렌더링 이미지와 목표 이미지의 차이인 loss가 얼마나 변하는지 나타내는 값
+      - 대응되는 픽셀은 놔두고, 스플릿의 중심이 옮겨지는것에 따라 loss를 확인했을때 크면 기울기가 크다고 하는것
+      - 기울기가 커서 스플릿을 복사한다고 해서 loss가 작아지는것은 아니지만(스플릿되는 영역이 밝아질뿐), 복제하는 이유는 이후 학습에서 두 스플랫을 따로 조정할 수 있게 하기 위해서임
+
+<br/>
+
+~~~python
+def clone_gaussians_if_high_grad(mus, sigmas, thetas, opacities, rgbs, mus_grad, grad_threshold=0.1, max_sigma=None):
+    """
+    Clone Gaussians whose positional gradient norm exceeds grad_threshold.
+    If max_sigma is provided, do NOT clone Gaussians larger than this size (they should be split instead).
+    """
+    if mus_grad is None:
+        return mus, sigmas, thetas, opacities, rgbs
+
+    # Compute gradient norms
+    grad_norms = torch.norm(mus_grad, dim=-1)
+    clone_mask = grad_norms > grad_threshold
+    
+    # Exclude large Gaussians if requested (they should be split, not cloned)
+    if max_sigma is not None:
+        largest_sigma = sigmas.max(dim=1).values
+        large_mask = largest_sigma > max_sigma
+        clone_mask = clone_mask & (~large_mask)
+    
+    if not torch.any(clone_mask):
+        return mus, sigmas, thetas, opacities, rgbs
+    
+    # Indices to clone
+    clone_indices = torch.nonzero(clone_mask).flatten()
+    num_clones = len(clone_indices)
+    if num_clones > 0:
+        print(f"Cloning: {num_clones} Gaussians → {num_clones} new points added")
+    
+    # Create clones (duplicates)
+    added_mus = mus[clone_indices].clone()
+    added_sigmas = sigmas[clone_indices].clone()
+    added_thetas = thetas[clone_indices].clone()
+    added_opacities = opacities[clone_indices].clone()
+    added_rgbs = rgbs[clone_indices].clone()
+    
+    # Concatenate original + clones
+    return (
+        torch.cat([mus, added_mus], dim=0),
+        torch.cat([sigmas, added_sigmas], dim=0),
+        torch.cat([thetas, added_thetas], dim=0),
+        torch.cat([opacities, added_opacities], dim=0),
+        torch.cat([rgbs, added_rgbs], dim=0)
+    )
+
+# Demo: Clone a Gaussian with high gradient
+mus_demo_c = torch.tensor([[0.0, 0.0]], dtype=torch.float32)
+sigmas_demo_c = torch.tensor([[0.2, 0.2]], dtype=torch.float32)
+thetas_demo_c = torch.tensor([0.0], dtype=torch.float32)
+opacities_demo_c = torch.tensor([0.5], dtype=torch.float32)
+rgbs_demo_c = torch.tensor([[0.0, 1.0, 0.0]], dtype=torch.float32) # Green
+
+# Simulate high gradient
+rl = torch.tensor([[1.0, 1.0]], dtype=torch.float32)
+
+img_before_c = render_gaussians_2d(H, W, mus_demo_c, sigmas_demo_c, thetas_demo_c, opacities_demo_c, rgbs_demo_c)
+
+clone_out = clone_gaussians_if_high_grad(
+    mus_demo_c, sigmas_demo_c, thetas_demo_c, opacities_demo_c, rgbs_demo_c, 
+    mus_grad_demo, grad_threshold=0.5
+)
+mus_clone, sigmas_clone, thetas_clone, opacities_clone, rgbs_clone = clone_out
+
+img_after_c = render_gaussians_2d(H, W, mus_clone, sigmas_clone, thetas_clone, opacities_clone, rgbs_clone)
+
+print(f"Gaussians before: {len(mus_demo_c)}, after clone: {len(mus_clone)}")
+
+# Visualization
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+pairs = [
+    (axes[0], img_before_c, "Before clone", mus_demo_c, sigmas_demo_c, thetas_demo_c),
+    (axes[1], img_after_c, "After clone", mus_clone, sigmas_clone, thetas_clone),
+]
+for ax, img, title, mus_v, sigmas_v, thetas_v in pairs:
+    ax.imshow(img.detach().cpu().numpy(), extent=[-1, 1, -1, 1], origin="upper", vmin=0.0, vmax=1.0)
+    draw_gaussian_ellipses(ax, mus_v, sigmas_v, thetas_v, color="magenta", alpha=0.8, n_sigma=1.5)
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_title(title)
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
+~~~
+
+<br/>
+
+  - Pruning: 투명해졌을 때 삭제
+    - min_opacity 정해놓은 불투명도보다 opacities 크면 제거하기(불투명도가 크다는건 더 불투명 하다는것)
+
+<br/>
+
+~~~python
+def prune_gaussians(mus, sigmas, thetas, opacities, rgbs, min_opacity=0.01, max_sigma=None):
+    """
+    Remove Gaussians with opacity below min_opacity or size exceeding max_sigma.
+    Returns filtered tensors and a mask indicating which Gaussians to keep.
+    """
+    # Create keep mask based on opacity
+    keep_mask = opacities >= min_opacity
+    
+    # Optionally filter by maximum size
+    if max_sigma is not None:
+        largest_sigma = sigmas.max(dim=1).values
+        size_mask = largest_sigma <= max_sigma
+        keep_mask = keep_mask & size_mask
+    
+    num_pruned = (~keep_mask).sum().item()
+    if num_pruned > 0:
+        print(f"Pruning: {num_pruned} Gaussians removed (kept {keep_mask.sum().item()})")
+    
+    if not torch.any(keep_mask):
+        print("Warning: All Gaussians would be pruned! Keeping all instead.")
+        return mus, sigmas, thetas, opacities, rgbs, torch.ones_like(opacities, dtype=torch.bool)
+    
+    # Filter all parameters
+    return (
+        mus[keep_mask],
+        sigmas[keep_mask],
+        thetas[keep_mask],
+        opacities[keep_mask],
+        rgbs[keep_mask],
+        keep_mask
+    )
+
+def remove_from_optimizer(opt, old_params, keep_mask):
+    """
+    Remove pruned points from optimizer state (opposite of extend_optimizer_with_new_points).
+    Returns new parameters with only the kept Gaussians.
+    """
+    mus_old, sigmas_old, thetas_old, opacities_old, rgbs_old = old_params
+    
+    # Helper to filter a single parameter and its optimizer state
+    def _filter_param_and_state(opt, old_param, keep_mask):
+        group = opt.param_groups[0]
+        idx = None
+        for i, p in enumerate(group["params"]):
+            if p is old_param:
+                idx = i
+                break
+        if idx is None:
+            raise ValueError("Parameter not found in optimizer")
+        
+        # Filter the parameter
+        filtered_data = old_param.data[keep_mask]
+        new_param = torch.nn.Parameter(filtered_data)
+        group["params"][idx] = new_param
+        
+        # Filter the optimizer state
+        state = opt.state.pop(old_param, {})
+        if state:
+            step = state.get("step", 0)
+            exp_avg = state.get("exp_avg", torch.zeros_like(old_param))
+            exp_avg_sq = state.get("exp_avg_sq", torch.zeros_like(old_param))
+            opt.state[new_param] = {
+                "step": step,
+                "exp_avg": exp_avg[keep_mask],
+                "exp_avg_sq": exp_avg_sq[keep_mask],
+            }
+        
+        return new_param
+    
+    # Filter all parameters and their states
+    mus_param = _filter_param_and_state(opt, mus_old, keep_mask)
+    sigmas_param = _filter_param_and_state(opt, sigmas_old, keep_mask)
+    thetas_param = _filter_param_and_state(opt, thetas_old, keep_mask)
+    opacities_param = _filter_param_and_state(opt, opacities_old, keep_mask)
+    rgbs_param = _filter_param_and_state(opt, rgbs_old, keep_mask)
+    
+    return mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param
+
+# Demo: Prune low-opacity Gaussians
+mus_demo_p = torch.tensor([[0.0, 0.0], [0.5, 0.5], [-0.3, 0.3]], dtype=torch.float32)
+sigmas_demo_p = torch.tensor([[0.2, 0.2], [0.15, 0.15], [0.25, 0.2]], dtype=torch.float32)
+thetas_demo_p = torch.tensor([0.0, 0.5, -0.3], dtype=torch.float32)
+opacities_demo_p = torch.tensor([0.7, 0.005, 0.6], dtype=torch.float32)  # Middle one is nearly transparent
+rgbs_demo_p = torch.tensor([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]], dtype=torch.float32)
+
+img_before_p = render_gaussians_2d(H, W, mus_demo_p, sigmas_demo_p, thetas_demo_p, opacities_demo_p, rgbs_demo_p)
+
+prune_out = prune_gaussians(
+    mus_demo_p, sigmas_demo_p, thetas_demo_p, opacities_demo_p, rgbs_demo_p, 
+    min_opacity=0.01
+)
+mus_pruned, sigmas_pruned, thetas_pruned, opacities_pruned, rgbs_pruned, keep_mask = prune_out
+
+img_after_p = render_gaussians_2d(H, W, mus_pruned, sigmas_pruned, thetas_pruned, opacities_pruned, rgbs_pruned)
+
+print(f"Gaussians before: {len(mus_demo_p)}, after pruning: {len(mus_pruned)}")
+print(f"Removed opacities: {opacities_demo_p[~keep_mask].tolist()}")
+
+# Visualization
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+pairs = [
+    (axes[0], img_before_p, f"Before pruning ({len(mus_demo_p)} points)", mus_demo_p, sigmas_demo_p, thetas_demo_p),
+    (axes[1], img_after_p, f"After pruning ({len(mus_pruned)} points)", mus_pruned, sigmas_pruned, thetas_pruned),
+]
+for ax, img, title, mus_v, sigmas_v, thetas_v in pairs:
+    ax.imshow(img.detach().cpu().numpy(), extent=[-1, 1, -1, 1], origin="upper", vmin=0.0, vmax=1.0)
+    draw_gaussian_ellipses(ax, mus_v, sigmas_v, thetas_v, color="yellow", alpha=0.8, n_sigma=1.5)
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_title(title)
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
+~~~
 
 
-
-
-
-
-
-
-
+###### [가우시안 밀도 조절 (분할,복제,제거)](#가우시안-밀도-조절-분할복제제거)
+###### [Top](#top)
 
 
 
