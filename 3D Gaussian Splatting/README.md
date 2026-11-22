@@ -1656,6 +1656,268 @@ plt.tight_layout()
 plt.show()
 ~~~
 
+<br/>
+
+  - L1과 D-SSIM 을 LOSS함수로 해서 학습하기
+
+~~~python
+// 초기 생성 세팅
+# Initialize multiple random Gaussians to fit the triangle
+num_gaussians = 3  # Use multiple Gaussians to approximate the triangle
+
+# Random initialization
+torch.manual_seed(42)
+init_mus = torch.randn(num_gaussians, 2) * 0.5
+init_sigmas = torch.rand(num_gaussians, 2) * 0.2 + 0.1  # Random sizes
+init_thetas = torch.rand(num_gaussians) * 2 * np.pi  # Random rotations [0, 2π]
+init_opacities = torch.rand(num_gaussians) * 0.5 + 0.3  # Random opacities [0.3, 0.8]
+init_rgbs = torch.rand(num_gaussians, 3) * 0.6 + 0.2  # Random RGB colors
+
+img_init_tri = render_gaussians_2d(H, W, init_mus, init_sigmas, init_thetas, init_opacities, init_rgbs)
+d_rgb_tri, d_mag_tri = diff_image(img_init_tri, img_target_tri)
+show_images(
+    [img_target_tri, img_init_tri, d_mag_tri],
+    ["Target Triangle", f"Initial ({num_gaussians} Gaussians)", "|Target - Initial|"],
+    figsize=(12, 4)
+)
+
+
+
+
+// ssim 로스 함수
+import torch.nn.functional as F
+
+def create_window(window_size, channel):
+    def gaussian(window_size, sigma):
+        gauss = torch.exp(torch.tensor([-(x - window_size // 2) ** 2 / float(2 * sigma ** 2) for x in range(window_size)]))
+        return gauss / gauss.sum()
+
+    _1D_window = gaussian(window_size, 1.5).unsqueeze(1)
+    _2D_window = _1D_window.mm(_1D_window.t()).float().unsqueeze(0).unsqueeze(0)
+    window = _2D_window.expand(channel, 1, window_size, window_size).contiguous()
+    return window
+
+def ssim(img1, img2, window_size=11, size_average=True):
+    # Expects [H, W, C] images, converts to [1, C, H, W]
+    if img1.ndim == 3:
+        img1 = img1.permute(2, 0, 1).unsqueeze(0)
+        img2 = img2.permute(2, 0, 1).unsqueeze(0)
+    
+    channel = img1.size(1)
+    window = create_window(window_size, channel)
+    
+    if img1.is_cuda:
+        window = window.cuda(img1.get_device())
+    window = window.type_as(img1)
+
+    mu1 = F.conv2d(img1, window, padding=window_size // 2, groups=channel)
+    mu2 = F.conv2d(img2, window, padding=window_size // 2, groups=channel)
+
+    mu1_sq = mu1.pow(2)
+    mu2_sq = mu2.pow(2)
+    mu1_mu2 = mu1 * mu2
+
+    sigma1_sq = F.conv2d(img1 * img1, window, padding=window_size // 2, groups=channel) - mu1_sq
+    sigma2_sq = F.conv2d(img2 * img2, window, padding=window_size // 2, groups=channel) - mu2_sq
+    sigma12 = F.conv2d(img1 * img2, window, padding=window_size // 2, groups=channel) - mu1_mu2
+
+    C1 = 0.01 ** 2
+    C2 = 0.03 ** 2
+
+    ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
+
+    if size_average:
+        return ssim_map.mean()
+    else:
+        return ssim_map.mean(1).mean(1).mean(1)
+
+
+
+
+// 학습하기
+# Optimize multiple Gaussians to fit the triangle - now with rotation and pruning!
+mus_param = init_mus.clone().detach().requires_grad_(True)
+sigmas_param = init_sigmas.clone().detach().requires_grad_(True)
+thetas_param = init_thetas.clone().detach().requires_grad_(True)
+opacities_param = init_opacities.clone().detach().requires_grad_(True)
+rgbs_param = init_rgbs.clone().detach().requires_grad_(True)
+
+optimizer_tri = torch.optim.Adam([mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param], lr=0.01)
+
+# Learning rate scheduler: exponential decay
+lr_decay_rate = 0.995  # Decay factor per iteration
+scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer_tri, gamma=lr_decay_rate)
+
+history_tri = []
+history_lr = []  # Track learning rate
+snapshots_tri = []
+snapshot_schedule_tri = {0, 1, 2, 5, 10, 20, 40, 80, 120, 160, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000}
+
+# Video frames
+video_frames_tri = []
+video_sample_rate = 1
+
+# Snapshot initial state
+snapshots_tri.append((0, mus_param.detach().clone(), sigmas_param.detach().clone(),
+                     thetas_param.detach().clone(), opacities_param.detach().clone(), rgbs_param.detach().clone()))
+video_frames_tri.append(img_init_tri.detach().cpu().numpy())
+
+max_iters_tri = 1000
+densify_interval = 30
+prune_interval = 10  
+max_sigma_threshold = 0.3 # Threshold for splitting (and avoiding cloning)
+min_opacity_threshold = 0.05  # Minimum opacity to keep a Gaussian
+
+for it in range(max_iters_tri):
+    optimizer_tri.zero_grad()
+    
+    # Clamp parameters to valid ranges
+    with torch.no_grad():
+        mus_param.clamp_(-1.5, 1.5)
+        sigmas_param.clamp_(0.01, 1.0)
+        opacities_param.clamp_(0.0, 1.0)
+        rgbs_param.clamp_(0.0, 1.0)
+        # No clamping for thetas - let them rotate freely
+    
+    # Render all Gaussians and compute loss
+    img = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param)
+    
+    # L1 + D-SSIM loss
+    lambda_dssim = 0.2
+    l1_loss = torch.abs(img - img_target_tri).mean()
+    ssim_loss = 1.0 - ssim(img, img_target_tri)
+    loss = (1.0 - lambda_dssim) * l1_loss + lambda_dssim * ssim_loss
+    
+    # Backward pass
+    loss.backward()
+    
+    # Save gradients before optimizer step (for cloning decision)
+    mus_grad = mus_param.grad.clone() if mus_param.grad is not None else None
+    
+    optimizer_tri.step()
+    
+    # Learning rate decay starts from iteration 300
+    if it >= 300:
+        scheduler.step()
+    
+    # Density control: Clone, Split, and Prune
+    if (it + 1) % densify_interval == 0 or (it + 1) % prune_interval == 0:
+        with torch.no_grad():
+            # Densification: Clone and Split (only until iter 300)
+            if (it + 1) % densify_interval == 0 and it < 300:
+                prev_count = mus_param.shape[0]
+                
+                # 1. Clone high-gradient Gaussians (that are NOT large)
+                clone_full = clone_gaussians_if_high_grad(
+                    mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param,
+                    mus_grad, grad_threshold=0.0002, max_sigma=max_sigma_threshold
+                )
+                
+                # 2. Split large Gaussians
+                split_full = split_gaussians_if_large(
+                    clone_full[0], clone_full[1], clone_full[2], clone_full[3], clone_full[4], 
+                    max_sigma=max_sigma_threshold
+                )
+                
+                # 3. Extend the optimizer with new points
+                mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param = extend_optimizer_with_new_points(
+                    optimizer_tri,
+                    (mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param),
+                    split_full,
+                    prev_count,
+                )
+                mus_param.requires_grad_(True)
+                sigmas_param.requires_grad_(True)
+                thetas_param.requires_grad_(True)
+                opacities_param.requires_grad_(True)
+                rgbs_param.requires_grad_(True)
+            
+            # Pruning: Remove low-opacity Gaussians (continues throughout all training)
+            if (it + 1) % prune_interval == 0:
+                prune_result = prune_gaussians(
+                    mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param,
+                    min_opacity=min_opacity_threshold, max_sigma=None
+                )
+                mus_pruned, sigmas_pruned, thetas_pruned, opacities_pruned, rgbs_pruned, keep_mask = prune_result
+                
+                # Only update if we actually pruned something
+                if keep_mask.sum() < len(mus_param):
+                    mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param = remove_from_optimizer(
+                        optimizer_tri,
+                        (mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param),
+                        keep_mask
+                    )
+                    mus_param.requires_grad_(True)
+                    sigmas_param.requires_grad_(True)
+                    thetas_param.requires_grad_(True)
+                    opacities_param.requires_grad_(True)
+                    rgbs_param.requires_grad_(True)
+    
+    # Record history
+    history_tri.append(loss.item())
+    history_lr.append(scheduler.get_last_lr()[0])
+    
+    # Take snapshots
+    if (it + 1) in snapshot_schedule_tri:
+        snapshots_tri.append((it + 1, mus_param.detach().clone(), sigmas_param.detach().clone(),
+                             thetas_param.detach().clone(), opacities_param.detach().clone(), rgbs_param.detach().clone()))
+    
+    # Capture video frames
+    if (it + 1) % video_sample_rate == 0:
+        frame = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param).detach().cpu().numpy()
+        video_frames_tri.append(frame)
+    
+    if (it + 1) % 50 == 0:
+        current_lr = scheduler.get_last_lr()[0]
+        print(f"Iteration {it+1}/{max_iters_tri}, Loss: {loss.item():.6f}, LR: {current_lr:.6f}, Gaussians: {mus_param.shape[0]}")
+
+# Add final frame
+final_frame = render_gaussians_2d(H, W, mus_param, sigmas_param, thetas_param, opacities_param, rgbs_param).detach().cpu().numpy()
+video_frames_tri.append(final_frame)
+
+print(f"Final loss: {history_tri[-1]:.6f}")
+print(f"Final learning rate: {history_lr[-1]:.6f}")
+print(f"Final number of Gaussians: {mus_param.shape[0]} (started with {num_gaussians})")
+~~~
+
+<br/>
+
+  - 학습 하이퍼파라미터
+
+~~~text
+## 학습 하이퍼파라미터
+
+1. 시작 러닝레이트 `lr = 0.01`
+   학습 초반에 위치, 크기, 색을 얼마나 크게 바꿀지 정한다.
+
+2. 러닝레이트 감소 비율 `lr_decay_rate = 0.995`
+   후반에는 매 반복마다 러닝레이트에 `0.995`를 곱한다.
+
+3. 총 학습 횟수 `max_iters_tri = 1000`
+   파라미터를 총 몇 번 업데이트할지 정한다.
+
+4. 복제·분할 검사 간격 `densify_interval = 30`
+   30회마다 복제와 분할 대상을 찾는다.
+   마지막 검사는 300회째에 한다.
+
+5. 복제 기울기 기준 `grad_threshold = 0.0002`
+   위치 기울기의 크기가 이 값을 넘으면 복제 후보가 된다.
+
+6. 분할 크기 기준 `max_sigma_threshold = 0.3`
+   가장 큰 sigma가 이 값을 넘으면 분할 대상이 된다.
+   이 값 이하면 기울기 기준을 통과한 경우 복제할 수 있다.
+
+7. 제거 검사 간격 `prune_interval = 10`
+   10회마다 제거 대상을 찾는다.
+   1000회 학습이 끝날 때까지 계속 검사한다.
+
+8. 최소 불투명도 `min_opacity_threshold = 0.05`
+   불투명도가 이 값보다 낮은 가우시안은 제거 후보가 된다.
+
+9. 구조 손실 비중 `lambda_dssim = 0.2`
+   전체 손실에 픽셀 오차(L1)를 80%,
+   구조 차이(1 - SSIM)를 20% 반영한다.
+~~~
 
 ###### [가우시안 밀도 조절 (분할,복제,제거)](#가우시안-밀도-조절-분할복제제거)
 ###### [Top](#top)
