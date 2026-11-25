@@ -2016,6 +2016,21 @@ pixel = [0.5, 0.3, 0.6] 값이 된다, 이것을 다시 0~255로 바꾸고 컬�
 <img width="311" height="82" alt="image" src="https://github.com/user-attachments/assets/b4a091ae-9cdb-4938-bee4-a17ad61207e1" />
 
 <br/>
+<br/>
+
+  - CUDA
+
+<img width="598" height="111" alt="image" src="https://github.com/user-attachments/assets/e33eca06-01a3-479a-a4bd-d31418b9fbaf" />
+
+<br/>
+<br/>
+
+  - 각 계수 sh[k]에 곱할 기저 함수의 계산식을, 인덱스 순서대로 나열한 표
+    - 예를 들어 index 2를 보면
+    - sh[2] * (SH_C1 × z) 가 된다
+
+<img width="912" height="883" alt="image" src="https://github.com/user-attachments/assets/b463ce5c-642c-4ecf-8baa-0ce5d9beef4a" />
+
 
 ~~~text
 // 구면 조화 함수 수식과 CUDA 코드 연결
@@ -2070,43 +2085,15 @@ sh[1] → 현재 가우시안의 (ℓ=1, m=-1) RGB 계수
 
 
 
+3. 밴드
 
+밴드0일 때는 -> (0, 0) 이거 한개 들어가 있음
+glm::vec3 result = SH_C0 * sh[0];  // Band 0
 
+밴드1일때는 m 이 -1 부터 1까지니까 -1, 0, 1 이렇게 3개 (1, 0), (1, 1), (1, 2)
+result = result - SH_C1 * y * sh[1] + SH_C1 * z * sh[2] - SH_C1 * x * sh[3];
 
-
-
-
-
-3. 수식의 Y_real[ℓ, m](θ, φ) → CUDA의 방향 계산식
-예를 들어 (ℓ, m) = (1, 0)이면,
-기저 함수 Y_real[1, 0]의 값은 SH_C1 × z다.
-
-아래 줄에서 SH_C1 × z 부분이 기저 함수 값이고,
-sh[2]는 거기에 곱하는 학습된 RGB 계수다.
-따라서 이 줄 전체가 시그마 안의 한 항에 해당한다.
-
-        + SH_C1 * z * sh[2]
-
-
-4. 수식의 시그마 두 개 → CUDA에서 result에 더하기
-수식의 최대 차수 L은 코드의 deg에 해당한다.
-deg = 1일 때 바깥 시그마는 ℓ = 0, 1을 돈다.
-
-ℓ = 0  →  m = 0인 한 항으로 result를 시작한다.
-ℓ = 1  →  m = −1, 0, 1인 세 항을 result에 더한다.
-
-수식에서는 시그마로 묶어 쓴 네 항을
-CUDA에서는 아래처럼 하나씩 펼쳐서 더한다.
-
-glm::vec3 result = SH_C0 * sh[0];  // (ℓ, m) = (0,  0)
-
-if (deg > 0)
-{
-    result = result
-        - SH_C1 * y * sh[1]       // (ℓ, m) = (1, −1)
-        + SH_C1 * z * sh[2]       // (ℓ, m) = (1,  0)
-        - SH_C1 * x * sh[3];      // (ℓ, m) = (1,  1)
-}
+밴드2일때는 m 이 -2 부터 2까지니까 -2, -1, 0, 1, 2 이렇게 5개 
 ~~~
 
 <br/>
