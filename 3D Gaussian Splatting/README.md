@@ -2205,7 +2205,7 @@ for i in sorted_gaussians:  # Front-to-back
 
 <br/>
 
-  - CUDA코드
+  - CUDA코드(볼륨 렌더링)
 
 ~~~c++
 float T = 1.0f;              // Transmittance -> 앞쪽 스플랫들을 지나고 남은 투과율
@@ -2242,11 +2242,116 @@ for (int j = 0; !done && j < min(BLOCK_SIZE, toDo); j++)
 
 ~~~
 
+<br/>
+
+~~~text
+// 타일 기반 래스터화
+
+1. 타일 ID와 깊이를 하나의 키로 만든다
+먼저 화면을 16×16 픽셀 타일로 나눈다.
+각 스플랫의 바운딩 박스가 걸치는 타일마다 정렬 키와 스플랫 ID를 하나씩 기록한다
+
+정렬 키의 상위 32비트는 타일 ID, 하위 32비트는 카메라 기준 깊이를 담는다.
+이 키로 전체를 한 번 정렬하면, 타일별로 모이면서 각 타일 안에서는 가까운 순이 된다
+
+예를 들어 A는 타일 0과 1에 걸치고,
+B는 타일 0, C는 타일 1에만 걸친다고 하자
+
+             (타일 ID, 깊이, 스플랫)
+정렬 전:      (0, 4, A)
+              (1, 4, A)
+              (0, 1, B)
+              (1, 2, C)
+
+정렬 후:      (0, 1, B)
+              (0, 4, A)
+              (1, 2, C)
+              (1, 4, A)
 
 
+2. 각 타일이 읽을 범위를 찾는다
+정렬된 스플랫 ID 목록은 `[B, A, C, A]`다.
+타일 ID가 바뀌는 지점을 찾아
+각 타일의 시작과 끝 인덱스를 저장한다
+
+타일 0: [0, 2) → B, A
+타일 1: [2, 4) → C, A
 
 
+3. 자기 타일의 픽셀만 그린다
+타일 하나를 CUDA 블록 하나가 맡는다.
+블록의 스레드는 각각 자기 타일의 픽셀 하나를 계산한다
 
+의 중심이 타일 1에 있어도,
+A가 타일 0까지 퍼지면 두 블록 모두 중심 좌표가 필요하다.
+두 블록은 같은 스플랫 ID로 GPU 전역 메모리(VRAM)를 읽고,
+필요한 데이터를 각자의 공유 메모리에 가져온다
+
+공유 메모리에 올린 중심과 모양은
+같은 블록 안의 스레드들이 함께 사용한다.
+각 스레드는 자기 픽셀에서 그 중심까지의 거리를 구하고,
+그 픽셀의 가우시안 가중치와 최종 색을 계산한다
+~~~
+
+<br/>
+
+  - key만드는 cuda코드
+
+~~~c++
+__global__ void identifyTileRanges(int L, uint64_t* point_list_keys, uint2* ranges)
+{
+    uint64_t key = point_list_keys[idx];
+    uint32_t currtile = key >> 32;  // Extract tile ID
+    
+    if (idx == 0)
+        ranges[currtile].x = 0;  // First entry
+    else
+    {
+        uint32_t prevtile = point_list_keys[idx - 1] >> 32;
+        if (currtile != prevtile)  // Tile transition
+        {
+            ranges[prevtile].y = idx;  // End previous
+            ranges[currtile].x = idx;  // Start current
+        }
+    }
+    
+    if (idx == L - 1)
+        ranges[currtile].y = L;  // Last entry
+}
+~~~
+
+<br/>
+
+  - CUDA로직
+
+~~~c++
+// Shared memory visible to all 256 threads in this tile
+__shared__ int collected_id[256];
+__shared__ float2 collected_xy[256];
+__shared__ float4 collected_conic_opacity[256];
+
+// Process in batches of 256 Gaussians
+for (int i = 0; i < rounds; i++, toDo -= 256)
+{
+    // COLLABORATIVE LOADING: Each thread loads ONE Gaussian
+    int progress = i * 256 + block.thread_rank();  // thread_rank = 0..255
+    
+    if (range.x + progress < range.y)  // Within this tile's range?
+    {
+        int coll_id = point_list[range.x + progress];
+        
+        // Thread N loads data into slot N
+        collected_id[block.thread_rank()] = coll_id;
+        collected_xy[block.thread_rank()] = points_xy_image[coll_id];
+        collected_conic_opacity[block.thread_rank()] = conic_opacity[coll_id];
+    }
+    
+    block.sync();  // ⚠️ CRITICAL: Wait for all 256 threads to finish loading
+    
+    // Now shared memory contains 256 Gaussians, ready for all threads to use
+    // ...
+}
+~~~
 
 ###### [렌더링 파이프라인,알파 합성과 타일 기반 래스터화](#렌더링-파이프라인알파-합성과-타일-기반-래스터화)
 ###### [Top](#top)
