@@ -11,9 +11,9 @@
 - [기저 함수와 푸리에 분석, 파동의 중첩에서 이미지 복원까지](#기저-함수와-푸리에-분석-파동의-중첩에서-이미지-복원까지)
 - [구면 조화 함수](#구면-조화-함수)
 - [EWA스플래팅](#ewa스플래팅)
+- [렌더링 파이프라인,알파 합성과 타일 기반 래스터화](#렌더링-파이프라인알파-합성과-타일-기반-래스터화)
 
  
-
 <br/>
 <br/>
 
@@ -2161,6 +2161,104 @@ result = result - SH_C1 * y * sh[1] + SH_C1 * z * sh[2] - SH_C1 * x * sh[3];
 
 ###### [EWA스플래팅](#ewa스플래팅)
 ###### [Top](#top)
+
+<br/>
+<br/>
+
+# 렌더링 파이프라인,알파 합성과 타일 기반 래스터화
+  - EWA로 화면에 투영한 가우시안들을 최종 이미지로 만드는 과정을 다룬다
+    - 볼륨 렌더링
+      - 픽셀 하나의 최종 색을 어떻게 계산할까?, 겹치는 가우시안을 가까운 것부터 합성. 앞의 가우시안이 불투명할수록 뒤의 가우시안 색은 덜 반영된다
+    - 타일 기반 래스터화
+      - 그 계산을 화면 전체에서 어떻게 빠르게 할까? 화면을 16×16 픽셀 타일로 나누고, 가우시안을 겹치는 타일에 배정합니다. (타일 ID, 깊이)로 한 번에 정렬한 뒤, 각 타일의 픽셀을 GPU에서 병렬로 합성
+
+<br/>
+
+~~~text
+// 볼륨 렌더링
+
+EWA는 3D 가우시안 하나를 화면 위의 2D 가우시안 타원으로 근사한다.
+투영된 중심은 타원의 위치를 정하고, 2D 공분산은 타원의 크기와 방향을 정한다.
+그다음에는 화면에서 타원 여러 개가 겹친다. 이때 어느 타원이 어떤 픽셀에 영향을 주는지,
+그리고 그 색들을 어떤 순서로 합칠지 정해야 한다
+
+→ 바운딩 박스로 겹치는 타일 찾기
+→ 타일별로 가우시안을 깊이순으로 정리
+→ 픽셀마다 가까운 가우시안부터 색 합성
+
+
+T = 1.0    # Transmittance -> 앞쪽 스플랫들을 지나고 남은 투과율
+C = 0.0    # Accumulated color -> 1픽셀에 반영 되어야 할 컬러, 스플릿의 컬러들을 섞는다
+
+for i in sorted_gaussians:  # Front-to-back
+    # Compute opacity α_i from Gaussian falloff
+    alpha = compute_alpha(gaussian_i, pixel) // // 현재 스플릿의 불투명도를 구한다
+    
+    # Volume rendering: C += T * α * c
+    C += T * alpha * color[i] // 현재 해당 픽셀에 있는 스플릿들의 컬러 값을 합산
+    
+    # Update transmittance: T *= (1 - α)
+    T *= (1 - alpha) // // 해당 픽셀에서 현재 스플릿에 적용된 불투명도 만큼 제외하고 다음 스플릿에 적용하기 위해 계산한다
+    
+    if T < 0.0001: break  # Early termination // 픽셀에 더이상 적용할수 있는 정도가 없으면 해당 픽셀은 끝
+~~~
+
+<br/>
+
+  - CUDA코드
+
+~~~c++
+float T = 1.0f;              // Transmittance -> 앞쪽 스플랫들을 지나고 남은 투과율
+float C[CHANNELS] = { 0 };   // Accumulated color -> 1픽셀에 반영 되어야 할 컬러, 스플릿의 컬러들을 섞는다
+
+for (int j = 0; !done && j < min(BLOCK_SIZE, toDo); j++)
+{
+    // Gaussian evaluation using conic matrix
+    float2 d = { xy.x - pixf.x, xy.y - pixf.y };
+    float power = -0.5f * (con_o.x * d.x * d.x + con_o.z * d.y * d.y) 
+                  - con_o.y * d.x * d.y;
+    if (power > 0.0f) continue;
+
+    // Opacity = learned_opacity × Gaussian_falloff
+    float alpha = min(0.99f, con_o.w * exp(power));  // 현재 스플릿의 불투명도를 구한다
+    if (alpha < 1.0f / 255.0f) continue;`
+    
+    // Early termination check
+    float test_T = T * (1 - alpha);
+    // 해당 픽셀에서 현재 스플릿에 적용된 불투명도 만큼 제외하고 다음 스플릿에 적용하기 위해 계산한다
+
+    if (test_T < 0.0001f) {  // 픽셀에 더이상 적용할수 있는 정도가 없으면 해당 픽셀은 끝
+        done = true;
+        continue;
+    }
+
+    // Volume rendering equation: C += T * α * c
+    for (int ch = 0; ch < CHANNELS; ch++) // RGB 3컬러를 따로따로 계산
+        C[ch] += features[...] * alpha * T;
+
+    // Update transmittance: T *= (1 - α)
+    T = test_T;
+}
+
+~~~
+
+
+
+
+
+
+
+###### [렌더링 파이프라인,알파 합성과 타일 기반 래스터화](#렌더링-파이프라인알파-합성과-타일-기반-래스터화)
+###### [Top](#top)
+
+
+
+
+
+
+
+
+
 
 
 
